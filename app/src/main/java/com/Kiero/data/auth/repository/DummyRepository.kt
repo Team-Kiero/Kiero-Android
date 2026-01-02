@@ -1,6 +1,6 @@
-package com.Kiero.domain.auth.repository
+package com.Kiero.data.auth.repository
 
-import com.Kiero.domain.auth.model.DummyEntity
+import com.Kiero.data.auth.model.DummyEntity
 
 interface DummyRepository {
     suspend fun getDummyList(): Result<List<DummyEntity>>

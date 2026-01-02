@@ -3,8 +3,8 @@ package com.Kiero.data.auth.repositoryimpl
 import com.Kiero.core.common.util.suspendRunCatching
 import com.Kiero.data.auth.mapper.DummyMapper
 import com.Kiero.data.auth.remote.datasource.DummyDataSource
-import com.Kiero.domain.auth.model.DummyEntity
-import com.Kiero.domain.auth.repository.DummyRepository
+import com.Kiero.data.auth.model.DummyEntity
+import com.Kiero.data.auth.repository.DummyRepository
 import javax.inject.Inject
 
 

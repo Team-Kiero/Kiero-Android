@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.sp
 import com.Kiero.core.common.extension.noRippleClickable
 import com.Kiero.core.model.UiState
 import com.Kiero.core.designsystem.theme.KieroTheme
-import com.Kiero.domain.auth.model.DummyEntity
+import com.Kiero.data.auth.model.DummyEntity
 import com.Kiero.presentation.auth.component.DummyItem
 import kotlinx.collections.immutable.PersistentList
 

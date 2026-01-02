@@ -1,7 +1,7 @@
 package com.Kiero.data.auth.mapper
 
 import com.Kiero.data.auth.remote.dto.response.DummyResponseDto
-import com.Kiero.domain.auth.model.DummyEntity
+import com.Kiero.data.auth.model.DummyEntity
 import javax.inject.Inject
 
 class DummyMapper @Inject constructor() {

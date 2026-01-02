@@ -1,8 +1,7 @@
-package com.Kiero.presentation
+package com.Kiero
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
-import com.Kiero.BuildConfig
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
@@ -16,7 +15,7 @@ class KieroApplication : Application() {
 
     private fun setTimber() {
         if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
+            Timber.Forest.plant(Timber.DebugTree())
         }
     }
 
@@ -25,4 +24,3 @@ class KieroApplication : Application() {
     }
 
 }
-

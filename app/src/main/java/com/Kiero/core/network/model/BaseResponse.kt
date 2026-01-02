@@ -12,3 +12,4 @@ data class BaseResponse<T>(
     @SerialName("data")
     val data: T,
 )
+// TODO : 명세서 확인 후 수정 예정

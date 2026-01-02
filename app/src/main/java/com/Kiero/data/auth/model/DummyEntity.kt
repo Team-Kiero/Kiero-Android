@@ -1,4 +1,4 @@
-package com.Kiero.domain.auth.model
+package com.Kiero.data.auth.model
 
 data class DummyEntity(
     val profile: String,

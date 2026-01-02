@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.Kiero.core.model.UiState
 import com.Kiero.core.common.util.handleError
-import com.Kiero.domain.auth.repository.DummyRepository
+import com.Kiero.data.auth.repository.DummyRepository
 import com.Kiero.presentation.auth.model.AuthContract.DummySideEffect
 import com.Kiero.presentation.auth.model.AuthContract.DummyState
 import dagger.hilt.android.lifecycle.HiltViewModel
