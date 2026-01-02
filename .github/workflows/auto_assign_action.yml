@@ -1,0 +1,13 @@
+name: "Auto Assign and Reviewers"
+on:
+  pull_request:
+    types: [opened, ready_for_review]
+
+jobs:
+  add-reviewers-and-assignees:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Assign author and add reviewers
+        uses: kentaro-m/auto-assign-action@v2.0.0
+        with:
+          configuration-path: '.github/auto_assign.yml'
