@@ -1,4 +1,4 @@
-package com.Kiero.presentation.auth
+package com.kiero.presentation.auth
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,11 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
-import com.Kiero.core.common.extension.noRippleClickable
-import com.Kiero.core.model.UiState
-import com.Kiero.core.designsystem.theme.KieroTheme
-import com.Kiero.data.auth.model.DummyEntity
-import com.Kiero.presentation.auth.component.DummyItem
+import com.kiero.core.common.extension.noRippleClickable
+import com.kiero.core.model.UiState
+import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.data.auth.model.DummyEntity
+import com.kiero.presentation.auth.component.DummyItem
 import kotlinx.collections.immutable.PersistentList
 
 @Composable

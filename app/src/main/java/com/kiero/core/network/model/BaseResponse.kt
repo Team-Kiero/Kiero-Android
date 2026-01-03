@@ -1,4 +1,4 @@
-package com.Kiero.core.network.model
+package com.kiero.core.network.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

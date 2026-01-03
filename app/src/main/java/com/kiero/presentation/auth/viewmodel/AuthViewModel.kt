@@ -1,12 +1,13 @@
-package com.Kiero.presentation.auth.viewmodel
+package com.kiero.presentation.auth.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.Kiero.core.model.UiState
-import com.Kiero.core.common.util.handleError
-import com.Kiero.data.auth.repository.DummyRepository
-import com.Kiero.presentation.auth.model.AuthContract.DummySideEffect
-import com.Kiero.presentation.auth.model.AuthContract.DummyState
+import com.kiero.core.common.util.handleError
+import com.kiero.core.model.UiState
+import com.kiero.data.auth.repository.DummyRepository
+import com.kiero.presentation.auth.model.DummySideEffect
+import com.kiero.presentation.auth.model.DummyState
+
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -18,15 +19,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val dummyRepository: DummyRepository
-): ViewModel() {
+    private val dummyRepository: DummyRepository,
+) : ViewModel() {
     private val _state = MutableStateFlow(DummyState())
-    val state: StateFlow<DummyState>
-        get() = _state.asStateFlow()
+    val state: StateFlow<DummyState> = _state.asStateFlow()
 
     private val _sideEffect = MutableSharedFlow<DummySideEffect>()
-    val sideEffect: MutableSharedFlow<DummySideEffect>
-        get() = _sideEffect
+    val sideEffect: MutableSharedFlow<DummySideEffect> = _sideEffect
 
     fun getDummyList() = viewModelScope.launch {
         dummyRepository.getDummyList()
