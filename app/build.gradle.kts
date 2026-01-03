@@ -16,7 +16,7 @@ val properties = Properties().apply {
 
 
 android {
-    namespace = "com.Kiero"
+    namespace = "com.kiero"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
