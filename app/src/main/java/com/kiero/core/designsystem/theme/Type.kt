@@ -1,6 +1,7 @@
 package com.kiero.core.designsystem.theme
 
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -14,8 +15,22 @@ object NotoSansFont {
     val regular = FontFamily(Font(R.font.notosans_regular))
 }
 
-sealed interface TypographyTokens {
+private object TypographyDefaults {
+    val RegularLetterSpacing = (-0.005).em
+    val RegularLineHeight = 1.3.em
 
+    val SemiBoldLetterSpacing = (-0.01).em
+    val SemiBoldLineHeight = 1.4.em
+
+    val BoldLetterSpacing = (-0.01).em
+    val BoldLineHeight = 1.4.em
+
+    val PlatformStyle = PlatformTextStyle(
+        includeFontPadding = false
+    )
+}
+
+sealed interface TypographyTokens {
     @Immutable
     data class Regular(
         val body1: TextStyle,
@@ -54,84 +69,97 @@ val defaultKieroTypography = KieroTypography(
         body1 = TextStyle(
             fontFamily = NotoSansFont.regular,
             fontSize = 18.sp,
-            letterSpacing = (-0.005).em,
-            lineHeight = 1.3.em,
+            letterSpacing = TypographyDefaults.RegularLetterSpacing,
+            lineHeight = TypographyDefaults.RegularLineHeight,
+            platformStyle = TypographyDefaults.PlatformStyle
         ),
         body2 = TextStyle(
             fontFamily = NotoSansFont.regular,
             fontSize = 16.sp,
-            letterSpacing = (-0.005).em,
-            lineHeight = 1.3.em,
+            letterSpacing = TypographyDefaults.RegularLetterSpacing,
+            lineHeight = TypographyDefaults.RegularLineHeight,
+            platformStyle = TypographyDefaults.PlatformStyle
         ),
         body3 = TextStyle(
             fontFamily = NotoSansFont.regular,
             fontSize = 14.sp,
-            letterSpacing = (-0.005).em,
-            lineHeight = 1.3.em,
+            letterSpacing = TypographyDefaults.RegularLetterSpacing,
+            lineHeight = TypographyDefaults.RegularLineHeight,
+            platformStyle = TypographyDefaults.PlatformStyle
         ),
         body4 = TextStyle(
             fontFamily = NotoSansFont.regular,
             fontSize = 12.sp,
-            letterSpacing = (-0.005).em,
-            lineHeight = 1.3.em,
+            letterSpacing = TypographyDefaults.RegularLetterSpacing,
+            lineHeight = TypographyDefaults.RegularLineHeight,
+            platformStyle = TypographyDefaults.PlatformStyle
         ),
         body5 = TextStyle(
             fontFamily = NotoSansFont.regular,
             fontSize = 10.sp,
-            letterSpacing = (-0.005).em,
-            lineHeight = 1.3.em,
+            letterSpacing = TypographyDefaults.RegularLetterSpacing,
+            lineHeight = TypographyDefaults.RegularLineHeight,
+            platformStyle = TypographyDefaults.PlatformStyle
         ),
     ),
     semiBold = TypographyTokens.SemiBold(
         title1 = TextStyle(
             fontFamily = NotoSansFont.semiBold,
             fontSize = 22.sp,
-            letterSpacing = (-0.01).em,
-            lineHeight = 1.4.em,
+            letterSpacing = TypographyDefaults.SemiBoldLetterSpacing,
+            lineHeight = TypographyDefaults.SemiBoldLineHeight,
+            platformStyle = TypographyDefaults.PlatformStyle
         ),
         title2 = TextStyle(
             fontFamily = NotoSansFont.semiBold,
             fontSize = 20.sp,
-            letterSpacing = (-0.01).em,
-            lineHeight = 1.4.em,
+            letterSpacing = TypographyDefaults.SemiBoldLetterSpacing,
+            lineHeight = TypographyDefaults.SemiBoldLineHeight,
+            platformStyle = TypographyDefaults.PlatformStyle
         ),
         title3 = TextStyle(
             fontFamily = NotoSansFont.semiBold,
             fontSize = 16.sp,
-            letterSpacing = (-0.01).em,
-            lineHeight = 1.4.em,
+            letterSpacing = TypographyDefaults.SemiBoldLetterSpacing,
+            lineHeight = TypographyDefaults.SemiBoldLineHeight,
+            platformStyle = TypographyDefaults.PlatformStyle
         ),
         title4 = TextStyle(
             fontFamily = NotoSansFont.semiBold,
             fontSize = 14.sp,
-            letterSpacing = (-0.01).em,
-            lineHeight = 1.4.em,
+            letterSpacing = TypographyDefaults.SemiBoldLetterSpacing,
+            lineHeight = TypographyDefaults.SemiBoldLineHeight,
+            platformStyle = TypographyDefaults.PlatformStyle
         ),
     ),
     bold = TypographyTokens.Bold(
         headLine1 = TextStyle(
             fontFamily = NotoSansFont.bold,
             fontSize = 22.sp,
-            letterSpacing = (-0.01).em,
-            lineHeight = 1.4.em,
+            letterSpacing = TypographyDefaults.BoldLetterSpacing,
+            lineHeight = TypographyDefaults.BoldLineHeight,
+            platformStyle = TypographyDefaults.PlatformStyle
         ),
         headLine2 = TextStyle(
             fontFamily = NotoSansFont.bold,
             fontSize = 20.sp,
-            letterSpacing = (-0.01).em,
-            lineHeight = 1.4.em,
+            letterSpacing = TypographyDefaults.BoldLetterSpacing,
+            lineHeight = TypographyDefaults.BoldLineHeight,
+            platformStyle = TypographyDefaults.PlatformStyle
         ),
         headLine3 = TextStyle(
             fontFamily = NotoSansFont.bold,
             fontSize = 16.sp,
-            letterSpacing = (-0.01).em,
-            lineHeight = 1.4.em,
+            letterSpacing = TypographyDefaults.BoldLetterSpacing,
+            lineHeight = TypographyDefaults.BoldLineHeight,
+            platformStyle = TypographyDefaults.PlatformStyle
         ),
         headLine4 = TextStyle(
             fontFamily = NotoSansFont.bold,
             fontSize = 14.sp,
-            letterSpacing = (-0.01).em,
-            lineHeight = 1.4.em,
+            letterSpacing = TypographyDefaults.BoldLetterSpacing,
+            lineHeight = TypographyDefaults.BoldLineHeight,
+            platformStyle = TypographyDefaults.PlatformStyle
         )
     )
 )

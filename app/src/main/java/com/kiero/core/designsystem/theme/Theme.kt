@@ -1,6 +1,5 @@
 package com.kiero.core.designsystem.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -48,7 +47,6 @@ fun ProvideKieroColorsAndTypography(
 
 @Composable
 fun KieroTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
     ProvideKieroColorsAndTypography(
