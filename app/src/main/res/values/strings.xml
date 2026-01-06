@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Kiero</string>
+    <!--Bottom Navigation -->
+    <string name="schedule_tab_content_desription">스케쥴 관리</string>
+    <string name="alarm_tab_content_desription">알람 피드</string>
+    <string name="journey_tab_content_description">오늘의 여정</string>
+    <string name="mission_tab_content_description">금화 미션</string>
+    <string name="wish_tab_content_description">소원의 우물</string>
 </resources>
