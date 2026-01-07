@@ -28,15 +28,14 @@ import com.kiero.core.designsystem.theme.KieroTheme
 import kotlinx.collections.immutable.ImmutableList
 
 @Composable
-fun <T> MainBottomBar(
+fun MainBottomBar(
     isVisible: Boolean,
     containerShape: Shape,
-    tabs: ImmutableList<T>,
-    currentTab: T?,
-    onTabSelected: (T) -> Unit,
+    tabs: ImmutableList<BottomBarTab>,
+    currentTab: BottomBarTab?,
+    onTabSelected: (BottomBarTab) -> Unit,
     modifier: Modifier = Modifier,
-) where T : Enum<T>, T : BottomBarTab {
-
+) {
     AnimatedVisibility(
         visible = isVisible,
         enter = EnterTransition.None,
@@ -69,9 +68,9 @@ fun <T> MainBottomBar(
 }
 
 @Composable
-private fun <T : BottomBarTab> MainNavigationBarItem(
+private fun MainNavigationBarItem(
     selected: Boolean,
-    tab: T,
+    tab: BottomBarTab,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
