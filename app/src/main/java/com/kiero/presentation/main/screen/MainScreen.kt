@@ -5,13 +5,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kiero.core.designsystem.component.KieroSnackbar
 import com.kiero.presentation.main.navigation.KidMainTab
 import com.kiero.presentation.main.navigation.KieroNavHost
 import com.kiero.presentation.main.navigation.MainAppState
@@ -22,20 +21,14 @@ import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun MainRoute(
-    appState: MainAppState = rememberMainAppState(),
+    appState: MainAppState = rememberMainAppState()
 ) {
-    val snackBarHostState = remember { SnackbarHostState() }
-
-    MainScreen(
-        appState = appState,
-        snackBarHostState = snackBarHostState,
-    )
+    MainScreen(appState = appState)
 }
 
 @Composable
 fun MainScreen(
     appState: MainAppState,
-    snackBarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
     val showParentBottomBar by appState.showParentBottomBar.collectAsStateWithLifecycle()
@@ -59,7 +52,12 @@ fun MainScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         snackbarHost = {
-            SnackbarHost(hostState = snackBarHostState)
+            SnackbarHost(hostState = appState.snackbarHostState) { data ->
+                KieroSnackbar(
+                    message = data.visuals.message,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
         },
         bottomBar = {
             MainBottomBar(
