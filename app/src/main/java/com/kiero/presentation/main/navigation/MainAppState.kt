@@ -1,5 +1,7 @@
 package com.kiero.presentation.main.navigation
 
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
@@ -27,12 +29,14 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 
 @Stable
 class MainAppState(
     val navController: NavHostController,
-    coroutineScope: CoroutineScope,
+    val snackbarHostState: SnackbarHostState,
+    val coroutineScope: CoroutineScope,
 ) {
     private val currentDestination = navController.currentBackStackEntryFlow
         .map { it.destination }
@@ -85,6 +89,15 @@ class MainAppState(
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = false
         )
+
+    fun showSnackbar(message: String) {
+        coroutineScope.launch {
+            snackbarHostState.showSnackbar(
+                message = message,
+                duration = SnackbarDuration.Short
+            )
+        }
+    }
 
     fun navigateToParent() {
         navController.navigate(ParentGraph) {
@@ -156,11 +169,13 @@ class MainAppState(
 @Composable
 fun rememberMainAppState(
     navController: NavHostController = rememberNavController(),
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
 ): MainAppState {
-    return remember(navController, coroutineScope) {
+    return remember(navController, snackbarHostState, coroutineScope) {
         MainAppState(
             navController = navController,
+            snackbarHostState = snackbarHostState,
             coroutineScope = coroutineScope
         )
     }
