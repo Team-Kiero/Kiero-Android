@@ -79,7 +79,6 @@ fun MainScreen(
         KieroNavHost(
             appState = appState,
             paddingValues = paddingValues,
-            modifier = Modifier.padding(paddingValues)
         )
     }
 }
