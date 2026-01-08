@@ -11,7 +11,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class DummyDataSourceModule {
+abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindDummyDataSource(
