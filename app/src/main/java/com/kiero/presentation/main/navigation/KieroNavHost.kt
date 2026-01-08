@@ -4,8 +4,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
-import com.kiero.core.navigation.AuthGraph
 import com.kiero.core.navigation.Route
+import com.kiero.presentation.auth.navigation.AuthGraph
 import com.kiero.presentation.auth.navigation.authNavGraph
 import com.kiero.presentation.kid.navigation.kidNavGraph
 import com.kiero.presentation.parent.navigation.parentNavGraph

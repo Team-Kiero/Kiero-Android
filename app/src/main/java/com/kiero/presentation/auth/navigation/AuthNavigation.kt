@@ -7,13 +7,15 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
-import com.kiero.core.navigation.AuthGraph
 import com.kiero.core.navigation.Route
 import com.kiero.presentation.auth.AuthRoute
 import kotlinx.serialization.Serializable
 
 @Serializable
 sealed interface Auth : Route
+
+@Serializable
+data object AuthGraph : Route
 
 @Serializable
 data object Login : Auth
