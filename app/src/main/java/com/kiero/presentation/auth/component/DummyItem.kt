@@ -23,7 +23,6 @@ fun DummyItem(
     firstName: String,
     lastName: String,
     profileUrl: String,
-    navigateNext: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -38,7 +37,6 @@ fun DummyItem(
                 .size(80.dp)
                 .clip(CircleShape)
                 .noRippleClickable {
-                    navigateNext()
                 },
             contentScale = ContentScale.Crop
         )
