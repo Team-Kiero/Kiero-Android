@@ -48,6 +48,8 @@ material = "1.13.0"
 #Logging
 timber = "5.0.1"
 
+#Kakao SDK
+kakao = "2.20.6"
 
 [libraries]
 # Test
@@ -99,6 +101,9 @@ material = { group = "com.google.android.material", name = "material", version.r
 
 # Timber
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
+
+# Kakao SDK (Timber 아래에 추가)
+kakao-user = { group = "com.kakao.sdk", name = "v2-user", version.ref = "kakao" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
