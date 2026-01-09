@@ -1,4 +1,4 @@
-package com.kiero.core.network.extension
+package com.kiero.core.common.extension
 
 import java.io.IOException
 import java.net.SocketTimeoutException
