@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- 인터넷 권한 -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -14,6 +15,8 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.Kiero">
+
+        <!-- MainActivity -->
         <activity
             android:name="com.kiero.presentation.main.MainActivity"
             android:exported="true"
@@ -21,10 +24,26 @@
             android:theme="@style/Theme.Kiero">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- KaKao_Login_Activity -->
+        <activity
+            android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <!-- manifestPlaceholders from build.gradle.kts(App) -->
+                <data
+                    android:host="oauth"
+                    android:scheme="kakao${NATIVE_APP_KEY}" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>
