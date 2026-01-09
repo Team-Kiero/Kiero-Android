@@ -14,10 +14,12 @@ inline fun <T, R> ApiResult<T>.toResult(
             }
         }
         is ApiResult.ApiError -> {
-            Result.failure(Exception("Api Error: code=${this.code}, msg=${this.message}"))
+            Result.failure(Exception("ApiResult Error: code=${this.code}, msg=${this.message}"))
         }
         is ApiResult.Failure -> {
-            Result.failure(this.exception)
+            val exception = this.exception.toHandleErrorMessage()
+
+            Result.failure(Exception(exception, this.exception))
         }
     }
 }
