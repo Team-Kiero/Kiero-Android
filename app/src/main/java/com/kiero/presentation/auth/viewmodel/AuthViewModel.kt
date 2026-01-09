@@ -2,6 +2,7 @@ package com.kiero.presentation.auth.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.common.extension.toHandleErrorMessage
 import com.kiero.core.model.UiState
 import com.kiero.data.auth.repository.DummyRepository
 import com.kiero.presentation.auth.model.DummySideEffect
@@ -33,7 +34,7 @@ class AuthViewModel @Inject constructor(
                 )
             }.onFailure { throwable ->
                 _state.value = _state.value.copy(
-                    uiState = UiState.Failure(throwable.message.orEmpty())
+                    uiState = UiState.Failure(throwable.toHandleErrorMessage())
                 )
                 showSnackBar(throwable.message.orEmpty())
             }
