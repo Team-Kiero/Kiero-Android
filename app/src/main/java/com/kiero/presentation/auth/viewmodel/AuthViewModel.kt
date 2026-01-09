@@ -2,12 +2,10 @@ package com.kiero.presentation.auth.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kiero.core.common.util.handleError
 import com.kiero.core.model.UiState
 import com.kiero.data.auth.repository.DummyRepository
 import com.kiero.presentation.auth.model.DummySideEffect
 import com.kiero.presentation.auth.model.DummyState
-
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -34,11 +32,10 @@ class AuthViewModel @Inject constructor(
                     uiState = UiState.Success(it.toPersistentList())
                 )
             }.onFailure { throwable ->
-                val errorMessage = handleError(throwable)
                 _state.value = _state.value.copy(
-                    uiState = UiState.Failure(errorMessage)
+                    uiState = UiState.Failure(throwable.message.orEmpty())
                 )
-                showSnackBar(errorMessage)
+                showSnackBar(throwable.message.orEmpty())
             }
     }
 
