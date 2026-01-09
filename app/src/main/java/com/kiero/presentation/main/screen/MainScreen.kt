@@ -5,8 +5,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -23,12 +25,18 @@ import kotlinx.collections.immutable.toImmutableList
 fun MainRoute(
     appState: MainAppState = rememberMainAppState()
 ) {
-    MainScreen(appState = appState)
+    val snackBarHostState = remember { SnackbarHostState() }
+
+    MainScreen(
+        appState = appState,
+        snackBarHostState = snackBarHostState,
+    )
 }
 
 @Composable
 fun MainScreen(
     appState: MainAppState,
+    snackBarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
     val showParentBottomBar by appState.showParentBottomBar.collectAsStateWithLifecycle()
@@ -52,9 +60,10 @@ fun MainScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         snackbarHost = {
-            SnackbarHost(hostState = appState.snackbarHostState) { data ->
+            SnackbarHost(hostState = snackBarHostState) { data ->
                 KieroSnackbar(
                     message = data.visuals.message,
+                    // TODO: 디자인 확정 후 스낵바 높이 및 패딩 수정 필요
                     modifier = Modifier.padding(16.dp)
                 )
             }
