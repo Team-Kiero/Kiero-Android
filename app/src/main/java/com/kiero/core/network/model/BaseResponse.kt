@@ -10,6 +10,6 @@ data class BaseResponse<T>(
     @SerialName("message")
     val message: String,
     @SerialName("data")
-    val data: T,
+    val data: T? = null,
 )
 // TODO : 명세서 확인 후 수정 예정
