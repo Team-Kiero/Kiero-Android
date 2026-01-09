@@ -27,7 +27,7 @@ fun <T> Flow<T>.collectSideEffect(
 }
 
 @Composable
-fun <T> Flow<T>.collectLatestSideEffect(
+fun <T> Flow<T>.collectSingleEvent(
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
     throttleTime: Long = 500L,
     action: suspend (T) -> Unit
