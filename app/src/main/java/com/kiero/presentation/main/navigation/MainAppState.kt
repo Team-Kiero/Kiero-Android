@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
+import com.kiero.core.network.monitor.NetworkMonitor
 import com.kiero.presentation.auth.navigation.AuthGraph
 import com.kiero.presentation.kid.journey.navigation.navigateToJourney
 import com.kiero.presentation.kid.mission.navigation.navigateToMission
@@ -33,7 +34,18 @@ import kotlinx.coroutines.flow.stateIn
 class MainAppState(
     val navController: NavHostController,
     coroutineScope: CoroutineScope,
+    networkMonitor: NetworkMonitor
 ) {
+    val startDestination = AuthGraph
+
+    val isOffline: StateFlow<Boolean> = networkMonitor.isOnline
+        .map(Boolean::not)
+        .stateIn(
+            scope = coroutineScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = false
+        )
+
     private val currentDestination = navController.currentBackStackEntryFlow
         .map { it.destination }
         .stateIn(
@@ -155,11 +167,13 @@ class MainAppState(
 
 @Composable
 fun rememberMainAppState(
+    networkMonitor: NetworkMonitor,
     navController: NavHostController = rememberNavController(),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
 ): MainAppState {
-    return remember(navController, coroutineScope) {
+    return remember(networkMonitor, navController, coroutineScope) {
         MainAppState(
+            networkMonitor = networkMonitor,
             navController = navController,
             coroutineScope = coroutineScope
         )
