@@ -1,39 +1,40 @@
 package com.kiero.presentation.auth
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kiero.core.common.extension.noRippleClickable
-import com.kiero.core.model.UiState
 import com.kiero.core.designsystem.theme.KieroTheme
-import com.kiero.data.auth.model.DummyEntity
-import com.kiero.presentation.auth.component.DummyItem
-import kotlinx.collections.immutable.PersistentList
+import com.kiero.core.model.UiState
 
 @Composable
 fun AuthRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
-    navigateNext: () -> Unit,
-    state: UiState<PersistentList<DummyEntity>>,
+    navigateToParent: () -> Unit,
+    navigateToKid: () -> Unit,
 ) {
     AuthScreen(
         paddingValues = paddingValues,
         navigateUp = navigateUp,
-        navigateNext = navigateNext,
-        state = state,
+        navigateToParent = navigateToParent,
+        navigateToKid = navigateToKid,
         modifier = Modifier
-            .fillMaxSize()
     )
 }
 
@@ -41,8 +42,8 @@ fun AuthRoute(
 fun AuthScreen(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
-    navigateNext: () -> Unit,
-    state: UiState<PersistentList<DummyEntity>>,
+    navigateToParent: () -> Unit,
+    navigateToKid: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -52,51 +53,36 @@ fun AuthScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        when (state) {
-            is UiState.Loading -> {
-                item {
-                    Text(
-                        modifier = modifier
-                            .noRippleClickable { navigateUp() },
-                        textAlign = TextAlign.Center,
-                        text = "Dummy",
-                        fontSize = 30.sp
-                    )
-                }
-            }
+        item {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    textAlign = TextAlign.Center,
+                    text = "Kiero App",
+                    fontSize = 30.sp
+                )
 
-            is UiState.Empty -> {
-                item {
-                    Text(
-                        modifier = modifier
-                            .noRippleClickable { navigateUp() },
-                        textAlign = TextAlign.Center,
-                        text = "Dummy",
-                        fontSize = 30.sp
-                    )
-                }
-            }
+                Spacer(modifier = Modifier.height(40.dp))
 
-            is UiState.Failure -> {
-                item {
-                    Text(
-                        modifier = modifier
-                            .noRippleClickable { navigateUp() },
-                        textAlign = TextAlign.Center,
-                        text = state.message,
-                    )
+                Button(
+                    onClick = navigateToParent,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "부모 화면으로 이동")
                 }
-            }
 
-            is UiState.Success -> {
-                items(state.data) {
-                    DummyItem(
-                        id = it.id,
-                        firstName = it.firstName,
-                        lastName = it.lastName,
-                        profileUrl = it.profile,
-                        navigateNext = navigateNext
-                    )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = navigateToKid,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "아이 화면으로 이동")
                 }
             }
         }
@@ -110,8 +96,8 @@ private fun DummyScreenPreview() {
         AuthScreen(
             paddingValues = PaddingValues(),
             navigateUp = {},
-            navigateNext = {},
-            state = UiState.Loading
+            navigateToParent = {},
+            navigateToKid = {}
         )
     }
 }
