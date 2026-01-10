@@ -5,6 +5,7 @@ import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
+import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.data.auth.remote.api.AuthService
 import com.kiero.data.auth.remote.datasource.AuthDataSource
 import com.kiero.data.auth.remote.dto.response.AuthLoginResponseDto
@@ -17,7 +18,7 @@ import kotlin.coroutines.resume
  * AuthDataSource 구현체
  */
 class AuthDataSourceImpl @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val authService: AuthService,
 ) : AuthDataSource {
 
@@ -66,17 +67,10 @@ class AuthDataSourceImpl @Inject constructor(
     /**
      * 카카오 토큰으로 우리 서버에 로그인
      */
-    override suspend fun postAuthLogin(accessToken: String): Result<AuthLoginResponseDto> {
-        return try {
+    override suspend fun postAuthLogin(accessToken: String): Result<AuthLoginResponseDto> =
+        suspendRunCatching {  // ← 추가!
             val response = authService.postAuthLogin(accessToken)
 
-            if (response.data != null) {
-                Result.success(response.data)
-            } else {
-                Result.failure(Exception("응답 데이터가 없습니다: ${response.message}"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
+            response.data ?: throw Exception("응답 데이터가 없습니다: ${response.message}")
         }
-    }
 }
