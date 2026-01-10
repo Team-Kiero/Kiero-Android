@@ -6,7 +6,7 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface AuthService {
-    @POST("auth/login")
+    @POST("api/v1/parents/login/access-token")
     suspend fun postAuthLogin(
         @Query("accessToken") accessToken: String
     ): BaseResponse<AuthLoginResponseDto>
