@@ -1,5 +1,6 @@
 package com.kiero.presentation.main.navigation
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
@@ -86,6 +87,7 @@ class MainAppState(
             initialValue = false
         )
 
+
     fun navigateToParent() {
         navController.navigate(ParentGraph) {
             popUpTo(AuthGraph) { inclusive = true }
@@ -156,9 +158,10 @@ class MainAppState(
 @Composable
 fun rememberMainAppState(
     navController: NavHostController = rememberNavController(),
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
 ): MainAppState {
-    return remember(navController, coroutineScope) {
+    return remember(navController, snackbarHostState, coroutineScope) {
         MainAppState(
             navController = navController,
             coroutineScope = coroutineScope
