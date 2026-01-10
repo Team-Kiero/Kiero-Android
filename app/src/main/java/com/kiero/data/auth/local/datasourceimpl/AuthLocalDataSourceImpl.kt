@@ -12,6 +12,7 @@ import com.kiero.data.auth.local.datasource.AuthLocalDataSource
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -38,55 +39,65 @@ class AuthLocalDataSourceImpl @Inject constructor(
 
     override suspend fun saveAccessToken(token: String) {
         suspendRunCatching {
-            // 1. 암호화
+            Timber.d("💾 AccessToken 암호화 및 저장 시작")
             val encryptedToken = tinkEncryption.encrypt(token)
-
-            // 2. DataStore 저장
-            context.dataStore.edit { preferences ->
-                preferences[KEY_ACCESS_TOKEN] = encryptedToken
-            }
+            context.dataStore.edit { it[KEY_ACCESS_TOKEN] = encryptedToken }
+        }.onSuccess {
+            Timber.i("✅ AccessToken 저장 완료")
+        }.onFailure {
+            Timber.e(it, "❌ AccessToken 저장 중 에러")
         }
     }
 
     override suspend fun saveRefreshToken(token: String) {
         suspendRunCatching {
+            Timber.d("💾 RefreshToken 암호화 및 저장 시작")
             val encryptedToken = tinkEncryption.encrypt(token)
-
-            context.dataStore.edit { preferences ->
-                preferences[KEY_REFRESH_TOKEN] = encryptedToken
-            }
+            context.dataStore.edit { it[KEY_REFRESH_TOKEN] = encryptedToken }
+        }.onSuccess {
+            Timber.i("✅ RefreshToken 저장 완료")
+        }.onFailure {
+            Timber.e(it, "❌ RefreshToken 저장 중 에러")
         }
     }
 
-    override suspend fun getAccessToken(): String? {
-        return suspendRunCatching {
-            context.dataStore.data
-                .map { preferences -> preferences[KEY_ACCESS_TOKEN] }
-                .first()
-                ?.let { encryptedToken ->
-                    // 복호화
-                    tinkEncryption.decrypt(encryptedToken)
-                }
-        }.getOrNull()
-    }
+    override suspend fun getAccessToken(): String? = suspendRunCatching {
+        Timber.d("🔑 AccessToken 로드 및 복호화 시도")
+        val encryptedToken = context.dataStore.data.map { it[KEY_ACCESS_TOKEN] }.first()
+        encryptedToken?.let { tinkEncryption.decrypt(it) }
+    }.onSuccess {
+        if (it != null) Timber.i("✅ AccessToken 복호화 성공")
+        else Timber.w("⚠️ 저장된 AccessToken이 없음")
+    }.onFailure {
+        Timber.e(it, "❌ AccessToken 로드 중 에러")
+    }.getOrNull()
 
-    override suspend fun getRefreshToken(): String? {
-        return suspendRunCatching {
-            context.dataStore.data
-                .map { preferences -> preferences[KEY_REFRESH_TOKEN] }
-                .first()
-                ?.let { encryptedToken ->
-                    tinkEncryption.decrypt(encryptedToken)
-                }
-        }.getOrNull()
-    }
+    override suspend fun getRefreshToken(): String? = suspendRunCatching {
+        Timber.d("🔑 RefreshToken 로드 및 복호화 시도")
+        val encryptedToken = context.dataStore.data
+            .map { preferences -> preferences[KEY_REFRESH_TOKEN] }
+            .first()
+        encryptedToken?.let {
+            tinkEncryption.decrypt(it)
+        }
+    }.onSuccess { token ->
+        if (token != null) {
+            Timber.i("✅ RefreshToken 복호화 성공")
+        } else {
+            Timber.w("⚠️ 저장된 RefreshToken이 없습니다.")
+        }
+    }.onFailure { throwable ->
+        Timber.e(throwable, "❌ RefreshToken 로드 중 에러 발생")
+    }.getOrNull()
 
     override suspend fun clearTokens() {
         suspendRunCatching {
-            context.dataStore.edit { preferences ->
-                preferences.remove(KEY_ACCESS_TOKEN)
-                preferences.remove(KEY_REFRESH_TOKEN)
-            }
+            Timber.d("🧹 모든 토큰 삭제 시작")
+            context.dataStore.edit { it.clear() }
+        }.onSuccess {
+            Timber.i("✅ 모든 토큰 삭제 완료")
+        }.onFailure {
+            Timber.e(it, "❌ 토큰 삭제 실패")
         }
     }
 }
