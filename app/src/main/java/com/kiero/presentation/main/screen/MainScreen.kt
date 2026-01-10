@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kiero.core.designsystem.component.KieroSnackbar
 import com.kiero.presentation.main.navigation.KidMainTab
 import com.kiero.presentation.main.navigation.KieroNavHost
 import com.kiero.presentation.main.navigation.MainAppState
@@ -22,7 +23,7 @@ import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun MainRoute(
-    appState: MainAppState = rememberMainAppState(),
+    appState: MainAppState = rememberMainAppState()
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
 
@@ -59,7 +60,13 @@ fun MainScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         snackbarHost = {
-            SnackbarHost(hostState = snackBarHostState)
+            SnackbarHost(hostState = snackBarHostState) { data ->
+                KieroSnackbar(
+                    message = data.visuals.message,
+                    // TODO: 디자인 확정 후 스낵바 높이 및 패딩 수정 필요
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
         },
         bottomBar = {
             MainBottomBar(
