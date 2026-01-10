@@ -6,6 +6,7 @@ import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
@@ -28,6 +29,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.core.model.trigger.DialogTrigger
 import com.kiero.core.model.trigger.GlobalUiEventHolder
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
+import com.kiero.core.designsystem.component.KieroSnackbar
 import com.kiero.presentation.main.navigation.KidMainTab
 import com.kiero.presentation.main.navigation.KieroNavHost
 import com.kiero.presentation.main.navigation.MainAppState
@@ -143,7 +145,13 @@ fun MainScreen(
         ) {
             Scaffold(
                 snackbarHost = {
-                    SnackbarHost(hostState = snackBarHostState)
+                    SnackbarHost(hostState = snackBarHostState) { data ->
+                        KieroSnackbar(
+                            message = data.visuals.message,
+                            // TODO: 디자인 확정 후 스낵바 높이 및 패딩 수정 필요
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
                 },
                 bottomBar = {
                     MainBottomBar(
