@@ -51,6 +51,10 @@ timber = "5.0.1"
 #Kakao SDK
 kakao = "2.20.6"
 
+# DataStore & Tink (여기 추가!)
+datastore = "1.0.0"
+tink = "1.15.0"
+
 [libraries]
 # Test
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -102,8 +106,12 @@ material = { group = "com.google.android.material", name = "material", version.r
 # Timber
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 
-# Kakao SDK (Timber 아래에 추가)
+# Kakao SDK
 kakao-user = { group = "com.kakao.sdk", name = "v2-user", version.ref = "kakao" }
+
+# DataStore & Tink
+androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
+tink-android = { group = "com.google.crypto.tink", name = "tink-android", version.ref = "tink" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

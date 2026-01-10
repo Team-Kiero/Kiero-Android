@@ -96,4 +96,8 @@ dependencies {
     implementation(libs.timber)
 
     implementation(libs.kakao.user)
+
+
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.tink.android)
 }
