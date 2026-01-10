@@ -80,7 +80,7 @@ class AuthLocalDataSourceImpl @Inject constructor(
                 }
         }.getOrNull()
     }
-    
+
     override suspend fun clearTokens() {
         suspendRunCatching {
             context.dataStore.edit { preferences ->
