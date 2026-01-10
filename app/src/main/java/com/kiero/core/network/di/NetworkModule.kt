@@ -2,7 +2,6 @@ package com.kiero.core.network.di
 
 import com.kiero.BuildConfig
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import com.kiero.data.auth.remote.api.AuthService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -68,11 +67,4 @@ object NetworkModule {
         .addConverterFactory(converterFactory)
         .client(client)
         .build()
-
-    // 카카오 로그인
-    @Provides
-    @Singleton
-    fun providesAuthService(retrofit: Retrofit): AuthService {
-        return retrofit.create(AuthService::class.java)
-    }
 }
