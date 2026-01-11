@@ -1,5 +1,6 @@
 package com.kiero.data.auth.repositoryimpl
 
+import android.content.Context
 import com.kiero.core.common.util.handleError
 import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.data.auth.local.datasource.AuthLocalDataSource
@@ -14,11 +15,11 @@ class AuthRepositoryImpl @Inject constructor(
     private val authLocalDataSource: AuthLocalDataSource,
 ) : AuthRepository {
 
-    override suspend fun loginWithKakao(): Result<AuthLoginResponseDto> = suspendRunCatching {
+    override suspend fun loginWithKakao(context: Context): Result<AuthLoginResponseDto> = suspendRunCatching {
         Timber.d("🚀 카카오 로그인 프로세스 시작")
 
         // 1. 카카오 토큰 가져오기 (실패 시 여기서 바로 catch 블록으로 이동)
-        val kakaoToken = authRemoteDataSource.getKakaoToken().getOrThrow()
+        val kakaoToken = authRemoteDataSource.getKakaoToken(context).getOrThrow()
         Timber.d("✅ 카카오 토큰 획득 성공")
 
         // 2. 서버 로그인 요청 (실패 시 여기서 바로 catch 블록으로 이동)
@@ -45,5 +46,5 @@ class AuthRepositoryImpl @Inject constructor(
         Timber.i("✅ 토큰 저장 완료")
     }.onFailure {
         Timber.e(it, "❌ 토큰 저장 실패")
-    }.getOrDefault(Unit) // 저장 로직은 성공 여부와 상관없이 Unit 반환 처리 (선택사항)
+    }
 }

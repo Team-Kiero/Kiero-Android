@@ -7,6 +7,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -23,6 +24,7 @@ fun KaKaoLoginRoute(
     navigateUp: () -> Unit,
     viewModel: AuthViewModel = hiltViewModel(),
 ) {
+    val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(viewModel.sideEffect) {
@@ -38,7 +40,7 @@ fun KaKaoLoginRoute(
     KakaoLoginScreen(
         paddingValues = paddingValues,
         isLoading = state.isLoading,
-        onLoginClick = viewModel::loginWithKakao
+        onLoginClick = { viewModel.loginWithKakao(context) }
     )
 }
 

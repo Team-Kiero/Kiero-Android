@@ -25,16 +25,16 @@ class AuthViewModel @Inject constructor(
 
     private val _sideEffect = MutableSharedFlow<AuthContract.SideEffect>()
     val sideEffect = _sideEffect.asSharedFlow() // 외부 노출용은 읽기 전용으로
-
     // 카카오 로그인 함수
-    fun loginWithKakao() = viewModelScope.launch {
+    fun loginWithKakao(context: android.content.Context) = viewModelScope.launch {
         Timber.d("로그인 프로세스 시작")
         // 1. 로딩 시작
         _state.update { it.copy(isLoading = true) }
 
-        authRepository.loginWithKakao()
+        authRepository.loginWithKakao(context)
             .onSuccess {
                 Timber.i("로그인 최종 성공")
+
                 _state.update { it.copy(isLoading = false) }
                 _sideEffect.emit(AuthContract.SideEffect.LoginSuccess)
             }.onFailure { throwable ->

@@ -19,11 +19,10 @@ import kotlin.coroutines.resume
  * AuthDataSource 구현체
  */
 class AuthDataSourceImpl @Inject constructor(
-    @param:ApplicationContext private val context: Context,
     private val authService: AuthService,
 ) : AuthDataSource {
 
-    override suspend fun getKakaoToken(): Result<OAuthToken> =
+    override suspend fun getKakaoToken(context: Context): Result<OAuthToken> =
         suspendCancellableCoroutine { continuation ->
             Timber.d("🚀 카카오 토큰 요청 시작")
 
