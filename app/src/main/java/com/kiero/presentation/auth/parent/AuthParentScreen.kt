@@ -21,13 +21,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.auth.model.AuthSideEffect
 import com.kiero.presentation.auth.parent.component.KakaoLoginButton
-import com.kiero.presentation.auth.parent.viewmodel.ParentKakaoViewModel
+import com.kiero.presentation.auth.parent.viewmodel.ParentLoginViewModel
 
 @Composable
 fun AuthParentRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
-    viewModel: ParentKakaoViewModel = hiltViewModel(),
+    viewModel: ParentLoginViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
