@@ -1,6 +1,10 @@
 package com.kiero.data.di
 
+import com.kiero.data.auth.local.datasource.AuthLocalDataSource
+import com.kiero.data.auth.local.datasourceimpl.AuthLocalDataSourceImpl
+import com.kiero.data.auth.remote.datasource.AuthDataSource
 import com.kiero.data.auth.remote.datasource.DummyDataSource
+import com.kiero.data.auth.remote.datasourceimpl.AuthDataSourceImpl
 import com.kiero.data.auth.remote.datasourceimpl.DummyDataSourceImpl
 import dagger.Binds
 import dagger.Module
@@ -17,4 +21,17 @@ abstract class DummyDataSourceModule {
     abstract fun bindDummyDataSource(
         dummyDataSourceImpl: DummyDataSourceImpl,
     ): DummyDataSource
+
+
+    @Binds
+    @Singleton
+    abstract fun bindAuthDataSource(
+        authDataSourceImpl: AuthDataSourceImpl,
+    ): AuthDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindAuthLocalDataSource(
+        authLocalDataSourceImpl: AuthLocalDataSourceImpl,
+    ): AuthLocalDataSource
 }
