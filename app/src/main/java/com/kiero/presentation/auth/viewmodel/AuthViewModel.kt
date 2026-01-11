@@ -4,7 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.common.util.handleError
 import com.kiero.data.auth.repository.AuthRepository
-import com.kiero.presentation.auth.model.AuthContract
+import com.kiero.presentation.auth.model.SideEffect
+import com.kiero.presentation.auth.model.State
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,10 +21,10 @@ import javax.inject.Inject
 class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
 ) : ViewModel() {
-    private val _state = MutableStateFlow(AuthContract.State())
-    val state: StateFlow<AuthContract.State> = _state.asStateFlow()
+    private val _state = MutableStateFlow(State())
+    val state: StateFlow<State> = _state.asStateFlow()
 
-    private val _sideEffect = MutableSharedFlow<AuthContract.SideEffect>()
+    private val _sideEffect = MutableSharedFlow<SideEffect>()
     val sideEffect = _sideEffect.asSharedFlow() // 외부 노출용은 읽기 전용으로
     // 카카오 로그인 함수
     fun loginWithKakao(context: android.content.Context) = viewModelScope.launch {
@@ -36,7 +37,7 @@ class AuthViewModel @Inject constructor(
                 Timber.i("로그인 최종 성공")
 
                 _state.update { it.copy(isLoading = false) }
-                _sideEffect.emit(AuthContract.SideEffect.LoginSuccess)
+                _sideEffect.emit(SideEffect.LoginSuccess)
             }.onFailure { throwable ->
                 Timber.e(throwable, "로그인 실패 에러 발생")
                 _state.update { it.copy(isLoading = false) }
@@ -46,10 +47,10 @@ class AuthViewModel @Inject constructor(
     }
 
     private fun showSnackBar(message: String) = viewModelScope.launch {
-        _sideEffect.emit(AuthContract.SideEffect.ShowSnackBar(message))
+        _sideEffect.emit(SideEffect.ShowSnackBar(message))
     }
 
     fun navigateUp() = viewModelScope.launch {
-        _sideEffect.emit(AuthContract.SideEffect.NavigateUp)
+        _sideEffect.emit(SideEffect.NavigateUp)
     }
 }

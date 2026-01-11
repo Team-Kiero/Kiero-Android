@@ -8,21 +8,19 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.kiero.core.navigation.Route
-import com.kiero.presentation.auth.parent.AuthParentRoute
 import com.kiero.presentation.auth.AuthRoute
+import com.kiero.presentation.auth.parent.navigation.Login
+import com.kiero.presentation.auth.parent.navigation.AuthParentloginScreen
 import kotlinx.serialization.Serializable
 
-@Serializable
-sealed interface Auth : Route
+
+interface Auth : Route
 
 @Serializable
 data object AuthGraph : Route
 
 @Serializable
-data object Selection : Auth // 부모님/아이로 시작하기
-
-@Serializable
-data object Login : Auth
+data object Selection : Auth
 
 fun NavController.navigateToAuth(
     navOptions: NavOptions? = null,
@@ -37,27 +35,21 @@ fun NavGraphBuilder.authNavGraph(
     navigateToParent: () -> Unit,
     navigateToKid: () -> Unit,
 ) {
-    // 시작점을 Selection으로 변경
-    navigation<AuthGraph>(startDestination = Selection) {
+    navigation<AuthGraph>(startDestination = Selection)  {
 
-        // 1. 역할 선택 (기존 AuthRoute)
         composable<Selection> {
             AuthRoute(
                 paddingValues = paddingValues,
                 navigateUp = navigateUp,
-                // "부모님으로 시작" 클릭 시 진짜 로그인 화면(Login)으로 이동
                 navigateToParent = { navController.navigate(Login) },
                 navigateToKid = navigateToKid,
             )
         }
 
-        // 2. 카카오 로그인 화면
-        composable<Login> {
-            AuthParentRoute(
-                paddingValues = paddingValues,
-                navigateUp = { navController.popBackStack() },
-                onLoginSuccess = navigateToParent
-            )
-        }
+        AuthParentloginScreen(
+            paddingValues = paddingValues,
+            navigateUp = { navController.popBackStack() },
+            onLoginSuccess = navigateToParent
+        )
     }
 }
