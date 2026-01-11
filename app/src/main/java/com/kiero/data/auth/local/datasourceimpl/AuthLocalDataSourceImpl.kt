@@ -24,7 +24,7 @@ private val Context.authDataStore: DataStore<Preferences> by preferencesDataStor
 )
 
 class AuthLocalDataSourceImpl @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val cryptoManager: CryptoManager,
 ) : AuthLocalDataSource {
 

@@ -10,7 +10,6 @@ import androidx.navigation.compose.navigation
 import com.kiero.core.navigation.Route
 import com.kiero.presentation.auth.AuthRoute
 import com.kiero.presentation.auth.KaKaoLoginRoute
-import com.kiero.presentation.parent.navigation.ParentGraph
 import kotlinx.serialization.Serializable
 
 @Serializable

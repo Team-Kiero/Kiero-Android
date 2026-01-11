@@ -13,10 +13,6 @@ import jakarta.inject.Inject
 import java.io.File
 import java.nio.charset.StandardCharsets
 
-interface CryptoManager {
-    fun encrypt(plaintext: String): String
-    fun decrypt(ciphertext: String): String
-}
 
 class TinkCryptoManager @Inject constructor(
    @param:ApplicationContext private val context: Context
@@ -93,7 +89,4 @@ class TinkCryptoManager @Inject constructor(
         private const val BASE64_FLAGS = Base64.NO_WRAP
         private val ASSOCIATED_DATA = null
     }
-
-    class EncryptionException(message: String, cause: Throwable? = null) :
-        Exception(message, cause)
 }
