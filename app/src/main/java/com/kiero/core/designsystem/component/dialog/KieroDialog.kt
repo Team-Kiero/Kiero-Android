@@ -81,7 +81,7 @@ fun KieroDialog(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(2.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
                     text = title.orEmpty(),
@@ -106,7 +106,7 @@ fun KieroDialog(
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     if (cancelAction != null) {
                         cancelAction(modifier = Modifier.weight(1f))
