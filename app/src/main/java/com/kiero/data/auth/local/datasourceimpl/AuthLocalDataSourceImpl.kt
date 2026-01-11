@@ -6,7 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.kiero.core.common.util.TinkEncryption
+import com.kiero.core.common.security.TinkEncryption
 import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.data.auth.local.datasource.AuthLocalDataSource
 import dagger.hilt.android.qualifiers.ApplicationContext

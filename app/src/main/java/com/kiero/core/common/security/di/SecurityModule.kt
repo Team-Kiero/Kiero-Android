@@ -1,7 +1,7 @@
-package com.kiero.core.common.di
+package com.kiero.core.common.security.di
 
 import android.content.Context
-import com.kiero.core.common.util.TinkEncryption
+import com.kiero.core.common.security.TinkEncryption
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -11,7 +11,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object UtilModule {
+object SecurityModule {
 
     @Provides
     @Singleton
