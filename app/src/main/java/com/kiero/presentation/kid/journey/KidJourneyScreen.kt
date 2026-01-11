@@ -11,6 +11,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
 import com.kiero.presentation.kid.journey.state.KidJourneySideEffect
 import com.kiero.presentation.kid.journey.viewmodel.KidJourneyViewModel
@@ -27,9 +28,10 @@ fun KidJourneyRoute(
         when (sideEffect) {
             is KidJourneySideEffect.ShowToast -> globalTrigger.showToast(sideEffect.message)
             is KidJourneySideEffect.ShowSnackbar -> globalTrigger.showSnackbar(
-                sideEffect.message,
-                null
-            ) {}
+                SnackbarState(
+                    message = sideEffect.message
+                )
+            )
 
             KidJourneySideEffect.ShowDialog -> globalTrigger.dialogTrigger.show {}
         }

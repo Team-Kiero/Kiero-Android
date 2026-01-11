@@ -10,15 +10,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -26,10 +25,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kiero.core.designsystem.component.KieroSnackbar
 import com.kiero.core.model.trigger.DialogTrigger
 import com.kiero.core.model.trigger.GlobalUiEventHolder
+import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
-import com.kiero.core.designsystem.component.KieroSnackbar
 import com.kiero.presentation.main.navigation.KidMainTab
 import com.kiero.presentation.main.navigation.KieroNavHost
 import com.kiero.presentation.main.navigation.MainAppState
@@ -37,6 +37,7 @@ import com.kiero.presentation.main.navigation.ParentMainTab
 import com.kiero.presentation.main.navigation.component.MainBottomBar
 import com.kiero.presentation.main.state.rememberDialogStateHolder
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -62,11 +63,16 @@ fun MainScreen(
     val scope = rememberCoroutineScope()
 
     val isOffline by appState.isOffline.collectAsStateWithLifecycle()
+
     val showParentBottomBar by appState.showParentBottomBar.collectAsStateWithLifecycle()
     val showKidBottomBar by appState.showKidBottomBar.collectAsStateWithLifecycle()
+
     val currentParentTab by appState.currentParentTab.collectAsStateWithLifecycle()
     val currentKidTab by appState.currentKidTab.collectAsStateWithLifecycle()
+    var currentSnackbarState by remember { mutableStateOf<SnackbarState?>(null) }
+
     val isVisible = showParentBottomBar || showKidBottomBar
+
     val containerShape = if (showParentBottomBar) {
         RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp)
     } else {
@@ -87,18 +93,24 @@ fun MainScreen(
         }
     }
 
-    val onShowSnackbar: (String, String?, (() -> Unit)?) -> Unit = remember(scope, snackBarHostState) {
-        { message, actionLabel, onAction ->
+    val onShowSnackbar: (SnackbarState) -> Unit = remember(scope, snackBarHostState) {
+        { state ->
+            currentSnackbarState = state
             scope.launch {
                 snackBarHostState.currentSnackbarData?.dismiss()
-                val result = snackBarHostState.showSnackbar(
-                    message = message,
-                    actionLabel = actionLabel,
-                    duration = SnackbarDuration.Short
-                )
-                if (result == SnackbarResult.ActionPerformed) {
-                    onAction?.invoke()
+
+                val job = launch {
+                    snackBarHostState.showSnackbar(
+                        message = state.message,
+                    )
                 }
+                job.invokeOnCompletion {
+                    if (currentSnackbarState == state) {
+                        currentSnackbarState = null
+                    }
+                }
+                delay(2000L)
+                job.cancel()
             }
         }
     }

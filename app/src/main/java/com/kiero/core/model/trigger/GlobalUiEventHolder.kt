@@ -6,5 +6,5 @@ import androidx.compose.runtime.Stable
 class GlobalUiEventHolder(
     val dialogTrigger: DialogTrigger,
     val showToast: (String) -> Unit,
-    val showSnackbar: (String, String?, () -> Unit) -> Unit
+    val showSnackbar: (SnackbarState) -> Unit
 )
