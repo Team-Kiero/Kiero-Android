@@ -6,6 +6,11 @@ import com.kiero.core.common.util.handleError
 import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.presentation.auth.model.AuthSideEffect
 import com.kiero.presentation.auth.model.AuthState
+import com.kiero.core.common.extension.toHandleErrorMessage
+import com.kiero.core.model.UiState
+import com.kiero.data.auth.repository.DummyRepository
+import com.kiero.presentation.auth.model.DummySideEffect
+import com.kiero.presentation.auth.model.DummyState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
