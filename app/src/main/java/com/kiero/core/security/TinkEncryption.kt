@@ -1,4 +1,4 @@
-package com.kiero.core.common.security
+package com.kiero.core.security
 
 import android.content.Context
 import android.util.Base64

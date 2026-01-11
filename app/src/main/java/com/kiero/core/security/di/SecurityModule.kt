@@ -1,7 +1,7 @@
-package com.kiero.core.common.security.di
+package com.kiero.core.security.di
 
 import android.content.Context
-import com.kiero.core.common.security.TinkEncryption
+import com.kiero.core.security.TinkEncryption
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
