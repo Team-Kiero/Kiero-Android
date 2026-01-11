@@ -24,7 +24,7 @@ import com.kiero.presentation.auth.model.AuthContract
 import com.kiero.presentation.auth.viewmodel.AuthViewModel
 
 @Composable
-fun KaKaoLoginRoute(
+fun AuthParentRoute(
     paddingValues: PaddingValues,
     onLoginSuccess: () -> Unit,
     navigateUp: () -> Unit,
@@ -43,7 +43,7 @@ fun KaKaoLoginRoute(
         }
     }
 
-    KakaoLoginScreen(
+    AuthParentScreen(
         paddingValues = paddingValues,
         isLoading = state.isLoading,
         onLoginClick = { viewModel.loginWithKakao(context) }
@@ -51,7 +51,7 @@ fun KaKaoLoginRoute(
 }
 
 @Composable
-fun KakaoLoginScreen(
+fun AuthParentScreen(
     paddingValues: PaddingValues,
     isLoading: Boolean,
     onLoginClick: () -> Unit,
@@ -81,7 +81,7 @@ fun KakaoLoginScreen(
 @Composable
 private fun LoginScreenPreview() {
     KieroTheme {
-        KakaoLoginScreen(
+        AuthParentScreen(
             paddingValues = PaddingValues(),
             isLoading = false,
             onLoginClick = {}
