@@ -61,7 +61,7 @@ fun KieroTextField(
 
     val borderColor = when {
         isError -> KieroTheme.colors.point
-        isFocused -> KieroTheme.colors.white
+        isFocused -> KieroTheme.colors.gray100
         else -> Color.Transparent
     }
 
@@ -94,7 +94,7 @@ fun KieroTextField(
                             color = borderColor,
                             shape = shape
                         )
-                        .padding(horizontal = 13.dp, vertical = 12.dp),
+                        .padding(horizontal = 13.dp, vertical = 14.dp),
                     contentAlignment = Alignment.CenterStart
                 ) {
                     if (state.text.isEmpty()) {

@@ -34,7 +34,7 @@ fun KieroTopbar(
             .background(color = Color.Transparent)
             .padding(
                 vertical = 4.dp,
-                horizontal = 6.dp
+                horizontal = 8.dp
             ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
