@@ -35,7 +35,7 @@ fun KaKaoLoginRoute(
         }
     }
 
-    LoginScreen(
+    KakaoLoginScreen(
         paddingValues = paddingValues,
         isLoading = state.isLoading,
         onLoginClick = viewModel::loginWithKakao
@@ -43,7 +43,7 @@ fun KaKaoLoginRoute(
 }
 
 @Composable
-fun LoginScreen(
+fun KakaoLoginScreen(
     paddingValues: PaddingValues,
     isLoading: Boolean,
     onLoginClick: () -> Unit,
@@ -73,7 +73,7 @@ fun LoginScreen(
 @Composable
 private fun LoginScreenPreview() {
     KieroTheme {
-        LoginScreen(
+        KakaoLoginScreen(
             paddingValues = PaddingValues(),
             isLoading = false,
             onLoginClick = {}
