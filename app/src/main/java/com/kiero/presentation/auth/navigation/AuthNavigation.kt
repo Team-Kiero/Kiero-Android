@@ -9,8 +9,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.kiero.core.navigation.Route
 import com.kiero.presentation.auth.AuthRoute
-import com.kiero.presentation.auth.parent.navigation.Login
-import com.kiero.presentation.auth.parent.navigation.AuthParentloginScreen
+import com.kiero.presentation.auth.parent.AuthParentRoute
+import com.kiero.presentation.auth.parent.navigation.ParentLogin
+import com.kiero.presentation.auth.parent.navigation.navigateToAuthParent
 import kotlinx.serialization.Serializable
 
 
@@ -25,7 +26,7 @@ data object Selection : Auth
 fun NavController.navigateToAuth(
     navOptions: NavOptions? = null,
 ) {
-    navigate(Login, navOptions)
+    navigate(Selection, navOptions)
 }
 
 fun NavGraphBuilder.authNavGraph(
@@ -41,15 +42,16 @@ fun NavGraphBuilder.authNavGraph(
             AuthRoute(
                 paddingValues = paddingValues,
                 navigateUp = navigateUp,
-                navigateToParent = { navController.navigate(Login) },
+                navigateToParent = navController::navigateToAuthParent,
                 navigateToKid = navigateToKid,
             )
         }
 
-        AuthParentloginScreen(
-            paddingValues = paddingValues,
-            navigateUp = { navController.popBackStack() },
-            onLoginSuccess = navigateToParent
-        )
+        composable<ParentLogin> {
+            AuthParentRoute(
+                paddingValues = paddingValues,
+                navigateUp = navigateUp,
+            )
+        }
     }
 }

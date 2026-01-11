@@ -19,16 +19,15 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.presentation.auth.model.AuthSideEffect
 import com.kiero.presentation.auth.parent.component.KakaoLoginButton
-import com.kiero.presentation.auth.model.SideEffect
-import com.kiero.presentation.auth.viewmodel.AuthViewModel
+import com.kiero.presentation.auth.parent.viewmodel.ParentKakaoViewModel
 
 @Composable
 fun AuthParentRoute(
     paddingValues: PaddingValues,
-    onLoginSuccess: () -> Unit,
     navigateUp: () -> Unit,
-    viewModel: AuthViewModel = hiltViewModel(),
+    viewModel: ParentKakaoViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -36,9 +35,8 @@ fun AuthParentRoute(
     LaunchedEffect(viewModel.sideEffect) {
         viewModel.sideEffect.collect { effect ->
             when (effect) {
-                is SideEffect.LoginSuccess -> onLoginSuccess()
-                is SideEffect.ShowSnackBar -> { /* 스낵바 로직 */ }
-                is SideEffect.NavigateUp -> navigateUp()
+                is AuthSideEffect.ShowSnackBar -> { /* 스낵바 로직 */ }
+                is AuthSideEffect.NavigateUp -> navigateUp()
             }
         }
     }
