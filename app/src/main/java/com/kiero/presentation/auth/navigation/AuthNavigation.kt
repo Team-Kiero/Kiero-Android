@@ -8,7 +8,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.kiero.core.navigation.Route
-import com.kiero.presentation.auth.AuthParentRoute
+import com.kiero.presentation.auth.parent.AuthParentRoute
 import com.kiero.presentation.auth.AuthRoute
 import kotlinx.serialization.Serializable
 
@@ -56,7 +56,7 @@ fun NavGraphBuilder.authNavGraph(
             AuthParentRoute(
                 paddingValues = paddingValues,
                 navigateUp = { navController.popBackStack() },
-                onLoginSuccess = navigateToParent // 로그인 성공 시 최종 부모 메인으로 이동!
+                onLoginSuccess = navigateToParent
             )
         }
     }

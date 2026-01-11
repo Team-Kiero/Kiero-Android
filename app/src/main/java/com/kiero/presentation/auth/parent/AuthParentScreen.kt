@@ -1,4 +1,4 @@
-package com.kiero.presentation.auth
+package com.kiero.presentation.auth.parent
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.core.designsystem.theme.KieroTheme
-import com.kiero.presentation.auth.component.KakaoLoginButton
+import com.kiero.presentation.auth.parent.component.KakaoLoginButton
 import com.kiero.presentation.auth.model.AuthContract
 import com.kiero.presentation.auth.viewmodel.AuthViewModel
 
