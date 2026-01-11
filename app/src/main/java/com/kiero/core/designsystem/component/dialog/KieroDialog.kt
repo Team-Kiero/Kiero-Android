@@ -139,10 +139,12 @@ private fun KieroDialogPreview() {
 
             content = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
+                    val coinImage = painterResource(R.drawable.img_kid_coin)
+
                     Image(
-                        painter = painterResource(R.drawable.img_kid_coin),
+                        painter = coinImage,
                         contentDescription = null,
-                        modifier = Modifier.forcePixelToDp(painterResource(R.drawable.img_kid_coin))
+                        modifier = Modifier.forcePixelToDp(coinImage)
                     )
 
                     Spacer(modifier = Modifier.width(10.dp))
