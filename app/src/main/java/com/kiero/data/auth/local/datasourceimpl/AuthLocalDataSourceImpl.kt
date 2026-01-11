@@ -59,6 +59,7 @@ class AuthLocalDataSourceImpl @Inject constructor(
 
     override suspend fun getRefreshToken(): String? {
         return suspendRunCatching {
+            val encryptedToken = context.authDataStore.data
                 .map { it[KEY_REFRESH_TOKEN] }
                 .first()
             encryptedToken?.let { cryptoManager.decrypt(it) }
