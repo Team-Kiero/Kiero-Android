@@ -15,19 +15,23 @@ import kotlinx.coroutines.flow.map
 import timber.log.Timber
 import javax.inject.Inject
 
+private const val DATASTORE_NAME = "kiero_auth_datastore"
+private val KEY_ACCESS_TOKEN = stringPreferencesKey("access_token")
+private val KEY_REFRESH_TOKEN = stringPreferencesKey("refresh_token")
+
+private val Context.authDataStore: DataStore<Preferences> by preferencesDataStore(
+    name = DATASTORE_NAME
+)
+
 class AuthLocalDataSourceImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val cryptoManager: CryptoManager,
 ) : AuthLocalDataSource {
 
-    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
-        name = DATASTORE_NAME
-    )
-
     override suspend fun saveAccessToken(token: String) {
         suspendRunCatching {
             val encryptedToken = cryptoManager.encrypt(token)
-            context.dataStore.edit { it[KEY_ACCESS_TOKEN] = encryptedToken }
+            context.authDataStore.edit { it[KEY_ACCESS_TOKEN] = encryptedToken }
         }.onFailure { throwable ->
             Timber.e(throwable, "AccessToken 저장 실패")
         }
@@ -36,7 +40,7 @@ class AuthLocalDataSourceImpl @Inject constructor(
     override suspend fun saveRefreshToken(token: String) {
         suspendRunCatching {
             val encryptedToken = cryptoManager.encrypt(token)
-            context.dataStore.edit { it[KEY_REFRESH_TOKEN] = encryptedToken }
+            context.authDataStore.edit { it[KEY_REFRESH_TOKEN] = encryptedToken }
         }.onFailure { throwable ->
             Timber.e(throwable, "RefreshToken 저장 실패")
         }
@@ -44,7 +48,7 @@ class AuthLocalDataSourceImpl @Inject constructor(
 
     override suspend fun getAccessToken(): String? {
         return suspendRunCatching {
-            val encryptedToken = context.dataStore.data
+            val encryptedToken = context.authDataStore.data
                 .map { it[KEY_ACCESS_TOKEN] }
                 .first()
             encryptedToken?.let { cryptoManager.decrypt(it) }
@@ -55,7 +59,6 @@ class AuthLocalDataSourceImpl @Inject constructor(
 
     override suspend fun getRefreshToken(): String? {
         return suspendRunCatching {
-            val encryptedToken = context.dataStore.data
                 .map { it[KEY_REFRESH_TOKEN] }
                 .first()
             encryptedToken?.let { cryptoManager.decrypt(it) }
@@ -66,15 +69,9 @@ class AuthLocalDataSourceImpl @Inject constructor(
 
     override suspend fun clearTokens() {
         suspendRunCatching {
-            context.dataStore.edit { it.clear() }
+            context.authDataStore.edit { it.clear() }
         }.onFailure { throwable ->
             Timber.e(throwable, "토큰 삭제 실패")
         }
-    }
-
-    companion object {
-        private const val DATASTORE_NAME = "kiero_auth_datastore"
-        private val KEY_ACCESS_TOKEN = stringPreferencesKey("access_token")
-        private val KEY_REFRESH_TOKEN = stringPreferencesKey("refresh_token")
     }
 }
