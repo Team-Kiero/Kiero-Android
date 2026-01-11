@@ -8,86 +8,92 @@ import com.google.crypto.tink.KeysetHandle
 import com.google.crypto.tink.TinkJsonProtoKeysetFormat
 import com.google.crypto.tink.aead.AeadConfig
 import com.google.crypto.tink.aead.PredefinedAeadParameters
+import dagger.hilt.android.qualifiers.ApplicationContext
+import jakarta.inject.Inject
 import java.io.File
 import java.nio.charset.StandardCharsets
 
-/**
- * Tink 기반 암호화/복호화 유틸리티
- */
-class TinkEncryption(private val context: Context) {
+interface CryptoManager {
+    fun encrypt(plaintext: String): String
+    fun decrypt(ciphertext: String): String
+}
 
-    companion object {
-        private const val KEYSET_FILENAME = "kiero_tink_keyset.json"
-    }
+class TinkCryptoManager @Inject constructor(
+   @param:ApplicationContext private val context: Context
+) : CryptoManager {
+
     private val aead: Aead
+
     init {
-        // 1. Tink AEAD 구성 등록
-        AeadConfig.register()
+        try {
+            AeadConfig.register()
 
-        // 2. 키셋 파일 경로
-        val keysetFile = File(context.filesDir, KEYSET_FILENAME)
+            val keysetFile = File(context.filesDir, KEYSET_FILENAME)
+            val keysetHandle = if (keysetFile.exists()) {
+                loadKeysetHandle(keysetFile)
+            } else {
+                generateAndSaveKeysetHandle(keysetFile)
+            }
 
-        // 3. KeysetHandle 생성 또는 로드
-        val keysetHandle = if (keysetFile.exists()) {
-            // 기존 키가 있으면 로드
-            loadKeysetHandle(keysetFile)
-        } else {
-            // 없으면 새로 생성
-            generateAndSaveKeysetHandle(keysetFile)
+            aead = keysetHandle.getPrimitive(Aead::class.java)
+        } catch (e: Exception) {
+            throw IllegalStateException("암호화 초기화 실패", e)
         }
-
-        // 4. AEAD primitive 가져오기
-        aead = keysetHandle.getPrimitive(Aead::class.java)
     }
 
     private fun generateAndSaveKeysetHandle(keysetFile: File): KeysetHandle {
-        // AES-256-GCM 키 생성
-        val keysetHandle = KeysetHandle.generateNew(
-            PredefinedAeadParameters.AES256_GCM
-        )
-
-        // JSON 형식으로 직렬화 (InsecureSecretKeyAccess 필요)
-        val keysetJson = TinkJsonProtoKeysetFormat.serializeKeyset(
-            keysetHandle,
-            InsecureSecretKeyAccess.get()
-        )
-
-        // 파일에 저장
-        keysetFile.writeText(keysetJson)
-
-        return keysetHandle
+        return try {
+            val keysetHandle = KeysetHandle.generateNew(PredefinedAeadParameters.AES256_GCM)
+            val keysetJson = TinkJsonProtoKeysetFormat.serializeKeyset(
+                keysetHandle,
+                InsecureSecretKeyAccess.get()
+            )
+            keysetFile.writeText(keysetJson)
+            keysetHandle
+        } catch (e: Exception) {
+            throw EncryptionException("키셋 생성 및 저장 실패", e)
+        }
     }
+
     private fun loadKeysetHandle(keysetFile: File): KeysetHandle {
-        // 파일에서 JSON 읽기
-        val keysetJson = keysetFile.readText()
-
-        // JSON을 KeysetHandle로 파싱
-        return TinkJsonProtoKeysetFormat.parseKeyset(
-            keysetJson,
-            InsecureSecretKeyAccess.get()
-        )
+        return try {
+            val keysetJson = keysetFile.readText()
+            TinkJsonProtoKeysetFormat.parseKeyset(
+                keysetJson,
+                InsecureSecretKeyAccess.get()
+            )
+        } catch (e: Exception) {
+            throw EncryptionException("키셋 로드 실패", e)
+        }
     }
 
-    fun encrypt(plaintext: String): String {
-        // 1. 문자열 → 바이트 배열
-        val plaintextBytes = plaintext.toByteArray(StandardCharsets.UTF_8)
-
-        // 2. AEAD 암호화 (associatedData = null)
-        //    associatedData: 암호화되지 않지만 인증되는 데이터 (옵션)
-        val encryptedBytes = aead.encrypt(plaintextBytes, null)
-
-        // 3. Base64 인코딩
-        return Base64.encodeToString(encryptedBytes, Base64.NO_WRAP)
+    override fun encrypt(plaintext: String): String {
+        return try {
+            val plaintextBytes = plaintext.toByteArray(CHARSET)
+            val encryptedBytes = aead.encrypt(plaintextBytes, ASSOCIATED_DATA)
+            Base64.encodeToString(encryptedBytes, BASE64_FLAGS)
+        } catch (e: Exception) {
+            throw EncryptionException("암호화 실패", e)
+        }
     }
 
-    fun decrypt(ciphertext: String): String {
-        // 1. Base64 디코딩
-        val encryptedBytes = Base64.decode(ciphertext, Base64.NO_WRAP)
-
-        // 2. AEAD 복호화
-        val decryptedBytes = aead.decrypt(encryptedBytes, null)
-
-        // 3. 바이트 배열 → 문자열
-        return String(decryptedBytes, StandardCharsets.UTF_8)
+    override fun decrypt(ciphertext: String): String {
+        return try {
+            val encryptedBytes = Base64.decode(ciphertext, BASE64_FLAGS)
+            val decryptedBytes = aead.decrypt(encryptedBytes, ASSOCIATED_DATA)
+            String(decryptedBytes, CHARSET)
+        } catch (e: Exception) {
+            throw EncryptionException("복호화 실패", e)
+        }
     }
+
+    companion object {
+        private const val KEYSET_FILENAME = "kiero_tink_keyset.json"
+        private val CHARSET = StandardCharsets.UTF_8
+        private const val BASE64_FLAGS = Base64.NO_WRAP
+        private val ASSOCIATED_DATA = null
+    }
+
+    class EncryptionException(message: String, cause: Throwable? = null) :
+        Exception(message, cause)
 }

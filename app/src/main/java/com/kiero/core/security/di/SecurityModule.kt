@@ -1,7 +1,8 @@
 package com.kiero.core.security.di
 
 import android.content.Context
-import com.kiero.core.security.TinkEncryption
+import com.kiero.core.security.CryptoManager
+import com.kiero.core.security.TinkCryptoManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,9 +16,9 @@ object SecurityModule {
 
     @Provides
     @Singleton
-    fun providesTinkEncryption(
+    fun providesCryptoManager(
         @ApplicationContext context: Context
-    ): TinkEncryption {
-        return TinkEncryption(context)
+    ): CryptoManager {
+        return TinkCryptoManager(context)
     }
 }
