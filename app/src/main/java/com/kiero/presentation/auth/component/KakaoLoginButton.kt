@@ -58,7 +58,8 @@ fun KakaoLoginButton(
 
         Text(
             text = if (isLoading) "로그인 중..." else "카카오톡 로그인",
-            style = KieroTheme.typography.semiBold.title3
+            style = KieroTheme.typography.semiBold.title3,
+            color = Color.Black
         )
     }
 }
