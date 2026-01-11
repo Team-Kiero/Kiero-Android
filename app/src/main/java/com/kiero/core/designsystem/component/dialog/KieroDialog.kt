@@ -40,9 +40,7 @@ fun KieroDialog(
     modifier: Modifier = Modifier,
     title: String? = null,
     subDescription: String? = null,
-    confirmAction: DialogAction = DialogAction {
-
-    },
+    confirmAction: DialogAction,
     cancelAction: DialogAction? = null,
     properties: DialogProperties = DialogProperties(
         usePlatformDefaultWidth = false,
