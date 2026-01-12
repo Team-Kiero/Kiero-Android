@@ -1,8 +1,6 @@
-package com.kiero.data.di
+package com.kiero.data.auth.di
 
 import com.kiero.data.auth.repository.AuthRepository
-import com.kiero.data.auth.repositoryimpl.DummyRepositoryImpl
-import com.kiero.data.auth.repository.DummyRepository
 import com.kiero.data.auth.repositoryimpl.AuthRepositoryImpl
 import dagger.Binds
 import dagger.Module
@@ -12,18 +10,10 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-interface RepositoryModule {
-
-    @Binds
-    @Singleton
-    fun bindsDummyRepository(
-        dummyRepositoryImpl: DummyRepositoryImpl
-    ): DummyRepository
-
+interface AuthRepositoryModule {
     @Binds
     @Singleton
     fun bindsAuthRepository(
         authRepositoryImpl: AuthRepositoryImpl
     ): AuthRepository
-
 }

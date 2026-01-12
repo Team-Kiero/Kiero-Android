@@ -1,10 +1,6 @@
 package com.kiero.presentation.kid.wish
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -17,7 +13,7 @@ fun KidWishRoute(
 ) {
     KidWishScreen(
         paddingValues = paddingValues,
-        navigateUp = navigateUp
+        navigateUp = navigateUp,
     )
 }
 
@@ -27,19 +23,16 @@ private fun KidWishScreen(
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(paddingValues),
-    ) {
-        Text(
-            text = "소원의 우물"
-        )
-    }
+
 }
 
 @Composable
 @Preview
 private fun KidWishScreenPreview() {
-    KieroTheme {}
+    KieroTheme {
+        KidWishScreen(
+            paddingValues = PaddingValues(),
+            navigateUp = {},
+        )
+    }
 }
