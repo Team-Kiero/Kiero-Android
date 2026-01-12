@@ -1,7 +1,13 @@
-package com.kiero.presentation.auth
+package com.kiero.presentation.auth.parent
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -13,16 +19,15 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.core.designsystem.theme.KieroTheme
-import com.kiero.presentation.auth.component.KakaoLoginButton
-import com.kiero.presentation.auth.model.AuthContract
-import com.kiero.presentation.auth.viewmodel.AuthViewModel
+import com.kiero.presentation.auth.model.AuthSideEffect
+import com.kiero.presentation.auth.parent.component.KakaoLoginButton
+import com.kiero.presentation.auth.parent.viewmodel.ParentLoginViewModel
 
 @Composable
-fun KaKaoLoginRoute(
+fun AuthParentRoute(
     paddingValues: PaddingValues,
-    onLoginSuccess: () -> Unit,
     navigateUp: () -> Unit,
-    viewModel: AuthViewModel = hiltViewModel(),
+    viewModel: ParentLoginViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -30,14 +35,13 @@ fun KaKaoLoginRoute(
     LaunchedEffect(viewModel.sideEffect) {
         viewModel.sideEffect.collect { effect ->
             when (effect) {
-                is AuthContract.SideEffect.LoginSuccess -> onLoginSuccess()
-                is AuthContract.SideEffect.ShowSnackBar -> { /* 스낵바 로직 */ }
-                is AuthContract.SideEffect.NavigateUp -> navigateUp()
+                is AuthSideEffect.ShowSnackBar -> { /* 스낵바 로직 */ }
+                is AuthSideEffect.NavigateUp -> navigateUp()
             }
         }
     }
 
-    KakaoLoginScreen(
+    AuthParentScreen(
         paddingValues = paddingValues,
         isLoading = state.isLoading,
         onLoginClick = { viewModel.loginWithKakao(context) }
@@ -45,7 +49,7 @@ fun KaKaoLoginRoute(
 }
 
 @Composable
-fun KakaoLoginScreen(
+fun AuthParentScreen(
     paddingValues: PaddingValues,
     isLoading: Boolean,
     onLoginClick: () -> Unit,
@@ -75,7 +79,7 @@ fun KakaoLoginScreen(
 @Composable
 private fun LoginScreenPreview() {
     KieroTheme {
-        KakaoLoginScreen(
+        AuthParentScreen(
             paddingValues = PaddingValues(),
             isLoading = false,
             onLoginClick = {}

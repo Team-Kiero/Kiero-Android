@@ -21,8 +21,7 @@ abstract class DummyDataSourceModule {
     abstract fun bindDummyDataSource(
         dummyDataSourceImpl: DummyDataSourceImpl,
     ): DummyDataSource
-
-
+  
     @Binds
     @Singleton
     abstract fun bindAuthDataSource(

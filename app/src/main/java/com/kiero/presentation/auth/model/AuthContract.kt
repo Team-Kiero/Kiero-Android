@@ -3,16 +3,12 @@ package com.kiero.presentation.auth.model
 import androidx.compose.runtime.Immutable
 
 
-object AuthContract {
+@Immutable
+data class AuthState(
+    val isLoading: Boolean = false,
+)
 
-    @Immutable
-    data class State(
-        val isLoading: Boolean = false,
-    )
-
-    sealed interface SideEffect {
-        data class ShowSnackBar(val message: String) : SideEffect
-        data object NavigateUp : SideEffect
-        data object LoginSuccess : SideEffect
-    }
+sealed interface AuthSideEffect {
+    data class ShowSnackBar(val message: String) : AuthSideEffect
+    data object NavigateUp : AuthSideEffect
 }

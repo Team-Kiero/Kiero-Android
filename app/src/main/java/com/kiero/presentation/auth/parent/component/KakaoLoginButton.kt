@@ -1,11 +1,8 @@
-package com.kiero.presentation.auth.component
+package com.kiero.presentation.auth.parent.component
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -23,8 +20,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.kiero.R
 import com.kiero.core.designsystem.theme.KieroTheme
-
 
 
 @Composable
@@ -48,7 +45,7 @@ fun KakaoLoginButton(
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
     ) {
         Icon(
-            painter = painterResource(id = com.kiero.R.drawable.ic_kakao_login),
+            painter = painterResource(id = R.drawable.ic_kakao_login),
             contentDescription = null,
             modifier = Modifier.size(24.dp),
             tint = KieroTheme.colors.black
