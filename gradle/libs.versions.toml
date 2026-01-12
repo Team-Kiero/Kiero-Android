@@ -30,6 +30,7 @@ navigation = "2.9.6"
 security = "1.1.0"
 androidxCoreSplash = "1.0.1"
 lifecycleRuntimeComposeAndroid = "2.10.0"
+graphicsShapes = "1.1.0"
 
 #Network
 okhttp = "5.3.2"
@@ -82,6 +83,7 @@ androidx-navigation = { group = "androidx.navigation", name = "navigation-compos
 androidx-security = { group = "androidx.security", name = "security-crypto-ktx", version.ref = "security" }
 androidx-lifecycle-runtime-compose-android = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose-android", version.ref = "lifecycleRuntimeComposeAndroid" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "androidxCoreSplash" }
+androidx-graphics-shapes = { group = "androidx.graphics", name = "graphics-shapes", version.ref = "graphicsShapes" }
 
 # Network
 okhttp-bom = { group = "com.squareup.okhttp3", name = "okhttp-bom", version.ref = "okhttp" }
@@ -137,7 +139,8 @@ androidx = [
     "androidx-security",
     "androidx-appcompat",
     "androidx-lifecycle-runtime-compose-android",
-    "androidx-core-splashscreen"
+    "androidx-core-splashscreen",
+    "androidx-graphics-shapes"
 ]
 
 test = [
