@@ -1,0 +1,54 @@
+package com.kiero.presentation.parent.alarm.state
+
+
+import androidx.compose.runtime.Immutable
+import androidx.compose.ui.graphics.Color
+import com.kiero.presentation.parent.alarm.model.ParentAlarmUiModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+
+@Immutable
+data class AlarmFeedState(
+    /** 로딩 상태 */
+    val isLoading: Boolean = false,
+
+    /** 알람 리스트 */
+    val alarms: ImmutableList<ParentAlarmUiModel> = persistentListOf(),
+
+    /** 에러 메시지 */
+    val errorMessage: String? = null,
+
+    /** 다음 페이지 로딩 중 */
+    val isLoadingMore: Boolean = false,
+
+    /** 더 불러올 데이터가 있는지 여부 */
+    val hasMore: Boolean = true
+) {
+    companion object {
+        val FAKE = AlarmFeedState(
+            isLoading = false,
+            alarms = persistentListOf(
+                ParentAlarmUiModel(
+                    id = "1",
+                    time = "오늘 12 : 00",
+                    message = "근영이가 피아노 학원에 도착했어요.",
+                    highlightText = "피아노 학원",
+                    highlightColor = Color(0xFF00E5FF),
+                    coinUsed = 150,
+                    imageUrl = "https://example.com/image.jpg",
+                    isExpanded = false
+                ),
+                ParentAlarmUiModel(
+                    id = "2",
+                    time = "오늘 14 : 30",
+                    message = "미션 '방 청소하기'를 완료하고 100개 금화를 받았어요.",
+                    highlightText = "100개",
+                    highlightColor = Color(0xFFFFB84D),
+                    coinUsed = 100,
+                    imageUrl = null,
+                    isExpanded = false
+                )
+            )
+        )
+    }
+}
