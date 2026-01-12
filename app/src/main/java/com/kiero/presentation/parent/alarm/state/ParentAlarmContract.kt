@@ -9,19 +9,10 @@ import kotlinx.collections.immutable.persistentListOf
 
 @Immutable
 data class AlarmFeedState(
-    /** 로딩 상태 */
     val isLoading: Boolean = false,
-
-    /** 알람 리스트 */
     val alarms: ImmutableList<ParentAlarmUiModel> = persistentListOf(),
-
-    /** 에러 메시지 */
     val errorMessage: String? = null,
-
-    /** 다음 페이지 로딩 중 */
     val isLoadingMore: Boolean = false,
-
-    /** 더 불러올 데이터가 있는지 여부 */
     val hasMore: Boolean = true
 ) {
     companion object {
