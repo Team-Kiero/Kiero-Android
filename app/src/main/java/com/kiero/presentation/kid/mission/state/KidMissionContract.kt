@@ -1,37 +1,37 @@
-package com.kiero.presentation.kid.wish.state
+package com.kiero.presentation.kid.mission.state
 
 import androidx.compose.runtime.Immutable
-import com.kiero.presentation.kid.wish.model.KidWishMission
-import com.kiero.presentation.kid.wish.model.KidWishMissionSection
+import com.kiero.presentation.kid.mission.model.KidMissionSectionUiModel
+import com.kiero.presentation.kid.mission.model.KidMissionUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 @Immutable
-data class KidWishState(
+data class KidMissionState(
     val kidName: String = "",
-    val kidMissionSectionList: ImmutableList<KidWishMissionSection> = persistentListOf()
+    val kidMissionSectionList: ImmutableList<KidMissionSectionUiModel> = persistentListOf()
 ) {
     companion object {
         val FAKE = persistentListOf(
-            KidWishMissionSection(
+            KidMissionSectionUiModel(
                 headerTitle = "미션 마감",
                 subTitle = "오늘 까지",
                 missions = persistentListOf(
-                    KidWishMission(
+                    KidMissionUiModel(
                         id = 1,
                         name = "미션 이름",
                         reward = 2,
                         dueAt = "2023-11-01",
                         isCompleted = false
                     ),
-                    KidWishMission(
+                    KidMissionUiModel(
                         id = 2,
                         name = "미션 이름",
                         reward = 2,
                         dueAt = "2023-11-01",
                         isCompleted = false
                     ),
-                    KidWishMission(
+                    KidMissionUiModel(
                         id = 3,
                         name = "미션 이름",
                         reward = 2,

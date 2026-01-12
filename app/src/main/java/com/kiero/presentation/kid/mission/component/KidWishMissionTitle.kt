@@ -1,4 +1,4 @@
-package com.kiero.presentation.kid.wish.component
+package com.kiero.presentation.kid.mission.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

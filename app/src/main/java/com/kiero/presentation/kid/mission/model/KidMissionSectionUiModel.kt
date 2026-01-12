@@ -1,12 +1,12 @@
-package com.kiero.presentation.kid.wish.model
+package com.kiero.presentation.kid.mission.model
 
 import androidx.compose.runtime.Immutable
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 
 @Immutable
-data class KidWishMissionSection(
+data class KidMissionSectionUiModel(
     val headerTitle: String = "미션 마감",
     val subTitle: String = "",
-    val missions: PersistentList<KidWishMission> = persistentListOf()
+    val missions: PersistentList<KidMissionUiModel> = persistentListOf()
 )
