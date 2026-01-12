@@ -28,8 +28,8 @@ import com.kiero.core.designsystem.component.chip.KieroChip
 import com.kiero.core.designsystem.component.chip.action.KieroCoinAction
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.kid.component.KidProfileChip
-import com.kiero.presentation.kid.mission.component.KidWishMissionItem
-import com.kiero.presentation.kid.mission.component.KidWishMissionTitle
+import com.kiero.presentation.kid.mission.component.KidMissionItem
+import com.kiero.presentation.kid.mission.component.KidMissionTitle
 import com.kiero.presentation.kid.mission.state.KidMissionState
 
 @Composable
@@ -106,7 +106,7 @@ private fun KidMissionScreen(
 
         KidMissionState.FAKE.forEach { section ->
             item {
-                KidWishMissionTitle(
+                KidMissionTitle(
                     title = section.headerTitle,
                     subTitle = section.subTitle,
                     modifier = Modifier
@@ -118,7 +118,7 @@ private fun KidMissionScreen(
                 items = section.missions,
                 key = { it.id },
             ) { item ->
-                KidWishMissionItem(
+                KidMissionItem(
                     missionTitle = item.name,
                     missionReward = item.reward,
                     isCompleted = item.isCompleted,

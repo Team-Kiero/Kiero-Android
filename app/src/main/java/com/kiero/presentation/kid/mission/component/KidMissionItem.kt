@@ -19,7 +19,7 @@ import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
 
 @Composable
-fun KidWishMissionItem(
+fun KidMissionItem(
     missionTitle: String,
     missionReward: Int,
     isCompleted: Boolean,
@@ -96,7 +96,7 @@ fun KidWishMissionItem(
 @Composable
 private fun KidWishMissionItemPreview() {
     KieroTheme {
-        KidWishMissionItem(
+        KidMissionItem(
             missionTitle = "미션 이름",
             missionReward = 2,
             isCompleted = true,

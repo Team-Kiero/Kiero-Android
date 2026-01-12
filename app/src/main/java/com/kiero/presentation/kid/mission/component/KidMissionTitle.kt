@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.theme.KieroTheme
 
 @Composable
-fun KidWishMissionTitle(
+fun KidMissionTitle(
     title: String,
     subTitle: String,
     modifier : Modifier = Modifier
@@ -42,7 +42,7 @@ fun KidWishMissionTitle(
 @Composable
 private fun KidWishMissionTitlePreview() {
     KieroTheme {
-        KidWishMissionTitle(
+        KidMissionTitle(
             title = "미션마감",
             subTitle = "오늘까지"
         )
