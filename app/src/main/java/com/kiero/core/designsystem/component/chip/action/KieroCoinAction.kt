@@ -14,7 +14,7 @@ import com.kiero.R
 import com.kiero.core.common.extension.forcePixelToDp
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
-import com.kiero.core.model.viewtype.ViewType
+import com.kiero.core.model.viewtype.DisplayType
 
 /**
  * @isCompleted - 완료 여부를 제어합니다 (main 색상)
@@ -25,7 +25,7 @@ class KieroCoinAction(
     private val coinCount: Int,
     private val isCompleted: Boolean = false,
     private val isEnabled: Boolean = true,
-    private val viewType: ViewType = ViewType.KID,
+    private val viewType: DisplayType = DisplayType.KID,
     private val onClick: () -> Unit
 ) : ChipAction {
     @Composable
@@ -39,17 +39,17 @@ class KieroCoinAction(
         }
 
         val textContent = when (viewType) {
-            ViewType.KID -> "$coinCount 개"
-            ViewType.PARENT -> "$coinCount 개 사용"
+            DisplayType.KID -> "$coinCount 개"
+            DisplayType.PARENT -> "$coinCount 개 사용"
         }
 
         val textStyle = when (viewType) {
-            ViewType.KID -> KieroTheme.typography.regular.body3
-            ViewType.PARENT -> KieroTheme.typography.regular.body5
+            DisplayType.KID -> KieroTheme.typography.regular.body3
+            DisplayType.PARENT -> KieroTheme.typography.regular.body5
         }
 
         Row(
-            modifier = Modifier
+            modifier = modifier
                 .noRippleClickable(onClick = onClick),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -77,7 +77,7 @@ private fun KieroCoinActionPreview() {
         KieroCoinAction(
             coinCount = 150,
             onClick = {},
-            viewType = ViewType.PARENT
+            viewType = DisplayType.PARENT
         ).invoke(modifier = Modifier)
     }
 }

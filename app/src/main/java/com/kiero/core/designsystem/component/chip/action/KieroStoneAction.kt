@@ -35,7 +35,7 @@ class KieroStoneAction(
         }
 
         Row(
-            modifier = Modifier
+            modifier = modifier
                 .noRippleClickable(onClick = onClick),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp)
