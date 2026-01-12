@@ -25,7 +25,10 @@ fun SpeechField(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    Box(modifier = modifier.padding(top = 17.dp)) {
+    Box(
+        modifier = modifier
+            .padding(top = 17.dp)
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -40,7 +43,7 @@ fun SpeechField(
         Text(
             text = name,
             modifier = Modifier
-                .offset(x = 18.dp, y = (-17).dp)
+                .offset(x = 18.dp, y = (-16).dp)
                 .background((KieroTheme.colors.main), shape = RoundedCornerShape(4.dp))
                 .padding(vertical = 2.dp, horizontal = 10.dp)
         )
