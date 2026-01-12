@@ -42,12 +42,12 @@ fun KieroButtonMedium(
             .fillMaxWidth()
             .height(49.dp),
         shape = RoundedCornerShape(8.dp),
-        color = if (isEnabled) containerColor else KieroTheme.colors.gray300,
-        contentColor = if (isEnabled) contentColor else KieroTheme.colors.gray600
+        color =  containerColor,
+        contentColor = contentColor
     ) {
         Row(
             modifier = Modifier
-                .padding(vertical = 13.dp, horizontal = 134.5.dp), // 내부 패딩으로 유연성 확보
+                .padding(vertical = 13.dp, horizontal = 127.dp), // 내부 패딩으로 유연성 확보
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
@@ -88,11 +88,6 @@ private fun KieroButtonMediumPreview() {
                 leadingIcon = ImageVector.vectorResource(id = com.kiero.R.drawable.ic_kid_camera),
                 containerColor = defaultKieroColors.gray900,
                 contentColor = defaultKieroColors.white,
-                onClick = { }
-            )
-            KieroButtonMedium(
-                text = "비활성화 버튼",
-                isEnabled = false,
                 onClick = { }
             )
         }

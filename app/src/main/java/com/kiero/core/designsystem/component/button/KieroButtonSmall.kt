@@ -33,12 +33,12 @@ fun KieroButtonSmall(
             .width( 70.dp)
             .height(40.dp),
         shape = RoundedCornerShape(8.dp),
-        color = if (isEnabled) containerColor else KieroTheme.colors.gray300,
-        contentColor = if (isEnabled) contentColor else KieroTheme.colors.gray600
+        color = containerColor,
+        contentColor = contentColor
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.padding(horizontal = 22.dp, vertical = 11.dp)
+            modifier = Modifier.padding(horizontal = 22.dp, vertical = 10.dp)
         ) {
             Text(
                 text = text,
