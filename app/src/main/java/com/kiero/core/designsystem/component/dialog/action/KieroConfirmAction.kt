@@ -11,6 +11,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kiero.core.designsystem.component.button.KieroButtonSmall
+import com.kiero.core.designsystem.component.button.model.KieroButtonColors
 import com.kiero.core.designsystem.theme.KieroTheme
 
 class KieroConfirmAction(
@@ -19,22 +21,17 @@ class KieroConfirmAction(
 ) : DialogAction {
     @Composable
     override fun invoke(modifier: Modifier) {
-        // Todo : 공통(kiero) 버튼으로 수정하기
-        Button(
+        // 공통 컴포넌트 KieroButtonSmall로 교체
+        KieroButtonSmall(
+            text = text,
             onClick = onClick,
             modifier = modifier,
-            shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = KieroTheme.colors.main
+            // 필요하다면 여기서 직접 colors를 주입해 다이얼로그 전용 색상을 쓸 수 있습니다.
+            colors = KieroButtonColors(
+                containerColor = KieroTheme.colors.main,
+                contentColor = Color.Black
             )
-        ) {
-            Text(
-                text = text,
-                color = Color.Black,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
-            )
-        }
+        )
     }
 }
 
