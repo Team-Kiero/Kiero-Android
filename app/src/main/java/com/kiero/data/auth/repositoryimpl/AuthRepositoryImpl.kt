@@ -1,7 +1,7 @@
 package com.kiero.data.auth.repositoryimpl
 
 import android.content.Context
-import com.kiero.core.common.util.handleError
+import com.kiero.core.common.extension.toHandleErrorMessage
 import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.data.auth.local.datasource.AuthLocalDataSource
 import com.kiero.data.auth.remote.datasource.AuthDataSource
@@ -35,7 +35,7 @@ class AuthRepositoryImpl @Inject constructor(
         response
     }.recoverCatching { throwable ->
         // 에러 발생 시 사용자가 정의한 handleError 메시지로 변환하여 새로운 Failure 반환
-        throw Exception(handleError(throwable))
+        throw Exception(throwable.toHandleErrorMessage())
     }
 
     override suspend fun saveAuthTokens(accessToken: String, refreshToken: String) = suspendRunCatching {
