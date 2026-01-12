@@ -1,6 +1,6 @@
 package com.kiero.core.model.viewtype
 
-enum class ViewType {
+enum class DisplayType {
     KID,
     PARENT,
 }
