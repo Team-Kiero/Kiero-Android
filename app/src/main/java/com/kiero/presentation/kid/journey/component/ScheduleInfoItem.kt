@@ -16,12 +16,12 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.theme.KieroTheme
-import com.kiero.presentation.kid.journey.model.TodayScheduleModel
+import com.kiero.presentation.kid.journey.model.JourneyScheduleModel
 import java.time.LocalTime
 
 @Composable
 fun ScheduleInfoItem(
-    item: TodayScheduleModel,
+    item: JourneyScheduleModel,
     modifier: Modifier = Modifier
 ) {
     val timeAnnotatedString = buildAnnotatedString {
@@ -64,8 +64,8 @@ fun ScheduleInfoItem(
 @Composable
 private fun ScheduleInfoItemPreview() {
     ScheduleInfoItem(
-        item = TodayScheduleModel(
-            order = 8,
+        item = JourneyScheduleModel(
+            order = 1,
             startTime = LocalTime.of(9, 0),
             endTime = LocalTime.of(10, 0)
         )

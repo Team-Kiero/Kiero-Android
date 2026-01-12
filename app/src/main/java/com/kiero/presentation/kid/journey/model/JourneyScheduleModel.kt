@@ -4,7 +4,7 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-data class TodayScheduleModel(
+data class JourneyScheduleModel(
     val order: Int,
     val startTime: LocalTime,
     val endTime: LocalTime
