@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -71,7 +72,9 @@ private fun ParentAlarmScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .statusBarsPadding() // 상태바 회피
+                .padding(horizontal = 15.dp) // 좌우 고정
+                .padding(top = 25.dp, bottom = 15.dp), // 상단은 시각적 균형을 위해 더 넓게, 하단은 15dp
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -92,8 +95,10 @@ private fun ParentAlarmScreen(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            // 1. 좌우 16dp 유지, 상하 여백은 0으로 잡는 것이 헤더와의 간격(15dp)을 유지하기에 더 정확.
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
+            // 2. 아이템(헤더-카드, 카드-카드) 사이의 간격을 16dp로 변경
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             val groupedAlarms = state.alarms.groupBy { it.date }
 
@@ -107,6 +112,7 @@ private fun ParentAlarmScreen(
                     key = { it.id }
                 ) { alarm ->
                     ParentAlarmCard(
+                        modifier = Modifier.fillMaxWidth(),
                         time = alarm.time,
                         message = alarm.message,
                         highlightTexts = listOf(alarm.highlightText),
@@ -122,7 +128,7 @@ private fun ParentAlarmScreen(
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable
 private fun ParentAlarmScreenPreview() {
     KieroTheme {
