@@ -1,15 +1,16 @@
 package com.kiero.presentation.parent.alarm.component
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -54,9 +55,8 @@ fun ParentAlarmCard(
 
     Card(
         modifier = modifier
-            .widthIn(max = 343.dp)
             .fillMaxWidth()
-            .defaultMinSize(minHeight = 68.dp)
+            .heightIn(min = 74.dp) // 이미지 확장성 고려, 최소 높이 보장
             .animateContentSize(),
         shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(containerColor = KieroTheme.colors.gray900)
@@ -64,7 +64,7 @@ fun ParentAlarmCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 13.dp, vertical = 12.dp)
+                .padding(15.dp),
         ) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -89,7 +89,7 @@ fun ParentAlarmCard(
                         text = message.toHighlightedText(
                             highlightColor, *highlightTexts.toTypedArray()
                         ),
-                        style = KieroTheme.typography.regular.body2,
+                        style = KieroTheme.typography.semiBold.title3,
                         color = KieroTheme.colors.white,
                         modifier = Modifier.weight(1f)
                     )
@@ -104,14 +104,11 @@ fun ParentAlarmCard(
                     }
                 }
             }
-
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-
-            // 3. 코인 정보 (사진이 없을 때만, 왼쪽 정렬)
+            // 3. 코인 정보
             if (!hasImage && coinUsed != null) {
+                Spacer(modifier = Modifier.height(6.dp))
                 KieroChip(
+                    modifier = Modifier.align(Alignment.Start),
                     isEnabled = true, isCompleted = false, action = KieroCoinAction(
                     coinCount = coinUsed,
                     isCompleted = false,
@@ -122,13 +119,16 @@ fun ParentAlarmCard(
 
             // 4. 확장 이미지
             if (hasImage && isExpanded) {
+                Spacer(modifier = Modifier.height(6.dp))
                 AsyncImage(
                     model = imageUrl,
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp)),
-                    contentScale = ContentScale.Crop
+                        .aspectRatio(317f / 268f) // 피그마 수치(317x268)를 비율로 환산
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(KieroTheme.colors.black),
+                    contentScale = ContentScale.Fit
                 )
             }
         }
@@ -149,7 +149,7 @@ private fun ParentAlarmCardPreview() {
         ) {
             // 케이스 1: 이미지가 있는 경우 (토글)
             ParentAlarmCard(
-                time = "12 : 00",
+                time = "2 : 00",
                 message = "근영이가 피아노 학원에 도착했어요.",
                 highlightTexts = listOf("피아노 학원"),
                 highlightColor = KieroTheme.colors.main,
@@ -160,7 +160,7 @@ private fun ParentAlarmCardPreview() {
 
             // 케이스 2: 이미지가 없는 경우 (코인 칩)
             ParentAlarmCard(
-                time = "오늘 14 : 30",
+                time = "14 : 30",
                 message = "근영이가 게임 30분 추가 쿠폰을 사용했어요",
                 highlightTexts = listOf("게임 30분 추가"),
                 highlightColor = KieroTheme.colors.main,
