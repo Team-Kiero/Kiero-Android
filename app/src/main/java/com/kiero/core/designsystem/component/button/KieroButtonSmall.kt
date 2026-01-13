@@ -3,9 +3,7 @@ package com.kiero.core.designsystem.component.button
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -29,20 +27,17 @@ fun KieroButtonSmall(
     Surface(
         onClick = onClick,
         enabled = isEnabled,
-        modifier = modifier
-            .width( 70.dp)
-            .height(40.dp),
+        modifier = modifier,
         shape = RoundedCornerShape(8.dp),
-        color = containerColor,
-        contentColor = contentColor
+        color = if (isEnabled) containerColor else KieroTheme.colors.gray300,
+        contentColor = if (isEnabled) contentColor else KieroTheme.colors.gray600
     ) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier.padding(horizontal = 22.dp, vertical = 10.dp)
         ) {
             Text(
-                text = text,
-                style = KieroTheme.typography.semiBold.title4
+                text = text, style = KieroTheme.typography.semiBold.title4
             )
         }
     }
@@ -53,15 +48,12 @@ fun KieroButtonSmall(
 fun KieroButtonSmallPreview() {
     KieroTheme {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Column {
                 Text("Primary", style = KieroTheme.typography.regular.body4)
                 KieroButtonSmall(
-                    text = "확인",
-                    onClick = {}
-                )
+                    text = "확인", onClick = {})
             }
 
             Column {

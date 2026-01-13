@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -38,8 +37,7 @@ fun KieroButtonMedium(
     Surface(
         onClick = onClick,
         enabled = isEnabled,
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
         color = if (isEnabled) containerColor else KieroTheme.colors.gray300,
         contentColor = if (isEnabled) contentColor else KieroTheme.colors.gray600
@@ -52,15 +50,12 @@ fun KieroButtonMedium(
             if (leadingIcon != null) {
                 Icon(
                     imageVector = leadingIcon, // ImageVector로 변경
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp)
+                    contentDescription = null, modifier = Modifier.size(24.dp)
                 )
                 Spacer(modifier = Modifier.width(10.dp))
             }
             Text(
-                text = text,
-                style = KieroTheme.typography.semiBold.title3,
-                maxLines = 1
+                text = text, style = KieroTheme.typography.semiBold.title3, maxLines = 1
             )
         }
     }
@@ -78,16 +73,13 @@ private fun KieroButtonMediumPreview() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             KieroButtonMedium(
-                text = "시작하기",
-                onClick = { }
-            )
+                text = "시작하기", onClick = { })
             KieroButtonMedium(
                 text = "일정 추가하기",
                 leadingIcon = ImageVector.vectorResource(id = com.kiero.R.drawable.ic_kid_camera),
                 containerColor = defaultKieroColors.gray900,
                 contentColor = defaultKieroColors.white,
-                onClick = { }
-            )
+                onClick = { })
         }
     }
 }
