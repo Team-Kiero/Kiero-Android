@@ -6,4 +6,17 @@
     <string name="journey_tab_content_description">오늘의 여정</string>
     <string name="mission_tab_content_description">금화 미션</string>
     <string name="wish_tab_content_description">소원의 우물</string>
+
+    <!--Today Journey Text -->
+    <string name="journey_no_schedule">오늘은 휴식의 날인가봐!\n푹 쉬면서 내일의 여정을 위한 힘을 모으자!</string>
+    <string name="journey_first_schedule">오늘도 내 불씨를 키워주러 왔구나!\n우리의 첫 번째 여정은 %s 야!</string>
+    <string name="journey_now_schedule">지금은 %s 의 시간이야!\n여정을 진행하면 %s 을 줄게.</string>
+    <string name="journey_next_schedule">다음은 %s 의 시간이야!\n다음 여정을 진행하면 %s 을 줄게.</string>
+    <string name="journey_fire_not_lit">고마워 %s!\n오늘의 조각들이 모두 모였어! %s 을 피워줘!</string>
+    <string name="journey_fire_lit">오늘의 불조각을 모두 모았어\n내일도 우리 함께하자!</string>
+
+    <string name="journey_btn_auth">인증하고 불조각 받기</string>
+    <string name="journey_btn_fire">마음의 불꽃 피워주기</string>
+    <string name="journey_btn_next">다음 여정으로</string>
+
 </resources>
