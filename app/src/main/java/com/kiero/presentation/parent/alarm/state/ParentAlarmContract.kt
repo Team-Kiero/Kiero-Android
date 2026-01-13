@@ -32,8 +32,8 @@ data class AlarmFeedState(
                 ParentAlarmUiModel(
                     id = "2",
                     time = "오늘 14 : 30",
-                    message = "미션 '방 청소하기'를 완료하고 100개 금화를 받았어요.",
-                    highlightText = "100개",
+                    message = "미션 방 청소하기를 완료하고 100개 금화를 받았어요.",
+                    highlightText = "방 청소하기",
                     highlightColor = Color(0xFFFFB84D),
                     coinUsed = 100,
                     imageUrl = null,
