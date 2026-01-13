@@ -78,9 +78,10 @@ private fun KidMissionScreen(
                     kidName = state.kidName
                 )
 
-                Spacer(modifier = Modifier.weight(1f))
+                //Spacer(modifier = Modifier.weight(1f))
 
                 KieroChip(
+                    modifier = Modifier.weight(1f),
                     action = KieroCoinAction(
                         coinCount = 150,
                         isEnabled = true,
