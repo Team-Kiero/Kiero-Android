@@ -1,7 +1,6 @@
-package com.kiero.data.di
+package com.kiero.data.auth.di
 
 import com.kiero.data.auth.remote.api.AuthService
-import com.kiero.data.auth.remote.api.DummyService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -11,13 +10,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object ServiceModule {
-
-    @Provides
-    @Singleton
-    fun providesDummyService(retrofit: Retrofit): DummyService =
-        retrofit.create(DummyService::class.java)
-
+object AuthServiceModule {
     // 카카오 로그인
     @Provides
     @Singleton
