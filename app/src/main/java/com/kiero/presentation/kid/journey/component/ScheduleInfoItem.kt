@@ -3,8 +3,8 @@ package com.kiero.presentation.kid.journey.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,6 +40,7 @@ fun ScheduleInfoItem(
     Row(
         modifier = modifier
             .background(color = KieroTheme.colors.gray900, shape = RoundedCornerShape(15.dp))
+            .fillMaxWidth()
             .padding(start = 20.dp, end = 20.dp, top = 14.dp, bottom = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -49,7 +50,7 @@ fun ScheduleInfoItem(
             color = KieroTheme.colors.gray300,
         )
 
-        Spacer(modifier = Modifier.width(40.dp))
+        Spacer(modifier = Modifier.weight(1f))
 
 
         Text(
