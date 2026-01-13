@@ -39,15 +39,13 @@ fun KieroButtonMedium(
         onClick = onClick,
         enabled = isEnabled,
         modifier = modifier
-            .fillMaxWidth()
-            .height(49.dp),
+            .fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
-        color =  containerColor,
-        contentColor = contentColor
+        color = if (isEnabled) containerColor else KieroTheme.colors.gray300,
+        contentColor = if (isEnabled) contentColor else KieroTheme.colors.gray600
     ) {
         Row(
-            modifier = Modifier
-                .padding(vertical = 13.dp, horizontal = 127.dp), // 내부 패딩으로 유연성 확보
+            modifier = Modifier.padding(vertical = 13.dp, horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
