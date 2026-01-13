@@ -32,7 +32,7 @@ class AuthRepositoryImpl @Inject constructor(
     }.mapCatching { response ->
         response
     }.recoverCatching { throwable ->
-        throw Throwable(throwable.toHandleErrorMessage())
+        throw Exception(throwable.toHandleErrorMessage())
     }
 
     override suspend fun saveAuthTokens(accessToken: String, refreshToken: String) = suspendRunCatching {
