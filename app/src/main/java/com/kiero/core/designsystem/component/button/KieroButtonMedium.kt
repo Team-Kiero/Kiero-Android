@@ -50,12 +50,15 @@ fun KieroButtonMedium(
             if (leadingIcon != null) {
                 Icon(
                     imageVector = leadingIcon, // ImageVector로 변경
-                    contentDescription = null, modifier = Modifier.size(24.dp)
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp)
                 )
                 Spacer(modifier = Modifier.width(10.dp))
             }
             Text(
-                text = text, style = KieroTheme.typography.semiBold.title3, maxLines = 1
+                text = text,
+                style = KieroTheme.typography.semiBold.title3,
+                maxLines = 1
             )
         }
     }

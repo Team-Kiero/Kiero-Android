@@ -37,7 +37,8 @@ fun KieroButtonSmall(
             modifier = Modifier.padding(horizontal = 22.dp, vertical = 10.dp)
         ) {
             Text(
-                text = text, style = KieroTheme.typography.semiBold.title4
+                text = text,
+                style = KieroTheme.typography.semiBold.title4
             )
         }
     }
@@ -48,10 +49,12 @@ fun KieroButtonSmall(
 fun KieroButtonSmallPreview() {
     KieroTheme {
         Column(
-            modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Column {
-                Text("Primary", style = KieroTheme.typography.regular.body4)
+                Text("Primary",
+                    style = KieroTheme.typography.regular.body4)
                 KieroButtonSmall(
                     text = "확인", onClick = {})
             }
