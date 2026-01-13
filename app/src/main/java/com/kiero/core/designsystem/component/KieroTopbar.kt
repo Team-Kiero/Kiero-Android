@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
@@ -23,10 +24,10 @@ import com.kiero.core.designsystem.theme.KieroTheme
 fun KieroTopbar(
     title: String,
     leftIconRes: Int,
-    rightIconRes: Int,
     leftIconClick: () -> Unit,
-    rightIconClick: () -> Unit,
     modifier: Modifier = Modifier,
+    rightIconRes: Int? = null,
+    rightIconClick: () -> Unit = {},
 ) {
     Row(
         modifier = modifier
@@ -50,16 +51,20 @@ fun KieroTopbar(
         Text(
             text = title,
             color = KieroTheme.colors.white,
-            style = KieroTheme.typography.bold.headLine2
+            style = KieroTheme.typography.bold.headLine2,
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.Center
         )
 
-        Icon(
-            imageVector = ImageVector.vectorResource(id = rightIconRes),
-            contentDescription = null,
-            tint = KieroTheme.colors.white,
-            modifier = Modifier
-                .noRippleClickable(onClick = rightIconClick)
-        )
+        if (rightIconRes != null) {
+            Icon(
+                imageVector = ImageVector.vectorResource(id = rightIconRes),
+                contentDescription = null,
+                tint = KieroTheme.colors.white,
+                modifier = Modifier
+                    .noRippleClickable(onClick = rightIconClick)
+            )
+        }
     }
 }
 
