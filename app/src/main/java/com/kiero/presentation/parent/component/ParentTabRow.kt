@@ -31,11 +31,11 @@ fun ParentTabRow(
             .fillMaxWidth(),
         indicator = {
             TabRowDefaults.PrimaryIndicator(
-                modifier = Modifier.tabIndicatorOffset(selectedTabIndex, matchContentSize = true),
+                modifier = Modifier.tabIndicatorOffset(selectedTabIndex, matchContentSize = false),
                 width = Dp.Unspecified,
                 height = 1.dp,
                 color = KieroTheme.colors.white,
-                shape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp),
+                shape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp)
             )
         },
         divider = {}
