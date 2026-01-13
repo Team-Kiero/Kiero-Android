@@ -13,6 +13,6 @@ data class ParentAlarmUiModel(
     val highlightText: String,
     val highlightColor: Color,
     val coinUsed: Int?,
-    val imageUrl: String?,
+    val imageUrl: Any?,  // String? → Any? (Int 리소스 ID도 받을 수 있게)
     val isExpanded: Boolean = false
 )

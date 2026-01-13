@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.Color
 import com.kiero.presentation.parent.alarm.model.ParentAlarmUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import com.kiero.R
 
 @Immutable
 data class AlarmFeedState(
@@ -29,7 +30,8 @@ data class AlarmFeedState(
                     highlightText = "피아노 학원",
                     highlightColor = Color(0xFF00FFE1),
                     coinUsed = null,
-                    imageUrl = "https://example.com/piano.jpg",
+                    imageUrl = R.drawable.img_kid_journey_piano_background,
+                    //imageUrl = "https://example.com/piano.jpg",
                     isExpanded = false
                 ), ParentAlarmUiModel(
                     id = "2",

@@ -16,7 +16,7 @@ class AlarmFeedViewModel @Inject constructor(
     // 나중에 Repository 주입
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(AlarmFeedState())
+    private val _state = MutableStateFlow(AlarmFeedState.FAKE)  // FAKE 데이터 사용
     val state = _state.asStateFlow()
 
     // TODO: 실제 데이터 로딩 로직 구현

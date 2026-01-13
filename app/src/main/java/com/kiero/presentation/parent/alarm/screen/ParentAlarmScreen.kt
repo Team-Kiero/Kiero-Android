@@ -1,23 +1,53 @@
 package com.kiero.presentation.parent.alarm.screen
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.kiero.R
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.presentation.parent.alarm.component.ParentAlarmCard
+import com.kiero.presentation.parent.alarm.component.ParentAlarmDateHeader
+import com.kiero.presentation.parent.alarm.state.AlarmFeedState
+import com.kiero.presentation.parent.alarm.viewmodel.AlarmFeedViewModel
+import kotlinx.collections.immutable.toPersistentList
 
 @Composable
 fun ParentAlarmRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
+    viewModel: AlarmFeedViewModel = hiltViewModel()
 ) {
+    val state by viewModel.state.collectAsState()
+
     ParentAlarmScreen(
         paddingValues = paddingValues,
-        navigateUp = navigateUp
+        navigateUp = navigateUp,
+        state = state,
+        onExpandClick = { alarmId -> viewModel.toggleExpand(alarmId) }
     )
 }
 
@@ -25,6 +55,8 @@ fun ParentAlarmRoute(
 private fun ParentAlarmScreen(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
+    state: AlarmFeedState,
+    onExpandClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -32,14 +64,86 @@ private fun ParentAlarmScreen(
             .fillMaxSize()
             .padding(paddingValues),
     ) {
-        Text(
-            text = "알람 피드"
-        )
+        // TODO: 헤더 컴포넌트로 분리 (ParentAlarmHeader)
+        //  - 왼쪽: 타이틀 없음
+        //  - 오른쪽: 사용자 이름 + 프로필 아이콘
+        //  - 클릭 시 로그아웃 다이얼로그
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "근영맘",  // TODO: 실제 사용자 이름으로 교체
+                style = KieroTheme.typography.regular.body2,
+                //color = KieroTheme.colors.white
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            // TODO: 실제 프로필 이미지 아이콘으로 교체
+            Icon(
+                imageVector = ImageVector.vectorResource(id = R.drawable.ic_parent_profile),
+                contentDescription = "프로필",
+                modifier = Modifier.size(32.dp),
+                tint = KieroTheme.colors.gray500
+            )
+        }
+
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            val groupedAlarms = state.alarms.groupBy { it.date }
+
+            groupedAlarms.forEach { (date, alarmsForDate) ->
+                item(key = "header_$date") {
+                    ParentAlarmDateHeader(date = date)
+                }
+
+                items(
+                    items = alarmsForDate,
+                    key = { it.id }
+                ) { alarm ->
+                    ParentAlarmCard(
+                        time = alarm.time,
+                        message = alarm.message,
+                        highlightTexts = listOf(alarm.highlightText),
+                        highlightColor = alarm.highlightColor,
+                        coinUsed = alarm.coinUsed,
+                        imageUrl = alarm.imageUrl,
+                        isExpanded = alarm.isExpanded,
+                        onExpandClick = { onExpandClick(alarm.id) }
+                    )
+                }
+            }
+        }
     }
 }
 
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
-@Preview
-private fun ParentAlarmRoutePreview() {
-    KieroTheme {}
+private fun ParentAlarmScreenPreview() {
+    KieroTheme {
+        var state by remember { mutableStateOf(AlarmFeedState.FAKE) }
+
+        ParentAlarmScreen(
+            paddingValues = PaddingValues(0.dp),
+            navigateUp = {},
+            state = state,
+            onExpandClick = { alarmId ->
+                // Preview에서 상태 변경 처리
+                state = state.copy(
+                    alarms = state.alarms.map { alarm ->
+                        if (alarm.id == alarmId) {
+                            alarm.copy(isExpanded = !alarm.isExpanded)
+                        } else {
+                            alarm
+                        }
+                    }.toPersistentList()
+                )
+            }
+        )
+    }
 }

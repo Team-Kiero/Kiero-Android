@@ -17,7 +17,7 @@ fun ParentAlarmDateHeader(
     Text(
         text = date,
         style = KieroTheme.typography.semiBold.title3,
-        color = KieroTheme.colors.white,
+        //color = KieroTheme.colors.white,
         modifier = modifier.padding(vertical = 16.dp)
     )
 }
