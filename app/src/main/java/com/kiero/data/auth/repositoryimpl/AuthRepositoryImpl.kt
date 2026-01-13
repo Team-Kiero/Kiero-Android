@@ -28,10 +28,8 @@ class AuthRepositoryImpl @Inject constructor(
 
         loginResponse
     }.onFailure { throwable ->
-        // 공통 에러 로그 기록 (Throwable을 넘겨서 상세 정보 출력)
         Timber.e(throwable, "❌ 로그인 과정 중 에러 발생")
     }.mapCatching { response ->
-        // 성공 시 데이터 반환 (필요 시 여기서 데이터 가공 가능)
         response
     }.recoverCatching { throwable ->
         // 에러 발생 시 사용자가 정의한 handleError 메시지로 변환하여 새로운 Failure 반환
