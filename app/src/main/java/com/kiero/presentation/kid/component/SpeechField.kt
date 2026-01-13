@@ -21,13 +21,13 @@ import com.kiero.core.designsystem.theme.KieroTheme
 
 @Composable
 fun SpeechField(
-    name: String,
     modifier: Modifier = Modifier,
+    name: String = "꾸비",
     content: @Composable () -> Unit
 ) {
     Box(
         modifier = modifier
-            .padding(top = 17.dp)
+            .padding(top = 19.dp)
     ) {
         Column(
             modifier = Modifier
@@ -43,7 +43,7 @@ fun SpeechField(
         Text(
             text = name,
             modifier = Modifier
-                .offset(x = 18.dp, y = (-16).dp)
+                .offset(x = 18.dp, y = (-19).dp)
                 .background((KieroTheme.colors.main), shape = RoundedCornerShape(4.dp))
                 .padding(vertical = 2.dp, horizontal = 10.dp)
         )
