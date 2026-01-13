@@ -20,7 +20,7 @@ fun KieroNavHost(
     NavHost(
         navController = appState.navController,
         startDestination = startDestination,
-        modifier = modifier
+        modifier = modifier,
     ) {
         authNavGraph(
             navController = appState.navController,
