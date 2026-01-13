@@ -32,6 +32,7 @@ class AuthRepositoryImpl @Inject constructor(
     }.mapCatching { response ->
         response
     }.recoverCatching { throwable ->
+        // 에러 발생 시 사용자가 정의한 handleError 메시지로 변환하여 새로운 Failure 반환
         throw Exception(throwable.toHandleErrorMessage())
     }
 
