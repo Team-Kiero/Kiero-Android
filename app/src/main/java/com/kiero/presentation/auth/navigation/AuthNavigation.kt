@@ -36,12 +36,12 @@ fun NavGraphBuilder.authNavGraph(
     navigateToParent: () -> Unit,
     navigateToKid: () -> Unit,
 ) {
-    navigation<AuthGraph>(startDestination = Selection)  {
-
+    navigation<AuthGraph>(
+        startDestination = Selection
+    )  {
         composable<Selection> {
             AuthRoute(
                 paddingValues = paddingValues,
-                navigateUp = navigateUp,
                 navigateToParent = navController::navigateToAuthParent,
                 navigateToKid = navigateToKid,
             )

@@ -9,6 +9,5 @@ data class AuthState(
 )
 
 sealed interface AuthSideEffect {
-    data class ShowSnackBar(val message: String) : AuthSideEffect
     data object NavigateUp : AuthSideEffect
 }
