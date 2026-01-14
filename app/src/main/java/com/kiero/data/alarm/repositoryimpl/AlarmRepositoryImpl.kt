@@ -48,7 +48,7 @@ class AlarmRepositoryImpl @Inject constructor(
         val response = dataSource.getAlarmFeed(
             childId = childId,
             size = size,
-            cursor = if (refresh) null else null  // refresh면 처음부터
+            cursor = null  // 초기 로드는 항상 null (첫 페이지)
         )
 
         val model = response.data!!.toModel()
