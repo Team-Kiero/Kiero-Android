@@ -171,7 +171,7 @@ private fun RepeatSection(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        Spacer(modifier = Modifier.weight(1F))
+        Spacer(modifier = Modifier.weight(1f))
 
         Icon(
             imageVector = ImageVector.vectorResource(id = iconRes),
@@ -211,7 +211,7 @@ private fun DaySection(
             style = KieroTheme.typography.semiBold.title3
         )
 
-        Spacer(modifier = Modifier.weight(1F))
+        Spacer(modifier = Modifier.weight(1f))
 
         Text(
             text = "매주 반복",

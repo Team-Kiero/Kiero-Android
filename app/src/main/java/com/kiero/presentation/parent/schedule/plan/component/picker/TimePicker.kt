@@ -87,7 +87,6 @@ fun TimePicker(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                modifier = Modifier.padding(),
                 text = if (isEmpty) placeHolder else value,
                 color = if (isEmpty) KieroTheme.colors.gray600 else KieroTheme.colors.gray100,
                 style = KieroTheme.typography.regular.body4,

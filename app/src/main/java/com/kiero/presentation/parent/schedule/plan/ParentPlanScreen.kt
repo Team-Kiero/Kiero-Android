@@ -24,9 +24,7 @@ fun ParentPlanScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(
-                color = KieroTheme.colors.black
-            )
+            .background(color = KieroTheme.colors.black)
             .padding(horizontal = 18.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
