@@ -4,10 +4,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
+import java.util.Locale
 
 val String.formattedDeadLine: String
     get() {
@@ -38,51 +39,32 @@ val String.formattedDeadLine: String
 val String.formattedAlarmDate: String
     get() {
         if (this.isBlank()) return ""
-
         return try {
-            val dateTime = LocalDateTime.parse(this)
-            val dayOfWeek = when (dateTime.dayOfWeek) {
-                DayOfWeek.MONDAY -> "월"
-                DayOfWeek.TUESDAY -> "화"
-                DayOfWeek.WEDNESDAY -> "수"
-                DayOfWeek.THURSDAY -> "목"
-                DayOfWeek.FRIDAY -> "금"
-                DayOfWeek.SATURDAY -> "토"
-                DayOfWeek.SUNDAY -> "일"
-            }
+            // "T" 유무에 따라 LocalDateTime 또는 LocalDate로 파싱
+            val date = if (this.contains("T")) LocalDateTime.parse(this).toLocalDate()
+            else LocalDate.parse(this)
+
             val formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd")
-            "${dateTime.format(formatter)}.($dayOfWeek)"
+            // 요일을 한글 (월, 화, 수...)로 추출
+            val dayOfWeek = date.dayOfWeek.getDisplayName(TextStyle.NARROW, Locale.KOREAN)
+
+            "${date.format(formatter)}.($dayOfWeek)"
         } catch (e: Exception) {
-            this
+            this // 실패 시 원본이라도 보여줌
         }
     }
 
 /**
- * ISO_LOCAL_DATE_TIME 형식을 시간 표시 형식으로 변환
- * 오늘: "오늘 14 : 30"
- * 어제: "어제 14 : 30"
- * 그 외: "14 : 30"
+ * 시간 정보가 있으면 "HH : mm", 없으면 "00 : 00" 반환
  */
+
 val String.formattedAlarmTime: String
     get() {
-        if (this.isBlank()) return ""
-
+        if (this.isBlank() || !this.contains("T")) return "00 : 00"
         return try {
-            val dateTime = LocalDateTime.parse(this)
-            val date = dateTime.toLocalDate()
-            val today = LocalDate.now()
-            val yesterday = today.minusDays(1)
-
-            val timeFormatter = DateTimeFormatter.ofPattern("HH : mm")
-            val timeString = dateTime.format(timeFormatter)
-
-            when {
-                date.isEqual(today) -> "오늘 $timeString"
-                date.isEqual(yesterday) -> "어제 $timeString"
-                else -> timeString
-            }
+            LocalDateTime.parse(this).format(DateTimeFormatter.ofPattern("HH : mm"))
         } catch (e: Exception) {
-            this
+            "00 : 00"
         }
     }
 
