@@ -5,6 +5,8 @@ import com.kiero.R
 import com.kiero.presentation.kid.journey.model.KidJourneyButtonType
 import com.kiero.presentation.kid.journey.model.KidJourneyContentModel
 import com.kiero.presentation.kid.journey.model.KidJourneyHeaderModel
+import com.kiero.presentation.kid.journey.model.KidJourneyScheduleModel
+import java.time.LocalTime
 
 @Immutable
 data class KidJourneyState(
@@ -84,6 +86,28 @@ data class KidJourneyState(
                 emptyArray()
             }
         }
+    }
+
+    companion object {
+        fun fake() = KidJourneyState(
+            header = KidJourneyHeaderModel(
+                kidName = "주완",
+                currentDate = java.time.LocalDate.of(2024, 12, 5),
+                coinCount = 350,
+                earnedStones = 5,
+                totalScheduleCount = 7
+            ),
+            content = KidJourneyContentModel.NextSchedule(
+                scheduleName = "피아노 학원 가기",
+                stoneType = "용기의 불조각",
+                scheduleInfo = KidJourneyScheduleModel(
+                    order = 1,
+                    startTime = LocalTime.of(14, 0),
+                    endTime = LocalTime.of(16, 0)
+                ),
+                isSkippable = true
+            )
+        )
     }
 }
 
