@@ -33,6 +33,7 @@ import com.kiero.presentation.kid.journey.component.KidJourneyGoblinMessage
 import com.kiero.presentation.kid.journey.component.KidJourneyHeader
 import com.kiero.presentation.kid.journey.component.KidJourneyNextButton
 import com.kiero.presentation.kid.journey.component.KidJourneyScheduleItem
+import com.kiero.presentation.kid.journey.model.KidJourneyButtonType
 import com.kiero.presentation.kid.journey.model.KidJourneyContentModel
 import com.kiero.presentation.kid.journey.model.KidJourneyHeaderModel
 import com.kiero.presentation.kid.journey.model.KidJourneyScheduleModel
@@ -47,6 +48,8 @@ import java.time.LocalTime
 fun KidJourneyRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
+    navigateToCamera: () -> Unit,
+    navigateToFire: () -> Unit,
     viewModel: KidJourneyViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -65,7 +68,13 @@ fun KidJourneyRoute(
     KidJourneyScreen(
         paddingValues = paddingValues,
         state = state,
-        onButtonClick = { },
+        onButtonClick = {
+            when (state.buttonType) {
+                KidJourneyButtonType.AUTH -> navigateToCamera()
+                KidJourneyButtonType.FIRE -> navigateToFire()
+                else -> { /* NONE 인 경우 처리 */ }
+            }
+        },
         navigateUp = navigateUp,
     )
 }

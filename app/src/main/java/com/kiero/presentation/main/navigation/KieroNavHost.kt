@@ -7,6 +7,8 @@ import androidx.navigation.compose.NavHost
 import com.kiero.core.navigation.Route
 import com.kiero.presentation.auth.navigation.AuthGraph
 import com.kiero.presentation.auth.navigation.authNavGraph
+import com.kiero.presentation.kid.journey.camera.navigation.kidJourneyCameraNavGraph
+import com.kiero.presentation.kid.journey.fire.navigation.kidJourneyFireNavGraph
 import com.kiero.presentation.kid.navigation.kidNavGraph
 import com.kiero.presentation.parent.navigation.parentNavGraph
 
@@ -40,6 +42,18 @@ fun KieroNavHost(
             navController = appState.navController,
             paddingValues = paddingValues,
             navigateUp = appState::navigateUp,
+            navigateToCamera = appState::navigateToCamera,
+            navigateToFire = appState::navigateToFire
+        )
+
+        kidJourneyCameraNavGraph(
+            navigateUp = appState::navigateUp,
+            paddingValues = paddingValues
+        )
+
+        kidJourneyFireNavGraph(
+            navigateUp = appState::navigateUp,
+            paddingValues = paddingValues
         )
     }
 }

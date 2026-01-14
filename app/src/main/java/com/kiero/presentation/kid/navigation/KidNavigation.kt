@@ -37,6 +37,8 @@ fun NavGraphBuilder.kidNavGraph(
     navController: NavHostController,
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
+    navigateToCamera: () -> Unit,
+    navigateToFire: () -> Unit
 ) {
     navigation<KidGraph>(
         startDestination = Journey
@@ -44,6 +46,8 @@ fun NavGraphBuilder.kidNavGraph(
         kidJourneyNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
+            navigateToCamera = navigateToCamera,
+            navigateToFire = navigateToFire
         )
 
         kidMissionNavGraph(
