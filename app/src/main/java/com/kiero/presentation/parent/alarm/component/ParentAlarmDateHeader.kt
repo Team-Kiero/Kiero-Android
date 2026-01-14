@@ -1,12 +1,10 @@
 package com.kiero.presentation.parent.alarm.component
 
 
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -22,8 +20,8 @@ fun ParentAlarmDateHeader(
         style = KieroTheme.typography.semiBold.title3,
         color = KieroTheme.colors.gray200,
         modifier = modifier
-            .heightIn(min = 23.dp)
-            .wrapContentHeight(Alignment.CenterVertically)
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
     )
 }
 

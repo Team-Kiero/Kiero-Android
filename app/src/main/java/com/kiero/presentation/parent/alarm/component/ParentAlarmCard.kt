@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -56,15 +55,14 @@ fun ParentAlarmCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = 74.dp) // 이미지 확장성 고려, 최소 높이 보장
-            .animateContentSize(),
+            .animateContentSize(), // 높이 변화 애니메이션은 유지
         shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(containerColor = KieroTheme.colors.gray900)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(15.dp),
+                .padding(15.dp), // 상하좌우 15dp 패딩이 카드의 최소 높이 역할을 수행함
         ) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -104,20 +102,21 @@ fun ParentAlarmCard(
                     }
                 }
             }
-            // 3. 코인 정보
+
+            // 3. 코인 정보 (간격은 그대로 유지)
             if (!hasImage && coinUsed != null) {
                 Spacer(modifier = Modifier.height(6.dp))
                 KieroChip(
                     modifier = Modifier.align(Alignment.Start),
                     isEnabled = true, isCompleted = false, action = KieroCoinAction(
-                    coinCount = coinUsed,
-                    isCompleted = false,
-                    isEnabled = true,
-                    viewType = DisplayType.PARENT,
-                    onClick = { }))
+                        coinCount = coinUsed,
+                        isCompleted = false,
+                        isEnabled = true,
+                        viewType = DisplayType.PARENT,
+                        onClick = { }))
             }
 
-            // 4. 확장 이미지
+            // 4. 확장 이미지 (고정 높이 대신 비율 사용)
             if (hasImage && isExpanded) {
                 Spacer(modifier = Modifier.height(6.dp))
                 AsyncImage(
@@ -125,7 +124,7 @@ fun ParentAlarmCard(
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .aspectRatio(317f / 268f) // 피그마 수치(317x268)를 비율로 환산
+                        .aspectRatio(317f / 268f) // 고정 높이 대신 피그마 비율 유지
                         .clip(RoundedCornerShape(8.dp))
                         .background(KieroTheme.colors.black),
                     contentScale = ContentScale.Fit
@@ -134,7 +133,6 @@ fun ParentAlarmCard(
         }
     }
 }
-
 @Preview
 @Composable
 private fun ParentAlarmCardPreview() {

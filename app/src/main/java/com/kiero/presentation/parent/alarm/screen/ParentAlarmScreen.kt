@@ -72,16 +72,15 @@ private fun ParentAlarmScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .statusBarsPadding() // 상태바 회피
-                .padding(horizontal = 15.dp) // 좌우 고정
-                .padding(top = 25.dp, bottom = 15.dp), // 상단은 시각적 균형을 위해 더 넓게, 하단은 15dp
+                .statusBarsPadding()
+                // 모든 수치를 패딩으로 제어 (상단 25, 하단 15, 좌우 15)
+                .padding(top = 25.dp, bottom = 15.dp, start = 15.dp, end = 15.dp),
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = "근영맘",  // TODO: 실제 사용자 이름으로 교체
                 style = KieroTheme.typography.regular.body2,
-                //color = KieroTheme.colors.white
             )
             Spacer(modifier = Modifier.width(8.dp))
             // TODO: 실제 프로필 이미지 아이콘으로 교체
