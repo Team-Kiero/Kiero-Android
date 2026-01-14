@@ -2,6 +2,7 @@ package com.kiero.data.alarm.repository
 
 import com.kiero.data.alarm.model.AlarmFeedModel
 import com.kiero.data.alarm.model.AlarmItemModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 interface AlarmRepository {
@@ -49,6 +50,14 @@ interface AlarmRepository {
         childId: Long,
         size: Int = 20 // 기본값 명시
     ): Result<AlarmFeedModel>
+
+
+    /**
+     * ✅ 실시간 알람 구독 (SSE)
+     * @param childId 구독할 자녀 ID
+     * @return 실시간으로 발생하는 알람 아이템의 흐름 (Flow)
+     */
+    fun subscribeAlarmFeed(childId: Long): Flow<AlarmItemModel>
 
     /**
      * SSE로 받은 실시간 알람 추가

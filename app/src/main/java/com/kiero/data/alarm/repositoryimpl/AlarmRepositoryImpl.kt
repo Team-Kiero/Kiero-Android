@@ -7,9 +7,13 @@ import com.kiero.data.alarm.model.AlarmItemModel
 import com.kiero.data.alarm.model.toModel
 import com.kiero.data.alarm.repository.AlarmRepository
 import com.kiero.data.auth.local.datasource.AuthLocalDataSource
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import timber.log.Timber
 import javax.inject.Inject
@@ -40,11 +44,11 @@ class AlarmRepositoryImpl @Inject constructor(
     private val _nextCursor = MutableStateFlow<String?>(null)
     override val nextCursor: StateFlow<String?> = _nextCursor.asStateFlow()
 
-    // [리펙] 토큰 생성 로직 공통화
+    // 토큰 생성 로직 공통화
     private suspend fun getBearerToken(): String =
         "Bearer ${authLocalDataSource.getAccessToken()}"
 
-    //  API 호출 및 공통 처리를 위한 내부 전용 함수
+    // API 호출 및 공통 처리를 위한 내부 전용 함수
     private suspend fun fetchFeeds(
         childId: Long,
         size: Int,
@@ -106,12 +110,34 @@ class AlarmRepositoryImpl @Inject constructor(
         model
     }
 
+    /**
+     * 실시간 알람 구독 (SSE) 구현
+     */
+    override fun subscribeAlarmFeed(childId: Long): Flow<AlarmItemModel> = flow {
+        val token = getBearerToken()
+
+        // DataSource의 스트림을 collect하여 실시간으로 데이터 수신
+        dataSource.subscribeAlarmFeed(token, childId).collect { dto ->
+            dto.toModel()?.let { model ->
+                // 캐시 리스트에 즉시 반영
+                addNewAlarm(model)
+                // 필요 시 외부(ViewModel)로 데이터 전달
+                emit(model)
+            }
+        }
+    }.flowOn(Dispatchers.IO) // 네트워크 스트림 읽기는 IO 스레드에서
+
     override suspend fun addNewAlarm(item: AlarmItemModel) {
         // TODO: Paging 3의 invalidate() 사용으로 대체 가능
         Timber.d("addNewAlarm - item: $item")
 
         _cachedAlarms.update { current ->
-            listOf(item) + current  // 맨 앞에 추가
+            // ✅ 중복 체크: 이미 동일한 id(feedItemId)가 있으면 리스트 유지, 없으면 맨 앞에 추가
+            if (current.any { it.id == item.id }) {
+                current
+            } else {
+                listOf(item) + current
+            }
         }
     }
 
