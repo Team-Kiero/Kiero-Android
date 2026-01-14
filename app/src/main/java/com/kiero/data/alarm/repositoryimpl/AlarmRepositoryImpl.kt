@@ -6,6 +6,7 @@ import com.kiero.data.alarm.model.AlarmFeedModel
 import com.kiero.data.alarm.model.AlarmItemModel
 import com.kiero.data.alarm.model.toModel
 import com.kiero.data.alarm.repository.AlarmRepository
+import com.kiero.data.auth.local.datasource.AuthLocalDataSource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,7 +17,8 @@ import javax.inject.Singleton
 
 @Singleton  // 앱 전체에서 하나만 (캐시 공유)
 class AlarmRepositoryImpl @Inject constructor(
-    private val dataSource: AlarmDataSource
+    private val dataSource: AlarmDataSource,
+    private val authLocalDataSource: AuthLocalDataSource
 ) : AlarmRepository {
 
     // TODO: Paging 3 전환 시 제거
@@ -38,22 +40,35 @@ class AlarmRepositoryImpl @Inject constructor(
     private val _nextCursor = MutableStateFlow<String?>(null)
     override val nextCursor: StateFlow<String?> = _nextCursor.asStateFlow()
 
+    // [리펙] 토큰 생성 로직 공통화
+    private suspend fun getBearerToken(): String =
+        "Bearer ${authLocalDataSource.getAccessToken()}"
+
+    //  API 호출 및 공통 처리를 위한 내부 전용 함수
+    private suspend fun fetchFeeds(
+        childId: Long,
+        size: Int,
+        cursor: String?
+    ): AlarmFeedModel {
+        val response = dataSource.getAlarmFeed(
+            token = getBearerToken(),
+            childId = childId,
+            size = size,
+            cursor = cursor
+        )
+        return response.data!!.toModel()
+    }
+
     override suspend fun loadAlarms(
         childId: Long,
-        size: Int?,
+        size: Int,
         refresh: Boolean
     ): Result<AlarmFeedModel> = suspendRunCatching {
         Timber.d("loadAlarms - childId: $childId, size: $size, refresh: $refresh")
 
-        val response = dataSource.getAlarmFeed(
-            childId = childId,
-            size = size,
-            cursor = null  // 초기 로드는 항상 null (첫 페이지)
-        )
+        val model = fetchFeeds(childId, size, null) // 초기 로드는 cursor null
 
-        val model = response.data!!.toModel()
-
-        // 캐시 업데이트
+        // 상태 업데이트 (새 데이터로 교체)
         _cachedAlarms.value = model.items
         _childName.value = model.childName
         _nextCursor.value = model.nextCursor
@@ -65,22 +80,14 @@ class AlarmRepositoryImpl @Inject constructor(
 
     override suspend fun loadMore(
         childId: Long,
-        size: Int?
+        size: Int
     ): Result<AlarmFeedModel> = suspendRunCatching {
-        val currentCursor = _nextCursor.value
-            ?: throw IllegalStateException("No more data to load")
-
+        val currentCursor = _nextCursor.value ?: throw IllegalStateException("No more data to load")
         Timber.d("loadMore - childId: $childId, cursor: $currentCursor")
 
-        val response = dataSource.getAlarmFeed(
-            childId = childId,
-            size = size,
-            cursor = currentCursor
-        )
+        val model = fetchFeeds(childId, size, currentCursor)
 
-        val model = response.data!!.toModel()
-
-        // 캐시에 추가 (기존 리스트 + 새 리스트)
+        // 상태 업데이트 (기존 데이터에 추가 및 용량 제한)
         _cachedAlarms.update { current ->
             val newList = current + model.items
 
@@ -92,7 +99,6 @@ class AlarmRepositoryImpl @Inject constructor(
                 newList
             }
         }
-
         _nextCursor.value = model.nextCursor
 
         Timber.d("loadMore success - added: ${model.items.size}, total: ${_cachedAlarms.value.size}")

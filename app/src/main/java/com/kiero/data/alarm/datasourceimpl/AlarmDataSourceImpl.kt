@@ -10,9 +10,10 @@ class AlarmDataSourceImpl @Inject constructor(
     private val service: AlarmService
 ) : AlarmDataSource {
     override suspend fun getAlarmFeed(
+        token: String,
         childId: Long,
         size: Int?,
         cursor: String?
     ): BaseResponse<AlarmFeedResponseDto> =
-        service.getAlarmFeed(childId, size, cursor)
+        service.getAlarmFeed(token, childId, size, cursor)
 }

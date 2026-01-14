@@ -29,25 +29,25 @@ interface AlarmRepository {
     /**
      * 알람 피드 로드
      * @param childId 조회할 자녀 ID
-     * @param size 페이지 크기 (기본 20)
+     * @param size 한 번에 조회할 크기 (기본 20)
      * @param refresh true면 캐시 초기화 후 로드
      * @return 알람 피드 도메인 모델
      */
     suspend fun loadAlarms(
         childId: Long,
-        size: Int? = 20,
+        size: Int = 20, //기본값을 인터페이스에 명시하여 일관성 확보
         refresh: Boolean = false
     ): Result<AlarmFeedModel>
 
     /**
      * 다음 페이지 로드 (무한 스크롤)
      * @param childId 조회할 자녀 ID
-     * @param size 페이지 크기 (기본 20)
+     * @param size 한 번에 조회할 크기 (기본 20)
      * @return 알람 피드 도메인 모델
      */
     suspend fun loadMore(
         childId: Long,
-        size: Int? = 20
+        size: Int = 20 // 기본값 명시
     ): Result<AlarmFeedModel>
 
     /**
