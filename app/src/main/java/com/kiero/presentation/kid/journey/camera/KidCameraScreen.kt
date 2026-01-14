@@ -115,12 +115,12 @@ private fun KidCameraScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .align(Alignment.BottomCenter), // 하단 정렬
+                    .align(Alignment.BottomCenter),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 StoneFloating()
 
-                Spacer(modifier = Modifier.height(19.dp)) // 이제 간격이 정상 작동합니다.
+                Spacer(modifier = Modifier.height(19.dp))
 
                 Image(
                     painter = painterResource(id = R.drawable.img_kid_camera_goblin),
@@ -156,7 +156,7 @@ fun StoneFloating(
     )
 
     Image(
-        painter = painterResource(id = R.drawable.img_stone_blue),
+        painter = painterResource(id = R.drawable.img_kid_journey_stone_blue),
         contentDescription = null,
         contentScale = ContentScale.Crop,
         modifier = modifier
