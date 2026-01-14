@@ -45,8 +45,12 @@ class AlarmRepositoryImpl @Inject constructor(
     override val nextCursor: StateFlow<String?> = _nextCursor.asStateFlow()
 
     // 토큰 생성 로직 공통화
-    private suspend fun getBearerToken(): String =
-        "Bearer ${authLocalDataSource.getAccessToken()}"
+    private suspend fun getBearerToken(): String {
+        val accessToken = authLocalDataSource.getAccessToken()
+        // ✅ 토큰이 null이거나 "null" 문자열인지 반드시 확인하세요.
+        Timber.d("실시간 구독 시도 토큰: $accessToken")
+        return "Bearer $accessToken"
+    }
 
     // API 호출 및 공통 처리를 위한 내부 전용 함수
     private suspend fun fetchFeeds(
