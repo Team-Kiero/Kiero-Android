@@ -1,9 +1,8 @@
 package com.kiero.presentation.kid.journey.camera
 
-import android.graphics.Bitmap
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.result.launch
 import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -30,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -40,41 +38,52 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
+import coil.compose.AsyncImage
 import com.kiero.R
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.kid.component.KidSpeechField
+import java.io.File
 
 @Composable
 fun KidCameraRoute(
     navigateUp: () -> Unit,
 ) {
-    var capturedBitmap by remember { mutableStateOf<Bitmap?>(null) }
+    val context = LocalContext.current
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+
+    val tempUri = remember {
+        val directory = File(context.cacheDir, "images")
+        directory.mkdirs()
+        val file = File(directory, "captured_image.jpg")
+        FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+    }
 
     val systemCameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicturePreview()
-    ) { bitmap: Bitmap? ->
-        if (bitmap != null) {
-            capturedBitmap = bitmap
-        } else if (capturedBitmap == null) {
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) {
+            imageUri = tempUri
+        } else {
             navigateUp()
         }
     }
 
     LaunchedEffect(Unit) {
-        if (capturedBitmap == null) {
-            systemCameraLauncher.launch()
+        if (imageUri == null) {
+            systemCameraLauncher.launch(tempUri)
         }
     }
 
     KidCameraScreen(
-        bitmap = capturedBitmap,
+        imageUri = imageUri,
         onBackClick = navigateUp
     )
 }
 
 @Composable
 private fun KidCameraScreen(
-    bitmap: Bitmap?,
+    imageUri: Uri?,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -83,9 +92,9 @@ private fun KidCameraScreen(
             .fillMaxSize()
             .background(KieroTheme.colors.black)
     ) {
-        if (bitmap != null) {
-            Image(
-                bitmap = bitmap.asImageBitmap(),
+        if (imageUri != null) {
+            AsyncImage(
+                model = imageUri,
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxSize()
@@ -172,20 +181,8 @@ fun StoneFloating(
 @Preview
 private fun KidCameraScreenPreview() {
     KieroTheme {
-        val context = LocalContext.current
-        val drawable = androidx.core.content.ContextCompat.getDrawable(
-            context,
-            android.R.drawable.ic_menu_gallery
-        )
-        val dummyBitmap = remember {
-            Bitmap.createBitmap(
-                100, 100, Bitmap.Config.ARGB_8888
-            )
-        }
-
         KidCameraScreen(
-            // null 대신 더미 비트맵 전달
-            bitmap = dummyBitmap,
+            imageUri = null,
             onBackClick = {}
         )
     }
