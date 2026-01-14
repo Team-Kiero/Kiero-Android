@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -48,24 +49,19 @@ class AlarmFeedViewModel @Inject constructor(
     )
 
     init {
-        loadAlarms(childId =  1)  // TODO: 실제 childId 받아오기, 현재 아이디 직접 받아서 테스트 완
+        // TODO: 실제 유저 정보 연동 시 childId 동적 주입 (현재 테스트용 1)
+        loadAlarms(childId = 1)
+
+        // TODO: SSE 실시간 구독 로직 및 토큰 처리 완성 후 활성화 예정
     }
 
     fun loadAlarms(childId: Long, refresh: Boolean = false) {
         viewModelScope.launch {
             _localState.update { it.copy(isLoading = true, errorMessage = null) }
-
             repository.loadAlarms(childId, refresh = refresh)
-                .onSuccess {
-                    _localState.update { it.copy(isLoading = false) }
-                }
+                .onSuccess { _localState.update { it.copy(isLoading = false) } }
                 .onFailure { error ->
-                    _localState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = error.toHandleErrorMessage()
-                        )
-                    }
+                    _localState.update { it.copy(isLoading = false, errorMessage = error.toHandleErrorMessage()) }
                 }
         }
     }
@@ -73,28 +69,15 @@ class AlarmFeedViewModel @Inject constructor(
     fun loadMore(childId: Long) {
         val currentState = _localState.value
         if (currentState.isLoadingMore || state.value.nextCursor == null) return
-
         viewModelScope.launch {
             _localState.update { it.copy(isLoadingMore = true) }
-
             repository.loadMore(childId)
-                .onSuccess {
-                    _localState.update { it.copy(isLoadingMore = false) }
-                }
-                .onFailure { error ->
-                    _localState.update {
-                        it.copy(
-                            isLoadingMore = false,
-                            errorMessage = error.toHandleErrorMessage()
-                        )
-                    }
-                }
+                .onSuccess { _localState.update { it.copy(isLoadingMore = false) } }
+                .onFailure { /* TODO: 추가 에러 처리 */ }
         }
     }
 
-    fun refresh(childId: Long) {
-        loadAlarms(childId, refresh = true)
-    }
+    fun refresh(childId: Long) = loadAlarms(childId, refresh = true)
 
     fun toggleExpand(alarmId: String) {
         _localState.update { currentState ->

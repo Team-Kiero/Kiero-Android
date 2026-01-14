@@ -19,58 +19,51 @@ data class ParentAlarmUiModel(
     val isExpanded: Boolean = false
 )
 
-/**
- * Domain Model → UiModel 변환 (확장 함수)
- */
 fun AlarmItemModel.toUiModel(childName: String): ParentAlarmUiModel {
     val highlightColor = Color(0xFF00FFE1)
 
-    val uniqueId = this.id.toString()
+    // ✅ 고유 ID 미리 계산 (날짜 + 타입 + 내용의 해시코드 조합으로 중복 원천 차단)
+    val contentKey = when (this) {
+        is AlarmItemModel.Schedule -> locationName
+        is AlarmItemModel.Mission -> missionName
+        is AlarmItemModel.Coupon -> couponName
+        is AlarmItemModel.Complete -> "complete"
+    }
+    val uniqueId = "${occurredAt}_${this::class.simpleName}_${contentKey.hashCode()}"
 
+    // TODO: 아이 이름 뒤 '이/가' 조사 자동 처리 유틸리티 적용 필요
     return when (this) {
         is AlarmItemModel.Schedule -> ParentAlarmUiModel(
             id = uniqueId,
             date = occurredAt.formattedAlarmDate,
             time = occurredAt.formattedAlarmTime,
             message = "${childName}가 ${locationName}에 도착했어요.",
-            highlightText = locationName,
-            highlightColor = highlightColor,
-            coinUsed = null,
-            imageUrl = imageUrl,
-            isExpanded = false
+            highlightText = locationName, highlightColor = highlightColor,
+            coinUsed = null, imageUrl = imageUrl, isExpanded = false
         )
         is AlarmItemModel.Mission -> ParentAlarmUiModel(
             id = uniqueId,
             date = occurredAt.formattedAlarmDate,
             time = occurredAt.formattedAlarmTime,
             message = "${childName}가 '$missionName' 미션을 완료했어요.",
-            highlightText = missionName,
-            highlightColor = highlightColor,
-            coinUsed = rewardAmount,
-            imageUrl = null,
-            isExpanded = false
+            highlightText = missionName, highlightColor = highlightColor,
+            coinUsed = rewardAmount, imageUrl = null, isExpanded = false
         )
         is AlarmItemModel.Coupon -> ParentAlarmUiModel(
             id = uniqueId,
             date = occurredAt.formattedAlarmDate,
             time = occurredAt.formattedAlarmTime,
             message = "${childName}가 '$couponName' 쿠폰을 사용했어요.",
-            highlightText = couponName,
-            highlightColor = highlightColor,
-            coinUsed = usedAmount,
-            imageUrl = null,
-            isExpanded = false
+            highlightText = couponName, highlightColor = highlightColor,
+            coinUsed = usedAmount, imageUrl = null, isExpanded = false
         )
         is AlarmItemModel.Complete -> ParentAlarmUiModel(
             id = uniqueId,
             date = occurredAt.formattedAlarmDate,
             time = occurredAt.formattedAlarmTime,
             message = "${childName}가 하루 일정을 모두 완료했어요.",
-            highlightText = "하루 일정",
-            highlightColor = highlightColor,
-            coinUsed = if (rewardAmount > 0) rewardAmount else null,
-            imageUrl = null,
-            isExpanded = false
+            highlightText = "하루 일정", highlightColor = highlightColor,
+            coinUsed = if (rewardAmount > 0) rewardAmount else null, imageUrl = null, isExpanded = false
         )
     }
 }

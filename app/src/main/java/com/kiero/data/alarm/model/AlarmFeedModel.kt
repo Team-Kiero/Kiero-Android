@@ -65,43 +65,46 @@ fun AlarmFeedResponseDto.toModel() = AlarmFeedModel(
  */
 fun FeedItemDto.toModel(): AlarmItemModel? {
     return try {
+        // ✅ 1. 서버 ID가 없으면 데이터 조합(날짜+타입+해시)으로 고유 ID 생성
+        // 이 작업이 없으면 LazyColumn이 리스트를 그리지 못합니다.
+        val fallbackId = (occurredAt + eventType + metadata.toString()).hashCode().toLong()
+        val finalId = id ?: fallbackId
+
         when (eventType) {
             "SCHEDULE" -> AlarmItemModel.Schedule(
-                id = id,
+                id = finalId, // ✅ 생성한 ID 주입
                 occurredAt = occurredAt,
                 locationName = metadata["content"]?.jsonPrimitive?.content ?: "",
                 imageUrl = metadata["imageUrl"]?.jsonPrimitive?.content
             )
 
             "MISSION" -> AlarmItemModel.Mission(
-                id = id,
+                id = finalId,
                 occurredAt = occurredAt,
                 missionName = metadata["content"]?.jsonPrimitive?.content ?: "",
-                rewardAmount = metadata["amount"]?.jsonPrimitive?.intOrNull ?: 0  // ← intOrNull 사용
+                rewardAmount = metadata["amount"]?.jsonPrimitive?.intOrNull ?: 0
             )
 
             "COUPON" -> AlarmItemModel.Coupon(
-                id = id,
+                id = finalId,
                 occurredAt = occurredAt,
                 couponName = metadata["content"]?.jsonPrimitive?.content ?: "",
-                usedAmount = metadata["amount"]?.jsonPrimitive?.intOrNull ?: 0  // ← intOrNull 사용
+                usedAmount = metadata["amount"]?.jsonPrimitive?.intOrNull ?: 0
             )
 
             "COMPLETE" -> AlarmItemModel.Complete(
-                id = id,
+                id = finalId,
                 occurredAt = occurredAt,
-                rewardAmount = metadata["amount"]?.jsonPrimitive?.intOrNull ?: 0  // ← intOrNull 사용
+                rewardAmount = metadata["amount"]?.jsonPrimitive?.intOrNull ?: 0
             )
 
             else -> {
-                // ✅ 알 수 없는 타입 로깅
-                Timber.w("Unknown eventType: $eventType, occurredAt: $occurredAt")
+                Timber.w("Unknown eventType: $eventType")
                 null
             }
         }
     } catch (e: Exception) {
-        // 파싱 실패 로깅
-        Timber.e(e, "Failed to parse FeedItemDto - eventType: $eventType, occurredAt: $occurredAt")
+        Timber.e(e, "파싱 실패 - eventType: $eventType, 데이터: $metadata")
         null
     }
 }
