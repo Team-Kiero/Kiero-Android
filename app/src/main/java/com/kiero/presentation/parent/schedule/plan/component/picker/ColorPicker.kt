@@ -16,10 +16,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.kiero.R
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.presentation.parent.schedule.plan.model.ColorType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,13 +38,12 @@ fun ColorPickerBottomSheet(
     modifier: Modifier = Modifier,
 ) {
     val sheetState = rememberModalBottomSheetState()
-    var tempSelectedColor by remember { mutableStateOf(selectedColor) }
 
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
         containerColor = KieroTheme.colors.gray900,
-        dragHandle = {},
+        dragHandle = null,
         modifier = modifier
     ) {
         Column(
@@ -60,19 +56,14 @@ fun ColorPickerBottomSheet(
                 leftIconRes = R.drawable.ic_close_light,
                 leftIconClick = onDismissRequest,
                 rightIconRes = R.drawable.ic_check,
-                rightIconClick = {
-                    onColorSelected(tempSelectedColor)
-                    onDismissRequest()
-                },
+                rightIconClick = onDismissRequest,
             )
 
             Spacer(modifier = Modifier.height(25.dp))
 
             ColorPicker(
-                selectedColor = tempSelectedColor,
-                onColorSelected = { color ->
-                    tempSelectedColor = color
-                },
+                selectedColor = selectedColor,
+                onColorSelected = onColorSelected,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
 
@@ -131,13 +122,6 @@ fun ColorPickerItem(
     }
 }
 
-enum class ColorType(val color: Color) {
-    SCHEDULE1(Color(0xFFCFFFFA)),
-    SCHEDULE2(Color(0xFFFFFEE9)),
-    SCHEDULE3(Color(0xFFBFFFE3)),
-    SCHEDULE4(Color(0xFF34D9D3)),
-    SCHEDULE5(Color(0xFF7BBDFF)),
-}
 
 @Preview(showBackground = true, backgroundColor = 0xFF2C2C2E)
 @Composable

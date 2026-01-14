@@ -1,4 +1,4 @@
-package com.kiero.presentation.parent.schedule.screen.component
+package com.kiero.presentation.parent.schedule.plan.component.select
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -11,10 +11,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,22 +22,19 @@ import androidx.compose.ui.unit.dp
 import com.kiero.R
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
-import com.kiero.presentation.parent.schedule.plan.component.picker.ColorPickerBottomSheet
 
 @Composable
 fun ColorSelectArea(
     selectColor: Color?,
-    onColorSelected: (Color) -> Unit,
+    onColorClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var showColorPicker by remember { mutableStateOf(false) }
-
     Row(
         modifier = modifier
             .fillMaxWidth()
             .background(color = Color.Unspecified)
             .padding(horizontal = 16.dp, vertical = 12.dp)
-            .noRippleClickable { showColorPicker = true },
+            .noRippleClickable { onColorClick() },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
@@ -73,14 +66,6 @@ fun ColorSelectArea(
             modifier = Modifier.padding(vertical = 3.dp)
         )
     }
-
-    if (showColorPicker) {
-        ColorPickerBottomSheet(
-            selectedColor = selectColor ?: Color(0xFFCFFFFA),
-            onColorSelected = onColorSelected,
-            onDismissRequest = { showColorPicker = false }
-        )
-    }
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF232428)
@@ -89,7 +74,7 @@ private fun PreviewColorSelectAreaPreivew() {
     KieroTheme {
         ColorSelectArea(
             selectColor = null,
-            onColorSelected = {}
+            onColorClick = {}
         )
     }
 }
