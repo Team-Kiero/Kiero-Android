@@ -18,6 +18,9 @@ data class AlarmFeedResponseDto(
 
 @Serializable
 data class FeedItemDto(
+    @SerialName("feedItemId") // ID 추가
+    val id: Long,
+
     @SerialName("eventType")
     val eventType: String,  // SCHEDULE, MISSION, COUPON, COMPLETE
 
