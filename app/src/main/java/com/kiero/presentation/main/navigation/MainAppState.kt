@@ -25,6 +25,7 @@ import com.kiero.presentation.parent.navigation.Alarm
 import com.kiero.presentation.parent.navigation.ParentGraph
 import com.kiero.presentation.parent.navigation.Schedule
 import com.kiero.presentation.parent.schedule.navigation.navigateToSchedule
+import com.kiero.presentation.parent.schedule.plan.navigation.navigateToScheduleAdd
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -157,6 +158,9 @@ class MainAppState(
 
     fun navigateToWish(navOptions: NavOptions? = null) =
         navController.navigateToWish(navOptions)
+
+    fun navigateToScheduleAdd(navOptions: NavOptions? = null) =
+        navController.navigateToScheduleAdd(navOptions)
 
     fun navigateToCamera(navOptions: NavOptions? = null) =
         navController.navigateToCamera(navOptions)

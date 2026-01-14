@@ -44,6 +44,7 @@ fun NavGraphBuilder.authNavGraph(
                 navigateUp = navigateUp,
                 navigateToParent = navController::navigateToAuthParent,
                 navigateToKid = navigateToKid,
+                navigateToEx = navigateToParent
             )
         }
 

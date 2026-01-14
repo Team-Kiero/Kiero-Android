@@ -26,12 +26,14 @@ fun AuthRoute(
     navigateUp: () -> Unit,
     navigateToParent: () -> Unit,
     navigateToKid: () -> Unit,
+    navigateToEx : () -> Unit,
 ) {
     AuthScreen(
         paddingValues = paddingValues,
         navigateUp = navigateUp,
         navigateToParent = navigateToParent,
         navigateToKid = navigateToKid,
+        navigateToEx = navigateToEx,
         modifier = Modifier
     )
 }
@@ -41,6 +43,7 @@ fun AuthScreen(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
     navigateToParent: () -> Unit,
+    navigateToEx: () -> Unit,
     navigateToKid: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -82,6 +85,13 @@ fun AuthScreen(
                 ) {
                     Text(text = "아이 화면으로 이동")
                 }
+
+                Button(
+                    onClick = navigateToEx,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "예시")
+                }
             }
         }
     }
@@ -95,7 +105,8 @@ private fun DummyScreenPreview() {
             paddingValues = PaddingValues(),
             navigateUp = {},
             navigateToParent = {},
-            navigateToKid = {}
+            navigateToKid = {},
+            navigateToEx = {},
         )
     }
 }

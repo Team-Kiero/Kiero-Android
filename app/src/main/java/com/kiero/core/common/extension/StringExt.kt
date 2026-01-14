@@ -24,3 +24,36 @@ val String.formattedDeadLine: String
             this
         }
     }
+fun String.validateAsStartTime(): String {
+    try {
+        val parts = this.split(" ")
+        if (parts.size != 2) return this
+
+        val timeParts = parts[0].split(":")
+        if (timeParts.size != 2) return this
+
+        val hour = timeParts[0].toIntOrNull() ?: return this
+        val minute = timeParts[1].toIntOrNull() ?: return this
+        val amPm = parts[1]
+
+        return when (amPm) {
+            "AM" -> {
+                if (hour < 8) {
+                    "08:00 AM"
+                } else {
+                    this
+                }
+            }
+            "PM" -> {
+                if (hour > 10) {
+                    "10:00 PM"
+                } else {
+                    this
+                }
+            }
+            else -> this
+        }
+    } catch (e: Exception) {
+        return this
+    }
+}
