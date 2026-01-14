@@ -1,4 +1,4 @@
-package com.kiero.presentation.parent.schedule.screen
+package com.kiero.presentation.parent.schedule.plan
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,10 +23,11 @@ import androidx.compose.ui.unit.dp
 import com.kiero.R
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.presentation.parent.schedule.plan.component.picker.ColorPickerBottomSheet
 import com.kiero.presentation.parent.schedule.plan.component.plan.ScheduleDatebar
 import com.kiero.presentation.parent.schedule.plan.component.select.ScheduleTextField
 import com.kiero.presentation.parent.schedule.plan.component.select.WeekSelectArea
-import com.kiero.presentation.parent.schedule.screen.component.ColorSelectArea
+import com.kiero.presentation.parent.schedule.plan.component.select.ColorSelectArea
 import com.kiero.presentation.parent.schedule.screen.component.TimeSelectArea
 
 
@@ -34,10 +36,27 @@ fun ParentScheduleAddRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
 ) {
+    val textState = rememberTextFieldState()
+    var selectedColor by remember { mutableStateOf<Color?>(null) }
+    var showColorPicker by remember { mutableStateOf(false) }
+
     ScheduleAddScreen(
         paddingValues = paddingValues,
-        navigateUp = navigateUp
+        navigateUp = navigateUp,
+        textState = textState,
+        selectedColor = selectedColor,
+        onColorClick = { showColorPicker = true }
     )
+
+    if (showColorPicker) {
+        ColorPickerBottomSheet(
+            selectedColor = selectedColor ?: Color(0xFFCFFFFA),
+            onColorSelected = { color ->
+                selectedColor = color
+            },
+            onDismissRequest = { showColorPicker = false }
+        )
+    }
 }
 
 
@@ -45,11 +64,11 @@ fun ParentScheduleAddRoute(
 fun ScheduleAddScreen(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
+    textState: TextFieldState,
+    selectedColor: Color?,
+    onColorClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val textState = rememberTextFieldState()
-    var selectedColor by remember { mutableStateOf<Color?>(null) }
-
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -87,9 +106,7 @@ fun ScheduleAddScreen(
 
         ColorSelectArea(
             selectColor = selectedColor,
-            onColorSelected = { color ->
-                selectedColor = color
-            }
+            onColorClick = onColorClick
         )
     }
 }
@@ -100,7 +117,10 @@ private fun ParentAddPlanScreenPreview() {
     KieroTheme {
         ScheduleAddScreen(
             paddingValues = PaddingValues(),
-            navigateUp = {}
+            navigateUp = {},
+            textState = rememberTextFieldState(),
+            selectedColor = null,
+            onColorClick = {}
         )
     }
 }

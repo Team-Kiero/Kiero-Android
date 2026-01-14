@@ -10,6 +10,7 @@ import com.kiero.core.navigation.Route
 import com.kiero.presentation.parent.alarm.navigation.parentAlarmNavGraph
 import com.kiero.presentation.parent.schedule.navigation.parentScheduleNavGraph
 import com.kiero.presentation.parent.schedule.plan.navigation.navigateToScheduleAdd
+import com.kiero.presentation.parent.schedule.plan.navigation.parentScheduleAddNavGraph
 import kotlinx.serialization.Serializable
 
 sealed interface ParentTab : Route
@@ -41,6 +42,11 @@ fun NavGraphBuilder.parentNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
             navigateToScheduleAdd = navController::navigateToScheduleAdd
+        )
+
+        parentScheduleAddNavGraph(
+            paddingValues = paddingValues,
+            navigateUp = navigateUp,
         )
 
         parentAlarmNavGraph(

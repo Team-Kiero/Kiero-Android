@@ -14,11 +14,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.presentation.parent.schedule.model.ScheduleEvent
 import com.kiero.presentation.parent.schedule.plan.component.plan.ScheduleDatebar
 import com.kiero.presentation.parent.schedule.plan.component.plan.ScheduleTimeTable
+import com.kiero.presentation.parent.schedule.plan.model.ScheduleData
 
 @Composable
 fun ParentPlanScreen(
+    events: List<ScheduleEvent>,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -30,7 +33,7 @@ fun ParentPlanScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(modifier = Modifier.height(15.dp))
-        
+
         ScheduleDatebar(
             date = "12월 4주차",
             onPreviousClick = {},
@@ -45,11 +48,9 @@ fun ParentPlanScreen(
                 ),
         ) {
             item {
-                ScheduleTimeTable()
+                ScheduleTimeTable(events = events)
             }
         }
-
-
     }
 }
 
@@ -57,6 +58,8 @@ fun ParentPlanScreen(
 @Composable
 private fun ParentPlanScreenPreview() {
     KieroTheme {
-        ParentPlanScreen()
+        ParentPlanScreen(
+            events = ScheduleData.fakeScheduleEvents
+        )
     }
 }
