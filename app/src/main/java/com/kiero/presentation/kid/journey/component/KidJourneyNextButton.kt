@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -21,11 +22,13 @@ import com.kiero.core.designsystem.theme.KieroTheme
 fun KidJourneyNextButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    isVisible: Boolean = true,
 ) {
     Row(
         modifier = modifier
-            .noRippleClickable(onClick = onClick)
-            .padding(top = 5.dp, bottom = 6.dp, start = 11.5.dp, end = 8.5.dp),
+            .alpha(if (isVisible) 1f else 0f)
+            .noRippleClickable { if (isVisible) onClick() }
+            .padding(top = 5.dp, start = 11.5.dp, end = 8.5.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
