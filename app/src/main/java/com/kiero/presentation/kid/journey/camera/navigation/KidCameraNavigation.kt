@@ -21,8 +21,7 @@ fun NavGraphBuilder.kidJourneyCameraNavGraph(
 ) {
     composable<Camera> {
         KidCameraRoute(
-            paddingValues = paddingValues,
-            navigateUp = navigateUp,
+            navigateUp = navigateUp
         )
     }
 }
