@@ -14,7 +14,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.theme.KieroTheme
-import com.kiero.presentation.parent.schedule.plan.DayList
+import com.kiero.presentation.parent.schedule.plan.model.DayList
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toPersistentList
 

@@ -1,6 +1,5 @@
 package com.kiero.presentation.parent.component
 
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -10,7 +9,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.kiero.R
 import com.kiero.core.designsystem.theme.KieroTheme
 
@@ -23,8 +21,7 @@ fun ParentFloatingButton(
     FloatingActionButton(
         onClick = onActiveClick,
         containerColor = buttonColor,
-        modifier = modifier
-            .size(53.dp),
+        modifier = modifier,
         shape = CircleShape,
     ) {
         Icon(

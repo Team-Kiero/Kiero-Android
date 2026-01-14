@@ -63,7 +63,7 @@ fun ScheduleTimeColumn(
 
 @Preview(name = "시간 컬럼", showBackground = true, backgroundColor = 0xFF232428)
 @Composable
-fun TimeColumnPreview() {
+private fun TimeColumnPreview() {
     ScheduleTimeColumn()
 }
 
