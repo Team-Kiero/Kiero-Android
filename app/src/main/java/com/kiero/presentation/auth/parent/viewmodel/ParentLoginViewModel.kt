@@ -34,8 +34,19 @@ class ParentLoginViewModel @Inject constructor(
         _state.update { it.copy(isLoading = true) }
 
         authRepository.loginWithKakao(context)
-            .onSuccess {
+            .onSuccess { response ->
                 Timber.Forest.i("로그인 최종 성공")
+                // 서버에서 받은 토큰을 로컬에 저장
+                authRepository.saveAuthTokens(
+                    accessToken = response.accessToken,
+                    refreshToken = response.refreshToken
+                )
+
+                // TODO: 자녀 계정 유무에 따른 화면 분기 로직 구현 필요
+                // 1. 자녀가 이미 있는 경우: _sideEffect.emit(AuthSideEffect.NavigateUp) -> 부모 메인 이동
+                // 2. 자녀가 없는 경우: 신규 SideEffect(예: NavigateToChildOnboarding)를 정의하여 전송
+                _sideEffect.emit(AuthSideEffect.NavigateUp)
+                // UI에 이동 신호 보내기 (AuthParentRoute가 이 신호를 받고 navigateToParent() 호출)
                 _state.update { it.copy(isLoading = false) }
             }.onFailure { throwable ->
                 Timber.Forest.e(throwable, "로그인 실패 에러 발생")

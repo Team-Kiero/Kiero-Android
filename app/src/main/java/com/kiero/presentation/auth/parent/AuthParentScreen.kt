@@ -27,6 +27,7 @@ import com.kiero.presentation.auth.parent.viewmodel.ParentLoginViewModel
 fun AuthParentRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
+    navigateToParent: () -> Unit, // ✅ 추가: 부모 메인으로 이동하는 콜백
     viewModel: ParentLoginViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
@@ -35,12 +36,17 @@ fun AuthParentRoute(
     LaunchedEffect(viewModel.sideEffect) {
         viewModel.sideEffect.collect { effect ->
             when (effect) {
-                is AuthSideEffect.ShowSnackBar -> { /* 스낵바 로직 */ }
-                is AuthSideEffect.NavigateUp -> navigateUp()
+                is AuthSideEffect.ShowSnackBar -> { /* 스낵바 로직 */
+                }
+
+                is AuthSideEffect.NavigateUp -> {
+                    // Todo : 신규 자녀 추가 화면 이동
+                    navigateToParent()
+                    // 로그인이 성공했을 때 메인으로 이동하도록 변경
+                }
             }
         }
     }
-
     AuthParentScreen(
         paddingValues = paddingValues,
         isLoading = state.isLoading,
