@@ -27,121 +27,29 @@ import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.schedule.model.ScheduleEvent
 import com.kiero.presentation.parent.schedule.model.toDayIndex
 import com.kiero.presentation.parent.schedule.model.toScheduleBlocks
-import com.kiero.presentation.parent.schedule.plan.DayList
-import kotlinx.collections.immutable.persistentListOf
+import com.kiero.presentation.parent.schedule.plan.model.ScheduleData
 
 
 @Composable
 fun ScheduleTimeTable(
+    events: List<ScheduleEvent>,
     modifier: Modifier = Modifier,
-    events: List<ScheduleEvent> = emptyList(),
 ) {
     Column(
-        modifier = modifier
-            .fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(9.dp)
     ) {
         ScheduleWeekTopbar(
-            dayList = persistentListOf(
-                DayList("8(월)"),
-                DayList("9(화)"),
-                DayList("10(수)"),
-                DayList("11(목)"),
-                DayList("12(금)"),
-                DayList("13(토)"),
-                DayList("14(일)")
-            )
+            dayList = ScheduleData.fakeDayList
         )
+
         Row(
-            modifier = Modifier
+            modifier = Modifier.fillMaxWidth()
         ) {
             ScheduleTimeColumn()
 
-            SchedulePlanner(
-                events = listOf(
-                    ScheduleEvent(
-                        id = "1",
-                        name = "학교",
-                        isRecurring = true,
-                        startTime = "08:00",
-                        endTime = "12:00",
-                        scheduleColor = "SCHEDULE4",
-                        dayOfWeek = "MON",
-                        date = null
-                    ),
-                    ScheduleEvent(
-                        id = "2",
-                        name = "수영",
-                        isRecurring = true,
-                        startTime = "08:00",
-                        endTime = "13:00",
-                        scheduleColor = "SCHEDULE4",
-                        dayOfWeek = "TUE",
-                        date = null
-                    ),
-                    ScheduleEvent(
-                        id = "3",
-                        name = "수영",
-                        isRecurring = true,
-                        startTime = "08:00",
-                        endTime = "9:00",
-                        scheduleColor = "SCHEDULE3",
-                        dayOfWeek = "WED",
-                        date = null
-                    ),
-                    ScheduleEvent(
-                        id = "4",
-                        name = "수영",
-                        isRecurring = true,
-                        startTime = "08:00",
-                        endTime = "9:00",
-                        scheduleColor = "SCHEDULE2",
-                        dayOfWeek = "THU",
-                        date = null
-                    ),
-                    ScheduleEvent(
-                        id = "5",
-                        name = "수영",
-                        isRecurring = true,
-                        startTime = "08:00",
-                        endTime = "9:00",
-                        scheduleColor = "SCHEDULE1",
-                        dayOfWeek = "FRI",
-                        date = null
-                    ),
-                    ScheduleEvent(
-                        id = "6",
-                        name = "수영",
-                        isRecurring = true,
-                        startTime = "08:00",
-                        endTime = "9:00",
-                        scheduleColor = "SCHEDULE2",
-                        dayOfWeek = "SAT",
-                        date = null
-                    ),
-                    ScheduleEvent(
-                        id = "7",
-                        name = "수영",
-                        isRecurring = true,
-                        startTime = "08:00",
-                        endTime = "9:00",
-                        scheduleColor = "SCHEDULE2",
-                        dayOfWeek = "SUN",
-                        date = null
-                    ),
-                    ScheduleEvent(
-                        id = "8",
-                        name = "태권도",
-                        isRecurring = true,
-                        startTime = "14:00",
-                        endTime = "16:00",
-                        scheduleColor = "SCHEDULE2",
-                        dayOfWeek = "TUE",
-                        date = null
-                    ),
-                )
-            )
+            SchedulePlanner(events = events)
         }
     }
 }
@@ -172,7 +80,7 @@ fun SchedulePlanner(
                 shape = RoundedCornerShape(10.dp)
             )
             .background(
-                color = Color.Unspecified,
+                color = Color.Transparent,
                 shape = RoundedCornerShape(10.dp)
             )
             .padding(all = 4.dp)

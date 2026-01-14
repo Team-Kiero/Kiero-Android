@@ -17,18 +17,16 @@ import com.kiero.presentation.parent.schedule.model.TabItem
 
 @Composable
 fun ParentTabRow(
-    modifier: Modifier = Modifier,
+    tabs: List<String>,
     selectedTabIndex: Int,
     onTabSelected: (Int) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    val titles = TabItem.entries.map { it.title }
-
     PrimaryTabRow(
         selectedTabIndex = selectedTabIndex,
         containerColor = KieroTheme.colors.gray900,
         contentColor = KieroTheme.colors.white,
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         indicator = {
             TabRowDefaults.PrimaryIndicator(
                 modifier = Modifier.tabIndicatorOffset(selectedTabIndex, matchContentSize = false),
@@ -40,30 +38,34 @@ fun ParentTabRow(
         },
         divider = {}
     ) {
-        titles.forEachIndexed { index, title ->
+        tabs.forEachIndexed { index, title ->
             Tab(
                 selected = selectedTabIndex == index,
-                onClick = {
-                    onTabSelected(index)
-                },
+                onClick = { onTabSelected(index) },
                 text = {
                     Text(
                         text = title,
                         style = KieroTheme.typography.bold.headLine2,
-                        color = if (selectedTabIndex == index) KieroTheme.colors.white else KieroTheme.colors.gray500
+                        color = if (selectedTabIndex == index) {
+                            KieroTheme.colors.white
+                        } else {
+                            KieroTheme.colors.gray500
+                        }
                     )
-                },
+                }
             )
         }
     }
-
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun ParentTabRowPreview() {
-    ParentTabRow(
-        selectedTabIndex = 0,
-        onTabSelected = {}
-    )
+    KieroTheme {
+        ParentTabRow(
+            tabs = listOf("일정", "미션"),
+            selectedTabIndex = 0,
+            onTabSelected = {}
+        )
+    }
 }

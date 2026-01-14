@@ -30,9 +30,7 @@ fun ParentUserSection(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(
-                color = Color.Unspecified
-            )
+            .background(color = Color.Transparent)
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.End

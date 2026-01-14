@@ -44,14 +44,10 @@ fun ScheduleEventBlock(
         BlockPosition.TOP -> RoundedCornerShape(
             topStart = 8.dp,
             topEnd = 8.dp,
-            bottomStart = 0.dp,
-            bottomEnd = 0.dp
         )
 
         BlockPosition.MIDDLE -> RoundedCornerShape(0.dp)
         BlockPosition.BOTTOM -> RoundedCornerShape(
-            topStart = 0.dp,
-            topEnd = 0.dp,
             bottomStart = 8.dp,
             bottomEnd = 8.dp
         )

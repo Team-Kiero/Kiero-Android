@@ -32,9 +32,8 @@ fun ScheduleDatebar(
         modifier = modifier
             .fillMaxWidth()
             .background(
-                color = Color.Unspecified
-            )
-            .padding(),
+                color = Color.Transparent
+            ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
 
