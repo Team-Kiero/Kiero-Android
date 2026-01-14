@@ -3,7 +3,6 @@ package com.kiero.presentation.parent.schedule.plan.component.select
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
@@ -40,48 +39,43 @@ fun ScheduleTextField(
     onKeyboardAction: KeyboardActionHandler? = null,
     lineLimits: TextFieldLineLimits = TextFieldLineLimits.SingleLine,
     textColor: Color = KieroTheme.colors.white,
-    maxLength : Int = 10
+    maxLength: Int = 10,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
 
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-    ) {
-        BasicTextField(
-            state = state,
-            enabled = enabled,
-            readOnly = readOnly,
-            inputTransformation = inputTransformation ?: InputTransformation.maxLength(maxLength),
-            outputTransformation = outputTransformation,
-            keyboardOptions = keyboardOptions,
-            onKeyboardAction = onKeyboardAction,
-            lineLimits = lineLimits,
-            textStyle = KieroTheme.typography.regular.body1.copy(color = textColor),
-            cursorBrush = SolidColor(if (isError) KieroTheme.colors.point else KieroTheme.colors.white),
-            interactionSource = interactionSource,
-            decorator = { innerTextField ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            color = Color.Unspecified,
-                        )
-                        .padding(horizontal = 13.dp, vertical = 14.dp),
-                    contentAlignment = Alignment.CenterStart
-                ) {
-                    if (state.text.isEmpty()) {
-                        Text(
-                            text = placeholder,
-                            style = KieroTheme.typography.regular.body1,
-                            color = KieroTheme.colors.gray500
-                        )
-                    }
-                    innerTextField()
+    BasicTextField(
+        state = state,
+        enabled = enabled,
+        readOnly = readOnly,
+        inputTransformation = inputTransformation ?: InputTransformation.maxLength(maxLength),
+        outputTransformation = outputTransformation,
+        keyboardOptions = keyboardOptions,
+        onKeyboardAction = onKeyboardAction,
+        lineLimits = lineLimits,
+        textStyle = KieroTheme.typography.regular.body1.copy(color = textColor),
+        cursorBrush = SolidColor(if (isError) KieroTheme.colors.point else KieroTheme.colors.white),
+        interactionSource = interactionSource,
+        decorator = { innerTextField ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = Color.Unspecified,
+                    )
+                    .padding(horizontal = 13.dp, vertical = 14.dp),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                if (state.text.isEmpty()) {
+                    Text(
+                        text = placeholder,
+                        style = KieroTheme.typography.regular.body1,
+                        color = KieroTheme.colors.gray500
+                    )
                 }
+                innerTextField()
             }
-        )
-    }
+        }
+    )
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF232428)

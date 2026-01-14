@@ -184,7 +184,6 @@ private fun RepeatSection(
             text = "매일",
             color = KieroTheme.colors.white,
             style = KieroTheme.typography.regular.body5
-
         )
     }
 }
@@ -221,7 +220,7 @@ private fun DaySection(
 
         DayToggle(
             onClick = onValidClick,
-            isEnabled = isEnabled
+            isChecked = isEnabled
         )
     }
 }
@@ -230,13 +229,12 @@ private fun DaySection(
 private fun DayToggle(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    isEnabled: Boolean = false,
+    isChecked: Boolean = false,
 ) {
     Switch(
-        checked = isEnabled,
+        checked = isChecked,
         onCheckedChange = { onClick() },
         modifier = modifier
-            .noRippleClickable(onClick)
             .scale(0.7f),
         colors = SwitchDefaults.colors(
             uncheckedThumbColor = KieroTheme.colors.gray200,

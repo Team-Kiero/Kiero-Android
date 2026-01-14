@@ -28,6 +28,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -39,7 +40,6 @@ import com.kiero.R
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
 import java.util.Calendar
 
 @Composable
@@ -213,19 +213,19 @@ fun TimeSelectionSection(
             modifier = Modifier.fillMaxWidth(),
         ) {
             TimeItemsPicker(
-                items = hours,
+                items = TimePickerConstants.hours,
                 firstIndex = chosenHour + 2 - 1,
                 onItemSelected = onHourChosen,
             )
             Spacer(modifier = Modifier.width(16.dp))
             TimeItemsPicker(
-                items = minutes,
+                items = TimePickerConstants.minutes,
                 firstIndex = chosenMinute + 2,
                 onItemSelected = onMinuteChosen,
             )
             Spacer(modifier = Modifier.width(16.dp))
             TimeItemsPicker(
-                items = amPmList,
+                items = TimePickerConstants.amPmList,
                 firstIndex = if (chosenAmPm == "AM") 2 else 3,
                 onItemSelected = onAmPmChosen,
             )
@@ -241,13 +241,15 @@ fun TimeItemsPicker(
     modifier: Modifier = Modifier,
 ) {
     val listState = rememberLazyListState(firstIndex)
-    val currentValue = remember { mutableStateOf("") }
 
-    LaunchedEffect(!listState.isScrollInProgress) {
-        if (currentValue.value.isNotEmpty()) {
-            onItemSelected(currentValue.value)
-            listState.animateScrollToItem(index = listState.firstVisibleItemIndex)
-        }
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.firstVisibleItemIndex }
+            .collect { index ->
+                val selectedIndex = (index + 2) % items.size
+                if (items[selectedIndex].isNotEmpty()) {
+                    onItemSelected(items[selectedIndex])
+                }
+            }
     }
 
     Box(
@@ -267,12 +269,7 @@ fun TimeItemsPicker(
                     derivedStateOf { listState.firstVisibleItemIndex }
                 }
 
-
                 val isSelected = it == firstVisibleItemIndex + 2
-
-                if (isSelected) {
-                    currentValue.value = items[index]
-                }
 
                 Spacer(modifier = Modifier.height(2.dp))
 
@@ -293,17 +290,6 @@ fun TimeItemsPicker(
     }
 }
 
-private val hours =
-    (listOf("", "") + (1..12).map { it.toString() } + listOf("", "")).toImmutableList()
-
-private val minutes =
-    (listOf("", "") + (0..59).map { it.toString().padStart(2, '0') } + listOf(
-        "",
-        ""
-    )).toImmutableList()
-
-private val amPmList =
-    (listOf("", "") + listOf("AM", "PM") + listOf("", "")).toImmutableList()
 
 @Preview(showBackground = true)
 @Composable
