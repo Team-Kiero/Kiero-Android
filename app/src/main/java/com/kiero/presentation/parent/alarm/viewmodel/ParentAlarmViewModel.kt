@@ -48,7 +48,7 @@ class AlarmFeedViewModel @Inject constructor(
     )
 
     init {
-        loadAlarms(childId = 1L)  // TODO: 실제 childId
+        loadAlarms(childId =  1)  // TODO: 실제 childId 받아오기, 현재 아이디 직접 받아서 테스트 완
     }
 
     fun loadAlarms(childId: Long, refresh: Boolean = false) {

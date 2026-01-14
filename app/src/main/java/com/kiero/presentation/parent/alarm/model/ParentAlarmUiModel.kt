@@ -25,9 +25,19 @@ data class ParentAlarmUiModel(
 fun AlarmItemModel.toUiModel(childName: String): ParentAlarmUiModel {
     val highlightColor = Color(0xFF00FFE1)
 
+    // 1. 고유 ID 미리 계산 (날짜 + 타입 + 내용의 해시코드 조합으로 중복 원천 차단)
+    val contentKey = when (this) {
+        is AlarmItemModel.Schedule -> locationName
+        is AlarmItemModel.Mission -> missionName
+        is AlarmItemModel.Coupon -> couponName
+        is AlarmItemModel.Complete -> "complete"
+    }
+    val uniqueId = "${occurredAt}_${this::class.simpleName}_${contentKey.hashCode()}"
+
+    // 2. 공통 변환 로직
     return when (this) {
         is AlarmItemModel.Schedule -> ParentAlarmUiModel(
-            id = "${occurredAt}_SCHEDULE_$locationName",
+            id = uniqueId,
             date = occurredAt.formattedAlarmDate,
             time = occurredAt.formattedAlarmTime,
             message = "${childName}가 ${locationName}에 도착했어요.",
@@ -37,9 +47,8 @@ fun AlarmItemModel.toUiModel(childName: String): ParentAlarmUiModel {
             imageUrl = imageUrl,
             isExpanded = false
         )
-
         is AlarmItemModel.Mission -> ParentAlarmUiModel(
-            id = "${occurredAt}_MISSION_$missionName",
+            id = uniqueId,
             date = occurredAt.formattedAlarmDate,
             time = occurredAt.formattedAlarmTime,
             message = "${childName}가 '$missionName' 미션을 완료했어요.",
@@ -49,9 +58,8 @@ fun AlarmItemModel.toUiModel(childName: String): ParentAlarmUiModel {
             imageUrl = null,
             isExpanded = false
         )
-
         is AlarmItemModel.Coupon -> ParentAlarmUiModel(
-            id = "${occurredAt}_COUPON_$couponName",
+            id = uniqueId,
             date = occurredAt.formattedAlarmDate,
             time = occurredAt.formattedAlarmTime,
             message = "${childName}가 '$couponName' 쿠폰을 사용했어요.",
@@ -61,9 +69,8 @@ fun AlarmItemModel.toUiModel(childName: String): ParentAlarmUiModel {
             imageUrl = null,
             isExpanded = false
         )
-
         is AlarmItemModel.Complete -> ParentAlarmUiModel(
-            id = "${occurredAt}_COMPLETE",
+            id = uniqueId,
             date = occurredAt.formattedAlarmDate,
             time = occurredAt.formattedAlarmTime,
             message = "${childName}가 하루 일정을 모두 완료했어요.",

@@ -3,10 +3,12 @@ package com.kiero.presentation.parent.alarm.component
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -113,59 +115,64 @@ fun ParentAlarmCard(
                         isCompleted = false,
                         isEnabled = true,
                         viewType = DisplayType.PARENT,
-                        onClick = { }))
+                        onClick = { })
+                )
             }
 
-            // 4. 확장 이미지 (고정 높이 대신 비율 사용)
+            // 4. 확장 이미지 (Box 안에 3:4 비율 반영)
             if (hasImage && isExpanded) {
-                Spacer(modifier = Modifier.height(6.dp))
-                AsyncImage(
-                    model = imageUrl,
-                    contentDescription = null,
+                Spacer(modifier = Modifier.height(10.dp))
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .aspectRatio(317f / 268f) // 고정 높이 대신 피그마 비율 유지
+                        .aspectRatio(3f / 4f) // ✅ 3:4 비율 강제
                         .clip(RoundedCornerShape(8.dp))
-                        .background(KieroTheme.colors.black),
-                    contentScale = ContentScale.Fit
+                        .background(KieroTheme.colors.black)
+                ) {
+                    AsyncImage(
+                        model = imageUrl,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop // ✅ 영역에 꽉 채움
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+    @Preview(showBackground = true, backgroundColor = 0xFF000000)
+    @Composable
+    private fun ParentAlarmCardPreview() {
+        KieroTheme {
+            Column(
+                modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // 1. 이미지 있고 확장된 상태 (3:4 비율 확인용)
+                ParentAlarmCard(
+                    time = "12 : 00",
+                    message = "근영이가 과자먹기에 도착했어요.",
+                    highlightTexts = listOf("과자먹기"),
+                    highlightColor = Color(0xFF00FFE1),
+                    coinUsed = null,
+                    imageUrl = R.drawable.img_kid_journey_piano_background,
+                    isExpanded = true, // ✅ 확장 상태 고정
+                    onExpandClick = {}
+                )
+
+                // 2. 코인 칩 상태
+                ParentAlarmCard(
+                    time = "14 : 30",
+                    message = "미션 '미션 1'을 완료했어요.",
+                    highlightTexts = listOf("미션 1"),
+                    highlightColor = Color(0xFF00FFE1),
+                    coinUsed = 100,
+                    imageUrl = null,
+                    isExpanded = false,
+                    onExpandClick = {}
                 )
             }
         }
     }
-}
-@Preview
-@Composable
-private fun ParentAlarmCardPreview() {
-    KieroTheme {
-        var expandedState by remember { mutableStateOf(false) }
-
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // 케이스 1: 이미지가 있는 경우 (토글)
-            ParentAlarmCard(
-                time = "2 : 00",
-                message = "근영이가 피아노 학원에 도착했어요.",
-                highlightTexts = listOf("피아노 학원"),
-                highlightColor = KieroTheme.colors.main,
-                coinUsed = 150,
-                imageUrl = R.drawable.img_kid_journey_piano_background,
-                isExpanded = expandedState,
-                onExpandClick = { expandedState = !expandedState })
-
-            // 케이스 2: 이미지가 없는 경우 (코인 칩)
-            ParentAlarmCard(
-                time = "14 : 30",
-                message = "근영이가 게임 30분 추가 쿠폰을 사용했어요",
-                highlightTexts = listOf("게임 30분 추가"),
-                highlightColor = KieroTheme.colors.main,
-                coinUsed = 100,
-                imageUrl = null,
-                isExpanded = false,
-                onExpandClick = {})
-        }
-    }
-}
