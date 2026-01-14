@@ -91,7 +91,7 @@ dependencies {
     implementation(libs.bundles.hilt)
     ksp(libs.hilt.compiler)
 
-    implementation(libs.coil.compose)
+    implementation(libs.bundles.coil)
 
     implementation(libs.timber)
 
