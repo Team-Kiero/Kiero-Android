@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.theme.KieroTheme
 
 @Composable
-fun SpeechField(
+fun KidSpeechField(
     modifier: Modifier = Modifier,
     name: String = "꾸비",
     content: @Composable () -> Unit
@@ -53,7 +53,7 @@ fun SpeechField(
 @Preview(showBackground = false)
 @Composable
 private fun SpeechFieldPreview() {
-    SpeechField(
+    KidSpeechField(
         name = "이름"
     ) {
         Text("첫번째 줄 입니다", color = KieroTheme.colors.gray300)

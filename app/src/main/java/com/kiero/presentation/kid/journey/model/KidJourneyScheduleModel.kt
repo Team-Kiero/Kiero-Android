@@ -1,10 +1,12 @@
 package com.kiero.presentation.kid.journey.model
 
+import androidx.compose.runtime.Immutable
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-data class JourneyScheduleModel(
+@Immutable
+data class KidJourneyScheduleModel(
     val order: Int,
     val startTime: LocalTime,
     val endTime: LocalTime
