@@ -28,10 +28,12 @@ import com.kiero.presentation.kid.journey.fire.component.KieroButtonLarge
 fun KidFireRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
+    navigateToFireResult: () -> Unit
 ) {
     KidFIreScreen(
         paddingValues = paddingValues,
         navigateUp = navigateUp,
+        onClick = navigateToFireResult
     )
 }
 
@@ -39,6 +41,7 @@ fun KidFireRoute(
 private fun KidFIreScreen(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -109,7 +112,7 @@ private fun KidFIreScreen(
             }
             KieroButtonLarge(
                 stoneCount = 7,
-                onClick = {},
+                onClick = onClick,
                 modifier = Modifier
                     .padding(top = 80.dp, start = 16.dp, end = 16.dp)
             )
@@ -124,6 +127,7 @@ private fun KidFIreScreenPreview() {
         KidFIreScreen(
             paddingValues = PaddingValues(),
             navigateUp = {},
+            onClick = {}
         )
     }
 }

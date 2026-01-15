@@ -6,28 +6,26 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.kiero.core.navigation.Route
-import com.kiero.presentation.kid.journey.fire.KidFireRoute
+import com.kiero.presentation.kid.journey.fire.KidFireResultRoute
 import kotlinx.serialization.Serializable
 
-fun NavController.navigateToFire(
+fun NavController.navigateToFireResult(
     navOptions: NavOptions? = null,
 ) {
-    navigate(Fire, navOptions)
+    navigate(FireResult, navOptions)
 }
 
-fun NavGraphBuilder.kidJourneyFireNavGraph(
+fun NavGraphBuilder.kidJourneyFireResultNavGraph(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
-    navigateToFireResult: () -> Unit,
 ) {
-    composable<Fire> {
-        KidFireRoute(
+    composable<FireResult> {
+        KidFireResultRoute(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
-            navigateToFireResult = navigateToFireResult
         )
     }
 }
 
 @Serializable
-data object Fire : Route
+data object FireResult : Route
