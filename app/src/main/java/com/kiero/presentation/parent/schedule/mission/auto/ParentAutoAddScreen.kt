@@ -51,14 +51,12 @@ fun ParentAutoAddScreen(
     ) {
         Spacer(modifier = Modifier.height(25.dp))
 
-        // TopBar
         KieroTopbar(
             title = "알림장 미션 추가",
             leftIconRes = R.drawable.ic_close_light,
             leftIconClick = navigateUp
         )
 
-        // 라벨
         Text(
             text = "이곳에 알림장 내용을 붙여넣어 주세요.",
             modifier = Modifier
