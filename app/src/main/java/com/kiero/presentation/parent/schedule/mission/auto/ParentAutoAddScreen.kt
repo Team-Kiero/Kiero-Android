@@ -16,6 +16,7 @@ import com.kiero.presentation.parent.schedule.mission.auto.component.ParentAutoI
 import com.kiero.presentation.parent.schedule.mission.auto.state.AutoMissionContract
 import com.kiero.presentation.parent.schedule.mission.auto.state.AutoMissionEvent
 
+// Todo : 네비게이션 연결
 @Composable
 fun ParentAutoAddRoute(
     paddingValues: PaddingValues,
@@ -43,11 +44,12 @@ fun ParentAutoAddScreen(
         modifier = modifier
             .fillMaxSize()
             .background(color = KieroTheme.colors.black)
-            .padding(paddingValues),
-        verticalArrangement = Arrangement.spacedBy(12.dp),  // ✅ 추가!
+            .padding(paddingValues)
+            .imePadding(),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(25.dp))  // 25 + 12 = 37.dp
+        Spacer(modifier = Modifier.height(25.dp))
 
         // TopBar
         KieroTopbar(
@@ -78,7 +80,7 @@ fun ParentAutoAddScreen(
                 .padding(horizontal = 20.dp)
         )
 
-        Spacer(modifier = Modifier.height(48.dp))  // 48 + 12 = 60.dp
+        Spacer(modifier = Modifier.height(48.dp))
 
         KieroButtonMedium(
             text = "분석하고 미션 추가하기",

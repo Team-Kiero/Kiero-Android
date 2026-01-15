@@ -2,10 +2,14 @@ package com.kiero.presentation.parent.schedule.mission.auto.component
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -18,6 +22,8 @@ fun ParentAutoInputField(
     onTextChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val focusManager = LocalFocusManager.current
+
     TextField(
         value = text,
         onValueChange = { newText ->
@@ -28,12 +34,13 @@ fun ParentAutoInputField(
         placeholder = {
             Text(
                 text = "알림장 내용을 입력하세요.",
-                style = KieroTheme.typography.regular.body3,
+                style = KieroTheme.typography.regular.body3.copy(
+                    lineHeight = 24.sp
+                ),
                 color = KieroTheme.colors.gray400
             )
         },
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         textStyle = TextStyle(
             color = KieroTheme.colors.white,
             fontSize = 16.sp,
@@ -49,7 +56,15 @@ fun ParentAutoInputField(
             cursorColor = KieroTheme.colors.white
         ),
         shape = RoundedCornerShape(15.dp),
-        maxLines = Int.MAX_VALUE
+        maxLines = Int.MAX_VALUE,
+        keyboardOptions = KeyboardOptions(
+            imeAction = ImeAction.Done
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                focusManager.clearFocus()
+            }
+        )
     )
 }
 
