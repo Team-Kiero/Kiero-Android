@@ -2,14 +2,7 @@ package com.kiero.presentation.kid.journey.camera
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.core.EaseInOut
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
+import androidx.activity.result.contract.ActivityResultContracts import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -43,6 +35,7 @@ import coil.compose.AsyncImage
 import com.kiero.R
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.kid.component.KidSpeechField
+import com.kiero.presentation.kid.journey.camera.component.StoneFloating
 import java.io.File
 
 @Composable
@@ -144,38 +137,6 @@ private fun KidCameraScreen(
     }
 }
 
-@Composable
-fun StoneFloating(
-    modifier: Modifier = Modifier
-) {
-    val infiniteTransition = rememberInfiniteTransition(label = "floating")
-
-    val floatAnim by infiniteTransition.animateFloat(
-        initialValue = -20f,
-        targetValue = 20f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(
-                durationMillis = 1000,
-                delayMillis = 100,
-                easing = EaseInOut
-            ),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "yOffset"
-    )
-
-    Image(
-        painter = painterResource(id = R.drawable.img_kid_journey_stone_blue),
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 110.dp)
-            .graphicsLayer {
-                this.translationY = floatAnim
-            }
-    )
-}
 
 @Composable
 @Preview
