@@ -9,6 +9,7 @@ import androidx.navigation.compose.navigation
 import com.kiero.core.navigation.Route
 import com.kiero.presentation.kid.journey.navigation.kidJourneyNavGraph
 import com.kiero.presentation.kid.mission.navigation.kidMissionNavGraph
+import com.kiero.presentation.kid.onboarding.navigation.kidOnboardingNavGraph
 import com.kiero.presentation.kid.wish.navigation.kidWishNavGraph
 import kotlinx.serialization.Serializable
 
@@ -26,6 +27,8 @@ data object Mission : KidTab
 @Serializable
 data object Wish : KidTab
 
+@Serializable
+data object Onboarding : KidTab
 
 fun NavController.navigateToKid(
     navOptions: NavOptions? = null,
@@ -54,6 +57,12 @@ fun NavGraphBuilder.kidNavGraph(
         kidWishNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
+        )
+
+        kidOnboardingNavGraph(
+            paddingValues = paddingValues,
+            navigateUp = navigateUp,
+            navigateToKid = navController::navigateToKid
         )
     }
 }
