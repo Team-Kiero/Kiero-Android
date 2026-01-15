@@ -3,17 +3,6 @@ package com.kiero.data.mission.repository
 import com.kiero.presentation.parent.schedule.mission.model.MissionUiModel
 
 /**
- * [Data Layer - Repository]
- *
- * 역할:
- * 1. DataSource 호출
- * 2. DTO ↔ UiModel 변환 (날짜 문자열 ↔ LocalDate)
- * 3. 네트워크 정책 (15초 타임아웃)
- * 4. 에러 처리 및 매핑
- * 5. Result 타입으로 성공/실패 전달
- *
- * 참고: Domain 레이어 생략으로 UiModel 직접 사용
- *
  * TODO: 구현 필요
  * 1. MissionRepositoryImpl.kt 작성
  * 2. DataModule에서 Hilt 바인딩

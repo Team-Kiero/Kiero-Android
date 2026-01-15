@@ -26,7 +26,7 @@ fun ParentMissionNavigator(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 100.dp),  // ✅ 컴포넌트 내부에서 패딩 처리
+            .padding(horizontal = 100.dp),
         contentAlignment = Alignment.Center
     ) {
         // 왼쪽 아이콘

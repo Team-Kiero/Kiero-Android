@@ -13,9 +13,6 @@ data class MissionUiModel(
     // TODO: AI 분석 결과를 받을 때 고유 ID 생성 로직 추가 필요
     val tempId: String = UUID.randomUUID().toString(),
 
-    /**
-     * [공통] 핵심 입력 데이터 (Direct / Auto 공용)
-     */
     val name: String = "",           // 미션 이름 (최대 15자)
     val dueAt: LocalDate = LocalDate.now(),  // 마감일
     val reward: Int = 20,            // 보상 금화 (1 ~ 500)
