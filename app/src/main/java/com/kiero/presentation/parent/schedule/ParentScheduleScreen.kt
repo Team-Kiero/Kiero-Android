@@ -118,7 +118,7 @@ private fun ParentScheduleScreen(
                 onMissionRecommend = { /* 규현이 화면 */ },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(end = 16.dp, bottom = 87.dp)
+                    .padding(end =16.dp, bottom = 52.dp)
             )
         }
     }

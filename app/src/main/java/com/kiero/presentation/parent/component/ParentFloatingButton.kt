@@ -88,6 +88,8 @@ fun MissionTabFab(
         ParentFloatingButton(
             buttonColor = KieroTheme.colors.main,
             onActiveClick = { onExpandedChange(!isExpanded) },
+            modifier = modifier
+                .padding(top = 87.dp)
         )
     }
 }
