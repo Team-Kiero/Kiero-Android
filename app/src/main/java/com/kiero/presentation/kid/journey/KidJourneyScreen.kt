@@ -76,6 +76,7 @@ fun KidJourneyRoute(
                 else -> { /* NONE 인 경우 처리 */ }
             }
         },
+        onNextClick = viewModel::onNextClick,
         navigateUp = navigateUp,
     )
 }
@@ -85,6 +86,7 @@ private fun KidJourneyScreen(
     paddingValues: PaddingValues,
     state: KidJourneyState,
     onButtonClick: () -> Unit,
+    onNextClick: () -> Unit,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -132,22 +134,27 @@ private fun KidJourneyScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            KidNextButton(
-                isVisible = state.shouldShowNextButton,
-                modifier = Modifier
-                    .align(Alignment.End),
-                onClick = {  }
-            )
-
-            // 꾸비 메시지
-            KidSpeechField(
-                name = "꾸비",
+            Box(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                KidJourneyGoblinMessage(
-                    content = state.content,
-                    messageRes = state.goblinMessageRes,
-                    messageArgs = state.getMessageArgs()
+                KidSpeechField(
+                    name = "꾸비",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 9.dp)
+                ) {
+                    KidJourneyGoblinMessage(
+                        content = state.content,
+                        messageRes = state.goblinMessageRes,
+                        messageArgs = state.getMessageArgs()
+                    )
+                }
+
+                KidNextButton(
+                    isVisible = state.shouldShowNextButton,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd),
+                    onClick = onNextClick
                 )
             }
 
@@ -197,7 +204,8 @@ private fun KidJourneyScreenPreview() {
                     isSkippable = true
                 )
             ),
-            onButtonClick = {}
+            onButtonClick = {},
+            onNextClick = {}
         )
     }
 }
