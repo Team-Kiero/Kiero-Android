@@ -17,11 +17,5 @@ sealed interface CalendarDay {
             override val date: LocalDate,
             val procedureCount: Int = 0
         ) : Date
-
-        @Immutable
-        data class Downtime(
-            override val date: LocalDate,
-            val status: DownTimeStatus
-        ) : Date
     }
 }

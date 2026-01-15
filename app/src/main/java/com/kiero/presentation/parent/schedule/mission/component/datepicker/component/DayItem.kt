@@ -21,15 +21,9 @@ import androidx.compose.ui.unit.dp
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.schedule.mission.component.datepicker.model.CalendarDay
-import com.kiero.presentation.parent.schedule.mission.component.datepicker.model.DownTimeStatus
-import com.kiero.presentation.parent.schedule.mission.component.datepicker.util.getDowntimeColors
+import com.kiero.presentation.parent.schedule.mission.component.datepicker.model.DateState
 import java.time.LocalDate
 
-private enum class DateState {
-    PAST,
-    TODAY,
-    FUTURE
-}
 
 private fun getDateState(date: LocalDate, today: LocalDate = LocalDate.now()): DateState {
     return when {
@@ -73,10 +67,6 @@ fun DayItem(
                 day = day,
                 isSelected = isSelected,
                 dateState = dateState!!
-            )
-
-            is CalendarDay.Date.Downtime -> DowntimeDateContent(
-                day = day
             )
         }
     }
@@ -128,26 +118,6 @@ private fun NormalDateContent(
     }
 }
 
-@Composable
-private fun DowntimeDateContent(
-    day: CalendarDay.Date.Downtime,
-) {
-    val kieroColors = KieroTheme.colors
-    val colors = remember(day.status, kieroColors) {
-        getDowntimeColors(day.status, kieroColors)
-    }
-
-    Box(
-        modifier = Modifier
-            .aspectRatio(1f)
-            .clip(shape = CircleShape)
-            .background(color = colors.background)
-            .border(width = 1.dp, color = colors.border, shape = CircleShape),
-        contentAlignment = Alignment.Center
-    ) {
-        DateText(day.date.dayOfMonth)
-    }
-}
 
 @Composable
 private fun DateText(dayOfMonth: Int, dateState: DateState? = null, isSelected: Boolean = false) {
@@ -202,13 +172,6 @@ private fun DayItemPreview() {
             DayItem(
                 day = CalendarDay.Date.Normal(today.plusDays(2), procedureCount = 0),
                 isSelected = true,
-                onDateClick = {},
-                modifier = Modifier.size(48.dp)
-            )
-
-            // Downtime date
-            DayItem(
-                day = CalendarDay.Date.Downtime(today.plusDays(3), status = DownTimeStatus.CAUTION),
                 onDateClick = {},
                 modifier = Modifier.size(48.dp)
             )
