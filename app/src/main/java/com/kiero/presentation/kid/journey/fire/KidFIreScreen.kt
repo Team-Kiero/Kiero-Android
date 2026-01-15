@@ -50,18 +50,6 @@ private fun KidFIreScreen(
             .background(KieroTheme.colors.black)
             .padding(paddingValues)
     ) {
-        // 배경 이미지
-        Image(
-            painter = painterResource(id = R.drawable.img_kid_journey_mask_background),
-            contentDescription = null,
-            contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 86.dp)
-                .fillMaxWidth()
-                .forcePixelToDp(painterResource(id = R.drawable.img_kid_journey_mask_background))
-        )
-
         Column(
             modifier = Modifier
                 .fillMaxSize(),
@@ -80,11 +68,28 @@ private fun KidFIreScreen(
                 textStyle = KieroTheme.typography.regular.body3
             )
 
+            // 배경 이미지
+            Image(
+                painter = painterResource(id = R.drawable.img_kid_journey_mask_background),
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .padding(top = 86.dp, start = 16.dp, end = 16.dp)
+                    .fillMaxWidth()
+                    .forcePixelToDp(painterResource(id = R.drawable.img_kid_journey_mask_background))
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             KieroToolTip(
                 message = "불조각을 나에게 건네줘!",
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
-                    .padding(top = 84.dp)
+                    .padding(top = 156.dp)
             )
 
             Box(
