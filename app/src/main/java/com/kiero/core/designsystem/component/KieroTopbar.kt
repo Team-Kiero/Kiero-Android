@@ -21,47 +21,51 @@ import com.kiero.core.designsystem.theme.KieroTheme
 
 @Composable
 fun KieroTopbar(
+    modifier: Modifier = Modifier,
     title: String,
     leftIconRes: Int,
-    rightIconRes: Int,
     leftIconClick: () -> Unit,
-    rightIconClick: () -> Unit,
-    modifier: Modifier = Modifier,
+    rightIconRes: Int? = null,
+    rightIconClick: (() -> Unit)? = null,
 ) {
-    Row(
+    androidx.compose.foundation.layout.Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(color = Color.Transparent)
-            .padding(
-                vertical = 4.dp,
-                horizontal = 8.dp
-            ),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+            .background(Color.Transparent)
+            .padding(vertical = 4.dp, horizontal = 8.dp)
     ) {
+        // 왼쪽 아이콘
         Icon(
             imageVector = ImageVector.vectorResource(id = leftIconRes),
             contentDescription = null,
             tint = KieroTheme.colors.white,
             modifier = Modifier
+                .align(Alignment.CenterStart)
                 .noRippleClickable(onClick = leftIconClick)
         )
 
+        // 가운데 텍스트
         Text(
             text = title,
             color = KieroTheme.colors.white,
-            style = KieroTheme.typography.bold.headLine2
+            style = KieroTheme.typography.bold.headLine2,
+            modifier = Modifier.align(Alignment.Center)
         )
 
-        Icon(
-            imageVector = ImageVector.vectorResource(id = rightIconRes),
-            contentDescription = null,
-            tint = KieroTheme.colors.white,
-            modifier = Modifier
-                .noRippleClickable(onClick = rightIconClick)
-        )
+        // 오른쪽 아이콘 있을 때만 표시
+        if (rightIconRes != null && rightIconClick != null) {
+            Icon(
+                imageVector = ImageVector.vectorResource(id = rightIconRes),
+                contentDescription = null,
+                tint = KieroTheme.colors.white,
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .noRippleClickable(onClick = rightIconClick)
+            )
+        }
     }
 }
+
 
 @Preview
 @Composable
