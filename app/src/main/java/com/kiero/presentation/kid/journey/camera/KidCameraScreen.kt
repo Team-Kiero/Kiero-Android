@@ -111,7 +111,7 @@ private fun KidCameraScreen(
             ) {
                 Text(
                     text = buildAnnotatedString {
-                        append("우와!")
+                        append("우와! ")
                         withStyle(style = SpanStyle(color = KieroTheme.colors.main)) {
                             append("용기의 불조각")
                         }
