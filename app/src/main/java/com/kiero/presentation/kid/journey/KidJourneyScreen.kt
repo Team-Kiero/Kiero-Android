@@ -1,7 +1,5 @@
 package com.kiero.presentation.kid.journey
 
-import android.os.Build.VERSION.SDK_INT
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -12,28 +10,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.ImageLoader
-import coil.compose.rememberAsyncImagePainter
-import coil.decode.GifDecoder
-import coil.decode.ImageDecoderDecoder
-import coil.request.ImageRequest
 import com.kiero.R
 import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.common.extension.forcePixelToDp
+import com.kiero.core.designsystem.component.KieroGifImage
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
@@ -171,44 +162,13 @@ private fun KidJourneyScreen(
         }
 
         // 꾸비 gif
-        GifImage(
+        KieroGifImage(
             drawableId = R.drawable.gif_kid_intro,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 200.dp)
         )
     }
-}
-
-@Composable
-private fun GifImage(
-    @DrawableRes drawableId: Int,
-    modifier: Modifier = Modifier,
-) {
-    val context = LocalContext.current
-    val imageLoader = ImageLoader.Builder(context)
-        .components {
-            if (SDK_INT >= 28) {
-                add(ImageDecoderDecoder.Factory())
-            } else {
-                add(GifDecoder.Factory())
-            }
-        }.build()
-
-    val painter = rememberAsyncImagePainter(
-        model = ImageRequest.Builder(context)
-            .data(drawableId)
-            .build(),
-        imageLoader = imageLoader
-    )
-
-    Image(
-        painter = painter,
-        contentDescription = null,
-        modifier = modifier
-            .clip(RoundedCornerShape(12.dp)),
-        contentScale = ContentScale.Crop
-    )
 }
 
 @Composable
