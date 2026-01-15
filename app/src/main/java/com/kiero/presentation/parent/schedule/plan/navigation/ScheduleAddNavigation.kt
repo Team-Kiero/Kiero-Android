@@ -6,7 +6,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.kiero.core.navigation.Route
-import com.kiero.presentation.parent.navigation.Schedule
 import com.kiero.presentation.parent.schedule.plan.ParentScheduleAddRoute
 import kotlinx.serialization.Serializable
 
