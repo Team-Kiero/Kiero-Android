@@ -1,4 +1,4 @@
-package com.kiero.data.mission.api
+package com.kiero.data.mission.remote.api
 
 import com.kiero.core.network.model.BaseResponse
 import com.kiero.data.mission.dto.response.MissionResponseDto
