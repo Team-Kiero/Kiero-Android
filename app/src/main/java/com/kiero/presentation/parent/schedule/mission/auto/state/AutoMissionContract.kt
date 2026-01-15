@@ -8,44 +8,41 @@ import java.time.LocalDate
 
 @Immutable
 data class AutoMissionContract(
-    /** [SCH-006] 알림장 입력 데이터 (화면 전환 시 보존 대상) */
+    /** 알림장 입력 데이터 (화면 전환 시 보존 대상) */
     val noticeText: String = "",
 
-    /** [SCH-007] 분석 로딩 상태 */
+    /** 분석 로딩 상태 */
     val isAnalyzing: Boolean = false,
 
-    /** [SCH-008] AI 분석 결과 리스트 */
+    /** AI 분석 결과 리스트 */
     val missions: ImmutableList<MissionUiModel> = persistentListOf(),
     val currentIndex: Int = 0,
 
     /** 최종 일괄 저장 로딩 상태 */
     val isSaving: Boolean = false,
-
-    /** 에러 메시지 (Toast용) */
-    val errorMessage: String? = null
 ) {
-    // [SCH-006] 분석 버튼 활성화: 10자 이상 1000자 이하
+    //  분석 버튼 활성화: 10자 이상 1000자 이하
     val isAnalyzeEnabled: Boolean = noticeText.trim().length in 10..1000
 
-    // [SCH-008] 현재 선택된 미션
+    //  현재 선택된 미션
     val currentMission: MissionUiModel? = missions.getOrNull(currentIndex)
 
-    // [SCH-008] 저장 버튼 활성화: 마지막 페이지 도달
+    //  저장 버튼 활성화: 마지막 페이지 도달
     val isSaveEnabled: Boolean = missions.isNotEmpty() &&
             currentIndex == missions.size - 1
 
-    // [UI 분기용] 현재 표시할 화면 판단
+    //  현재 표시할 화면 판단
     val currentScreen: Screen
         get() = when {
-            isAnalyzing -> Screen.LOADING           // SCH-007
-            missions.isEmpty() -> Screen.INPUT      // SCH-006
-            else -> Screen.RESULT                   // SCH-008
+            isAnalyzing -> Screen.LOADING
+            missions.isEmpty() -> Screen.INPUT
+            else -> Screen.RESULT
         }
 
     enum class Screen {
-        INPUT,      // SCH-006
-        LOADING,    // SCH-007
-        RESULT      // SCH-008
+        INPUT,
+        LOADING,
+        RESULT
     }
 
     companion object {
