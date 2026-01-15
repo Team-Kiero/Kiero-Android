@@ -104,6 +104,7 @@ private fun KidFIreResultScreen(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(top = 183.dp)
+                    .alpha(if (!isFinished) 1f else 0f),
             )
 
             Box(
@@ -124,19 +125,19 @@ private fun KidFIreResultScreen(
                         modifier = Modifier
                             .padding(horizontal = 12.dp)
                     )
-                }
 
-                KieroChip(
-                    action = KieroTextAction(
-                        text = "꾸비",
-                        onClick = {}
-                    ),
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 9.dp),
-                    horizontalPadding = 20,
-                    verticalPadding = 4,
-                )
+                    KieroChip(
+                        action = KieroTextAction(
+                            text = "꾸비",
+                            onClick = {}
+                        ),
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(bottom = 9.dp),
+                        horizontalPadding = 20,
+                        verticalPadding = 4,
+                    )
+                }
             }
         }
 
