@@ -1,4 +1,4 @@
-package com.kiero.presentation.kid.journey.component
+package com.kiero.presentation.kid.component
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -19,10 +20,11 @@ import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
 
 @Composable
-fun KidJourneyNextButton(
+fun KidNextButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     isVisible: Boolean = true,
+    textColor: Color = KieroTheme.colors.gray600,
 ) {
     Row(
         modifier = modifier
@@ -49,6 +51,6 @@ fun KidJourneyNextButton(
 
 @Preview(showBackground = false)
 @Composable
-fun KidJourneyNextButtonPreview() {
-    KidJourneyNextButton(onClick = {})
+fun KidNextButtonPreview() {
+    KidNextButton(onClick = {})
 }

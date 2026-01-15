@@ -28,11 +28,11 @@ import com.kiero.core.designsystem.component.KieroGifImage
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
+import com.kiero.presentation.kid.component.KidNextButton
 import com.kiero.presentation.kid.component.KidSpeechField
 import com.kiero.presentation.kid.journey.component.KidJourneyActionButton
 import com.kiero.presentation.kid.journey.component.KidJourneyGoblinMessage
 import com.kiero.presentation.kid.journey.component.KidJourneyHeader
-import com.kiero.presentation.kid.journey.component.KidJourneyNextButton
 import com.kiero.presentation.kid.journey.component.KidJourneyScheduleItem
 import com.kiero.presentation.kid.journey.model.KidJourneyButtonType
 import com.kiero.presentation.kid.journey.model.KidJourneyContentModel
@@ -132,7 +132,7 @@ private fun KidJourneyScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            KidJourneyNextButton(
+            KidNextButton(
                 isVisible = state.shouldShowNextButton,
                 modifier = Modifier
                     .align(Alignment.End),
