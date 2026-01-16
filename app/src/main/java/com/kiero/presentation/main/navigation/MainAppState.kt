@@ -19,6 +19,7 @@ import com.kiero.presentation.kid.navigation.Journey
 import com.kiero.presentation.kid.navigation.KidGraph
 import com.kiero.presentation.kid.navigation.Mission
 import com.kiero.presentation.kid.navigation.Wish
+import com.kiero.presentation.kid.onboarding.navigation.navigateToKidOnboarding
 import com.kiero.presentation.kid.wish.navigation.navigateToWish
 import com.kiero.presentation.parent.alarm.navigation.navigateToAlarm
 import com.kiero.presentation.parent.navigation.Alarm
@@ -163,6 +164,9 @@ class MainAppState(
     fun navigateToScheduleAdd(navOptions: NavOptions? = null) =
         navController.navigateToScheduleAdd(navOptions)
 
+    fun navigateToKidOnboarding(navOptions: NavOptions? = null) =
+        navController.navigateToKidOnboarding(navOptions)
+        
     fun navigateToCamera(navOptions: NavOptions? = null) =
         navController.navigateToCamera(navOptions)
 

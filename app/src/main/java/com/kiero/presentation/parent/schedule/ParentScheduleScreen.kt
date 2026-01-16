@@ -6,7 +6,9 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -62,6 +64,24 @@ private fun ParentScheduleScreen(
 
     Box(
         modifier = modifier
+            .fillMaxSize()
+            .padding(paddingValues),
+        containerColor = KieroTheme.colors.black,
+        floatingActionButton = {
+            ParentFloatingButton(
+                buttonColor = KieroTheme.colors.white,
+                onActiveClick = navigateToScheduleAdd,
+                modifier = Modifier
+                    .padding(bottom = 24.dp, end = 27.dp)
+            )
+        }
+    ) { innerPadding ->
+        Spacer(
+            modifier = Modifier
+                .background(color = KieroTheme.colors.gray900)
+                .height(33.dp)
+        )
+
             .background(color = KieroTheme.colors.black)
     ) {
         Column(
@@ -69,6 +89,7 @@ private fun ParentScheduleScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+
             ParentUserSection(
                 userName = "근영맘",
                 onUserNameClick = {},

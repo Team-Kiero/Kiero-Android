@@ -26,7 +26,7 @@ fun KieroNavHost(
             navController = appState.navController,
             paddingValues = paddingValues,
             navigateUp = appState::navigateUp,
-            navigateToParent = appState::navigateToParent,
+            navigateToParent = appState::navigateToKidOnboarding,
             navigateToKid = appState::navigateToKid,
         )
 

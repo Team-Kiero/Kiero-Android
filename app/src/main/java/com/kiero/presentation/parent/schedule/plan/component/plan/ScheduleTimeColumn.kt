@@ -1,4 +1,4 @@
-package com.example.timetable.components
+package com.kiero.presentation.parent.schedule.plan.component.plan
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -48,7 +48,7 @@ fun ScheduleTimeColumn(
                     color = KieroTheme.colors.gray600,
                     style = KieroTheme.typography.regular.body5,
                     modifier = Modifier
-                        .padding(top= 3. dp, bottom = 7.dp, start = 5.dp , end = 5.dp)
+                        .padding(top = 3.dp, bottom = 7.dp, start = 5.dp, end = 5.dp)
                 )
 
                 HorizontalDivider(

@@ -20,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
@@ -62,7 +61,7 @@ fun ScheduleEventBlock(
     ) {
         if (block.title.isNotEmpty()) {
             Column(
-                modifier = Modifier
+                modifier = Modifier.fillMaxSize()
             ) {
                 HorizontalDivider(
                     modifier = Modifier
