@@ -3,10 +3,13 @@ package com.kiero.presentation.auth.parent.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.common.extension.toHandleErrorMessage
+import com.kiero.core.model.UiState
 import com.kiero.data.auth.repository.AuthRepository
-import com.kiero.presentation.auth.model.AuthSideEffect
-import com.kiero.presentation.auth.model.AuthState
+import com.kiero.presentation.auth.state.AuthSideEffect
+import com.kiero.presentation.auth.state.AuthState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,6 +17,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,13 +32,47 @@ class AuthParentViewModel @Inject constructor(
     val sideEffect = _sideEffect.asSharedFlow()
 
     fun loginWithKakao(context: Context) = viewModelScope.launch {
-        _state.update { it.copy(isLoading = true) }
+        _state.update { it.copy(uiState = UiState.Loading) }
 
         authRepository.loginWithKakao(context)
-            .onSuccess {
-                _state.update { it.copy(isLoading = false) }
+            .onSuccess { result ->
+                val childrenDeferred = async { authRepository.getChildren() }
+
+                val childrenResult = childrenDeferred.await()
+
+                childrenResult.onSuccess { children ->
+                    if (children.isNotEmpty()) {
+                        _sideEffect.emit(
+                            AuthSideEffect.NavigateToParentGraph
+                        )
+                    } else {
+                        _sideEffect.emit(
+                            AuthSideEffect.NavigateToParentSignUp(
+                                parentName = result.name,
+                                parentProfileImage = result.image
+                            )
+                        )
+                    }
+                }.onFailure { throwable ->
+                    Timber.e(throwable)
+                    _sideEffect.emit(
+                        AuthSideEffect.ShowSnackbar(
+                            message = throwable.toHandleErrorMessage()
+                        )
+                    )
+                }
+
             }.onFailure { throwable ->
-                _state.update { it.copy(isLoading = false) }
+                Timber.e(throwable)
+                _state.update {
+                    it.copy(uiState = UiState.Failure(throwable.toHandleErrorMessage()))
+                }
+
+                _sideEffect.emit(
+                    AuthSideEffect.ShowSnackbar(
+                        message = throwable.toHandleErrorMessage()
+                    )
+                )
             }
     }
 

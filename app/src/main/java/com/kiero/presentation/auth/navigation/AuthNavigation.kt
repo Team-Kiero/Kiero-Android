@@ -33,7 +33,8 @@ fun NavGraphBuilder.authNavGraph(
     navController: NavHostController,
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
-    navigateToParent: () -> Unit,
+    navigateToParentGraph: () -> Unit,
+    navigateToParentSignUp: (String, String) -> Unit,
     navigateToKid: () -> Unit,
 ) {
     navigation<AuthGraph>(
@@ -44,7 +45,6 @@ fun NavGraphBuilder.authNavGraph(
                 paddingValues = paddingValues,
                 navigateToParent = navController::navigateToAuthParent,
                 navigateToKid = navigateToKid,
-                navigateToEx = navigateToParent
             )
         }
 
@@ -52,6 +52,10 @@ fun NavGraphBuilder.authNavGraph(
             AuthParentRoute(
                 paddingValues = paddingValues,
                 navigateUp = navigateUp,
+                navigateToParentSignUp = { parentName, parentProfileImage ->
+                    navigateToParentSignUp(parentName, parentProfileImage)
+                },
+                navigateToParentGraph = navigateToParentGraph
             )
         }
     }
