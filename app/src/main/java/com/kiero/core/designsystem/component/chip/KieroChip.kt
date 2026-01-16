@@ -115,7 +115,7 @@ fun KieroChip(
         verticalAlignment = Alignment.CenterVertically
     ) {
         action(
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
         )
     }
 }

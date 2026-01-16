@@ -90,7 +90,7 @@ fun KieroTextField(
                             shape = shape
                         )
                         .border(
-                            width = 0.5.dp,
+                            width = 1.dp,
                             color = borderColor,
                             shape = shape
                         )

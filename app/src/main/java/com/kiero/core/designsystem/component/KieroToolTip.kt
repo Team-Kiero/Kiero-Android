@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.graphics.shapes.CornerRounding
 import androidx.graphics.shapes.RoundedPolygon
 import androidx.graphics.shapes.toPath
+
 import com.kiero.core.designsystem.theme.KieroTheme
 
 @Composable
