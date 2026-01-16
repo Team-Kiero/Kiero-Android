@@ -33,6 +33,69 @@ object ScheduleData {
             date = null
         ),
         ScheduleEvent(
+            id = "111",
+            name = "학교",
+            isRecurring = true,
+            startTime = "13:00",
+            endTime = "16:00",
+            scheduleColor = "SCHEDULE3",
+            dayOfWeek = "MON",
+            date = null
+        ),
+        ScheduleEvent(
+            id = "112",
+            name = "수영",
+            isRecurring = true,
+            startTime = "16:00",
+            endTime = "17:00",
+            scheduleColor = "SCHEDULE1",
+            dayOfWeek = "MON",
+            date = null
+        ),
+        ScheduleEvent(
+            id = "113",
+            name = "수학",
+            isRecurring = true,
+            startTime = "18:00",
+            endTime = "19:00",
+            scheduleColor = "SCHEDULE2",
+            dayOfWeek = "MON",
+            date = null
+        ),
+
+        ScheduleEvent(
+            id = "114",
+            name = "수학",
+            isRecurring = true,
+            startTime = "12:00",
+            endTime = "19:00",
+            scheduleColor = "SCHEDULE3",
+            dayOfWeek = "THU",
+            date = null
+        ),
+
+        ScheduleEvent(
+            id = "115",
+            name = "수학",
+            isRecurring = true,
+            startTime = "13:00",
+            endTime = "19:00",
+            scheduleColor = "SCHEDULE4",
+            dayOfWeek = "SAT",
+            date = null
+        ),
+
+        ScheduleEvent(
+            id = "116",
+            name = "수학",
+            isRecurring = true,
+            startTime = "15:00",
+            endTime = "21:00",
+            scheduleColor = "SCHEDULE5",
+            dayOfWeek = "SUN",
+            date = null
+        ),
+        ScheduleEvent(
             id = "2",
             name = "수영",
             isRecurring = true,
@@ -67,7 +130,7 @@ object ScheduleData {
             name = "미술",
             isRecurring = true,
             startTime = "08:00",
-            endTime = "09:00",
+            endTime = "22:00",
             scheduleColor = "SCHEDULE1",
             dayOfWeek = "FRI",
             date = null
