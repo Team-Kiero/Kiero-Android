@@ -1,13 +1,18 @@
 package com.kiero
 
 import android.app.Application
+import android.os.Build.VERSION.SDK_INT
 import androidx.appcompat.app.AppCompatDelegate
+import coil.ImageLoader
+import coil.ImageLoaderFactory
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
 import com.kakao.sdk.common.KakaoSdk
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
 @HiltAndroidApp
-class KieroApplication : Application() {
+class KieroApplication : Application(), ImageLoaderFactory {
     override fun onCreate() {
         super.onCreate()
         setTimber()
@@ -32,5 +37,17 @@ class KieroApplication : Application() {
         } catch (e: Exception) {
             Timber.tag("KAKAO_INIT").e(e, "❌ 카카오 SDK 초기화 실패")
         }
+    }
+
+    override fun newImageLoader(): ImageLoader {
+        return ImageLoader.Builder(this)
+            .components {
+                if (SDK_INT >= 28) {
+                    add(ImageDecoderDecoder.Factory())
+                } else {
+                    add(GifDecoder.Factory())
+                }
+            }.crossfade(false)
+            .build()
     }
 }

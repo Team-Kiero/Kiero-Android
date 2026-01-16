@@ -39,7 +39,7 @@ fun KieroNavHost(
         kidNavGraph(
             navController = appState.navController,
             paddingValues = paddingValues,
-            navigateUp = appState::navigateUp,
+            navigateUp = appState::navigateUp
         )
     }
 }
