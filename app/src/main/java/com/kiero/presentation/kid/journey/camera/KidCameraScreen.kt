@@ -2,7 +2,8 @@ package com.kiero.presentation.kid.journey.camera
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts import androidx.compose.foundation.Image
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -57,8 +58,6 @@ fun KidCameraRoute(
     ) { success ->
         if (success) {
             imageUri = tempUri
-        } else {
-            navigateUp()
         }
     }
 
