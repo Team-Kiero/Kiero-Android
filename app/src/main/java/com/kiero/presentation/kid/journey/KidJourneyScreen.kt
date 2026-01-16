@@ -18,6 +18,9 @@ import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -33,6 +36,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
 import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.designsystem.component.KieroGifImage
+import com.kiero.core.designsystem.component.dialog.KieroDialog
+import com.kiero.core.designsystem.component.dialog.action.KieroCancelAction
+import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
@@ -42,9 +48,9 @@ import com.kiero.presentation.kid.journey.component.KidJourneyGoblinMessage
 import com.kiero.presentation.kid.journey.component.KidJourneyHeader
 import com.kiero.presentation.kid.journey.component.KidJourneyScheduleItem
 import com.kiero.presentation.kid.journey.model.KidJourneyButtonType
-import com.kiero.presentation.kid.journey.model.KidJourneyContentModel
-import com.kiero.presentation.kid.journey.model.KidJourneyHeaderModel
-import com.kiero.presentation.kid.journey.model.KidJourneyScheduleModel
+import com.kiero.presentation.kid.journey.model.KidJourneyContentUiModel
+import com.kiero.presentation.kid.journey.model.KidJourneyHeaderUiModel
+import com.kiero.presentation.kid.journey.model.KidJourneyScheduleUiModel
 import com.kiero.presentation.kid.journey.state.KidJourneySideEffect
 import com.kiero.presentation.kid.journey.state.KidJourneyState
 import com.kiero.presentation.kid.journey.util.KidJourneyContentUtil
@@ -102,7 +108,7 @@ fun KidJourneyRoute(
                 KidJourneyButtonType.FIRE -> {
                     navigateToFire()
                 }
-                else -> { /* NONE 인 경우 처리 */ }
+                else -> { }
             }
         },
         onNextClick = viewModel::onNextClick,
@@ -121,6 +127,8 @@ private fun KidJourneyScreen(
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     val imageWidth = screenWidth + 8.dp
+
+    var showDialog by remember { mutableStateOf(false) }
 
     Box(
         modifier = modifier
@@ -174,7 +182,7 @@ private fun KidJourneyScreen(
                     .fillMaxWidth()
                     .padding(top = 9.dp),
                 isVisibleButton = state.shouldShowNextButton,
-                onClick = onNextClick
+                onClick = { showDialog = true }
             ) {
                 KidJourneyGoblinMessage(
                     content = state.content
@@ -199,6 +207,26 @@ private fun KidJourneyScreen(
                 .padding(top = 250.dp, start = 8.dp, end = 8.dp, bottom = 150.dp)
         )
     }
+
+    if (showDialog) {
+        KieroDialog(
+            onDismiss = { showDialog = false },
+            title = "다음 여정으로 갈거야?",
+            subDescription = "한 번 다음 여정으로 넘어가면 \n다시 지금 여정으로 돌아올 수 없어!",
+            cancelAction = KieroCancelAction(
+                text = "취소",
+                onClick = { showDialog = false }
+            ),
+            confirmAction = KieroConfirmAction(
+                text = "확인",
+                onClick = {
+                    showDialog = false
+                    onNextClick()
+                }
+            ),
+            content = {}
+        )
+    }
 }
 
 @Composable
@@ -209,17 +237,17 @@ private fun KidJourneyScreenPreview() {
             paddingValues = PaddingValues(),
             navigateUp = {},
             state = KidJourneyState(
-                header = KidJourneyHeaderModel(
+                header = KidJourneyHeaderUiModel(
                     kidName = "주완",
                     currentDate = LocalDate.of(2024, 12, 5),
                     coinCount = 350,
                     earnedStones = 5,
                     totalScheduleCount = 7
                 ),
-                content = KidJourneyContentModel.NowSchedule(
+                content = KidJourneyContentUiModel.NowSchedule(
                     scheduleName = "피아노 학원 가기",
                     stoneType = "용기의 불조각",
-                    scheduleInfo = KidJourneyScheduleModel(
+                    scheduleInfo = KidJourneyScheduleUiModel(
                         order = 4,
                         startTime = LocalTime.of(14, 0),
                         endTime = LocalTime.of(16, 0)
