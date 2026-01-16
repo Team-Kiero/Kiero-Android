@@ -47,18 +47,18 @@ fun KidOnboardingScreen(
     onSkipClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var currentStep by remember { mutableStateOf(OnboardingModel.STORY1) }
+    var currentStep by remember { mutableStateOf(OnboardingUiModel.STORY1) }
     val currentDescription = DescriptionModel.getDescription(
         step = currentStep.step,
         mainColor = KieroTheme.colors.main
     )
     val moveToNextStep = {
         currentStep = when (currentStep) {
-            OnboardingModel.STORY1 -> OnboardingModel.STORY2
-            OnboardingModel.STORY2 -> OnboardingModel.STORY3
-            OnboardingModel.STORY3 -> OnboardingModel.STORY4
-            OnboardingModel.STORY4 -> OnboardingModel.STORY5
-            OnboardingModel.STORY5 -> {
+            OnboardingUiModel.STORY1 -> OnboardingUiModel.STORY2
+            OnboardingUiModel.STORY2 -> OnboardingUiModel.STORY3
+            OnboardingUiModel.STORY3 -> OnboardingUiModel.STORY4
+            OnboardingUiModel.STORY4 -> OnboardingUiModel.STORY5
+            OnboardingUiModel.STORY5 -> {
                 navigateToKid()
                 currentStep
             }
@@ -99,7 +99,7 @@ fun KidOnboardingScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            if (currentStep == OnboardingModel.STORY5) {
+            if (currentStep == OnboardingUiModel.STORY5) {
                 KieroButtonMedium(
                     text = "여정 시작하기",
                     onClick = navigateToKid,

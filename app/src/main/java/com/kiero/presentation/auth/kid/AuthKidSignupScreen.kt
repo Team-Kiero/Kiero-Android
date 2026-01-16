@@ -85,7 +85,6 @@ fun AuthKidSignupScreen(
             )
             .padding(paddingValues),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(21.dp)
     ) {
         Spacer(modifier = Modifier.height(30.dp))
 
@@ -98,6 +97,8 @@ fun AuthKidSignupScreen(
             rightIconClick = {}
         )
 
+        Spacer(modifier = Modifier.height(21.dp))
+
         Text(
             text = "이름과 부모님께 받은 초대 코드를 입력해줘!",
             color = KieroTheme.colors.gray200,
@@ -106,6 +107,8 @@ fun AuthKidSignupScreen(
                 .align(Alignment.Start)
                 .padding(start = 15.dp)
         )
+
+        Spacer(modifier = Modifier.height(31.dp))
 
         KidInputField(
             fieldTitle = "성",
@@ -119,7 +122,7 @@ fun AuthKidSignupScreen(
             fieldState = lastNameState
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(31.dp))
 
         KidInputField(
             fieldTitle = "초대 코드",
@@ -136,7 +139,7 @@ fun AuthKidSignupScreen(
                 .padding(horizontal = 16.dp)
         )
 
-        Spacer(modifier = Modifier.height(41.dp))
+        Spacer(modifier = Modifier.height(55.dp))
     }
 }
 

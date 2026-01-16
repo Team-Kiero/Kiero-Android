@@ -9,7 +9,7 @@ import androidx.compose.ui.graphics.Color
 import com.kiero.R
 
 
-enum class OnboardingModel (
+enum class OnboardingUiModel (
     val step : Int,
     val backImage : Int,
     val description : String
