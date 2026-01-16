@@ -117,6 +117,7 @@ private fun KidFIreResultScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 12.dp)
+                            .padding(bottom = 200.dp)
                     )
                 } else {
                     Image(

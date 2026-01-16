@@ -14,12 +14,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,7 +32,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
 import com.kiero.core.common.extension.collectSideEffect
-import com.kiero.core.common.extension.forcePixelToDp
 import com.kiero.core.designsystem.component.KieroGifImage
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.trigger.SnackbarState
@@ -118,6 +120,9 @@ private fun KidJourneyScreen(
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    val imageWidth = screenWidth + 8.dp
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -128,12 +133,14 @@ private fun KidJourneyScreen(
         Image(
             painter = painterResource(id = R.drawable.img_kid_journey_mask_background),
             contentDescription = null,
-            contentScale = ContentScale.Fit,
             modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 132.dp)
-                .fillMaxWidth()
-                .forcePixelToDp(painterResource(id = R.drawable.img_kid_journey_mask_background))
+                .wrapContentSize(
+                    align = Alignment.TopCenter,
+                    unbounded = true
+                )
+                .padding(top = 132.dp, bottom = 250.dp)
+                .requiredWidth(imageWidth),
+            contentScale = ContentScale.FillWidth
         )
 
         Column(
@@ -199,7 +206,7 @@ private fun KidJourneyScreen(
             drawableId = R.drawable.gif_kid_intro,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 200.dp)
+                .padding(top = 250.dp, start = 8.dp, end = 8.dp, bottom = 150.dp)
         )
     }
 }
