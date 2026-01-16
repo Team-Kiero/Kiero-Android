@@ -27,14 +27,14 @@ fun KieroSnackbar(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(KieroTheme.colors.gray900)
+            .background(KieroTheme.colors.schedule1)
             .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = message,
             style = KieroTheme.typography.regular.body4,
-            color = KieroTheme.colors.schedule1,
+            color = KieroTheme.colors.gray900,
             textAlign = TextAlign.Center
         )
     }

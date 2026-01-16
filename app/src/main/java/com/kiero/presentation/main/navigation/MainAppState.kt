@@ -11,6 +11,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import com.kiero.core.network.monitor.NetworkMonitor
 import com.kiero.presentation.auth.navigation.AuthGraph
+import com.kiero.presentation.kid.journey.camera.navigation.navigateToCamera
+import com.kiero.presentation.kid.journey.fire.navigation.navigateToFire
 import com.kiero.presentation.kid.journey.navigation.navigateToJourney
 import com.kiero.presentation.kid.mission.navigation.navigateToMission
 import com.kiero.presentation.kid.navigation.Journey
@@ -160,6 +162,12 @@ class MainAppState(
 
     fun navigateToScheduleAdd(navOptions: NavOptions? = null) =
         navController.navigateToScheduleAdd(navOptions)
+
+    fun navigateToCamera(navOptions: NavOptions? = null) =
+        navController.navigateToCamera(navOptions)
+
+    fun navigateToFire(navOptions: NavOptions? = null) =
+        navController.navigateToFire(navOptions)
 
     fun navigateToMissionAdd(navOptions: NavOptions? = null) =
         navController.navigateToMissionAdd(navOptions)

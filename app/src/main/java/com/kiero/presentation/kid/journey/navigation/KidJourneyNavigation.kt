@@ -17,11 +17,15 @@ fun NavController.navigateToJourney(
 fun NavGraphBuilder.kidJourneyNavGraph(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
+    navigateToCamera: () -> Unit,
+    navigateToFire: () -> Unit
 ) {
     composable<Journey> {
         KidJourneyRoute(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
+            navigateToCamera = navigateToCamera,
+            navigateToFire = navigateToFire
         )
     }
 }

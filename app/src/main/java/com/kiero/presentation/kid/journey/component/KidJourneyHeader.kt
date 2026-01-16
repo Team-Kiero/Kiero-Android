@@ -1,0 +1,81 @@
+package com.kiero.presentation.kid.journey.component
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.kiero.core.designsystem.component.chip.KieroChip
+import com.kiero.core.designsystem.component.chip.action.KieroCoinAction
+import com.kiero.core.designsystem.component.chip.action.KieroStoneAction
+import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.presentation.kid.component.KidProfileChip
+import com.kiero.presentation.kid.journey.model.KidJourneyHeaderUiModel
+import com.kiero.presentation.kid.journey.util.KidJourneyDateUtil
+import java.time.LocalDate
+
+@Composable
+fun KidJourneyHeader(
+    header: KidJourneyHeaderUiModel,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column {
+            KidProfileChip(kidName = header.kidName)
+            Text(
+                text = KidJourneyDateUtil.formatDate(header.currentDate),
+                style = KieroTheme.typography.regular.body3,
+                color = KieroTheme.colors.gray500
+            )
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Column(horizontalAlignment = Alignment.End) {
+            KieroChip(
+                action = KieroCoinAction(
+                    coinCount = header.coinCount,
+                    onClick = {}
+                )
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            KieroChip(
+                action = KieroStoneAction(
+                    currentStoneCount = header.earnedStones,
+                    maxStoneCount = header.totalScheduleCount,
+                    onClick = {}
+                ),
+                isEnabled = true,
+                isCompleted = header.earnedStones == header.totalScheduleCount
+                        && header.totalScheduleCount > 0
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun KidJourneyHeaderPreview() {
+    KieroTheme {
+        KidJourneyHeader(
+            header = KidJourneyHeaderUiModel(
+                kidName = "주완",
+                currentDate = LocalDate.of(2024, 12, 5),
+                coinCount = 350,
+                earnedStones = 5,
+                totalScheduleCount = 7
+            )
+        )
+    }
+}
