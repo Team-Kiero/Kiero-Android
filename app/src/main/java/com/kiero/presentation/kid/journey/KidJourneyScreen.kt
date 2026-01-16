@@ -1,5 +1,9 @@
 package com.kiero.presentation.kid.journey
 
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -16,9 +20,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
@@ -55,6 +61,7 @@ fun KidJourneyRoute(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val globalTrigger = LocalGlobalUiEventTrigger.current
+    val context = LocalContext.current
 
     viewModel.sideEffect.collectSideEffect { sideEffect ->
         when (sideEffect) {
@@ -66,13 +73,34 @@ fun KidJourneyRoute(
         }
     }
 
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            navigateToCamera()
+        }
+    }
+
     KidJourneyScreen(
         paddingValues = paddingValues,
         state = state,
         onButtonClick = {
             when (state.buttonType) {
-                KidJourneyButtonType.AUTH -> navigateToCamera()
-                KidJourneyButtonType.FIRE -> navigateToFire()
+                KidJourneyButtonType.AUTH -> {
+                    val hasPermission = ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.CAMERA
+                    ) == PackageManager.PERMISSION_GRANTED
+
+                    if (hasPermission) {
+                        navigateToCamera()
+                    } else {
+                        permissionLauncher.launch(Manifest.permission.CAMERA)
+                    }
+                }
+                KidJourneyButtonType.FIRE -> {
+                    navigateToFire()
+                }
                 else -> { /* NONE 인 경우 처리 */ }
             }
         },
@@ -144,9 +172,7 @@ private fun KidJourneyScreen(
                         .padding(top = 9.dp)
                 ) {
                     KidJourneyGoblinMessage(
-                        content = state.content,
-                        messageRes = state.goblinMessageRes,
-                        messageArgs = state.getMessageArgs()
+                        content = state.content
                     )
                 }
 
