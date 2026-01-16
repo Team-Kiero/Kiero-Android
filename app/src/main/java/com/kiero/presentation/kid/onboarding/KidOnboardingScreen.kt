@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.component.button.KieroButtonMedium
 import com.kiero.core.designsystem.theme.KieroTheme
-import com.kiero.presentation.kid.component.SpeechField
+import com.kiero.presentation.kid.component.KidSpeechField
 
 @Composable
 fun KidOnboardingRoute(
@@ -83,7 +83,7 @@ fun KidOnboardingScreen(
         ) {
             Spacer(modifier = Modifier.height(512.dp))
 
-            SpeechField(
+            KidSpeechField(
                 name = "꾸비",
                 modifier = Modifier
                     .noRippleClickable(onClick = moveToNextStep)
