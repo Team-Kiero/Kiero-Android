@@ -2,6 +2,7 @@ package com.kiero.core.designsystem.component
 
 import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -14,11 +15,14 @@ fun KieroGifImage(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    val imageRequest = remember(drawableId) {
+        ImageRequest.Builder(context)
+            .data(drawableId)
+            .build()
+    }
 
     AsyncImage(
-        model = ImageRequest.Builder(context)
-            .data(drawableId)
-            .build(),
+        model = imageRequest,
         contentDescription = null,
         modifier = modifier,
         contentScale = ContentScale.Crop
