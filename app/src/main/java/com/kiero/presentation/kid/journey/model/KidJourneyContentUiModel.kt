@@ -3,13 +3,13 @@ package com.kiero.presentation.kid.journey.model
 import androidx.compose.runtime.Immutable
 
 @Immutable
-sealed interface KidJourneyContentModel {
+sealed interface KidJourneyContentUiModel {
 
     /**
      * 금일 일정 없음 (NO_SCHEDULE)
      * - 추가 데이터 불필요
      */
-    data object NoSchedule : KidJourneyContentModel
+    data object NoSchedule : KidJourneyContentUiModel
 
     /**
      * 첫 번째 일정 시작 전 (FIRST_SCHEDULE)
@@ -17,9 +17,9 @@ sealed interface KidJourneyContentModel {
      */
     data class FirstSchedule(
         val scheduleName: String,
-        val scheduleInfo: KidJourneyScheduleModel,
+        val scheduleInfo: KidJourneyScheduleUiModel,
         val isSkippable: Boolean
-    ) : KidJourneyContentModel
+    ) : KidJourneyContentUiModel
 
     /**
      * 현재 일정 진행 중 (NOW_SCHEDULE_EXIST)
@@ -28,9 +28,9 @@ sealed interface KidJourneyContentModel {
     data class NowSchedule(
         val scheduleName: String,
         val stoneType: String,
-        val scheduleInfo: KidJourneyScheduleModel,
+        val scheduleInfo: KidJourneyScheduleUiModel,
         val isSkippable: Boolean
-    ) : KidJourneyContentModel
+    ) : KidJourneyContentUiModel
 
     /**
      * 다음 일정 존재 (NEXT_SCHEDULE_EXIST)
@@ -39,9 +39,9 @@ sealed interface KidJourneyContentModel {
     data class NextSchedule(
         val scheduleName: String,
         val stoneType: String,
-        val scheduleInfo: KidJourneyScheduleModel,
+        val scheduleInfo: KidJourneyScheduleUiModel,
         val isSkippable: Boolean
-    ) : KidJourneyContentModel
+    ) : KidJourneyContentUiModel
 
     /**
      * 불 피우기 전 (FIRE_NOT_LIT)
@@ -49,11 +49,11 @@ sealed interface KidJourneyContentModel {
      */
     data class FireNotLit(
         val kidName: String
-    ) : KidJourneyContentModel
+    ) : KidJourneyContentUiModel
 
     /**
      * 불 피우기 완료 (FIRE_LIT)
      * - 추가 데이터 불필요
      */
-    data object FireLit : KidJourneyContentModel
+    data object FireLit : KidJourneyContentUiModel
 }

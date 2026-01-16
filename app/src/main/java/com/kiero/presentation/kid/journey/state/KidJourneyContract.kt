@@ -3,27 +3,27 @@ package com.kiero.presentation.kid.journey.state
 import androidx.compose.runtime.Immutable
 import com.kiero.R
 import com.kiero.presentation.kid.journey.model.KidJourneyButtonType
-import com.kiero.presentation.kid.journey.model.KidJourneyContentModel
-import com.kiero.presentation.kid.journey.model.KidJourneyHeaderModel
-import com.kiero.presentation.kid.journey.model.KidJourneyScheduleModel
+import com.kiero.presentation.kid.journey.model.KidJourneyContentUiModel
+import com.kiero.presentation.kid.journey.model.KidJourneyHeaderUiModel
+import com.kiero.presentation.kid.journey.model.KidJourneyScheduleUiModel
 import java.time.LocalTime
 
 @Immutable
 data class KidJourneyState(
     val isLoading: Boolean = false,
-    val header: KidJourneyHeaderModel? = null,
-    val content: KidJourneyContentModel = KidJourneyContentModel.NoSchedule
+    val header: KidJourneyHeaderUiModel? = null,
+    val content: KidJourneyContentUiModel = KidJourneyContentUiModel.NoSchedule
 ) {
 
     // 버튼 타입
     val buttonType: KidJourneyButtonType
         get() = when (content) {
-            is KidJourneyContentModel.FirstSchedule,
-            is KidJourneyContentModel.NowSchedule,
-            is KidJourneyContentModel.NextSchedule -> KidJourneyButtonType.AUTH
-            is KidJourneyContentModel.FireNotLit -> KidJourneyButtonType.FIRE
-            is KidJourneyContentModel.NoSchedule,
-            is KidJourneyContentModel.FireLit -> KidJourneyButtonType.NONE
+            is KidJourneyContentUiModel.FirstSchedule,
+            is KidJourneyContentUiModel.NowSchedule,
+            is KidJourneyContentUiModel.NextSchedule -> KidJourneyButtonType.AUTH
+            is KidJourneyContentUiModel.FireNotLit -> KidJourneyButtonType.FIRE
+            is KidJourneyContentUiModel.NoSchedule,
+            is KidJourneyContentUiModel.FireLit -> KidJourneyButtonType.NONE
         }
 
     // 버튼 텍스트 리소스 ID
@@ -37,34 +37,34 @@ data class KidJourneyState(
     // 다음 일정 버튼 활성화
     val shouldShowNextButton: Boolean
         get() = when (content) {
-            is KidJourneyContentModel.FirstSchedule -> content.isSkippable
-            is KidJourneyContentModel.NowSchedule -> content.isSkippable
-            is KidJourneyContentModel.NextSchedule -> content.isSkippable
+            is KidJourneyContentUiModel.FirstSchedule -> content.isSkippable
+            is KidJourneyContentUiModel.NowSchedule -> content.isSkippable
+            is KidJourneyContentUiModel.NextSchedule -> content.isSkippable
             else -> false
         }
 
     // 일정 정보 표시 여부
     val shouldShowSchedule: Boolean
         get() = when (content) {
-            is KidJourneyContentModel.FirstSchedule,
-            is KidJourneyContentModel.NowSchedule,
-            is KidJourneyContentModel.NextSchedule -> true
+            is KidJourneyContentUiModel.FirstSchedule,
+            is KidJourneyContentUiModel.NowSchedule,
+            is KidJourneyContentUiModel.NextSchedule -> true
             else -> false
         }
 
     companion object {
         fun fake() = KidJourneyState(
-            header = KidJourneyHeaderModel(
+            header = KidJourneyHeaderUiModel(
                 kidName = "주완",
                 currentDate = java.time.LocalDate.of(2024, 12, 5),
                 coinCount = 350,
-                earnedStones = 5,
+                earnedStones = 7,
                 totalScheduleCount = 7
             ),
-            content = KidJourneyContentModel.NextSchedule(
+            content = KidJourneyContentUiModel.NextSchedule(
                 scheduleName = "피아노 학원 가기",
                 stoneType = "용기의 불조각",
-                scheduleInfo = KidJourneyScheduleModel(
+                scheduleInfo = KidJourneyScheduleUiModel(
                     order = 1,
                     startTime = LocalTime.of(14, 0),
                     endTime = LocalTime.of(16, 0)

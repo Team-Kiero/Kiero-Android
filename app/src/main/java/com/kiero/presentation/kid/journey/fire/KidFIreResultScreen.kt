@@ -73,7 +73,7 @@ private fun KidFIreResultScreen(
                 leftIconClick = {},
                 rightIconClick = {},
                 modifier = Modifier
-                    .padding(top = 10.dp)
+                    .padding(top = 20.dp)
                     .alpha(if (!isFinished) 1f else 0f),
                 textColor = KieroTheme.colors.gray500,
                 textStyle = KieroTheme.typography.regular.body3

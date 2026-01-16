@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Immutable
-data class KidJourneyScheduleModel(
+data class KidJourneyScheduleUiModel(
     val order: Int,
     val startTime: LocalTime,
     val endTime: LocalTime

@@ -1,15 +1,15 @@
 package com.kiero.presentation.kid.journey.util
 
-import com.kiero.presentation.kid.journey.model.KidJourneyContentModel
-import com.kiero.presentation.kid.journey.model.KidJourneyScheduleModel
+import com.kiero.presentation.kid.journey.model.KidJourneyContentUiModel
+import com.kiero.presentation.kid.journey.model.KidJourneyScheduleUiModel
 
 object KidJourneyContentUtil {
 
-    fun getScheduleInfo(content: KidJourneyContentModel): KidJourneyScheduleModel? {
+    fun getScheduleInfo(content: KidJourneyContentUiModel): KidJourneyScheduleUiModel? {
         return when (content) {
-            is KidJourneyContentModel.FirstSchedule -> content.scheduleInfo
-            is KidJourneyContentModel.NowSchedule -> content.scheduleInfo
-            is KidJourneyContentModel.NextSchedule -> content.scheduleInfo
+            is KidJourneyContentUiModel.FirstSchedule -> content.scheduleInfo
+            is KidJourneyContentUiModel.NowSchedule -> content.scheduleInfo
+            is KidJourneyContentUiModel.NextSchedule -> content.scheduleInfo
             else -> null
         }
     }

@@ -16,13 +16,13 @@ import com.kiero.core.designsystem.component.chip.action.KieroCoinAction
 import com.kiero.core.designsystem.component.chip.action.KieroStoneAction
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.kid.component.KidProfileChip
-import com.kiero.presentation.kid.journey.model.KidJourneyHeaderModel
+import com.kiero.presentation.kid.journey.model.KidJourneyHeaderUiModel
 import com.kiero.presentation.kid.journey.util.KidJourneyDateUtil
 import java.time.LocalDate
 
 @Composable
 fun KidJourneyHeader(
-    header: KidJourneyHeaderModel,
+    header: KidJourneyHeaderUiModel,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -69,7 +69,7 @@ fun KidJourneyHeader(
 private fun KidJourneyHeaderPreview() {
     KieroTheme {
         KidJourneyHeader(
-            header = KidJourneyHeaderModel(
+            header = KidJourneyHeaderUiModel(
                 kidName = "주완",
                 currentDate = LocalDate.of(2024, 12, 5),
                 coinCount = 350,
