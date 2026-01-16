@@ -31,7 +31,6 @@ fun ParentMissionNavigator(
             .padding(horizontal = 100.dp),
         contentAlignment = Alignment.Center
     ) {
-        // 왼쪽 아이콘
         Icon(
             imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_left),
             contentDescription = "이전",
@@ -46,16 +45,12 @@ fun ParentMissionNavigator(
                     }
                 )
         )
-
-        // 중앙 텍스트
         Text(
             text = "미션 ${currentIndex + 1}/$totalCount",
-            style = KieroTheme.typography.semiBold.title3,
+            style = KieroTheme.typography.semiBold.title4,
             color = KieroTheme.colors.white,
             textAlign = TextAlign.Center
         )
-
-        // 오른쪽 아이콘
         Icon(
             imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_right),
             contentDescription = "다음",

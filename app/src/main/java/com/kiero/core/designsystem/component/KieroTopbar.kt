@@ -42,7 +42,7 @@ fun KieroTopbar(
                 .align(Alignment.CenterStart)
                 .noRippleClickable(onClick = leftIconClick)
         )
-        
+
         Text(
             text = title,
             color = KieroTheme.colors.white,
