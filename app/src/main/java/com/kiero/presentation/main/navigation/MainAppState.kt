@@ -22,6 +22,7 @@ import com.kiero.presentation.parent.alarm.navigation.navigateToAlarm
 import com.kiero.presentation.parent.navigation.Alarm
 import com.kiero.presentation.parent.navigation.ParentGraph
 import com.kiero.presentation.parent.navigation.Schedule
+import com.kiero.presentation.parent.schedule.mission.navigation.navigateToMissionAdd
 import com.kiero.presentation.parent.schedule.navigation.navigateToSchedule
 import com.kiero.presentation.parent.schedule.plan.navigation.navigateToScheduleAdd
 import kotlinx.coroutines.CoroutineScope
@@ -35,7 +36,7 @@ import kotlinx.coroutines.flow.stateIn
 class MainAppState(
     val navController: NavHostController,
     coroutineScope: CoroutineScope,
-    networkMonitor: NetworkMonitor
+    networkMonitor: NetworkMonitor,
 ) {
     val startDestination = AuthGraph
 
@@ -159,6 +160,9 @@ class MainAppState(
 
     fun navigateToScheduleAdd(navOptions: NavOptions? = null) =
         navController.navigateToScheduleAdd(navOptions)
+
+    fun navigateToMissionAdd(navOptions: NavOptions? = null) =
+        navController.navigateToMissionAdd(navOptions)
 
     fun navigateUp() {
         navController.navigateUp()

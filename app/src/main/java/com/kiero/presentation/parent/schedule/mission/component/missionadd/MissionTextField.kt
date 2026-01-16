@@ -1,10 +1,10 @@
-package com.kiero.presentation.parent.schedule.plan.component.select
+package com.kiero.presentation.parent.schedule.mission.component.missionadd
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.InputTransformation
@@ -19,29 +19,33 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.theme.KieroTheme
 
 @Composable
-fun ScheduleTextField(
+fun MissionTextField(
     state: TextFieldState,
     placeholder: String,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     readOnly: Boolean = false,
-    isError: Boolean = false,
     inputTransformation: InputTransformation? = null,
     outputTransformation: OutputTransformation? = null,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
     onKeyboardAction: KeyboardActionHandler? = null,
     lineLimits: TextFieldLineLimits = TextFieldLineLimits.SingleLine,
     textColor: Color = KieroTheme.colors.white,
-    maxLength: Int = 8,
+    maxLength: Int = 3,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
+    val borderColor = KieroTheme.colors.gray600
 
     BasicTextField(
         state = state,
@@ -52,24 +56,37 @@ fun ScheduleTextField(
         keyboardOptions = keyboardOptions,
         onKeyboardAction = onKeyboardAction,
         lineLimits = lineLimits,
-        textStyle = KieroTheme.typography.regular.body1.copy(color = textColor),
-        cursorBrush = SolidColor(if (isError) KieroTheme.colors.point else KieroTheme.colors.white),
+        textStyle = KieroTheme.typography.semiBold.title3.copy(
+            color = textColor,
+            textAlign = TextAlign.Center
+        ),
+        cursorBrush = SolidColor(KieroTheme.colors.white),
         interactionSource = interactionSource,
+        modifier = modifier.wrapContentWidth(),
         decorator = { innerTextField ->
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = Color.Unspecified,
-                    )
-                    .padding(horizontal = 20.dp, vertical = 14.dp),
-                contentAlignment = Alignment.CenterStart
+                    .wrapContentWidth()
+                    .background(color = Color.Transparent)
+                    .drawBehind {
+                        val strokeWidth = 1.dp.toPx()
+                        val y = size.height - strokeWidth / 2
+                        drawLine(
+                            color = borderColor,
+                            start = Offset(0f, y),
+                            end = Offset(size.width, y),
+                            strokeWidth = strokeWidth
+                        )
+                    }
+                    .padding(horizontal = 8.dp, vertical = 8.dp),
+                contentAlignment = Alignment.Center
             ) {
                 if (state.text.isEmpty()) {
                     Text(
                         text = placeholder,
-                        style = KieroTheme.typography.regular.body1,
-                        color = KieroTheme.colors.gray500
+                        style = KieroTheme.typography.semiBold.title3,
+                        color = KieroTheme.colors.white,
+                        textAlign = TextAlign.Center
                     )
                 }
                 innerTextField()
@@ -82,9 +99,9 @@ fun ScheduleTextField(
 @Composable
 private fun KieroTextFieldPreviewDefault() {
     KieroTheme {
-        ScheduleTextField(
+        MissionTextField(
             state = rememberTextFieldState(),
-            placeholder = "텍스트를 입력하세요",
+            placeholder = "20",
         )
     }
 }

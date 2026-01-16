@@ -8,6 +8,8 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.navigation
 import com.kiero.core.navigation.Route
 import com.kiero.presentation.parent.alarm.navigation.parentAlarmNavGraph
+import com.kiero.presentation.parent.schedule.mission.navigation.navigateToMissionAdd
+import com.kiero.presentation.parent.schedule.mission.navigation.parentMissionAddNavGraph
 import com.kiero.presentation.parent.schedule.navigation.parentScheduleNavGraph
 import com.kiero.presentation.parent.schedule.plan.navigation.navigateToScheduleAdd
 import com.kiero.presentation.parent.schedule.plan.navigation.parentScheduleAddNavGraph
@@ -41,10 +43,16 @@ fun NavGraphBuilder.parentNavGraph(
         parentScheduleNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
-            navigateToScheduleAdd = navController::navigateToScheduleAdd
+            navigateToScheduleAdd = navController::navigateToScheduleAdd,
+            navigateToMissionAdd = navController::navigateToMissionAdd
         )
 
         parentScheduleAddNavGraph(
+            paddingValues = paddingValues,
+            navigateUp = navigateUp,
+        )
+
+        parentMissionAddNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
         )
