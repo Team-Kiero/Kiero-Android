@@ -129,7 +129,7 @@ class AutoMissionViewModel @Inject constructor(
             _state.update { it.copy(isSaving = false) }
 
             postSideEffect(AutoMissionSideEffect.ShowToast("미션이 등록되었습니다."))
-            postSideEffect(AutoMissionSideEffect.NavigateToMain)
+            _state.update { it.copy(shouldNavigateBack = true) }
         }
     }
 
@@ -142,8 +142,7 @@ class AutoMissionViewModel @Inject constructor(
     // 유틸리티 로직
     private fun handleCancel() {
         if (_state.value.missions.isEmpty()) {
-            _state.update { AutoMissionContract() }
-            postSideEffect(AutoMissionSideEffect.NavigateToMain)
+            _state.update { it.copy(shouldNavigateBack = true) }
         } else {
             _state.update {
                 it.copy(

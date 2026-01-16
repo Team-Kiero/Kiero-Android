@@ -20,6 +20,8 @@ data class AutoMissionContract(
 
     /** 최종 일괄 저장 로딩 상태 */
     val isSaving: Boolean = false,
+
+    val shouldNavigateBack: Boolean = false,
 ) {
     //  분석 버튼 활성화: 10자 이상 1000자 이하
     val isAnalyzeEnabled: Boolean = noticeText.trim().length in 10..1000
