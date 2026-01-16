@@ -36,7 +36,6 @@ import com.kiero.core.designsystem.component.KieroGifImage
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
-import com.kiero.presentation.kid.component.KidNextButton
 import com.kiero.presentation.kid.component.KidSpeechField
 import com.kiero.presentation.kid.journey.component.KidJourneyActionButton
 import com.kiero.presentation.kid.journey.component.KidJourneyGoblinMessage
@@ -169,25 +168,16 @@ private fun KidJourneyScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            Box(
-                modifier = Modifier.fillMaxWidth()
+            KidSpeechField(
+                name = "꾸비",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 9.dp),
+                isVisibleButton = state.shouldShowNextButton,
+                onClick = onNextClick
             ) {
-                KidSpeechField(
-                    name = "꾸비",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 9.dp)
-                ) {
-                    KidJourneyGoblinMessage(
-                        content = state.content
-                    )
-                }
-
-                KidNextButton(
-                    isVisible = state.shouldShowNextButton,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd),
-                    onClick = onNextClick
+                KidJourneyGoblinMessage(
+                    content = state.content
                 )
             }
 
