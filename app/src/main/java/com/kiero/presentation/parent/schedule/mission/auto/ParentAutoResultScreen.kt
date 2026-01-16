@@ -94,7 +94,7 @@ fun ParentAutoResultScreen(
                 onRewardChange = { onEvent(AutoMissionEvent.UpdateMissionReward(it)) },
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = 26.dp)
+                    .padding(horizontal = 16.dp)
             )
         }
 

@@ -36,7 +36,7 @@ fun ParentMissionEditForm(
                 bottom = 12.dp,
                 start = 14.dp
             ),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+        verticalArrangement = Arrangement.spacedBy(15.dp)
     ) {
         // TODO: PR #35 머지 후 ScheduleTextField로 교체
         Text(
