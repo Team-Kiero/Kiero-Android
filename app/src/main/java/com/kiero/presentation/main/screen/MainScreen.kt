@@ -27,6 +27,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.core.designsystem.component.KieroSnackbar
+import com.kiero.core.designsystem.component.dialog.KieroDialog
+import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
 import com.kiero.core.model.trigger.DialogTrigger
 import com.kiero.core.model.trigger.GlobalUiEventHolder
 import com.kiero.core.model.trigger.SnackbarState
@@ -195,8 +197,18 @@ fun MainScreen(
                 }
             ) { paddingValues ->
                 if (dialogState.dialogState.isVisible) {
-                    // Todo : 공통 Dialog 띄우기
-                    Timber.e("Dialog 띄워짐")
+                    KieroDialog(
+                        title = "인터넷 연결 확인해주세요!",
+                        confirmAction = KieroConfirmAction(
+                            text = "확인",
+                            onClick = {
+                                dialogState.dismissDialog()
+                            }
+                        ),
+                        onDismiss = {
+                            dialogState.dismissDialog()
+                        }
+                    )
                 }
 
                 KieroNavHost(

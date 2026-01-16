@@ -35,7 +35,6 @@ fun KieroNavHost(
             navigateUp = appState::navigateUp,
             navigateToParentGraph = appState::navigateToParentGraph,
             navigateToParentSignUp = appState::navigateToParentSignUp,
-            navigateToKid = appState::navigateToKidOnboarding,
         )
 
         parentSignUpNavGraph(
