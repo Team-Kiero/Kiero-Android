@@ -41,7 +41,6 @@ fun NavGraphBuilder.authNavGraph(
     navigateUp: () -> Unit,
     navigateToParentGraph: () -> Unit,
     navigateToParentSignUp: (String, String) -> Unit,
-    navigateToKid: () -> Unit,
 ) {
     navigation<AuthGraph>(
         startDestination = Selection
