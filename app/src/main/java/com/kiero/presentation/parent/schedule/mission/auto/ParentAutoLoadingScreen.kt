@@ -66,6 +66,11 @@ fun ParentAutoLoadingScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Todo : Box -> KieroGifImage 대체
+//        KieroGifImage(
+//            drawableId = R.drawable.parent2,
+//            modifier = Modifier
+//                .size(200.dp)
+//        )
         Box(
             modifier = Modifier
                 .size(120.dp)
