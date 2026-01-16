@@ -1,0 +1,26 @@
+package com.kiero.core.designsystem.component.indicator
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import com.kiero.R
+import com.kiero.core.designsystem.component.KieroGifImage
+import com.kiero.core.designsystem.theme.KieroTheme
+
+@Composable
+fun KieroLoadingIndicator() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(KieroTheme.colors.white),
+        contentAlignment = Alignment.Center
+    ) {
+        KieroGifImage(
+            drawableId = R.drawable.gif_loading,
+        )
+    }
+}
