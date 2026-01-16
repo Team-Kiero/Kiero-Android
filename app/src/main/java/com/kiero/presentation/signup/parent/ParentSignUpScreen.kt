@@ -13,6 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.ClipEntry
@@ -26,6 +29,7 @@ import com.kiero.core.common.extension.collectSingleEvent
 import com.kiero.core.designsystem.component.dialog.KieroDialog
 import com.kiero.core.designsystem.component.dialog.action.KieroCancelAction
 import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
+import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
@@ -49,6 +53,7 @@ fun ParentSignUpRoute(
     val globalTrigger = LocalGlobalUiEventTrigger.current
     val focusManager = LocalFocusManager.current
 
+    var isLoading by remember { mutableStateOf(false) }
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     viewModel.sideEffect.collectSingleEvent {
@@ -127,7 +132,10 @@ fun ParentSignUpRoute(
                 onDismiss = viewModel::onLogoutCancel,
                 confirmAction = KieroConfirmAction(
                     text = "확인",
-                    onClick = viewModel::onLogoutConfirm
+                    onClick = {
+                        isLoading = true
+                        viewModel.onLogoutConfirm()
+                    }
                 ),
                 cancelAction = KieroCancelAction(
                     text = "취소",
@@ -136,6 +144,10 @@ fun ParentSignUpRoute(
                 isDisabled = true,
                 content = {}
             )
+        }
+
+        if (isLoading) {
+            KieroLoadingIndicator()
         }
     }
 }

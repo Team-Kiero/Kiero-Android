@@ -73,7 +73,7 @@ fun ParentSignUpInviteHolder(
                 .fillMaxWidth()
                 .background(
                     color = KieroTheme.colors.black,
-                    shape = RoundedCornerShape(10.dp)
+                    shape = RoundedCornerShape(8.dp)
                 )
                 .noRippleClickable(
                     onClick = onCopyClick
