@@ -1,8 +1,7 @@
 package com.kiero.core.designsystem.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -28,7 +27,7 @@ fun KieroTopbar(
     rightIconRes: Int? = null,
     rightIconClick: (() -> Unit)? = null,
 ) {
-    androidx.compose.foundation.layout.Box(
+    Box(
         modifier = modifier
             .fillMaxWidth()
             .background(Color.Transparent)
@@ -43,25 +42,24 @@ fun KieroTopbar(
                 .align(Alignment.CenterStart)
                 .noRippleClickable(onClick = leftIconClick)
         )
-
-        // 가운데 텍스트
+        
         Text(
             text = title,
             color = KieroTheme.colors.white,
             style = KieroTheme.typography.bold.headLine2,
             modifier = Modifier.align(Alignment.Center)
         )
-
-        // 오른쪽 아이콘 있을 때만 표시
-        if (rightIconRes != null && rightIconClick != null) {
-            Icon(
-                imageVector = ImageVector.vectorResource(id = rightIconRes),
-                contentDescription = null,
-                tint = KieroTheme.colors.white,
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .noRippleClickable(onClick = rightIconClick)
-            )
+        rightIconRes?.let { res ->
+            rightIconClick?.let { click ->
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = res),
+                    contentDescription = null,
+                    tint = KieroTheme.colors.white,
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .noRippleClickable(onClick = click)
+                )
+            }
         }
     }
 }
@@ -76,7 +74,6 @@ private fun KieroTopbarReview() {
             leftIconRes = R.drawable.ic_arrow_left,
             rightIconRes = R.drawable.ic_arrow_right,
             leftIconClick = {},
-            rightIconClick = {}
-        )
+            rightIconClick = {})
     }
 }
