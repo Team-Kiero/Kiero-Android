@@ -7,6 +7,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.navigation
 import com.kiero.core.navigation.Route
+import com.kiero.presentation.kid.journey.camera.navigation.kidJourneyCameraNavGraph
+import com.kiero.presentation.kid.journey.camera.navigation.navigateToCamera
+import com.kiero.presentation.kid.journey.fire.navigation.kidJourneyFireNavGraph
+import com.kiero.presentation.kid.journey.fire.navigation.kidJourneyFireResultNavGraph
+import com.kiero.presentation.kid.journey.fire.navigation.navigateToFire
+import com.kiero.presentation.kid.journey.fire.navigation.navigateToFireResult
 import com.kiero.presentation.kid.journey.navigation.kidJourneyNavGraph
 import com.kiero.presentation.kid.mission.navigation.kidMissionNavGraph
 import com.kiero.presentation.kid.onboarding.navigation.kidOnboardingNavGraph
@@ -47,6 +53,8 @@ fun NavGraphBuilder.kidNavGraph(
         kidJourneyNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
+            navigateToCamera = navController::navigateToCamera,
+            navigateToFire = navController::navigateToFire
         )
 
         kidMissionNavGraph(
@@ -58,11 +66,27 @@ fun NavGraphBuilder.kidNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
         )
-
+        
         kidOnboardingNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
             navigateToKid = navController::navigateToKid
+        )
+
+        kidJourneyCameraNavGraph(
+            paddingValues = paddingValues,
+            navigateUp = navigateUp
+        )
+
+        kidJourneyFireNavGraph(
+            paddingValues = paddingValues,
+            navigateUp = navigateUp,
+            navigateToFireResult = navController::navigateToFireResult
+        )
+
+        kidJourneyFireResultNavGraph(
+            paddingValues = paddingValues,
+            navigateUp = navigateUp,
         )
     }
 }

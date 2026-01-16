@@ -39,7 +39,7 @@ fun ScheduleTextField(
     onKeyboardAction: KeyboardActionHandler? = null,
     lineLimits: TextFieldLineLimits = TextFieldLineLimits.SingleLine,
     textColor: Color = KieroTheme.colors.white,
-    maxLength: Int = 10,
+    maxLength: Int = 8,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
 
@@ -62,7 +62,7 @@ fun ScheduleTextField(
                     .background(
                         color = Color.Unspecified,
                     )
-                    .padding(horizontal = 13.dp, vertical = 14.dp),
+                    .padding(horizontal = 20.dp, vertical = 14.dp),
                 contentAlignment = Alignment.CenterStart
             ) {
                 if (state.text.isEmpty()) {

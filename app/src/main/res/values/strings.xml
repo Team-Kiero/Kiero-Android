@@ -6,4 +6,10 @@
     <string name="journey_tab_content_description">오늘의 여정</string>
     <string name="mission_tab_content_description">금화 미션</string>
     <string name="wish_tab_content_description">소원의 우물</string>
+
+    <!--Today Journey Text -->
+    <string name="journey_btn_auth">인증하고 불조각 받기</string>
+    <string name="journey_btn_fire">마음의 불꽃 피워주기</string>
+    <string name="journey_btn_next">다음 여정으로</string>
+
 </resources>
