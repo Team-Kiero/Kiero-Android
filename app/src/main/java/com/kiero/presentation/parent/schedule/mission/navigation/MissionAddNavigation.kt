@@ -1,4 +1,4 @@
-package com.kiero.presentation.parent.schedule.plan.navigation
+package com.kiero.presentation.parent.schedule.mission.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.navigation.NavController
@@ -6,26 +6,27 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.kiero.core.navigation.Route
-import com.kiero.presentation.parent.schedule.plan.ParentScheduleAddRoute
+import com.kiero.presentation.parent.schedule.mission.ParentAddMissionRoute
 import kotlinx.serialization.Serializable
 
-fun NavController.navigateToScheduleAdd(
+fun NavController.navigateToMissionAdd(
     navOptions: NavOptions? = null,
 ) {
-    navigate(ScheduleAdd, navOptions)
+    navigate(MissionAdd, navOptions)
 }
 
-fun NavGraphBuilder.parentScheduleAddNavGraph(
+fun NavGraphBuilder.parentMissionAddNavGraph(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
 ) {
-    composable<ScheduleAdd> {
-        ParentScheduleAddRoute(
+    composable<MissionAdd> {
+        ParentAddMissionRoute(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
         )
     }
 }
 
+
 @Serializable
-data object ScheduleAdd : Route
+data object MissionAdd : Route
