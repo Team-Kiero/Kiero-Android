@@ -72,7 +72,6 @@ fun ParentAutoAddRoute(
             navigateUp = { viewModel.onEvent(AutoMissionEvent.OnCancelClick) },
             state = state,
             onEvent = viewModel::onEvent,
-            onBack = navigateUp,
         )
         AutoMissionContract.Screen.LOADING -> ParentAutoLoadingScreen(
             paddingValues = paddingValues,
@@ -93,7 +92,6 @@ fun ParentAutoAddScreen(
     navigateUp: () -> Unit,
     state: AutoMissionContract,
     onEvent: (AutoMissionEvent) -> Unit,
-    onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -105,7 +103,7 @@ fun ParentAutoAddScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(25.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         KieroTopbar(
             title = "알림장 미션 추가",
@@ -118,7 +116,7 @@ fun ParentAutoAddScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
-                    top = 19.dp,
+                    top = 24.dp,
                     start = 20.dp,
                     end = 20.dp
                 ),
@@ -142,7 +140,7 @@ fun ParentAutoAddScreen(
             isEnabled = state.isAnalyzeEnabled,
             containerColor = KieroTheme.colors.main,
             contentColor = KieroTheme.colors.black,
-            modifier = Modifier.padding(horizontal = 20.dp)
+            modifier = Modifier.padding(horizontal = 16.dp)
         )
 
         Spacer(modifier = Modifier.height(28.dp))
@@ -158,7 +156,6 @@ private fun ParentAutoAddScreenPreview() {
             navigateUp = {},
             state = AutoMissionContract(),
             onEvent = {},
-            onBack = {}
         )
     }
 }
@@ -183,7 +180,6 @@ private fun ParentAutoAddScreenWithLongTextPreview() {
                 """.trimIndent()
             ),
             onEvent = {},
-            onBack = {}
         )
     }
 }
