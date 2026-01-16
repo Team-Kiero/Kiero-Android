@@ -3,7 +3,9 @@ package com.kiero.presentation.parent.schedule
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -65,11 +67,18 @@ private fun ParentScheduleScreen(
             )
         }
     ) { innerPadding ->
+        Spacer(
+            modifier = Modifier
+                .background(color = KieroTheme.colors.gray900)
+                .height(33.dp)
+        )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+
             ParentUserSection(
                 userName = "근영맘",
                 onUserNameClick = {},
