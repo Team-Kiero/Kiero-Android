@@ -46,6 +46,7 @@ fun MainRoute(
     appState: MainAppState,
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
+    var currentSnackbarState by remember { mutableStateOf<SnackbarState?>(null) }
 
     MainScreen(
         appState = appState,
@@ -87,9 +88,22 @@ fun MainScreen(
 
     val dialogState = rememberDialogStateHolder()
 
-    val onShowToast: (String) -> Unit = remember {
+    val onShowToast: (String) -> Unit = remember(scope, snackBarHostState) {
         { message ->
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            val state = SnackbarState(message = message) // String을 객체로 변환
+            currentSnackbarState = state
+
+            scope.launch {
+                snackBarHostState.currentSnackbarData?.dismiss()
+                val job = launch {
+                    snackBarHostState.showSnackbar(message = message)
+                }
+                job.invokeOnCompletion {
+                    if (currentSnackbarState == state) currentSnackbarState = null
+                }
+                delay(2000L)
+                job.cancel()
+            }
         }
     }
 
@@ -157,7 +171,11 @@ fun MainScreen(
         ) {
             Scaffold(
                 snackbarHost = {
-                    SnackbarHost(hostState = snackBarHostState) { data ->
+                    val bottomPadding = currentSnackbarState?.bottomPadding ?: 0.dp
+                    SnackbarHost(
+                        hostState = snackBarHostState,
+                        modifier = Modifier.padding(bottom = bottomPadding)
+                    ) { data ->
                         KieroSnackbar(
                             message = data.visuals.message,
                             // TODO: 디자인 확정 후 스낵바 높이 및 패딩 수정 필요
