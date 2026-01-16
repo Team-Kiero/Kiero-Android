@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
+import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
 
 
@@ -32,6 +33,7 @@ fun KakaoLoginButton(
                 color = KieroTheme.colors.yellow,
                 shape = RoundedCornerShape(10.dp)
             )
+            .noRippleClickable(onClick = onClick)
             .padding(vertical = 15.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
