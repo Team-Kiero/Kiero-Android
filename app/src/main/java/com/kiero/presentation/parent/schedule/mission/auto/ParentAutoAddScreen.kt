@@ -75,7 +75,6 @@ fun ParentAutoAddRoute(
         )
         AutoMissionContract.Screen.LOADING -> ParentAutoLoadingScreen(
             paddingValues = paddingValues,
-            snackbarHostState = snackbarHostState
         )
         AutoMissionContract.Screen.RESULT -> ParentAutoResultScreen(
             paddingValues = paddingValues,
