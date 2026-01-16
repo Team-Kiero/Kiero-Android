@@ -1,7 +1,8 @@
 package com.kiero.core.designsystem.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -27,12 +28,13 @@ fun KieroTopbar(
     rightIconRes: Int? = null,
     rightIconClick: (() -> Unit)? = null,
 ) {
-    Box(
+    androidx.compose.foundation.layout.Box(
         modifier = modifier
             .fillMaxWidth()
             .background(Color.Transparent)
             .padding(vertical = 4.dp, horizontal = 8.dp)
     ) {
+        // 왼쪽 아이콘
         Icon(
             imageVector = ImageVector.vectorResource(id = leftIconRes),
             contentDescription = null,
@@ -42,6 +44,7 @@ fun KieroTopbar(
                 .noRippleClickable(onClick = leftIconClick)
         )
 
+        // 가운데 텍스트
         Text(
             text = title,
             color = KieroTheme.colors.white,
@@ -49,17 +52,16 @@ fun KieroTopbar(
             modifier = Modifier.align(Alignment.Center)
         )
 
-        rightIconRes?.let { res ->
-            rightIconClick?.let { click ->
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = res),
-                    contentDescription = null,
-                    tint = KieroTheme.colors.white,
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .noRippleClickable(onClick = click)
-                )
-            }
+        // 오른쪽 아이콘 있을 때만 표시
+        if (rightIconRes != null && rightIconClick != null) {
+            Icon(
+                imageVector = ImageVector.vectorResource(id = rightIconRes),
+                contentDescription = null,
+                tint = KieroTheme.colors.white,
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .noRippleClickable(onClick = rightIconClick)
+            )
         }
     }
 }
