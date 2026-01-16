@@ -1,4 +1,5 @@
 package com.kiero.presentation.parent.schedule.mission.component.datepicker.model
+
 import androidx.compose.runtime.Immutable
 import java.time.LocalDate
 
@@ -15,7 +16,7 @@ sealed interface CalendarDay {
         @Immutable
         data class Normal(
             override val date: LocalDate,
-            val procedureCount: Int = 0
+            val procedureCount: Int = 0,
         ) : Date
     }
 }

@@ -22,16 +22,10 @@ import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.schedule.mission.component.datepicker.model.CalendarDay
 import com.kiero.presentation.parent.schedule.mission.component.datepicker.model.DateState
+import com.kiero.presentation.parent.schedule.mission.component.datepicker.model.DateTextStyle
+import com.kiero.presentation.parent.schedule.mission.component.datepicker.model.getDateState
 import java.time.LocalDate
 
-
-private fun getDateState(date: LocalDate, today: LocalDate = LocalDate.now()): DateState {
-    return when {
-        date.isBefore(today) -> DateState.PAST
-        date.isEqual(today) -> DateState.TODAY
-        else -> DateState.FUTURE
-    }
-}
 
 @Composable
 fun DayItem(
@@ -76,6 +70,7 @@ fun DayItem(
 private fun NormalDateContent(
     day: CalendarDay.Date.Normal,
     dateState: DateState,
+    modifier: Modifier = Modifier,
     isSelected: Boolean = false,
 ) {
     val backgroundColor = when {
@@ -93,7 +88,7 @@ private fun NormalDateContent(
     val showBorder = (isSelected && dateState == DateState.FUTURE) || dateState == DateState.TODAY
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .aspectRatio(1f)
             .clip(shape = CircleShape)
             .background(color = backgroundColor)
@@ -118,20 +113,19 @@ private fun NormalDateContent(
     }
 }
 
-
 @Composable
-private fun DateText(dayOfMonth: Int, dateState: DateState? = null, isSelected: Boolean = false) {
-    val textColor = when {
-        isSelected && dateState == DateState.FUTURE -> KieroTheme.colors.black
-        dateState == DateState.PAST -> KieroTheme.colors.gray700
-        dateState == DateState.TODAY -> KieroTheme.colors.gray400
-        dateState == DateState.FUTURE -> KieroTheme.colors.white
-        else -> KieroTheme.colors.black
+private fun DateText(
+    dayOfMonth: Int,
+    dateState: DateState? = null,
+    isSelected: Boolean = false,
+) {
+    val style = remember(dateState, isSelected) {
+        DateTextStyle(dateState, isSelected)
     }
 
     Text(
         text = dayOfMonth.toString(),
-        color = textColor,
+        color = style.textColor,
         style = KieroTheme.typography.semiBold.title4
     )
 }
@@ -147,28 +141,24 @@ private fun DayItemPreview() {
         ) {
             val today = LocalDate.now()
 
-            // Past date - gray text, non-clickable
             DayItem(
                 day = CalendarDay.Date.Normal(today.minusDays(2), procedureCount = 0),
                 onDateClick = {},
                 modifier = Modifier.size(48.dp)
             )
 
-            // Today - gray border, non-clickable
             DayItem(
                 day = CalendarDay.Date.Normal(today, procedureCount = 0),
                 onDateClick = {},
                 modifier = Modifier.size(48.dp)
             )
 
-            // Future date - white text, clickable
             DayItem(
                 day = CalendarDay.Date.Normal(today.plusDays(1), procedureCount = 0),
                 onDateClick = {},
                 modifier = Modifier.size(48.dp)
             )
 
-            // Future date selected - main color background
             DayItem(
                 day = CalendarDay.Date.Normal(today.plusDays(2), procedureCount = 0),
                 isSelected = true,

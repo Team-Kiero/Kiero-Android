@@ -3,6 +3,7 @@ package com.kiero.presentation.parent.schedule.mission.component.datepicker.util
 import com.kiero.presentation.parent.schedule.mission.component.datepicker.model.CalendarDay
 import com.kiero.presentation.parent.schedule.mission.component.datepicker.model.CalendarDisplayMode
 import com.kiero.presentation.parent.schedule.mission.component.datepicker.model.CalendarMonth
+import kotlinx.collections.immutable.toImmutableList
 import java.time.DayOfWeek
 import java.time.YearMonth
 
@@ -20,9 +21,9 @@ data class MonthData(
 
     val calendarMonth: CalendarMonth = CalendarMonth(
         month,
-        rows.map { week ->
-            week.map { dayOffset -> getDay(dayOffset) }
-        }
+        rows.map { row ->
+            row.map { dayOffset -> getDay(dayOffset) }.toImmutableList()
+        }.toImmutableList()
     )
 
     private fun getDay(dayOffset: Int): CalendarDay {
