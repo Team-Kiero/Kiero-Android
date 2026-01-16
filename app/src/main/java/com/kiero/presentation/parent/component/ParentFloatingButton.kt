@@ -24,7 +24,7 @@ import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.schedule.mission.component.missionmain.MissionFabContent
 
 @Composable
-fun ParentFloatingButton(
+private fun ParentFloatingButton(
     buttonColor: Color,
     onActiveClick: () -> Unit,
     modifier: Modifier = Modifier,

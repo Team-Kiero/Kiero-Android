@@ -16,7 +16,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.theme.KieroTheme
@@ -93,7 +92,7 @@ private fun ParentScheduleScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.5f))
+                    .background(KieroTheme.colors.black.copy(alpha = 0.75f))
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null
@@ -114,11 +113,11 @@ private fun ParentScheduleScreen(
             1 -> MissionTabFab(
                 isExpanded = isMissionFabExpanded,
                 onExpandedChange = { isMissionFabExpanded = it },
-                onMissionAdd = { navigateToMissionAdd() },
+                onMissionAdd =  navigateToMissionAdd,
                 onMissionRecommend = { /* 규현이 화면 */ },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(end =16.dp, bottom = 52.dp)
+                    .padding(end = 16.dp, bottom = 52.dp)
             )
         }
     }

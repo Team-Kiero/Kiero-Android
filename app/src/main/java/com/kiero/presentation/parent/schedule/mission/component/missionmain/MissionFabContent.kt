@@ -1,5 +1,6 @@
 package com.kiero.presentation.parent.schedule.mission.component.missionmain
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -23,7 +24,7 @@ import com.kiero.core.designsystem.theme.KieroTheme
 @Composable
 fun MissionFabContent(
     fabTitle: String,
-    fabIconRes: Int,
+    @DrawableRes fabIconRes: Int,
     onFabClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {

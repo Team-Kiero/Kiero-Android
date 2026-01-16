@@ -18,7 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
-import com.kiero.presentation.parent.schedule.mission.model.MissionAwardDefaults
+import com.kiero.presentation.parent.schedule.mission.component.model.MissionAwardDefaults
 
 @Composable
 fun MissionAwardSelect(
@@ -57,7 +57,7 @@ fun MissionAwardSelect(
 }
 
 @Composable
-fun MissionAwardButton(
+private fun MissionAwardButton(
     awardText: String,
     onAwardClick: () -> Unit,
     modifier: Modifier = Modifier,

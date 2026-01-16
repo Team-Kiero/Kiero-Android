@@ -1,9 +1,12 @@
-package com.kiero.presentation.parent.schedule.mission.model
+package com.kiero.presentation.parent.schedule.mission.component.model
 
 data class MissionAwardValue(
-    val value: Int,
-    val displayText: String = if (value > 0) "+$value" else "$value"
-)
+    val value: Int
+) {
+
+    val displayText: String
+        get() = if (value > 0) "+$value" else "$value"
+}
 
 object MissionAwardDefaults {
     const val MIN_AWARD = 1

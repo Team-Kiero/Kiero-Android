@@ -7,20 +7,14 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.theme.KieroTheme
@@ -28,59 +22,24 @@ import com.kiero.presentation.parent.schedule.mission.component.datepicker.compo
 import com.kiero.presentation.parent.schedule.mission.component.missionadd.MissionAwardInfo
 import com.kiero.presentation.parent.schedule.mission.component.missionadd.MissionAwardSelect
 import com.kiero.presentation.parent.schedule.mission.component.missionmain.MissionCalendar
-import com.kiero.presentation.parent.schedule.mission.model.MissionAwardDefaults
 import com.kiero.presentation.parent.schedule.plan.component.select.ScheduleTextField
-import kotlinx.coroutines.flow.debounce
 
 
 @Composable
 fun ParentAddMissionRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
+    viewModel: ParentAddMissionViewModel = hiltViewModel(),
 ) {
-    val missionNameState = rememberTextFieldState()
-    val awardTextFieldState = rememberTextFieldState()
-    var showBottomSheet by rememberSaveable { mutableStateOf(false) }
-    var currentAwardValue by rememberSaveable { mutableIntStateOf(MissionAwardDefaults.DEFAULT_AWARD) }
-
-    LaunchedEffect(awardTextFieldState) {
-        snapshotFlow { awardTextFieldState.text.toString() }
-            .debounce(500)
-            .collect { text ->
-                if (text.isNotEmpty()) {
-                    val parsed = text.toIntOrNull() ?: MissionAwardDefaults.DEFAULT_AWARD
-                    val newValue = MissionAwardDefaults.constrainValue(parsed)
-                    if (newValue != currentAwardValue) {
-                        currentAwardValue = newValue
-                        if (parsed != newValue) {
-                            awardTextFieldState.edit {
-                                replace(0, length, newValue.toString())
-                            }
-                        }
-                    }
-                }
-            }
-    }
-
-    LaunchedEffect(currentAwardValue) {
-        if (awardTextFieldState.text.toString().toIntOrNull() != currentAwardValue) {
-            awardTextFieldState.edit {
-                replace(0, length, currentAwardValue.toString())
-            }
-        }
-    }
+    val showBottomSheet by viewModel.showBottomSheet.collectAsStateWithLifecycle()
+    val selectedDate by viewModel.selectedDate.collectAsStateWithLifecycle()
 
     ParentAddMissionScreen(
         paddingValues = paddingValues,
         navigateUp = navigateUp,
-        missionNameState = missionNameState,
-        awardTextFieldState = awardTextFieldState,
+        viewModel = viewModel,
         showBottomSheet = showBottomSheet,
-        onDateClick = { showBottomSheet = true },
-        onDismissBottomSheet = { showBottomSheet = false },
-        onAwardClick = { change ->
-            currentAwardValue = MissionAwardDefaults.applyChange(currentAwardValue, change)
-        }
+        selectedDate = selectedDate,
     )
 }
 
@@ -88,12 +47,9 @@ fun ParentAddMissionRoute(
 fun ParentAddMissionScreen(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
-    missionNameState: TextFieldState,
-    awardTextFieldState: TextFieldState,
+    viewModel: ParentAddMissionViewModel,
     showBottomSheet: Boolean,
-    onDateClick: () -> Unit,
-    onDismissBottomSheet: () -> Unit,
-    onAwardClick: (Int) -> Unit,
+    selectedDate: String?,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -114,25 +70,27 @@ fun ParentAddMissionScreen(
         )
 
         ScheduleTextField(
-            state = missionNameState,
+            state = viewModel.missionNameState,
             placeholder = "미션 이름을 입력해주세요."
         )
 
         MissionCalendar(
-            onDateClick = onDateClick,
-            dateText = "2025.12.26.(금)"
+            onDateClick = viewModel::onDateClick,
+            dateText = selectedDate ?: "2025.12.26.(금)"
         )
 
         MissionAwardInfo()
 
+        Spacer(modifier = Modifier.height(12.dp))
+
         MissionAwardSelect(
-            textFieldState = awardTextFieldState,
-            onAwardClick = onAwardClick,
+            textFieldState = viewModel.awardTextFieldState,
+            onAwardClick = viewModel::onAwardClick,
         )
 
         if (showBottomSheet) {
             CalendarBottomSheet(
-                onDismissRequest = onDismissBottomSheet
+                onDismissRequest = viewModel::onDismissBottomSheet
             )
         }
     }
@@ -142,15 +100,9 @@ fun ParentAddMissionScreen(
 @Composable
 private fun ParentAddMissionScreenPreview() {
     KieroTheme {
-        ParentAddMissionScreen(
+        ParentAddMissionRoute(
             paddingValues = PaddingValues(),
-            navigateUp = {},
-            missionNameState = TextFieldState(),
-            awardTextFieldState = TextFieldState(),
-            showBottomSheet = false,
-            onDateClick = {},
-            onDismissBottomSheet = {},
-            onAwardClick = {}
+            navigateUp = {}
         )
     }
 }
