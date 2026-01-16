@@ -13,6 +13,7 @@ import com.kiero.core.network.monitor.NetworkMonitor
 import com.kiero.presentation.auth.navigation.AuthGraph
 import com.kiero.presentation.kid.journey.camera.navigation.navigateToCamera
 import com.kiero.presentation.kid.journey.fire.navigation.navigateToFire
+import com.kiero.presentation.auth.navigation.navigateToAuth
 import com.kiero.presentation.kid.journey.navigation.navigateToJourney
 import com.kiero.presentation.kid.mission.navigation.navigateToMission
 import com.kiero.presentation.kid.navigation.Journey
@@ -26,6 +27,7 @@ import com.kiero.presentation.parent.navigation.ParentGraph
 import com.kiero.presentation.parent.navigation.Schedule
 import com.kiero.presentation.parent.schedule.mission.navigation.navigateToMissionAdd
 import com.kiero.presentation.parent.schedule.navigation.navigateToSchedule
+import com.kiero.presentation.signup.parent.navigation.navigateToParentSignUp
 import com.kiero.presentation.parent.schedule.plan.navigation.navigateToScheduleAdd
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
@@ -38,7 +40,7 @@ import kotlinx.coroutines.flow.stateIn
 class MainAppState(
     val navController: NavHostController,
     coroutineScope: CoroutineScope,
-    networkMonitor: NetworkMonitor,
+    networkMonitor: NetworkMonitor
 ) {
     val startDestination = AuthGraph
 
@@ -102,11 +104,30 @@ class MainAppState(
             initialValue = false
         )
 
-    fun navigateToParent() {
-        navController.navigate(ParentGraph) {
-            popUpTo(AuthGraph) { inclusive = true }
+    private val clearStackNavOptions = navOptions {
+        popUpTo(0) {
+            inclusive = true
         }
+        launchSingleTop = true
     }
+
+    fun navigateToParentGraph() = navController.navigate(ParentGraph) {
+        popUpTo(AuthGraph) { inclusive = true }
+    }
+
+    fun navigateToParentSignUp(
+        parentName: String,
+        parentProfileImage: String,
+        navOptions: NavOptions? = null,
+    ) = navController.navigateToParentSignUp(
+        parentName = parentName,
+        parentProfileImage = parentProfileImage,
+        navOptions = navOptions
+    )
+
+    fun navigateToSelection() = navController.navigateToAuth(
+        navOptions = clearStackNavOptions
+    )
 
     fun navigateToKid() {
         navController.navigate(KidGraph) {
