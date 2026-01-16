@@ -3,104 +3,63 @@ package com.kiero.presentation.parent.schedule.mission.auto.component
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.foundation.text.input.InputTransformation
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.maxLength
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.kiero.core.designsystem.component.KieroTextField
 import com.kiero.core.designsystem.theme.KieroTheme
 
 @Composable
 fun ParentAutoInputField(
-    text: String,
-    onTextChange: (String) -> Unit,
+    state: TextFieldState,
     modifier: Modifier = Modifier
 ) {
-    val focusManager = LocalFocusManager.current
-
-    TextField(
-        value = text,
-        onValueChange = { newText ->
-            if (newText.length <= 1000) {
-                onTextChange(newText)
-            }
-        },
-        placeholder = {
-            Text(
-                text = "알림장 내용을 입력하세요.",
-                style = KieroTheme.typography.regular.body3.copy(
-                    lineHeight = 24.sp
-                ),
-                color = KieroTheme.colors.gray400
-            )
-        },
+    KieroTextField(
+        state = state,
+        placeholder = "알림장 내용을 입력하세요.",
         modifier = modifier.fillMaxWidth(),
-        textStyle = TextStyle(
-            color = KieroTheme.colors.white,
-            fontSize = 16.sp,
-            lineHeight = 24.sp
-        ),
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = KieroTheme.colors.gray900,
-            unfocusedContainerColor = KieroTheme.colors.gray900,
-            disabledContainerColor = KieroTheme.colors.gray900,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent,
-            cursorColor = KieroTheme.colors.white
-        ),
-        shape = RoundedCornerShape(15.dp),
-        maxLines = Int.MAX_VALUE,
-        keyboardOptions = KeyboardOptions(
-            imeAction = ImeAction.Done
-        ),
-        keyboardActions = KeyboardActions(
-            onDone = {
-                focusManager.clearFocus()
-            }
-        )
+        lineLimits = TextFieldLineLimits.MultiLine(minHeightInLines = 1),
+        containerColor = KieroTheme.colors.gray900,
+        inputTransformation = InputTransformation.maxLength(1000)
     )
 }
-
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun ParentAutoInputFieldPreview() {
     KieroTheme {
+        val state = rememberTextFieldState("")
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
             ParentAutoInputField(
-                text = "",
-                onTextChange = {}
+                state = state
             )
         }
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun ParentAutoInputFieldWithTextPreview() {
     KieroTheme {
+        val state = rememberTextFieldState("내일은 독서록을 가져오세요. 수학 익힘책 30쪽까지 풀어오세요.")
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
             ParentAutoInputField(
-                text = "내일은 독서록을 가져오세요. 수학 익힘책 30쪽까지 풀어오세요.",
-                onTextChange = {}
+                state = state
             )
         }
     }
