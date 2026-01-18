@@ -2,7 +2,7 @@ package com.kiero.presentation.kid.wish.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kiero.data.coin.repository.CoinRepository
+import com.kiero.data.kid.coin.repository.CoinRepository
 import com.kiero.data.mission.repository.MissionRepository
 import com.kiero.presentation.kid.wish.model.toState
 import com.kiero.presentation.kid.wish.state.KidWishState
