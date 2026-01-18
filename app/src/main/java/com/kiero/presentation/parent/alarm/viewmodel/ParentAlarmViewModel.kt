@@ -1,5 +1,6 @@
 package com.kiero.presentation.parent.alarm.viewmodel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.common.extension.toHandleErrorMessage
@@ -20,10 +21,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ParentAlarmViewModel @Inject constructor(
-    private val repository: AlarmRepository
+    private val repository: AlarmRepository,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _localState = MutableStateFlow(LocalState())
+    private val childId: Long = savedStateHandle.get<Long>("childId") ?: -1L
+
 
     val state: StateFlow<AlarmFeedState> = combine(
         _localState,
@@ -49,15 +53,20 @@ class ParentAlarmViewModel @Inject constructor(
     )
 
     init {
-        // TODO: 실제 유저 정보 연동 시 childId 동적 주입 (현재 테스트용 1)
-        loadAlarms(childId = 1)
-
-        // TODO: SSE 실시간 구독 로직 및 토큰 처리 완성 후 활성화 예정
+        if (childId != -1L) {
+            loadAlarms()
+        } else {
+            Timber.e("초기화 실패: childId가 전달되지 않았습니다.")
+            _localState.update { it.copy(errorMessage = "자녀 정보를 불러올 수 없습니다.") }
+        }
     }
 
-    fun loadAlarms(childId: Long, refresh: Boolean = false) {
+    fun loadAlarms(refresh: Boolean = false) {
+        if (childId == -1L) return // 방어 코드
+
         viewModelScope.launch {
             _localState.update { it.copy(isLoading = true, errorMessage = null) }
+            // 멤버 변수 childId 사용
             repository.loadAlarms(childId, refresh = refresh)
                 .onSuccess { _localState.update { it.copy(isLoading = false) } }
                 .onFailure { error ->
@@ -66,18 +75,20 @@ class ParentAlarmViewModel @Inject constructor(
         }
     }
 
-    fun loadMore(childId: Long) {
+    fun loadMore() {
+        if (childId == -1L) return
+
         val currentState = _localState.value
         if (currentState.isLoadingMore || state.value.nextCursor == null) return
+
         viewModelScope.launch {
             _localState.update { it.copy(isLoadingMore = true) }
             repository.loadMore(childId)
                 .onSuccess { _localState.update { it.copy(isLoadingMore = false) } }
-                .onFailure { /* TODO: 추가 에러 처리 */ }
         }
     }
 
-    fun refresh(childId: Long) = loadAlarms(childId, refresh = true)
+    fun refresh() = loadAlarms(refresh = true)
 
     fun toggleExpand(alarmId: String) {
         _localState.update { currentState ->

@@ -4,7 +4,16 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import com.kiero.core.common.extension.formattedAlarmDate
 import com.kiero.core.common.extension.formattedAlarmTime
+import com.kiero.core.common.extension.withJosa
 import com.kiero.data.alarm.model.AlarmItemModel
+
+private object AlarmUiConstant {
+    val HIGHLIGHT_MAIN = Color(0xFF00FFE1)
+    val HIGHLIGHT_WHITE = Color(0xFFFFFFFF)
+
+    const val TEXT_COMPLETE_KEY = "complete"
+    const val TEXT_DAILY_SCHEDULE = "하루 일정"
+}
 
 @Immutable
 data class ParentAlarmUiModel(
@@ -20,49 +29,59 @@ data class ParentAlarmUiModel(
 )
 
 fun AlarmItemModel.toUiModel(childName: String): ParentAlarmUiModel {
-    val highlightColor = Color(0xFF00FFE1)
-
     val contentKey = when (this) {
         is AlarmItemModel.Schedule -> locationName
         is AlarmItemModel.Mission -> missionName
         is AlarmItemModel.Coupon -> couponName
-        is AlarmItemModel.Complete -> "complete"
+        is AlarmItemModel.Complete -> AlarmUiConstant.TEXT_COMPLETE_KEY
     }
-    val uniqueId = "${occurredAt}_${this::class.simpleName}_${contentKey.hashCode()}"
 
-    // TODO: 아이 이름 뒤 '이/가' 조사 자동 처리 유틸리티 적용 필요
+    val uniqueId = "${occurredAt}_${this::class.simpleName}_${contentKey.hashCode()}"
+    val subject = childName.withJosa("이가")
+
+    val dateStr = occurredAt.formattedAlarmDate
+    val timeStr = occurredAt.formattedAlarmTime
+
     return when (this) {
         is AlarmItemModel.Schedule -> ParentAlarmUiModel(
             id = uniqueId,
-            date = occurredAt.formattedAlarmDate,
-            time = occurredAt.formattedAlarmTime,
-            message = "${childName}가 ${locationName}에 도착했어요.",
-            highlightText = locationName, highlightColor = highlightColor,
-            coinUsed = null, imageUrl = imageUrl, isExpanded = false
+            date = dateStr,
+            time = timeStr,
+            message = "$subject ${locationName}에 도착했어요.",
+            highlightText = locationName,
+            highlightColor = AlarmUiConstant.HIGHLIGHT_MAIN,
+            coinUsed = null,
+            imageUrl = imageUrl
         )
         is AlarmItemModel.Mission -> ParentAlarmUiModel(
             id = uniqueId,
-            date = occurredAt.formattedAlarmDate,
-            time = occurredAt.formattedAlarmTime,
-            message = "${childName}가 '$missionName' 미션을 완료했어요.",
-            highlightText = missionName, highlightColor = highlightColor,
-            coinUsed = rewardAmount, imageUrl = null, isExpanded = false
+            date = dateStr,
+            time = timeStr,
+            message = "$subject $missionName 미션을 완료했어요.",
+            highlightText = missionName,
+            highlightColor = AlarmUiConstant.HIGHLIGHT_MAIN,
+            coinUsed = rewardAmount,
+            imageUrl = null
         )
         is AlarmItemModel.Coupon -> ParentAlarmUiModel(
             id = uniqueId,
-            date = occurredAt.formattedAlarmDate,
-            time = occurredAt.formattedAlarmTime,
-            message = "${childName}가 '$couponName' 쿠폰을 사용했어요.",
-            highlightText = couponName, highlightColor = highlightColor,
-            coinUsed = usedAmount, imageUrl = null, isExpanded = false
+            date = dateStr,
+            time = timeStr,
+            message = "$subject $couponName 쿠폰을 사용했어요.",
+            highlightText = couponName,
+            highlightColor = AlarmUiConstant.HIGHLIGHT_MAIN,
+            coinUsed = usedAmount,
+            imageUrl = null
         )
         is AlarmItemModel.Complete -> ParentAlarmUiModel(
             id = uniqueId,
-            date = occurredAt.formattedAlarmDate,
-            time = occurredAt.formattedAlarmTime,
-            message = "${childName}가 하루 일정을 모두 완료했어요.",
-            highlightText = "하루 일정", highlightColor = highlightColor,
-            coinUsed = if (rewardAmount > 0) rewardAmount else null, imageUrl = null, isExpanded = false
+            date = dateStr,
+            time = timeStr,
+            message = "$subject ${AlarmUiConstant.TEXT_DAILY_SCHEDULE}을 모두 완료했어요.",
+            highlightText = AlarmUiConstant.TEXT_DAILY_SCHEDULE,
+            highlightColor = AlarmUiConstant.HIGHLIGHT_WHITE,
+            coinUsed = if (rewardAmount > 0) rewardAmount else null,
+            imageUrl = null
         )
     }
 }

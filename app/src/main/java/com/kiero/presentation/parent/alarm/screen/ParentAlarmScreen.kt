@@ -45,7 +45,7 @@ fun ParentAlarmRoute(
     LaunchedEffect(isTabReselected) {
         if (isTabReselected) {
             listState.animateScrollToItem(0)
-            viewModel.refresh(1)
+            viewModel.refresh()
         }
     }
 
@@ -71,7 +71,6 @@ private fun ParentAlarmScreen(
             .background(color = KieroTheme.colors.black)
             .padding(paddingValues)
     ) {
-        // TODO: PR #31 머지 후 공통 ParentUserSection으로 헤더 교체
         Row(
             modifier = Modifier
                 .fillMaxWidth()
