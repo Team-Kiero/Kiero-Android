@@ -1,10 +1,27 @@
 package com.kiero.data.schedule.api
 
 import com.kiero.core.network.model.BaseResponse
+import com.kiero.data.schedule.dto.request.ScheduleCompleteRequestDto
+import com.kiero.data.schedule.dto.request.ScheduleImageUploadRequestDto
+import com.kiero.data.schedule.dto.response.ScheduleImageUploadResponseDto
 import com.kiero.data.schedule.dto.response.TodayScheduleResponseDto
+import retrofit2.http.Body
 import retrofit2.http.PATCH
+import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface ScheduleService {
     @PATCH("/api/v1/schedules/today")
     suspend fun getTodaySchedule(): BaseResponse<TodayScheduleResponseDto>
+
+    @POST("api/v1/schedule/presigned-url")
+    suspend fun getPresignedUrl(
+        @Body request: ScheduleImageUploadRequestDto
+    ): BaseResponse<ScheduleImageUploadResponseDto>
+
+    @POST("api/v1/schedule/complete/{scheduleDetailId}")
+    suspend fun postScheduleComplete(
+        @Path("scheduleDetailId") scheduleDetailId: Long,
+        @Body request: ScheduleCompleteRequestDto
+    ): BaseResponse<Unit>
 }
