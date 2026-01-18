@@ -19,7 +19,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-class AlarmFeedViewModel @Inject constructor(
+class ParentAlarmViewModel @Inject constructor(
     private val repository: AlarmRepository
 ) : ViewModel() {
 

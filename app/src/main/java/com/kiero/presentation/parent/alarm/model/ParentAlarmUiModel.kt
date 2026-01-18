@@ -22,7 +22,6 @@ data class ParentAlarmUiModel(
 fun AlarmItemModel.toUiModel(childName: String): ParentAlarmUiModel {
     val highlightColor = Color(0xFF00FFE1)
 
-    // ✅ 고유 ID 미리 계산 (날짜 + 타입 + 내용의 해시코드 조합으로 중복 원천 차단)
     val contentKey = when (this) {
         is AlarmItemModel.Schedule -> locationName
         is AlarmItemModel.Mission -> missionName

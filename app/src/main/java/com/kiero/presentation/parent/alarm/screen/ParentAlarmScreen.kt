@@ -13,10 +13,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kiero.R
@@ -25,17 +27,19 @@ import com.kiero.presentation.parent.alarm.component.ParentAlarmCard
 import com.kiero.presentation.parent.alarm.component.ParentAlarmDateHeader
 import com.kiero.presentation.parent.alarm.model.ParentAlarmUiModel
 import com.kiero.presentation.parent.alarm.state.AlarmFeedState
-import com.kiero.presentation.parent.alarm.viewmodel.AlarmFeedViewModel
-import timber.log.Timber
+import com.kiero.presentation.parent.alarm.viewmodel.ParentAlarmViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlin.collections.sortedWith
+
 
 @Composable
 fun ParentAlarmRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
-    viewModel: AlarmFeedViewModel = hiltViewModel(),
+    viewModel: ParentAlarmViewModel = hiltViewModel(),
     isTabReselected: Boolean = false
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
 
     LaunchedEffect(isTabReselected) {
@@ -73,35 +77,55 @@ private fun ParentAlarmScreen(
                 .fillMaxWidth()
                 .background(color = KieroTheme.colors.black)
                 .statusBarsPadding()
-                .padding(top = 25.dp, bottom = 15.dp, start = 16.dp, end = 16.dp),
+                .padding(
+                    top = 25.dp,
+                    bottom = 15.dp,
+                    start = 16.dp,
+                    end = 16.dp
+                ),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.End
         ) {
-            Text(text = "근영맘", style = KieroTheme.typography.regular.body2, color = KieroTheme.colors.white)
+            Text(
+                text = "근영맘",
+                style = KieroTheme.typography.regular.body2,
+                color = KieroTheme.colors.white
+            )
             Spacer(modifier = Modifier.width(4.dp))
             Icon(
-                imageVector = androidx.compose.ui.graphics.vector.ImageVector.vectorResource(id = R.drawable.ic_parent_profile),
-                contentDescription = null, modifier = Modifier.size(32.dp), tint = KieroTheme.colors.gray500
+                imageVector = ImageVector.vectorResource(id = R.drawable.ic_parent_profile),
+                contentDescription = null,
+                modifier = Modifier.size(32.dp),
+                tint = KieroTheme.colors.gray500
             )
         }
 
         when {
-            state.isLoading && state.alarms.isEmpty() -> {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            state.isLoading -> {
+                Box(Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
                     CircularProgressIndicator(color = KieroTheme.colors.main)
                 }
             }
-            state.alarms.isEmpty() -> EmptyAlarmView()
+            state.alarms.isEmpty() ->{
+                EmptyAlarmView()
+            }
             else -> {
                 LazyColumn(
                     state = listState,
-                    modifier = Modifier.fillMaxSize().padding(horizontal = 18.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 18.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(top = 15.dp, bottom = 20.dp)
+                    contentPadding = PaddingValues(
+                        top = 15.dp,
+                        bottom = 20.dp
+                    )
                 ) {
                     val sortedAlarms = state.alarms
-                        .sortedWith(compareByDescending<ParentAlarmUiModel> { it.date }.thenByDescending { it.time })
-
+                        .sortedWith(compareByDescending<ParentAlarmUiModel> { it.date }
+                            .thenByDescending { it.time })
                     val groupedAlarms = sortedAlarms.groupBy { it.date }
 
                     groupedAlarms.forEach { (date, alarmsForDate) ->
@@ -127,6 +151,7 @@ private fun ParentAlarmScreen(
     }
 }
 
+@Preview
 @Composable
 private fun EmptyAlarmView() {
     Column(
