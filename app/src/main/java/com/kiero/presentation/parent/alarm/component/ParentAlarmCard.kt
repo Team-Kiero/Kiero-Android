@@ -108,10 +108,10 @@ fun ParentAlarmCard(
                 )
                 KieroChip(
                     modifier = Modifier.align(Alignment.Start),
-                    isEnabled = true, isCompleted = false, action = KieroCoinAction(
+                    isEnabled = false, isCompleted = true, action = KieroCoinAction(
                         coinCount = coinUsed,
-                        isCompleted = false,
-                        isEnabled = true,
+                        isCompleted = true,
+                        isEnabled = false,
                         viewType = DisplayType.PARENT,
                         onClick = { })
                 )

@@ -17,6 +17,5 @@ object MissionServiceModule {
     @Singleton
     fun providesMissionService(
         @AuthNetwork retrofit: Retrofit
-    ): MissionService =
-        retrofit.create()
+    ): MissionService = retrofit.create()
 }
