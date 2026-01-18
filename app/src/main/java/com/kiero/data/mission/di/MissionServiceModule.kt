@@ -1,5 +1,6 @@
 package com.kiero.data.mission.di
 
+import com.kiero.core.network.di.AuthNetwork
 import com.kiero.data.mission.remote.api.MissionService
 import dagger.Module
 import dagger.Provides
@@ -14,6 +15,8 @@ import javax.inject.Singleton
 object MissionServiceModule {
     @Provides
     @Singleton
-    fun providesMissionService(retrofit: Retrofit): MissionService =
+    fun providesMissionService(
+        @AuthNetwork retrofit: Retrofit
+    ): MissionService =
         retrofit.create()
 }
