@@ -1,7 +1,7 @@
-package com.kiero.data.mission.di
+package com.kiero.data.kid.wish.di
 
 import com.kiero.core.network.di.AuthNetwork
-import com.kiero.data.mission.remote.api.MissionService
+import com.kiero.data.kid.wish.remote.api.WishService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,11 +12,12 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object MissionServiceModule {
+object WishServiceModule {
+
     @Provides
     @Singleton
-    fun providesMissionService(
+    fun providesWishService(
         @AuthNetwork retrofit: Retrofit
-    ): MissionService =
+    ): WishService =
         retrofit.create()
 }
