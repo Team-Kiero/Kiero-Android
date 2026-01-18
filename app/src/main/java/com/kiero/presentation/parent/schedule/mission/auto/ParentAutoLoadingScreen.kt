@@ -23,7 +23,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kiero.core.designsystem.theme.KieroTheme
-import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
 import com.kiero.presentation.parent.schedule.mission.auto.state.AutoMissionSideEffect
 import com.kiero.presentation.parent.schedule.mission.auto.viewmodel.AutoMissionViewModel
@@ -37,15 +36,10 @@ fun ParentAutoLoadingRoute(
     val globalUiEvent = LocalGlobalUiEventTrigger.current
 
     LaunchedEffect(Unit) {
-        viewModel.sideEffect.collect { effect ->
-            when (effect) {
+        viewModel.sideEffect.collect { sideEffect ->
+            when (sideEffect) {
                 is AutoMissionSideEffect.ShowToast -> {
-                    globalUiEvent.showSnackbar(
-                        SnackbarState(
-                            message = effect.message,
-                            bottomPadding = 89.dp
-                        )
-                    )
+                    globalUiEvent.showToast(sideEffect.message)
                 }
                 else -> {}
             }
