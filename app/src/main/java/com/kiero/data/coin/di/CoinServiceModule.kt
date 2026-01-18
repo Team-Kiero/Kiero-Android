@@ -1,5 +1,6 @@
 package com.kiero.data.coin.di
 
+import com.kiero.core.network.di.AuthNetwork
 import com.kiero.data.coin.api.CoinService
 import dagger.Module
 import dagger.Provides
@@ -14,6 +15,8 @@ import javax.inject.Singleton
 object CoinServiceModule {
     @Provides
     @Singleton
-    fun providesCoinService(retrofit: Retrofit): CoinService =
+    fun providesCoinService(
+        @AuthNetwork retrofit: Retrofit
+    ): CoinService =
         retrofit.create()
 }

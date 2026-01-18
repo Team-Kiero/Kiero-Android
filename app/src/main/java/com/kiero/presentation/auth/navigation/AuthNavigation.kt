@@ -39,18 +39,17 @@ fun NavGraphBuilder.authNavGraph(
     navController: NavHostController,
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
-    navigateToParent: () -> Unit,
-    navigateToKid: () -> Unit,
+    navigateToParentGraph: () -> Unit,
+    navigateToParentSignUp: (String, String) -> Unit,
 ) {
-    navigation<AuthGraph>(startDestination = Selection) {
-
+    navigation<AuthGraph>(
+        startDestination = Selection
+    )  {
         composable<Selection> {
             AuthRoute(
                 paddingValues = paddingValues,
-                navigateUp = navigateUp,
                 navigateToParent = navController::navigateToAuthParent,
                 navigateToKid = navController::navigateToKidSignup,
-                navigateToEx = navigateToParent
             )
         }
 
@@ -58,6 +57,10 @@ fun NavGraphBuilder.authNavGraph(
             AuthParentRoute(
                 paddingValues = paddingValues,
                 navigateUp = navigateUp,
+                navigateToParentSignUp = { parentName, parentProfileImage ->
+                    navigateToParentSignUp(parentName, parentProfileImage)
+                },
+                navigateToParentGraph = navigateToParentGraph
             )
         }
 

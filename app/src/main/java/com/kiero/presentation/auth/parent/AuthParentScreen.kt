@@ -1,6 +1,8 @@
 package com.kiero.presentation.auth.parent
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -9,70 +11,148 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kiero.R
+import com.kiero.core.common.extension.collectSingleEvent
+import com.kiero.core.designsystem.component.KieroToolTip
+import com.kiero.core.designsystem.component.KieroTopbar
+import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.KieroTheme
-import com.kiero.presentation.auth.model.AuthSideEffect
+import com.kiero.core.model.UiState
+import com.kiero.core.model.trigger.SnackbarState
+import com.kiero.core.trigger.LocalGlobalUiEventTrigger
 import com.kiero.presentation.auth.parent.component.KakaoLoginButton
-import com.kiero.presentation.auth.parent.viewmodel.ParentLoginViewModel
+import com.kiero.presentation.auth.parent.viewmodel.AuthParentViewModel
+import com.kiero.presentation.auth.state.AuthSideEffect
 
 @Composable
 fun AuthParentRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
-    viewModel: ParentLoginViewModel = hiltViewModel(),
+    navigateToParentSignUp: (String, String) -> Unit,
+    navigateToParentGraph: () -> Unit,
+    viewModel: AuthParentViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
+    val globalTrigger = LocalGlobalUiEventTrigger.current
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    LaunchedEffect(viewModel.sideEffect) {
-        viewModel.sideEffect.collect { effect ->
-            when (effect) {
-                is AuthSideEffect.ShowSnackBar -> { /* 스낵바 로직 */ }
-                is AuthSideEffect.NavigateUp -> navigateUp()
+    viewModel.sideEffect.collectSingleEvent {
+        when (it) {
+            is AuthSideEffect.NavigateUp -> navigateUp()
+            is AuthSideEffect.NavigateToParentSignUp -> {
+                navigateToParentSignUp(
+                    it.parentName, it.parentProfileImage
+                )
+            }
+
+            is AuthSideEffect.ShowSnackbar -> {
+                globalTrigger.showSnackbar(
+                    SnackbarState(
+                        message = it.message
+                    )
+                )
+            }
+
+            AuthSideEffect.NavigateToParentGraph -> {
+                navigateToParentGraph()
             }
         }
     }
 
-    AuthParentScreen(
-        paddingValues = paddingValues,
-        isLoading = state.isLoading,
-        onLoginClick = { viewModel.loginWithKakao(context) }
-    )
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        AuthParentScreen(
+            paddingValues = paddingValues,
+            navigateUp = viewModel::navigateUp,
+            onLoginClick = {
+                if (state.uiState !is UiState.Loading) {
+                    viewModel.loginWithKakao(context)
+                }
+            }
+        )
+
+        if (state.uiState is UiState.Loading) {
+            KieroLoadingIndicator()
+        }
+    }
 }
 
 @Composable
 fun AuthParentScreen(
     paddingValues: PaddingValues,
-    isLoading: Boolean,
+    navigateUp: () -> Unit,
     onLoginClick: () -> Unit,
 ) {
-    Column(
+    val painter = painterResource(id = R.drawable.img_auth_parent_goblin)
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(KieroTheme.colors.black)
             .padding(paddingValues)
-            .padding(horizontal = 15.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // 상단에 빈 공간을 채워 버튼을 아래로 밀어내기
-        Spacer(modifier = Modifier.weight(1f))
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(KieroTheme.colors.black)
+                .padding(paddingValues),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(14.dp))
 
-        KakaoLoginButton(
-            onClick = onLoginClick,
-            isLoading = isLoading,
-            modifier = Modifier.fillMaxWidth()
-        )
+            KieroTopbar(
+                title = "부모님으로 시작하기",
+                leftIconRes = R.drawable.ic_arrow_left,
+                leftIconClick = navigateUp,
+            )
 
-        Spacer(modifier = Modifier.height(65.dp))
+            Spacer(modifier = Modifier.weight(1f))
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 40.dp),
+                contentAlignment = Alignment.BottomEnd
+            ) {
+                Image(
+                    painter = painter,
+                    contentDescription = null,
+                    contentScale = ContentScale.FillWidth,
+                    modifier = Modifier.fillMaxSize()
+                )
+
+                KieroToolTip(
+                    message = "반가워요!",
+                    modifier = Modifier
+                        .align(BiasAlignment(
+                            horizontalBias = -0.5f,
+                            verticalBias = -0.5f
+                        ))
+                )
+
+                KakaoLoginButton(
+                    onClick = onLoginClick,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                )
+            }
+        }
     }
+
 }
 
 @Preview(showBackground = true, name = "기본 화면")
@@ -81,8 +161,8 @@ private fun LoginScreenPreview() {
     KieroTheme {
         AuthParentScreen(
             paddingValues = PaddingValues(),
-            isLoading = false,
-            onLoginClick = {}
+            onLoginClick = {},
+            navigateUp = {}
         )
     }
 }
