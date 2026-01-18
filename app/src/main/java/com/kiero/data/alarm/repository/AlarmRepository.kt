@@ -19,7 +19,7 @@ interface AlarmRepository {
 
     suspend fun loadMore(
         childId: Long,
-        size: Int = 20 // 기본값 명시
+        size: Int = 20
     ): Result<AlarmFeedModel>
 
     fun subscribeAlarmFeed(childId: Long): Flow<AlarmItemModel>

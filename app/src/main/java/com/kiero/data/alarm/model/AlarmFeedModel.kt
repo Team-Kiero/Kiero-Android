@@ -3,8 +3,8 @@ package com.kiero.data.alarm.model
 import com.kiero.data.alarm.dto.response.AlarmFeedResponseDto
 import com.kiero.data.alarm.dto.response.FeedItemDto
 import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.intOrNull  // ← 추가!
-import timber.log.Timber  // ← 추가!
+import kotlinx.serialization.json.intOrNull
+import timber.log.Timber
 
 data class AlarmFeedModel(
     val childName: String = "",
