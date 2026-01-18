@@ -1,7 +1,6 @@
-package com.kiero.data.coin.di
+package com.kiero.data.kid.coin.di
 
-import com.kiero.core.network.di.AuthNetwork
-import com.kiero.data.coin.api.CoinService
+import com.kiero.data.kid.coin.remote.api.CoinService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

@@ -1,7 +1,7 @@
-package com.kiero.data.coin.di
+package com.kiero.data.kid.coin.di
 
-import com.kiero.data.coin.repository.CoinRepository
-import com.kiero.data.coin.repositoryimpl.CoinRepositoryImpl
+import com.kiero.data.kid.coin.repository.CoinRepository
+import com.kiero.data.kid.coin.repositoryimpl.CoinRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

@@ -1,10 +1,10 @@
-package com.kiero.data.coin.repositoryimpl
+package com.kiero.data.kid.coin.repositoryimpl
 
 import com.kiero.core.common.util.suspendRunCatching
-import com.kiero.data.coin.datasource.CoinDataSource
-import com.kiero.data.coin.model.CoinModel
-import com.kiero.data.coin.model.toModel
-import com.kiero.data.coin.repository.CoinRepository
+import com.kiero.data.kid.coin.model.CoinModel
+import com.kiero.data.kid.coin.model.toModel
+import com.kiero.data.kid.coin.remote.datasource.CoinDataSource
+import com.kiero.data.kid.coin.repository.CoinRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

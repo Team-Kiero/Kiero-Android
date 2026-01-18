@@ -3,6 +3,7 @@ package com.kiero.presentation.kid.wish.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.data.coin.repository.CoinRepository
+import com.kiero.data.mission.repository.MissionRepository
 import com.kiero.presentation.kid.wish.model.toState
 import com.kiero.presentation.kid.wish.state.KidWishState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,9 +18,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class KidWishViewModel @Inject constructor(
-    private val repository: CoinRepository
+    private val repository: CoinRepository,
+    private val missionRepository: MissionRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(KidWishState())
+
+    // Todo: 추후 usecase 고려
     val state: StateFlow<KidWishState> = combine(
         _state,
         repository.myCoin

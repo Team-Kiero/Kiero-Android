@@ -1,10 +1,10 @@
-package com.kiero.data.mission.dto.response
+package com.kiero.data.mission.remote.dto.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class MissionResponseDto(
+data class MissionCompleteResponseDto(
     @SerialName("id")
     val id : Long,
     @SerialName("name")
