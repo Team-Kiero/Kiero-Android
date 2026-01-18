@@ -5,6 +5,7 @@ import com.kiero.data.parent.signup.remote.dto.response.ParentSignUpResponseDto
 import com.kiero.data.parent.signup.remote.api.ParentSignUpService
 import com.kiero.data.parent.signup.remote.datasource.ParentSignUpDataSource
 import com.kiero.data.parent.signup.remote.dto.reqeust.ParentSignUpRequestDto
+import com.kiero.data.parent.signup.remote.dto.response.LinkageKidResponseDto
 import javax.inject.Inject
 
 class ParentSignUpDataSourceImpl @Inject constructor(
@@ -19,5 +20,14 @@ class ParentSignUpDataSourceImpl @Inject constructor(
                 childLastName = childLastName,
                 childFirstName = childFirstName
             )
+        )
+
+    override suspend fun getLinkageKid(
+        childLastName: String,
+        childFirstName: String
+    ): BaseResponse<LinkageKidResponseDto> =
+        parentSignUpService.getLinkageKid(
+            childLastName = childLastName,
+            childFirstName = childFirstName
         )
 }
