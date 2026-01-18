@@ -2,6 +2,8 @@ package com.kiero.core.network.di
 
 import com.kiero.BuildConfig
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import com.kiero.core.network.auth.AuthInterceptor
+import com.kiero.core.network.auth.TokenAuthenticator
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -40,16 +42,12 @@ object NetworkModule {
         .build()
 
 
-    /*
-    Test 용 Setting 입니다
-     */
     @Provides
     @Singleton
     fun providesJson(): Json = Json {
         ignoreUnknownKeys = true
         coerceInputValues = true
         isLenient = true
-        prettyPrint = false
         encodeDefaults = true
     }
 
@@ -57,10 +55,51 @@ object NetworkModule {
     @Singleton
     fun providesConverterFactory(json: Json): Converter.Factory =
         json.asConverterFactory("application/json".toMediaType())
+
     @Provides
     @Singleton
-    fun providesRetrofit(
-        client: OkHttpClient,
+    @NoAuthNetwork
+    fun providesNoAuthOkHttpClient(
+        loggingInterceptor: HttpLoggingInterceptor
+    ): OkHttpClient = OkHttpClient.Builder()
+        .connectTimeout(10, TimeUnit.SECONDS)
+        .readTimeout(10, TimeUnit.SECONDS)
+        .addInterceptor(loggingInterceptor)
+        .build()
+
+    @Provides
+    @Singleton
+    @NoAuthNetwork
+    fun providesNoAuthRetrofit(
+        @NoAuthNetwork client: OkHttpClient,
+        converterFactory: Converter.Factory,
+    ): Retrofit = Retrofit.Builder()
+        .baseUrl(BuildConfig.BASE_URL)
+        .addConverterFactory(converterFactory)
+        .client(client)
+        .build()
+
+
+    @Provides
+    @Singleton
+    @AuthNetwork
+    fun providesAuthOkHttpClient(
+        loggingInterceptor: HttpLoggingInterceptor,
+        authInterceptor: AuthInterceptor,
+        tokenAuthenticator: TokenAuthenticator
+    ): OkHttpClient = OkHttpClient.Builder()
+        .connectTimeout(10, TimeUnit.SECONDS)
+        .readTimeout(10, TimeUnit.SECONDS)
+        .addInterceptor(loggingInterceptor)
+        .addInterceptor(authInterceptor)
+        .authenticator(tokenAuthenticator)
+        .build()
+
+    @Provides
+    @Singleton
+    @AuthNetwork
+    fun providesAuthRetrofit(
+        @AuthNetwork client: OkHttpClient,
         converterFactory: Converter.Factory,
     ): Retrofit = Retrofit.Builder()
         .baseUrl(BuildConfig.BASE_URL)

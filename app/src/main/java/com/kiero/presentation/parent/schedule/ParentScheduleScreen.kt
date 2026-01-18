@@ -6,7 +6,9 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.component.MissionTabFab
+import com.kiero.presentation.parent.component.ParentFloatingButton
 import com.kiero.presentation.parent.component.ParentTabRow
 import com.kiero.presentation.parent.component.ParentUserSection
 import com.kiero.presentation.parent.component.PlanTabFab
@@ -64,6 +67,12 @@ private fun ParentScheduleScreen(
         modifier = modifier
             .background(color = KieroTheme.colors.black)
     ) {
+        Spacer(
+            modifier = Modifier
+                .background(color = KieroTheme.colors.gray900)
+                .height(33.dp)
+        )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()

@@ -12,12 +12,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -27,9 +31,10 @@ import com.kiero.core.common.extension.forcePixelToDp
 import com.kiero.core.designsystem.component.chip.KieroChip
 import com.kiero.core.designsystem.component.chip.action.KieroCoinAction
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.core.model.UiState
 import com.kiero.presentation.kid.component.KidProfileChip
+import com.kiero.presentation.kid.component.KidSpeechField
 import com.kiero.presentation.kid.mission.component.KidMissionItem
-import com.kiero.presentation.kid.mission.component.KidMissionTitle
 import com.kiero.presentation.kid.mission.state.KidMissionState
 
 @Composable
@@ -40,12 +45,23 @@ fun KidMissionRoute(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    KidMissionScreen(
-        paddingValues = paddingValues,
-        state = state,
-        navigateUp = navigateUp,
-        onMissionCompleted = viewModel::onMissionCompleted
-    )
+    when (val state = state) {
+        is UiState.Success -> {
+            KidMissionScreen(
+                paddingValues = paddingValues,
+                state = state.data,
+                navigateUp = navigateUp,
+                onMissionCompleted = viewModel::onMissionCompleted
+            )
+        }
+
+        UiState.Empty -> {}
+        is UiState.Failure -> {}
+
+        UiState.Loading -> {
+            // Todo 로딩뷰 넣기
+        }
+    }
 }
 
 // Todo 서버 값으로 변경
@@ -54,7 +70,7 @@ private fun KidMissionScreen(
     paddingValues: PaddingValues,
     state: KidMissionState,
     navigateUp: () -> Unit,
-    onMissionCompleted: (missionId: Int) -> Unit,
+    onMissionCompleted: (missionId: Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val painterGoblin = painterResource(id = R.drawable.img_kid_wish_goblin)
@@ -100,17 +116,36 @@ private fun KidMissionScreen(
                 modifier = Modifier
                     .forcePixelToDp(painterGoblin)
             )
+
+            KidSpeechField (
+                name = "꾸비",
+                isVisibleButton = false
+            ) {
+                Text(
+                    text = buildAnnotatedString {
+                        append("우리 함께 ")
+                        withStyle(style = SpanStyle(color = KieroTheme.colors.main)) {
+                            append("멋진 금화")
+                        }
+                        append(" 를 만들어볼까?")
+                    },
+                    color = KieroTheme.colors.gray300
+                )
+            }
+
+            Text(
+                text = "미션",
+                style = KieroTheme.typography.semiBold.title4,
+                color = KieroTheme.colors.gray200
+            )
         }
 
-        // Todo 승재거 추가하기
-
-        KidMissionState.FAKE.forEach { section ->
+        state.kidMissionByDateList.missionsByDate.forEach { section ->
             item {
-                KidMissionTitle(
-                    title = section.headerTitle,
-                    subTitle = section.subTitle,
-                    modifier = Modifier
-                        .fillMaxWidth()
+                Text(
+                    text = section.title,
+                    style = KieroTheme.typography.regular.body4,
+                    color = KieroTheme.colors.gray200
                 )
             }
 

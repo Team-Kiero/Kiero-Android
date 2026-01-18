@@ -77,7 +77,7 @@ fun KidMissionItem(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "버튼",
+                    text = "완료",
                     color = KieroTheme.colors.black,
                     style = KieroTheme.typography.semiBold.title4
                 )

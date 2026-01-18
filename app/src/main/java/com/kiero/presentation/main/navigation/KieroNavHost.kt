@@ -1,5 +1,7 @@
 package com.kiero.presentation.main.navigation
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -9,6 +11,7 @@ import com.kiero.presentation.auth.navigation.AuthGraph
 import com.kiero.presentation.auth.navigation.authNavGraph
 import com.kiero.presentation.kid.navigation.kidNavGraph
 import com.kiero.presentation.parent.navigation.parentNavGraph
+import com.kiero.presentation.signup.parent.navigation.parentSignUpNavGraph
 
 @Composable
 fun KieroNavHost(
@@ -20,15 +23,27 @@ fun KieroNavHost(
     NavHost(
         navController = appState.navController,
         startDestination = startDestination,
-        modifier = modifier,
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None },
+        popEnterTransition = { EnterTransition.None },
+        popExitTransition = { ExitTransition.None },
+        modifier = modifier
     ) {
         authNavGraph(
             navController = appState.navController,
             paddingValues = paddingValues,
             navigateUp = appState::navigateUp,
-            navigateToParent = appState::navigateToParent,
-            navigateToKid = appState::navigateToKid,
+            navigateToParentGraph = appState::navigateToParentGraph,
+            navigateToParentSignUp = appState::navigateToParentSignUp,
         )
+
+        parentSignUpNavGraph(
+            paddingValues = paddingValues,
+            navigateToParent = appState::navigateToParentGraph,
+            navigateToSelection = appState::navigateToSelection
+        )
+
+
 
         parentNavGraph(
             navController = appState.navController,
@@ -39,7 +54,7 @@ fun KieroNavHost(
         kidNavGraph(
             navController = appState.navController,
             paddingValues = paddingValues,
-            navigateUp = appState::navigateUp,
+            navigateUp = appState::navigateUp
         )
     }
 }

@@ -1,9 +1,12 @@
 package com.kiero.core.designsystem.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,6 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
@@ -20,50 +25,55 @@ import com.kiero.core.designsystem.theme.KieroTheme
 
 @Composable
 fun KieroTopbar(
-    modifier: Modifier = Modifier,
     title: String,
     leftIconRes: Int,
     leftIconClick: () -> Unit,
+    modifier: Modifier = Modifier,
     rightIconRes: Int? = null,
-    rightIconClick: (() -> Unit)? = null,
+    rightIconClick: () -> Unit = {},
+    textStyle: TextStyle = KieroTheme.typography.bold.headLine2,
+    textColor: Color = KieroTheme.colors.white,
 ) {
-    Box(
+    Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(Color.Transparent)
-            .padding(vertical = 4.dp, horizontal = 8.dp)
+            .background(color = Color.Transparent)
+            .padding(
+                vertical = 4.dp,
+                horizontal = 8.dp
+            ),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        // 왼쪽 아이콘
         Icon(
             imageVector = ImageVector.vectorResource(id = leftIconRes),
             contentDescription = null,
             tint = KieroTheme.colors.white,
             modifier = Modifier
-                .align(Alignment.CenterStart)
                 .noRippleClickable(onClick = leftIconClick)
         )
 
         Text(
             text = title,
-            color = KieroTheme.colors.white,
-            style = KieroTheme.typography.bold.headLine2,
-            modifier = Modifier.align(Alignment.Center)
+            color = textColor,
+            style = textStyle,
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.Center
         )
-        rightIconRes?.let { res ->
-            rightIconClick?.let { click ->
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = res),
-                    contentDescription = null,
-                    tint = KieroTheme.colors.white,
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .noRippleClickable(onClick = click)
-                )
-            }
+
+        if (rightIconRes != null) {
+            Icon(
+                imageVector = ImageVector.vectorResource(id = rightIconRes),
+                contentDescription = null,
+                tint = KieroTheme.colors.white,
+                modifier = Modifier
+                    .noRippleClickable(onClick = rightIconClick)
+            )
+        } else {
+            Spacer(modifier = Modifier.width(24.dp))
         }
     }
 }
-
 
 @Preview
 @Composable
@@ -74,6 +84,7 @@ private fun KieroTopbarReview() {
             leftIconRes = R.drawable.ic_arrow_left,
             rightIconRes = R.drawable.ic_arrow_right,
             leftIconClick = {},
-            rightIconClick = {})
+            rightIconClick = {}
+        )
     }
 }

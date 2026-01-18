@@ -30,9 +30,9 @@ fun ScheduleWeekTopbar(
             .background(
                 color = Color.Unspecified
             )
-            .padding(start = 40.dp, end = 6.dp),
+            .padding(start = 28.dp, end = 7.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.spacedBy(3.dp)
     ) {
         dayList.forEachIndexed { index, date ->
             Text(
@@ -40,6 +40,8 @@ fun ScheduleWeekTopbar(
                 color = if (index == 0) KieroTheme.colors.main else KieroTheme.colors.gray100,
                 style = KieroTheme.typography.regular.body5,
                 textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .weight(1f)
             )
         }
     }

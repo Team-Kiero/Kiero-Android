@@ -24,7 +24,6 @@ fun KieroSnackbar(
     message: String,
     modifier: Modifier = Modifier,
     contentPadding: Dp = 16.dp,
-    cornerRadius: Dp = 12.dp,
 ) {
     Box(
         modifier = modifier

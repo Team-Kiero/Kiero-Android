@@ -1,6 +1,5 @@
 package com.kiero.presentation.parent.schedule.plan.component.plan
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,11 +17,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.timetable.components.ScheduleTimeColumn
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.schedule.model.ScheduleEvent
 import com.kiero.presentation.parent.schedule.model.toDayIndex
@@ -38,7 +35,7 @@ fun ScheduleTimeTable(
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(9.dp)
+        verticalArrangement = Arrangement.spacedBy(11.dp)
     ) {
         ScheduleWeekTopbar(
             dayList = ScheduleData.fakeDayList
@@ -59,52 +56,37 @@ fun SchedulePlanner(
     events: List<ScheduleEvent>,
     modifier: Modifier = Modifier,
     daysCount: Int = 7,
-    hoursCount: Int = 15,
-    hourHeight: Dp = 38.dp,
 ) {
+    val density = LocalDensity.current
+    val hourHeight = with(density) { 38.dp.roundToPx().toDp() }
+
     val allBlocks = events.flatMap { event ->
         val dayIndex = event.dayOfWeek?.toDayIndex() ?: 0
         event.toScheduleBlocks(dayIndex)
     }
 
-    val totalHeight = hourHeight * hoursCount
-
     BoxWithConstraints(
         modifier = modifier
             .fillMaxWidth()
-            .height(totalHeight)
+            .height(hourHeight * 15)
             .clip(RoundedCornerShape(10.dp))
-            .border(
-                width = 0.3.dp,
-                color = KieroTheme.colors.gray800,
-                shape = RoundedCornerShape(10.dp)
-            )
-            .background(
-                color = Color.Transparent,
-                shape = RoundedCornerShape(10.dp)
-            )
-            .padding(all = 4.dp)
+            .border(0.3.dp, KieroTheme.colors.gray800, RoundedCornerShape(10.dp))
+            .padding(4.dp)
     ) {
-        val containerWidth = maxWidth
-        val dayWidth = containerWidth / daysCount
+        val dayWidth = maxWidth / daysCount
 
         allBlocks.forEach { block ->
-            val startOffset = block.startHour - 8
-            val topOffset = hourHeight * startOffset
-            val leftOffset = dayWidth * block.dayIndex
-
+            val topOffset = hourHeight * (block.startHour - 8)
             val blockHeight = hourHeight * block.durationInSlots
 
             Box(
                 modifier = Modifier
-                    .offset(x = leftOffset, y = topOffset)
+                    .offset(x = dayWidth * block.dayIndex, y = topOffset)
                     .width(dayWidth)
                     .height(blockHeight)
-                    .padding(horizontal = 2.dp)
+                    .padding(horizontal = 3.dp)
             ) {
-                ScheduleEventBlock(
-                    block = block,
-                )
+                ScheduleEventBlock(block = block)
             }
         }
     }
