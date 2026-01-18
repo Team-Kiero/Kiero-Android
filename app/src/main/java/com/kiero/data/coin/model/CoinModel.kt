@@ -1,6 +1,6 @@
 package com.kiero.data.coin.model
 
-import com.kiero.data.coin.dto.response.CoinResponseDto
+import com.kiero.data.coin.remote.dto.response.CoinResponseDto
 
 data class CoinModel(
     val lastName : String = "",

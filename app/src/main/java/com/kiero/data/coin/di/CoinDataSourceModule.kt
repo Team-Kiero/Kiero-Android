@@ -1,7 +1,7 @@
 package com.kiero.data.coin.di
 
-import com.kiero.data.coin.datasource.CoinDataSource
-import com.kiero.data.coin.datasourceimpl.CoinDataSourceImpl
+import com.kiero.data.coin.remote.datasource.CoinDataSource
+import com.kiero.data.coin.remote.datasourceimpl.CoinDataSourceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

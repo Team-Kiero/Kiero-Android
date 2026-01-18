@@ -1,7 +1,7 @@
 package com.kiero.data.coin.repositoryimpl
 
 import com.kiero.core.common.util.suspendRunCatching
-import com.kiero.data.coin.datasource.CoinDataSource
+import com.kiero.data.coin.remote.datasource.CoinDataSource
 import com.kiero.data.coin.model.CoinModel
 import com.kiero.data.coin.model.toModel
 import com.kiero.data.coin.repository.CoinRepository

@@ -1,6 +1,6 @@
 package com.kiero.data.coin.di
 
-import com.kiero.data.coin.api.CoinService
+import com.kiero.data.coin.remote.api.CoinService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
