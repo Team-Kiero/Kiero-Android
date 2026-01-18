@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.component.chip.KieroChip
 import com.kiero.core.designsystem.component.chip.action.KieroCoinAction
 import com.kiero.core.designsystem.theme.KieroTheme
@@ -24,13 +23,11 @@ import com.kiero.core.designsystem.theme.KieroTheme
 fun MissionListItem(
     missionTitle: String,
     reward: Int,
-    onMissionClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .noRippleClickable(onClick = onMissionClick)
             .background(
                 color = KieroTheme.colors.gray900,
                 shape = RoundedCornerShape(10.dp)
@@ -64,9 +61,9 @@ fun MissionListItem(
 
 @Composable
 fun MissionInfo(
-    dayOfWeek: String,
     dueAt: String,
     modifier: Modifier = Modifier,
+    dayOfWeek: String? = null,
 ) {
     Column(
         modifier = modifier
@@ -74,11 +71,13 @@ fun MissionInfo(
             .background(color = Color.Unspecified),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        Text(
-            text = dayOfWeek,
-            color = KieroTheme.colors.gray300,
-            style = KieroTheme.typography.semiBold.title4
-        )
+        dayOfWeek?.let {
+            Text(
+                text = dayOfWeek,
+                color = KieroTheme.colors.gray300,
+                style = KieroTheme.typography.semiBold.title4
+            )
+        }
 
         Text(
             text = dueAt,
@@ -96,7 +95,6 @@ private fun MissionListItemPreview() {
             MissionListItem(
                 missionTitle = "테스트 미션",
                 reward = 150,
-                onMissionClick = {}
             )
 
             MissionInfo(
