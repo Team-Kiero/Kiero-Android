@@ -7,6 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import androidx.navigation.navOptions
 import com.kiero.core.navigation.Route
 import com.kiero.presentation.auth.AuthRoute
 import com.kiero.presentation.auth.kid.AuthKidSignupRoute
@@ -68,7 +69,16 @@ fun NavGraphBuilder.authNavGraph(
             AuthKidSignupRoute(
                 paddingValues = paddingValues,
                 navigateUp = navigateUp,
-                navigateToKidOnboarding = navController::navigateToKidOnboarding
+                navigateToKidOnboarding = {
+                    navController.navigateToKidOnboarding(
+                        navOptions = navOptions {
+                           popUpTo<AuthGraph> {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    )
+                }
             )
         }
     }

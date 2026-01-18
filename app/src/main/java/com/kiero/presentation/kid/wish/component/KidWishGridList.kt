@@ -15,6 +15,7 @@ import kotlinx.collections.immutable.ImmutableList
 @Composable
 fun KidWishGridList(
     wishList: ImmutableList<KidWishUiModel>,
+    onClickWish: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -29,14 +30,18 @@ fun KidWishGridList(
                 KidWishGridItem(
                     reward = columnItems[0].price,
                     missionTitle = columnItems[0].name,
-                    onClickWish = {}
+                    onClickWish = {
+                        onClickWish(columnItems[0].couponId)
+                    }
                 )
 
                 if (columnItems.size > 1) {
                     KidWishGridItem(
                         reward = columnItems[1].price,
                         missionTitle = columnItems[1].name,
-                        onClickWish = {}
+                        onClickWish = {
+                            onClickWish(columnItems[1].couponId)
+                        }
                     )
                 }
             }
@@ -49,7 +54,8 @@ fun KidWishGridList(
 private fun KidWishGridListPreview() {
     KieroTheme {
         KidWishGridList(
-            wishList = KidWishState.FAKE
+            wishList = KidWishState.FAKE,
+            onClickWish = {}
         )
     }
 }
