@@ -15,13 +15,11 @@ data class AlarmFeedState(
     val errorMessage: String? = null,
     val isLoadingMore: Boolean = false,
     val hasMore: Boolean = true,
-    /** 다음 커서 (페이징용) */
     val nextCursor: String? = null
 ) {
     companion object {
         val FAKE = AlarmFeedState(
             isLoading = false, alarms = persistentListOf(
-                // 2025.12.26.(금) 알람들
                 ParentAlarmUiModel(
                     id = "1",
                     date = "2025.12.26.(금)",
@@ -31,7 +29,6 @@ data class AlarmFeedState(
                     highlightColor = Color(0xFF00FFE1),
                     coinUsed = null,
                     imageUrl = R.drawable.img_kid_journey_piano_background,
-                    //imageUrl = "https://example.com/piano.jpg",
                     isExpanded = false
                 ), ParentAlarmUiModel(
                     id = "2",
@@ -54,7 +51,6 @@ data class AlarmFeedState(
                     imageUrl = null,
                     isExpanded = false
                 ),
-                // 2025.12.25.(목) 알람들
                 ParentAlarmUiModel(
                     id = "4",
                     date = "2025.12.25.(목)",

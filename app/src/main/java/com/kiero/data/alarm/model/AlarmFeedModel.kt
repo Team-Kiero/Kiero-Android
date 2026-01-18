@@ -6,18 +6,12 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.intOrNull  // ← 추가!
 import timber.log.Timber  // ← 추가!
 
-/**
- * 알람 피드 도메인 모델
- */
 data class AlarmFeedModel(
     val childName: String = "",
     val items: List<AlarmItemModel> = emptyList(),
     val nextCursor: String? = null
 )
 
-/**
- * EventType별 타입 안전 분리
- */
 sealed class AlarmItemModel {
     abstract val id: Long
     abstract val occurredAt: String
@@ -50,29 +44,20 @@ sealed class AlarmItemModel {
     ) : AlarmItemModel()
 }
 
-/**
- * DTO → Domain Model 변환
- */
 fun AlarmFeedResponseDto.toModel() = AlarmFeedModel(
     childName = this.childName,
     items = this.feedItems.mapNotNull { it.toModel() },
     nextCursor = this.nextCursor
 )
 
-/**
- * EventType별 파싱 로직
- * 파싱 실패 시 Timber로 로깅
- */
 fun FeedItemDto.toModel(): AlarmItemModel? {
     return try {
-        // ✅ 1. 서버 ID가 없으면 데이터 조합(날짜+타입+해시)으로 고유 ID 생성
-        // 이 작업이 없으면 LazyColumn이 리스트를 그리지 못합니다.
         val fallbackId = (occurredAt + eventType + metadata.toString()).hashCode().toLong()
         val finalId = id ?: fallbackId
 
         when (eventType) {
             "SCHEDULE" -> AlarmItemModel.Schedule(
-                id = finalId, // ✅ 생성한 ID 주입
+                id = finalId,
                 occurredAt = occurredAt,
                 locationName = metadata["content"]?.jsonPrimitive?.content ?: "",
                 imageUrl = metadata["imageUrl"]?.jsonPrimitive?.content

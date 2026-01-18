@@ -17,12 +17,11 @@ interface AlarmService {
         @Query("cursor") cursor: String? = null
     ): BaseResponse<AlarmFeedResponseDto>
 
-    // 실시간 구독 API 추가
     @Streaming
     @GET("api/v1/feeds/{childId}/subscribe")
     suspend fun subscribeAlarmFeed(
         @Header("Authorization") token: String,
-        @Header("Accept") accept: String = "text/event-stream", // 명세의 Accept 헤더
+        @Header("Accept") accept: String = "text/event-stream",
         @Path("childId") childId: Long
-    ): okhttp3.ResponseBody // 스트림을 직접 읽기 위해 ResponseBody 반환
+    ): okhttp3.ResponseBody
 }

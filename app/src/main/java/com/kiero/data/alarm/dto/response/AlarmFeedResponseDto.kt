@@ -18,15 +18,15 @@ data class AlarmFeedResponseDto(
 
 @Serializable
 data class FeedItemDto(
-    @SerialName("feedItemId") // ID 추가
+    @SerialName("feedItemId")
     val id: Long? = null,
 
     @SerialName("eventType")
-    val eventType: String,  // SCHEDULE, MISSION, COUPON, COMPLETE
+    val eventType: String,
 
     @SerialName("occurredAt")
-    val occurredAt: String,  // "2026-01-10T14:30:00"
+    val occurredAt: String,
 
     @SerialName("metadata")
-    val metadata: JsonObject  // 동적 필드
+    val metadata: JsonObject
 )

@@ -57,14 +57,14 @@ fun ParentAlarmCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .animateContentSize(), // 높이 변화 애니메이션은 유지
+            .animateContentSize(),
         shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(containerColor = KieroTheme.colors.gray900)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(15.dp), // 상하좌우 15dp 패딩이 카드의 최소 높이 역할을 수행함
+                .padding(15.dp),
         ) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -105,7 +105,6 @@ fun ParentAlarmCard(
                 }
             }
 
-            // 3. 코인 정보 (간격은 그대로 유지)
             if (!hasImage && coinUsed != null) {
                 Spacer(modifier = Modifier.height(6.dp))
                 KieroChip(
@@ -119,13 +118,13 @@ fun ParentAlarmCard(
                 )
             }
 
-            // 4. 확장 이미지 (Box 안에 3:4 비율 반영)
             if (hasImage && isExpanded) {
                 Spacer(modifier = Modifier.height(10.dp))
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .aspectRatio(3f / 4f) // ✅ 3:4 비율 강제
+                        .aspectRatio(3f / 4f)
+                        //animateContentSize() 추가
                         .clip(RoundedCornerShape(8.dp))
                         .background(KieroTheme.colors.black)
                 ) {
@@ -133,7 +132,7 @@ fun ParentAlarmCard(
                         model = imageUrl,
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop // ✅ 영역에 꽉 채움
+                        contentScale = ContentScale.Crop
                     )
                 }
             }
@@ -150,7 +149,6 @@ fun ParentAlarmCard(
                 modifier = Modifier.padding(16.dp).fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // 1. 이미지 있고 확장된 상태 (3:4 비율 확인용)
                 ParentAlarmCard(
                     time = "12 : 00",
                     message = "근영이가 과자먹기에 도착했어요.",
@@ -162,7 +160,6 @@ fun ParentAlarmCard(
                     onExpandClick = {}
                 )
 
-                // 2. 코인 칩 상태
                 ParentAlarmCard(
                     time = "14 : 30",
                     message = "미션 '미션 1'을 완료했어요.",

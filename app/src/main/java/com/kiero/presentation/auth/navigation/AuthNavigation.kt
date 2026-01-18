@@ -54,12 +54,5 @@ fun NavGraphBuilder.authNavGraph(
                 navigateToParent = navigateToParent
             )
         }
-
-        // TODO : [담당자] 자녀 등록 온보딩 화면(OnboardingChildRoute) 추가 및 연결 필요
-        /*
-        composable<ChildOnboarding> {
-            ChildOnboardingRoute(...)
-        }
-        */
     }
 }

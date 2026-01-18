@@ -36,7 +36,6 @@ object NetworkModule {
     ): OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(10, TimeUnit.SECONDS)
         .readTimeout(10, TimeUnit.SECONDS)
-        //.readTimeout(0, TimeUnit.SECONDS) // 0은 타임아웃 없음을 의미 추후 SSE 상태확인
         .addInterceptor(loggingInterceptor)
         .build()
 
