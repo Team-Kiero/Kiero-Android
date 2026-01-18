@@ -18,29 +18,41 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.kiero.R
+import com.kiero.core.common.extension.collectSingleEvent
 import com.kiero.core.common.extension.forcePixelToDp
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.core.model.auth.UserRole
 import com.kiero.presentation.auth.component.AuthButton
+import com.kiero.presentation.auth.state.AuthSideEffect
+import com.kiero.presentation.auth.viewmodel.AuthViewModel
 
 @Composable
 fun AuthRoute(
     paddingValues: PaddingValues,
     navigateToParent: () -> Unit,
     navigateToKid: () -> Unit,
+    viewModel: AuthViewModel = hiltViewModel()
 ) {
+    viewModel.sideEffect.collectSingleEvent {
+        when (it) {
+            AuthSideEffect.NavigateToParent -> navigateToParent()
+            AuthSideEffect.NavigateToKid -> navigateToKid()
+            else -> {}
+        }
+    }
+
     AuthScreen(
         paddingValues = paddingValues,
-        navigateToParent = navigateToParent,
-        navigateToKid = navigateToKid,
+        onClickAuth = viewModel::fetchRole
     )
 }
 
 @Composable
 fun AuthScreen(
     paddingValues: PaddingValues,
-    navigateToParent: () -> Unit,
-    navigateToKid: () -> Unit,
+    onClickAuth: (UserRole) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val logoPainter = painterResource(id = R.drawable.img_auth_app_logo)
@@ -80,7 +92,9 @@ fun AuthScreen(
             AuthButton(
                 icon = R.drawable.img_auth_parent_goblin_small,
                 text = "부모님으로 시작하기",
-                onClickButton = navigateToParent
+                onClickButton = {
+                    onClickAuth(UserRole.PARENT)
+                }
             )
 
             Spacer(modifier = Modifier.height(25.dp))
@@ -88,7 +102,9 @@ fun AuthScreen(
             AuthButton(
                 icon = R.drawable.img_auth_kid_goblin_small,
                 text = "자녀로 시작하기",
-                onClickButton = navigateToKid
+                onClickButton = {
+                    onClickAuth(UserRole.KID)
+                }
             )
         }
 
@@ -102,8 +118,7 @@ private fun DummyScreenPreview() {
     KieroTheme {
         AuthScreen(
             paddingValues = PaddingValues(),
-            navigateToParent = {},
-            navigateToKid = {}
+            onClickAuth = {}
         )
     }
 }
