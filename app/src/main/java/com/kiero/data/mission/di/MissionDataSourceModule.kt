@@ -1,9 +1,7 @@
 package com.kiero.data.mission.di
 
-import com.kiero.data.auth.local.datasource.AuthLocalDataSource
-import com.kiero.data.auth.local.datasourceimpl.AuthLocalDataSourceImpl
-import com.kiero.data.auth.remote.datasource.AuthDataSource
-import com.kiero.data.auth.remote.datasourceimpl.AuthDataSourceImpl
+import com.kiero.data.mission.remote.datasource.MissionDataSource
+import com.kiero.data.mission.remote.datasourceimpl.MissionDataSourceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -14,4 +12,9 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 abstract class MissionDataSourceModule {
 
+    @Binds
+    @Singleton
+    abstract fun bindMissionDataSource(
+        missionDataSourceImpl: MissionDataSourceImpl
+    ): MissionDataSource
 }

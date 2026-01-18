@@ -1,7 +1,10 @@
 package com.kiero.data.mission.repository
 
-interface MissionRepository {
-    suspend fun getMissions(childId: Long? = null)
+import com.kiero.data.mission.model.MissionByDateModel
+import com.kiero.data.mission.model.MissionCompleteModel
 
-    suspend fun patchMission(missionId: Long)
+interface MissionRepository {
+    suspend fun getMissions(childId: Long? = null) : Result<MissionByDateModel>
+
+    suspend fun patchMission(missionId: Long) : Result<MissionCompleteModel>
 }
