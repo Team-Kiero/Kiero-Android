@@ -90,7 +90,7 @@ fun KieroTextField(
                             shape = shape
                         )
                         .border(
-                            width = 0.5.dp,
+                            width = 1.dp,
                             color = borderColor,
                             shape = shape
                         )
@@ -118,15 +118,14 @@ fun KieroTextField(
             ) {
                 Spacer(modifier = Modifier.weight(1f))
 
-                supportingIcon?.let {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_info_error),
-                        contentDescription = null,
-                        tint = KieroTheme.colors.point,
-                        modifier = Modifier.padding(top = 2.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                }
+                Icon(
+                    imageVector = if (supportingIcon != null) ImageVector.vectorResource(id = supportingIcon) else ImageVector.vectorResource(id = R.drawable.ic_info_error),
+                    contentDescription = null,
+                    tint = KieroTheme.colors.point,
+                    modifier = Modifier.padding(top = 2.dp)
+                )
+
+                Spacer(modifier = Modifier.width(4.dp))
 
                 Text(
                     text = it,

@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
@@ -46,7 +47,8 @@ fun KieroDialog(
         usePlatformDefaultWidth = false,
         decorFitsSystemWindows = false
     ),
-    content: @Composable () -> Unit
+    isDisabled: Boolean = false, // x 버튼의 표시 여부
+    content: (@Composable () -> Unit)? = null
 ) {
     Dialog(
         onDismissRequest = onDismiss,
@@ -55,7 +57,7 @@ fun KieroDialog(
         Box(
             modifier = modifier
                 .fillMaxSize()
-                .background(color = KieroTheme.colors.gray500)
+                .background(color = KieroTheme.colors.black.copy(alpha = 0.75f))
                 .padding(horizontal = 16.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -77,6 +79,7 @@ fun KieroDialog(
                         contentDescription = null,
                         tint = Color.Unspecified,
                         modifier = Modifier
+                            .alpha(if (isDisabled) 0f else 1f)
                             .noRippleClickable(onClick = onDismiss)
                     )
                 }
@@ -89,9 +92,9 @@ fun KieroDialog(
                     style = KieroTheme.typography.semiBold.title2
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
-
-                content()
+                if (content != null) {
+                    content()
+                }
 
                 Spacer(modifier = Modifier.height(15.dp))
 
