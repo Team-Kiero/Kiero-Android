@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -129,12 +130,15 @@ fun KidWishRoute(
                                     )
                                 }
                             } else {
-                                val coinImage = painterResource(R.drawable.img_kid_wish_complete_goblin)
+                                val coinImage = painterResource(R.drawable.img_kid_camera_goblin)
 
                                 Image(
                                     painter = coinImage,
                                     contentDescription = null,
-                                    modifier = Modifier.forcePixelToDp(coinImage)
+                                    modifier = Modifier.size(
+                                        width = 62.dp,
+                                        height = 70.dp
+                                    )
                                 )
                             }
                         }
