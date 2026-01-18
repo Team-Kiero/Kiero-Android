@@ -60,48 +60,46 @@ fun ParentAlarmCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(15.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+            Text(
+                text = time,
+                style = KieroTheme.typography.regular.body4,
+                color = KieroTheme.colors.gray400
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(
+                        if (hasImage) Modifier
+                            .noRippleClickable(onClick = onExpandClick)
+                        else Modifier
+                    ),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = time,
-                    style = KieroTheme.typography.regular.body4,
-                    color = KieroTheme.colors.gray400
+                    text = message.toHighlightedText(
+                        highlightColor, *highlightTexts.toTypedArray()
+                    ),
+                    style = KieroTheme.typography.semiBold.title3,
+                    color = KieroTheme.colors.white,
+                    modifier = Modifier.weight(1f)
                 )
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .then(
-                            if (hasImage) Modifier
-                                .noRippleClickable(onClick = onExpandClick)
-                            else Modifier
-                        ),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = message.toHighlightedText(
-                            highlightColor, *highlightTexts.toTypedArray()
-                        ),
-                        style = KieroTheme.typography.semiBold.title3,
-                        color = KieroTheme.colors.white,
-                        modifier = Modifier.weight(1f)
+                if (hasImage) {
+                    Icon(
+                        imageVector = if (isExpanded) ImageVector
+                            .vectorResource(id = R.drawable.ic_arrow_up)
+                        else ImageVector
+                            .vectorResource(id = R.drawable.ic_arrow_down),
+                        contentDescription = "확장 버튼",
+                        tint = KieroTheme.colors.white
                     )
-
-                    if (hasImage) {
-                        Icon(
-                            imageVector = if (isExpanded) ImageVector
-                                .vectorResource(id = R.drawable.ic_arrow_up)
-                            else ImageVector
-                                .vectorResource(id = R.drawable.ic_arrow_down),
-                            contentDescription = "확장 버튼",
-                            tint = KieroTheme.colors.white
-                        )
-                    }
                 }
             }
+
 
             if (!hasImage && coinUsed != null) {
                 Spacer(
@@ -120,8 +118,9 @@ fun ParentAlarmCard(
             }
 
             if (hasImage && isExpanded) {
-                Spacer(modifier = Modifier
-                    .height(7.dp)
+                Spacer(
+                    modifier = Modifier
+                        .height(7.dp)
                 )
                 Box(
                     modifier = Modifier
