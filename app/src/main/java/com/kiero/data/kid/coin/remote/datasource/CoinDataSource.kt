@@ -1,7 +1,7 @@
-package com.kiero.data.coin.remote.datasource
+package com.kiero.data.kid.coin.remote.datasource
 
 import com.kiero.core.network.model.BaseResponse
-import com.kiero.data.coin.remote.dto.response.CoinResponseDto
+import com.kiero.data.kid.coin.remote.dto.response.CoinResponseDto
 
 interface CoinDataSource {
     suspend fun getCurrentCoin() : BaseResponse<CoinResponseDto>

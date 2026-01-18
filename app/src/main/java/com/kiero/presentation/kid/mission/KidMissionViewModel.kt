@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.kiero.core.common.extension.updateSuccess
 import com.kiero.core.model.UiState
 import com.kiero.data.mission.repository.MissionRepository
-import com.kiero.presentation.kid.mission.model.toState
+import com.kiero.presentation.kid.mission.model.toUiModel
 import com.kiero.presentation.kid.mission.state.KidMissionSideEffect
 import com.kiero.presentation.kid.mission.state.KidMissionState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,7 +38,7 @@ class KidMissionViewModel @Inject constructor(
                 .onSuccess { result ->
                     _state.updateSuccess {
                         it.copy(
-                            kidMissionByDateList = result.toState()
+                            kidMissionByDateList = result.toUiModel()
                         )
                     }
                 }

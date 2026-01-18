@@ -30,18 +30,18 @@ data class KidMissionUiModel(
     val reward: Int
 )
 
-fun MissionByDateModel.toState() = KidMissionByDateUiModel(
-    missionsByDate = this.missionsByDate.map { it.toState() }.toImmutableList()
+fun MissionByDateModel.toUiModel() = KidMissionByDateUiModel(
+    missionsByDate = this.missionsByDate.map { it.toUiModel() }.toImmutableList()
 )
 
-fun MissionListModel.toState() = KidMissionListUiModel(
+fun MissionListModel.toUiModel() = KidMissionListUiModel(
     dueAt = this.dueAt,
     dayOfWeek = this.dayOfWeek,
-    missions = this.missions.map { it.toState() }.toImmutableList(),
+    missions = this.missions.map { it.toUiModel() }.toImmutableList(),
     title = createDateTitle(this.dueAt, this.dayOfWeek),
 )
 
-fun MissionModel.toState() = KidMissionUiModel(
+fun MissionModel.toUiModel() = KidMissionUiModel(
     id = this.id,
     isCompleted = this.isCompleted,
     name = this.name,

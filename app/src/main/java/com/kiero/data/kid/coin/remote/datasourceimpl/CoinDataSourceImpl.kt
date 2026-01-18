@@ -1,9 +1,9 @@
-package com.kiero.data.coin.remote.datasourceimpl
+package com.kiero.data.kid.coin.remote.datasourceimpl
 
 import com.kiero.core.network.model.BaseResponse
-import com.kiero.data.coin.remote.api.CoinService
-import com.kiero.data.coin.remote.datasource.CoinDataSource
-import com.kiero.data.coin.remote.dto.response.CoinResponseDto
+import com.kiero.data.kid.coin.remote.api.CoinService
+import com.kiero.data.kid.coin.remote.datasource.CoinDataSource
+import com.kiero.data.kid.coin.remote.dto.response.CoinResponseDto
 import javax.inject.Inject
 
 class CoinDataSourceImpl @Inject constructor(
