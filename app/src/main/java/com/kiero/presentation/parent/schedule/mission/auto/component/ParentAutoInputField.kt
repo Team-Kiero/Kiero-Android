@@ -13,11 +13,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.kiero.core.designsystem.theme.KieroTheme
 
 @Composable
@@ -38,18 +36,15 @@ fun ParentAutoInputField(
         placeholder = {
             Text(
                 text = "알림장 내용을 입력하세요.",
-                style = KieroTheme.typography.regular.body3.copy(
-                    lineHeight = 24.sp
-                ),
+                style = KieroTheme.typography.regular.body3,
                 color = KieroTheme.colors.gray400
             )
         },
         modifier = modifier.fillMaxWidth(),
-        textStyle = TextStyle(
-            color = KieroTheme.colors.white,
-            fontSize = 16.sp,
-            lineHeight = 24.sp
+        textStyle = KieroTheme.typography.regular.body3.copy(
+            color = KieroTheme.colors.gray400
         ),
+
         colors = TextFieldDefaults.colors(
             focusedContainerColor = KieroTheme.colors.gray900,
             unfocusedContainerColor = KieroTheme.colors.gray900,
