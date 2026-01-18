@@ -5,11 +5,11 @@ import com.kiero.data.schedule.model.TodayScheduleModel
 
 @Immutable
 data class KidJourneyHeaderUiModel(
-    val kidName: String,
-    val currentDate: String,
-    val coinCount: Int,
-    val earnedStones: Int,
-    val totalScheduleCount: Int
+    val kidName: String = "주완",
+    val currentDate: String = "12월 5일 목요일",
+    val coinCount: Int = 0,
+    val earnedStones: Int? = 0,
+    val totalScheduleCount: Int? = 0
 )
 
 fun TodayScheduleModel.toUiModel() : KidJourneyHeaderUiModel {
@@ -17,7 +17,7 @@ fun TodayScheduleModel.toUiModel() : KidJourneyHeaderUiModel {
         kidName = "주완",
         currentDate = "12월 5일 목요일",
         coinCount = 350,
-        earnedStones = earnedStones ?: 0,
+        earnedStones = earnedStones,
         totalScheduleCount = totalSchedule
     )
 }

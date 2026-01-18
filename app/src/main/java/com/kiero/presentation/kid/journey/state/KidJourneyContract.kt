@@ -6,7 +6,6 @@ import com.kiero.presentation.kid.journey.model.KidJourneyButtonType
 import com.kiero.presentation.kid.journey.model.KidJourneyContentUiModel
 import com.kiero.presentation.kid.journey.model.KidJourneyHeaderUiModel
 import com.kiero.presentation.kid.journey.model.KidJourneyScheduleUiModel
-import java.time.LocalTime
 
 @Immutable
 data class KidJourneyState(
@@ -66,8 +65,8 @@ data class KidJourneyState(
                 stoneType = "용기의 불조각",
                 scheduleInfo = KidJourneyScheduleUiModel(
                     order = 1,
-                    startTime = LocalTime.of(14, 0),
-                    endTime = LocalTime.of(16, 0)
+                    startTime = "14:00:00",
+                    endTime = "16:00:00"
                 ),
                 isSkippable = true
             )

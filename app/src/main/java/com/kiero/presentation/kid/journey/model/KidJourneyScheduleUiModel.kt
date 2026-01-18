@@ -7,12 +7,30 @@ import java.util.Locale
 
 @Immutable
 data class KidJourneyScheduleUiModel(
-    val order: Int,
-    val startTime: LocalTime,
-    val endTime: LocalTime
+    val order: Int?,
+    val startTime: String?,
+    val endTime: String?
 ) {
+    private fun parseTime(time: String?): LocalTime {
+        return try {
+            LocalTime.parse(time)
+        } catch (e: Exception) {
+            LocalTime.now()
+        }
+    }
+
     val amPmFormatter: DateTimeFormatter? = DateTimeFormatter.ofPattern("a", Locale.KOREAN)
     val timeNumberFormatter: DateTimeFormatter? = DateTimeFormatter.ofPattern("hh : mm", Locale.KOREAN)
+
+    fun getFormattedStartTime(): String {
+        val time = parseTime(startTime)
+        return "${time.format(amPmFormatter)} ${time.format(timeNumberFormatter)}"
+    }
+
+    fun getFormattedEndTime(): String {
+        val time = parseTime(endTime)
+        return "${time.format(amPmFormatter)} ${time.format(timeNumberFormatter)}"
+    }
 
     val orderText: String
         get() = when (order) {

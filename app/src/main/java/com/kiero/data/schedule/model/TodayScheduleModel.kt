@@ -4,12 +4,12 @@ import com.kiero.data.schedule.dto.response.TodayScheduleResponseDto
 
 data class TodayScheduleModel(
     val scheduleDetailId: Long?,
-    val scheduleOrder: Int,
+    val scheduleOrder: Int?,
     val startTime: String?,
     val endTime: String?,
     val name: String?,
     val stoneType: String?,
-    val totalSchedule: Int,
+    val totalSchedule: Int?,
     val earnedStones: Int?,
     val scheduleStatus: ScheduleStatus,
     val isSkippable: Boolean,

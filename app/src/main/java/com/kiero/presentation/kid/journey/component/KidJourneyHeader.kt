@@ -50,8 +50,8 @@ fun KidJourneyHeader(
 
             KieroChip(
                 action = KieroStoneAction(
-                    currentStoneCount = header.earnedStones,
-                    maxStoneCount = header.totalScheduleCount,
+                    currentStoneCount = header.earnedStones!!,
+                    maxStoneCount = header.totalScheduleCount!!,
                     onClick = {}
                 ),
                 isEnabled = true,

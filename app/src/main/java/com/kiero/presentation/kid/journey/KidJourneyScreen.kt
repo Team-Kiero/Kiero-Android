@@ -55,7 +55,6 @@ import com.kiero.presentation.kid.journey.state.KidJourneySideEffect
 import com.kiero.presentation.kid.journey.state.KidJourneyState
 import com.kiero.presentation.kid.journey.util.KidJourneyContentUtil
 import com.kiero.presentation.kid.journey.viewmodel.KidJourneyViewModel
-import java.time.LocalTime
 
 @Composable
 fun KidJourneyRoute(
@@ -248,8 +247,8 @@ private fun KidJourneyScreenPreview() {
                     stoneType = "용기의 불조각",
                     scheduleInfo = KidJourneyScheduleUiModel(
                         order = 4,
-                        startTime = LocalTime.of(14, 0),
-                        endTime = LocalTime.of(16, 0)
+                        startTime = "14:00:00",
+                        endTime = "16:00:00"
                     ),
                     isSkippable = true
                 )
