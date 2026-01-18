@@ -32,15 +32,16 @@ val String.formattedDeadLine: String
         }
     }
 
+private val SERVER_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")
+
 val String.formattedAlarmDate: String
     get() {
         if (this.isBlank()) return ""
         return try {
-            val date = if (this.contains("T")) LocalDateTime.parse(this).toLocalDate()
-            else LocalDate.parse(this)
-            val formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd")
-            val dayOfWeek = date.dayOfWeek.getDisplayName(TextStyle.NARROW, Locale.KOREAN)
-            "${date.format(formatter)}.($dayOfWeek)"
+            val dateTime = LocalDateTime.parse(this, SERVER_DATE_FORMAT)
+            val outputFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd")
+            val dayOfWeek = dateTime.dayOfWeek.getDisplayName(TextStyle.NARROW, Locale.KOREAN)
+            "${dateTime.format(outputFormatter)}.($dayOfWeek)"
         } catch (e: Exception) {
             this
         }
@@ -48,9 +49,10 @@ val String.formattedAlarmDate: String
 
 val String.formattedAlarmTime: String
     get() {
-        if (this.isBlank() || !this.contains("T")) return "00 : 00"
+        if (this.isBlank()) return "00 : 00"
         return try {
-            LocalDateTime.parse(this).format(DateTimeFormatter.ofPattern("HH : mm"))
+            val dateTime = LocalDateTime.parse(this, SERVER_DATE_FORMAT)
+            dateTime.format(DateTimeFormatter.ofPattern("HH : mm"))
         } catch (e: Exception) {
             "00 : 00"
         }
@@ -75,6 +77,28 @@ fun String.toHighlightedText(
         }
     }
 }
+
+ // 아이 이름 뒤 '이/가' 조사 자동 처리
+fun String.withJosa(josaPair: String): String {
+    if (this.isBlank()) return this
+    if (josaPair.length != 2) return this
+
+    val lastChar = this.last()
+    if (lastChar < '가' || lastChar > '힣') {
+        return this + josaPair[1]
+    }
+
+    val hasBatchim = (lastChar - 0xAC00.toChar()) % 28 > 0
+
+    val particle = if (hasBatchim) {
+        josaPair[0]
+    } else {
+        josaPair[1]
+    }
+
+    return this + particle
+}
+
 fun String.validateAsStartTime(): String {
     try {
         val parts = this.split(" ")
