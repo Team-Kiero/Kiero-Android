@@ -56,7 +56,7 @@ data class KidJourneyState(
         fun fake() = KidJourneyState(
             header = KidJourneyHeaderUiModel(
                 kidName = "주완",
-                currentDate = java.time.LocalDate.of(2024, 12, 5),
+                currentDate = "12월 5일 목요일",
                 coinCount = 350,
                 earnedStones = 7,
                 totalScheduleCount = 7

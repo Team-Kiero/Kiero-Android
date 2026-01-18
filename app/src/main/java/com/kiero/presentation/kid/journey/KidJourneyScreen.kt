@@ -55,7 +55,6 @@ import com.kiero.presentation.kid.journey.state.KidJourneySideEffect
 import com.kiero.presentation.kid.journey.state.KidJourneyState
 import com.kiero.presentation.kid.journey.util.KidJourneyContentUtil
 import com.kiero.presentation.kid.journey.viewmodel.KidJourneyViewModel
-import java.time.LocalDate
 import java.time.LocalTime
 
 @Composable
@@ -239,7 +238,7 @@ private fun KidJourneyScreenPreview() {
             state = KidJourneyState(
                 header = KidJourneyHeaderUiModel(
                     kidName = "주완",
-                    currentDate = LocalDate.of(2024, 12, 5),
+                    currentDate = "12월 5일 목요일",
                     coinCount = 350,
                     earnedStones = 5,
                     totalScheduleCount = 7
