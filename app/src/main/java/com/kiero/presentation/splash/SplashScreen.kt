@@ -41,8 +41,8 @@ fun SplashRoute(
     viewModel.sideEffect.collectSingleEvent {
         when (it) {
             SplashSideEffect.NavigateToAuth -> navigateToAuth()
-            SplashSideEffect.NavigateToKidHome -> navigateToParentHome()
-            SplashSideEffect.NavigateToParentHome -> navigateToKidHome()
+            SplashSideEffect.NavigateToKidHome -> navigateToKidHome()
+            SplashSideEffect.NavigateToParentHome -> navigateToParentHome()
             SplashSideEffect.NavigateToParentGraph -> navigateToParentGraph()
             SplashSideEffect.NavigateToKidOnboarding -> navigateToKidOnboarding()
         }

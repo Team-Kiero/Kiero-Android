@@ -55,16 +55,7 @@ fun KieroNavHost(
 
                 appState.navigateToJourney(clearStackNavOptions)
             },
-            navigateToParentGraph = {
-                val clearStackNavOptions = navOptions {
-                    popUpTo(0) {
-                        inclusive = true
-                    }
-                    launchSingleTop = true
-                }
-
-                appState.navigateToParentGraph()
-            },
+            navigateToParentGraph = appState::navigateToParentGraph,
             navigateToKidOnboarding = {
                 val clearStackNavOptions = navOptions {
                     popUpTo(0) {
