@@ -19,15 +19,14 @@ class AlarmDataSourceImpl @Inject constructor(
 ) : AlarmDataSource {
 
     override suspend fun getAlarmFeed(
-        token: String,
         childId: Long,
         size: Int?,
         cursor: String?
     ): BaseResponse<AlarmFeedResponseDto> =
-        service.getAlarmFeed(token, childId, size, cursor)
+        service.getAlarmFeed(childId, size, cursor)
 
-    override fun subscribeAlarmFeed(token: String, childId: Long): Flow<FeedItemDto> = flow {
-        val response = service.subscribeAlarmFeed(token = token, childId = childId)
+    override fun subscribeAlarmFeed(childId: Long): Flow<FeedItemDto> = flow {
+        val response = service.subscribeAlarmFeed(childId = childId)
         val reader = response.byteStream().bufferedReader()
 
         try {

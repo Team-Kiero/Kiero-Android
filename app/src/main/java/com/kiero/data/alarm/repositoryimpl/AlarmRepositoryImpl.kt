@@ -6,7 +6,6 @@ import com.kiero.data.alarm.model.AlarmFeedModel
 import com.kiero.data.alarm.model.AlarmItemModel
 import com.kiero.data.alarm.model.toModel
 import com.kiero.data.alarm.repository.AlarmRepository
-import com.kiero.data.auth.local.datasource.AuthLocalDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,12 +21,8 @@ import javax.inject.Singleton
 @Singleton
 class AlarmRepositoryImpl @Inject constructor(
     private val dataSource: AlarmDataSource,
-    private val authLocalDataSource: AuthLocalDataSource
 ) : AlarmRepository {
 
-    companion object {
-        private const val MAX_CACHE_SIZE = 100
-    }
 
     private val _cachedAlarms = MutableStateFlow<List<AlarmItemModel>>(emptyList())
     override val cachedAlarms: StateFlow<List<AlarmItemModel>> = _cachedAlarms.asStateFlow()
@@ -38,24 +33,18 @@ class AlarmRepositoryImpl @Inject constructor(
     private val _nextCursor = MutableStateFlow<String?>(null)
     override val nextCursor: StateFlow<String?> = _nextCursor.asStateFlow()
 
-    private suspend fun getBearerToken(): String {
-        val accessToken = authLocalDataSource.getAccessToken()
-        Timber.d("실시간 구독 시도 토큰: $accessToken")
-        return "Bearer $accessToken"
-    }
-
     private suspend fun fetchFeeds(
         childId: Long,
         size: Int,
         cursor: String?
     ): AlarmFeedModel {
         val response = dataSource.getAlarmFeed(
-            token = getBearerToken(),
             childId = childId,
             size = size,
             cursor = cursor
         )
-        return response.data!!.toModel()
+        val model = response.data!!.toModel()
+        return model
     }
 
     override suspend fun loadAlarms(
@@ -102,8 +91,7 @@ class AlarmRepositoryImpl @Inject constructor(
     }
 
     override fun subscribeAlarmFeed(childId: Long): Flow<AlarmItemModel> = flow {
-        val token = getBearerToken()
-        dataSource.subscribeAlarmFeed(token, childId).collect { dto ->
+        dataSource.subscribeAlarmFeed(childId).collect { dto ->
             dto.toModel()?.let { model ->
                 addNewAlarm(model)
                 emit(model)
@@ -129,5 +117,8 @@ class AlarmRepositoryImpl @Inject constructor(
         _cachedAlarms.value = emptyList()
         _childName.value = ""
         _nextCursor.value = null
+    }
+    companion object {
+        private const val MAX_CACHE_SIZE = 100
     }
 }

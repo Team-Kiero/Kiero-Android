@@ -7,14 +7,12 @@ import kotlinx.coroutines.flow.Flow
 
 interface AlarmDataSource {
     suspend fun getAlarmFeed(
-        token: String,
         childId: Long,
         size: Int?,
         cursor: String?
     ): BaseResponse<AlarmFeedResponseDto>
 
     fun subscribeAlarmFeed(
-        token: String,
         childId: Long
     ): Flow<FeedItemDto>
 }

@@ -1,5 +1,6 @@
 package com.kiero.data.alarm.di
 
+import com.kiero.core.network.di.AuthNetwork
 import com.kiero.data.alarm.api.AlarmService
 import dagger.Module
 import dagger.Provides
@@ -14,6 +15,7 @@ import javax.inject.Singleton
 object AlarmServiceModule {
     @Provides
     @Singleton
-    fun providesAlarmService(retrofit: Retrofit): AlarmService =
-        retrofit.create()
+    fun providesAlarmService(
+        @AuthNetwork retrofit: Retrofit
+    ): AlarmService = retrofit.create()
 }
