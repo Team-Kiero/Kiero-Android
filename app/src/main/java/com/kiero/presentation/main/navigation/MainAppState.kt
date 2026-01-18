@@ -11,9 +11,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import com.kiero.core.network.monitor.NetworkMonitor
 import com.kiero.presentation.auth.navigation.AuthGraph
+import com.kiero.presentation.auth.navigation.navigateToAuth
 import com.kiero.presentation.kid.journey.camera.navigation.navigateToCamera
 import com.kiero.presentation.kid.journey.fire.navigation.navigateToFire
-import com.kiero.presentation.auth.navigation.navigateToAuth
 import com.kiero.presentation.kid.journey.navigation.navigateToJourney
 import com.kiero.presentation.kid.mission.navigation.navigateToMission
 import com.kiero.presentation.kid.navigation.Journey
@@ -28,8 +28,9 @@ import com.kiero.presentation.parent.navigation.ParentGraph
 import com.kiero.presentation.parent.navigation.Schedule
 import com.kiero.presentation.parent.schedule.mission.navigation.navigateToMissionAdd
 import com.kiero.presentation.parent.schedule.navigation.navigateToSchedule
-import com.kiero.presentation.signup.parent.navigation.navigateToParentSignUp
 import com.kiero.presentation.parent.schedule.plan.navigation.navigateToScheduleAdd
+import com.kiero.presentation.signup.parent.navigation.navigateToParentSignUp
+import com.kiero.presentation.splash.navigation.Splash
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -43,7 +44,7 @@ class MainAppState(
     coroutineScope: CoroutineScope,
     networkMonitor: NetworkMonitor
 ) {
-    val startDestination = AuthGraph
+    val startDestination = Splash
 
     val isOffline: StateFlow<Boolean> = networkMonitor.isOnline
         .map(Boolean::not)
@@ -185,8 +186,7 @@ class MainAppState(
     fun navigateToScheduleAdd(navOptions: NavOptions? = null) =
         navController.navigateToScheduleAdd(navOptions)
 
-    fun navigateToKidOnboarding(navOptions: NavOptions? = null) =
-        navController.navigateToKidOnboarding(navOptions)
+    fun navigateToKidOnboarding(navOptions: NavOptions? = null) = navController.navigateToKidOnboarding(navOptions)
         
     fun navigateToCamera(navOptions: NavOptions? = null) =
         navController.navigateToCamera(navOptions)

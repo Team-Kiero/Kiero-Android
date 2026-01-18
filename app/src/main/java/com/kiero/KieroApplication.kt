@@ -1,6 +1,7 @@
 package com.kiero
 
 import android.app.Application
+import android.graphics.Bitmap
 import android.os.Build.VERSION.SDK_INT
 import androidx.appcompat.app.AppCompatDelegate
 import coil.ImageLoader
@@ -47,7 +48,9 @@ class KieroApplication : Application(), ImageLoaderFactory {
                 } else {
                     add(GifDecoder.Factory())
                 }
-            }.crossfade(false)
+            }
+            .crossfade(false)
+            .bitmapConfig(Bitmap.Config.ARGB_8888)
             .build()
     }
 }
