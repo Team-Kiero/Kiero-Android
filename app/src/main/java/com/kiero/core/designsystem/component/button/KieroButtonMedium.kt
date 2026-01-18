@@ -49,7 +49,7 @@ fun KieroButtonMedium(
         ) {
             if (leadingIcon != null) {
                 Icon(
-                    imageVector = leadingIcon, // ImageVector로 변경
+                    imageVector = leadingIcon,
                     contentDescription = null,
                     modifier = Modifier.size(24.dp)
                 )

@@ -14,6 +14,8 @@ import javax.inject.Singleton
 object CoinServiceModule {
     @Provides
     @Singleton
-    fun providesCoinService(retrofit: Retrofit): CoinService =
+    fun providesCoinService(
+        @AuthNetwork retrofit: Retrofit
+    ): CoinService =
         retrofit.create()
 }

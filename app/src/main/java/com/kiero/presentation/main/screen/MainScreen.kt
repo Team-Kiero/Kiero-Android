@@ -22,10 +22,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.core.designsystem.component.KieroSnackbar
+import com.kiero.core.designsystem.component.dialog.KieroDialog
+import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
 import com.kiero.core.model.trigger.DialogTrigger
 import com.kiero.core.model.trigger.GlobalUiEventHolder
 import com.kiero.core.model.trigger.SnackbarState
@@ -34,8 +37,10 @@ import com.kiero.presentation.main.navigation.KidMainTab
 import com.kiero.presentation.main.navigation.KieroNavHost
 import com.kiero.presentation.main.navigation.MainAppState
 import com.kiero.presentation.main.navigation.ParentMainTab
+import com.kiero.presentation.main.navigation.component.BottomBarTab
 import com.kiero.presentation.main.navigation.component.MainBottomBar
 import com.kiero.presentation.main.state.rememberDialogStateHolder
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -73,18 +78,27 @@ fun MainScreen(
 
     val isVisible = showParentBottomBar || showKidBottomBar
 
-    val containerShape = if (showParentBottomBar) {
-        RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp)
-    } else {
-        RoundedCornerShape(0.dp)
+    var cachedTabs by remember {
+        mutableStateOf(ParentMainTab.entries.toImmutableList() as ImmutableList<BottomBarTab>)
     }
-    val tabs = if (showParentBottomBar) {
-        ParentMainTab.entries.toImmutableList()
-    } else {
-        KidMainTab.entries.toImmutableList()
-    }
-    val currentTab = if (showParentBottomBar) currentParentTab else currentKidTab
 
+    var cachedShape by remember {
+        mutableStateOf<Shape>(RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp))
+    }
+
+    if (showParentBottomBar) {
+        cachedTabs = ParentMainTab.entries.toImmutableList()
+        cachedShape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp)
+    } else if (showKidBottomBar) {
+        cachedTabs = KidMainTab.entries.toImmutableList()
+        cachedShape = RoundedCornerShape(0.dp)
+    }
+
+    val tabs = cachedTabs
+    val containerShape = cachedShape
+
+    val currentTab =
+        if (showParentBottomBar) currentParentTab else if (showKidBottomBar) currentKidTab else null
     val dialogState = rememberDialogStateHolder()
 
     val onShowToast: (String) -> Unit = remember {
@@ -161,7 +175,9 @@ fun MainScreen(
                         KieroSnackbar(
                             message = data.visuals.message,
                             // TODO: 디자인 확정 후 스낵바 높이 및 패딩 수정 필요
-                            modifier = Modifier.padding(16.dp)
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .padding(bottom = 90.dp)
                         )
                     }
                 },
@@ -181,8 +197,18 @@ fun MainScreen(
                 }
             ) { paddingValues ->
                 if (dialogState.dialogState.isVisible) {
-                    // Todo : 공통 Dialog 띄우기
-                    Timber.e("Dialog 띄워짐")
+                    KieroDialog(
+                        title = "인터넷 연결 확인해주세요!",
+                        confirmAction = KieroConfirmAction(
+                            text = "확인",
+                            onClick = {
+                                dialogState.dismissDialog()
+                            }
+                        ),
+                        onDismiss = {
+                            dialogState.dismissDialog()
+                        }
+                    )
                 }
 
                 KieroNavHost(

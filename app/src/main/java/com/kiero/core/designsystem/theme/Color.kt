@@ -23,6 +23,8 @@ val Schedule4 = Color(0xFF34D9D3)
 val Schedule5 = Color(0xFF7BBDFF)
 val Point = Color(0xFFFF7BA2)
 
+val Yellow = Color(0xFFFAE100)
+
 @Immutable
 data class KieroColors(
     val white: Color = White,
@@ -45,6 +47,7 @@ data class KieroColors(
     val gray700: Color = Gray700,
     val gray800: Color = Gray800,
     val gray900: Color = Gray900,
+    val yellow: Color = Yellow,
 )
 
 val defaultKieroColors = KieroColors()

@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.component.MissionTabFab
+import com.kiero.presentation.parent.component.ParentFloatingButton
 import com.kiero.presentation.parent.component.ParentTabRow
 import com.kiero.presentation.parent.component.ParentUserSection
 import com.kiero.presentation.parent.component.PlanTabFab
@@ -64,32 +65,19 @@ private fun ParentScheduleScreen(
 
     Box(
         modifier = modifier
-            .fillMaxSize()
-            .padding(paddingValues),
-        containerColor = KieroTheme.colors.black,
-        floatingActionButton = {
-            ParentFloatingButton(
-                buttonColor = KieroTheme.colors.white,
-                onActiveClick = navigateToScheduleAdd,
-                modifier = Modifier
-                    .padding(bottom = 24.dp, end = 27.dp)
-            )
-        }
-    ) { innerPadding ->
+            .background(color = KieroTheme.colors.black)
+    ) {
         Spacer(
             modifier = Modifier
                 .background(color = KieroTheme.colors.gray900)
                 .height(33.dp)
         )
 
-            .background(color = KieroTheme.colors.black)
-    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-
             ParentUserSection(
                 userName = "근영맘",
                 onUserNameClick = {},
