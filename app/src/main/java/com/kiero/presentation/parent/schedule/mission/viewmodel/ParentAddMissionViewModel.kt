@@ -1,53 +1,75 @@
-package com.kiero.presentation.parent.schedule.mission
+package com.kiero.presentation.parent.schedule.mission.viewmodel
 
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.data.parent.repository.ParentMissionAddRepository
 import com.kiero.presentation.parent.schedule.mission.component.model.MissionAwardDefaults
+import com.kiero.presentation.parent.schedule.mission.component.model.ParentMissionAddValid
+import com.kiero.presentation.parent.schedule.mission.state.ParentAddMissionSideEffect
+import com.kiero.presentation.parent.schedule.mission.state.ParentAddMissionState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ParentAddMissionViewModel @Inject constructor() : ViewModel() {
+class ParentAddMissionViewModel @Inject constructor(
+    private val repository: ParentMissionAddRepository,
+) : ViewModel() {
 
     val missionNameState = TextFieldState()
     val awardTextFieldState = TextFieldState()
 
+    private val _state = MutableStateFlow(ParentAddMissionState())
+    val state = _state.asStateFlow()
+
+    private val _sideEffect = MutableSharedFlow<ParentAddMissionSideEffect>()
+    val sideEffect: SharedFlow<ParentAddMissionSideEffect> = _sideEffect.asSharedFlow()
+
     private val _showBottomSheet = MutableStateFlow(false)
-    val showBottomSheet: StateFlow<Boolean> = _showBottomSheet.asStateFlow()
+    val showBottomSheet = _showBottomSheet.asStateFlow()
 
     private val _currentAwardValue = MutableStateFlow(MissionAwardDefaults.DEFAULT_AWARD)
-    val currentAwardValue: StateFlow<Int> = _currentAwardValue.asStateFlow()
+    val currentAwardValue = _currentAwardValue.asStateFlow()
 
     private val _selectedDate = MutableStateFlow<String?>(null)
-    val selectedDate: StateFlow<String?> = _selectedDate.asStateFlow()
+    val selectedDate = _selectedDate.asStateFlow()
 
     init {
         observeAwardTextFieldChanges()
         observeCurrentAwardValueChanges()
+        observeMissionNameChanges()
     }
 
-    @OptIn(FlowPreview::class)
     private fun observeAwardTextFieldChanges() {
         viewModelScope.launch {
             snapshotFlow { awardTextFieldState.text.toString() }
-                .debounce(500)
                 .collect { text ->
                     if (text.isNotEmpty()) {
-                        val parsed = text.toIntOrNull() ?: MissionAwardDefaults.DEFAULT_AWARD
-                        val newValue = MissionAwardDefaults.constrainValue(parsed)
-                        if (newValue != _currentAwardValue.value) {
-                            _currentAwardValue.value = newValue
-                            if (parsed != newValue) {
-                                awardTextFieldState.setTextAndPlaceCursorAtEnd(newValue.toString())
+                        val parsed = text.toIntOrNull()
+
+                        if (parsed != null) {
+                            if (parsed > 500) {
+                                _sideEffect.emit(
+                                    ParentAddMissionSideEffect.ShowSnackbar(
+                                        ParentMissionAddValid.MAX.message
+                                    )
+                                )
+
+                            }
+
+                            val newValue = MissionAwardDefaults.constrainValue(parsed)
+                            if (newValue != _currentAwardValue.value) {
+                                _currentAwardValue.value = newValue
+                                _state.update { it.copy(reward = newValue) }
                             }
                         }
                     }
@@ -62,6 +84,15 @@ class ParentAddMissionViewModel @Inject constructor() : ViewModel() {
                     awardTextFieldState.setTextAndPlaceCursorAtEnd(value.toString())
                 }
             }
+        }
+    }
+
+    private fun observeMissionNameChanges() {
+        viewModelScope.launch {
+            snapshotFlow { missionNameState.text.toString() }
+                .collect { name ->
+                    _state.update { it.copy(missionName = name) }
+                }
         }
     }
 
@@ -80,6 +111,51 @@ class ParentAddMissionViewModel @Inject constructor() : ViewModel() {
 
     fun onDateSelected(date: String) {
         _selectedDate.value = date
+        _state.update { it.copy(selectedDate = date) }
         _showBottomSheet.value = false
+    }
+
+    fun setChildId(childId: Long) {
+        _state.update { it.copy(childId = childId) }
+    }
+
+    fun createMission() {
+        val currentState = _state.value
+
+        val validationError = when {
+            currentState.missionName.isBlank() -> ParentMissionAddValid.MISSION
+            _currentAwardValue.value <= 0 -> ParentMissionAddValid.AWARD
+            _currentAwardValue.value > 500 -> ParentMissionAddValid.MAX
+            else -> null
+        }
+
+        if (validationError != null) {
+            viewModelScope.launch {
+                _sideEffect.emit(ParentAddMissionSideEffect.ShowSnackbar(validationError.message))
+            }
+            return
+        }
+
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+
+            repository.postParentMission(
+                childId = currentState.childId!!,
+                name = currentState.missionName,
+                reward = currentState.reward,
+                dueAt = currentState.selectedDate!!
+            ).onSuccess { mission ->
+                _state.update { it.copy(isLoading = false) }
+                _sideEffect.emit(ParentAddMissionSideEffect.ShowSnackbar(message = "미션이 등록되었습니다."))
+                _sideEffect.emit(ParentAddMissionSideEffect.NavigateToMissionList(mission))
+            }.onFailure { error ->
+                _state.update { it.copy(isLoading = false) }
+                _sideEffect.emit(
+                    ParentAddMissionSideEffect.ShowSnackbar(
+                        error.message ?: "미션 생성에 실패했습니다."
+                    )
+                )
+            }
+        }
     }
 }
