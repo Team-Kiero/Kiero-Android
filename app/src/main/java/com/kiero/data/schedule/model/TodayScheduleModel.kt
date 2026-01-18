@@ -22,8 +22,7 @@ enum class ScheduleStatus {
     NEXT_SCHEDULE_EXIST,
     NOW_SCHEDULE_EXIST,
     FIRE_NOT_LIT,
-    FIRE_LIT,
-    UNKNOWN
+    FIRE_LIT
 }
 
 fun TodayScheduleResponseDto.toModel() = TodayScheduleModel(
