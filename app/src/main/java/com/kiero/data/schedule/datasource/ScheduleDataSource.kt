@@ -3,10 +3,10 @@ package com.kiero.data.schedule.datasource
 import com.kiero.core.network.model.BaseResponse
 import com.kiero.data.schedule.dto.response.ScheduleImageUploadResponseDto
 import com.kiero.data.schedule.dto.response.ScheduleSkipResponseDto
-import com.kiero.data.schedule.dto.response.TodayScheduleResponseDto
+import com.kiero.data.schedule.dto.response.ScheduleTodayResponseDto
 
 interface ScheduleDataSource {
-    suspend fun getTodaySchedule(): BaseResponse<TodayScheduleResponseDto>
+    suspend fun getTodaySchedule(): BaseResponse<ScheduleTodayResponseDto>
 
     suspend fun postPresignedUrl(
         fileName: String,

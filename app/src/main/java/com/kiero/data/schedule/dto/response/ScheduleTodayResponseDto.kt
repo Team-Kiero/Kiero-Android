@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class TodayScheduleResponseDto(
+data class ScheduleTodayResponseDto(
     @SerialName("scheduleDetailId")
     val scheduleDetailId: Long?,
     @SerialName("scheduleOrder")

@@ -7,13 +7,13 @@ import com.kiero.data.schedule.dto.request.ScheduleCompleteRequestDto
 import com.kiero.data.schedule.dto.request.ScheduleImageUploadRequestDto
 import com.kiero.data.schedule.dto.response.ScheduleImageUploadResponseDto
 import com.kiero.data.schedule.dto.response.ScheduleSkipResponseDto
-import com.kiero.data.schedule.dto.response.TodayScheduleResponseDto
+import com.kiero.data.schedule.dto.response.ScheduleTodayResponseDto
 import javax.inject.Inject
 
 class ScheduleDataSourceImpl @Inject constructor(
     private val service: ScheduleService
 ) : ScheduleDataSource {
-    override suspend fun getTodaySchedule(): BaseResponse<TodayScheduleResponseDto> =
+    override suspend fun getTodaySchedule(): BaseResponse<ScheduleTodayResponseDto> =
         service.getTodaySchedule()
 
     override suspend fun postPresignedUrl(
