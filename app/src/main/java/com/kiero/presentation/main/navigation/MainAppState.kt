@@ -12,6 +12,7 @@ import androidx.navigation.navOptions
 import com.kiero.core.network.monitor.NetworkMonitor
 import com.kiero.presentation.auth.navigation.AuthGraph
 import com.kiero.presentation.auth.navigation.navigateToAuth
+import com.kiero.presentation.auth.parent.navigation.navigateToAuthParent
 import com.kiero.presentation.kid.journey.camera.navigation.navigateToCamera
 import com.kiero.presentation.kid.journey.fire.navigation.navigateToFire
 import com.kiero.presentation.kid.journey.navigation.navigateToJourney
@@ -116,6 +117,12 @@ class MainAppState(
     fun navigateToParentGraph() = navController.navigate(ParentGraph) {
         popUpTo(AuthGraph) { inclusive = true }
     }
+
+    fun navigateToAuthParent(
+        navOptions: NavOptions? = null,
+    ) = navController.navigateToAuthParent(
+        navOptions = navOptions
+    )
 
     fun navigateToParentSignUp(
         parentName: String,

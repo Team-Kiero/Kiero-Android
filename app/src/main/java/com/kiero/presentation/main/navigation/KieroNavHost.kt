@@ -14,6 +14,7 @@ import com.kiero.presentation.kid.navigation.kidNavGraph
 import com.kiero.presentation.parent.navigation.parentNavGraph
 import com.kiero.presentation.signup.parent.navigation.parentSignUpNavGraph
 import com.kiero.presentation.splash.navigation.splashNavGraph
+import timber.log.Timber
 
 @Composable
 fun KieroNavHost(
@@ -34,6 +35,7 @@ fun KieroNavHost(
         splashNavGraph(
             navigateToAuth = appState::navigateToAuth,
             navigateToParentHome = {
+                Timber.e("navigateToParentHome")
                 val clearStackNavOptions = navOptions {
                     popUpTo(0) {
                         inclusive = true
@@ -46,6 +48,7 @@ fun KieroNavHost(
                 )
             },
             navigateToKidHome = {
+                Timber.e("navigateToKidHome")
                 val clearStackNavOptions = navOptions {
                     popUpTo(0) {
                         inclusive = true
@@ -55,8 +58,19 @@ fun KieroNavHost(
 
                 appState.navigateToJourney(clearStackNavOptions)
             },
-            navigateToParentGraph = appState::navigateToParentGraph,
+            navigateToParentGraph = {
+                Timber.e("navigateToAuthParent")
+                val clearStackNavOptions = navOptions {
+                    popUpTo(0) {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
+                }
+
+                appState.navigateToAuthParent(clearStackNavOptions)
+            },
             navigateToKidOnboarding = {
+                Timber.e("navigateToKidOnboarding")
                 val clearStackNavOptions = navOptions {
                     popUpTo(0) {
                         inclusive = true

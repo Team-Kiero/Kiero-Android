@@ -57,7 +57,7 @@ fun AuthScreen(
     paddingValues: PaddingValues,
     onClickAuth: (UserRole) -> Unit,
     modifier: Modifier = Modifier,
-    onEasterEggClick:() -> Unit = {},
+    onEasterEggClick: () -> Unit = {},
 ) {
     val logoPainter = painterResource(id = R.drawable.img_auth_app_logo)
 
@@ -71,21 +71,22 @@ fun AuthScreen(
     ) {
         Spacer(modifier = Modifier.weight(1f))
 
-        Image(
-            painter = logoPainter,
-            contentDescription = null,
-            modifier = Modifier.forcePixelToDp(logoPainter)
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
         Text(
             text = "아이의 하루가 모험이 되는 곳",
             style = KieroTheme.typography.regular.body1,
             color = KieroTheme.colors.schedule1,
             textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .noRippleClickable(onClick = onEasterEggClick)
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Image(
+            painter = logoPainter,
+            contentDescription = null,
+            modifier = Modifier.forcePixelToDp(logoPainter)
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -111,9 +112,9 @@ fun AuthScreen(
                     onClickAuth(UserRole.KID)
                 }
             )
-        }
 
-        Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(60.dp))
+        }
     }
 }
 
