@@ -1,6 +1,7 @@
 package com.kiero.presentation.parent.schedule.mission.auto
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -9,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -26,9 +29,16 @@ import com.kiero.R
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.component.button.KieroButtonMedium
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.presentation.parent.schedule.mission.auto.component.ParentAutoInputField
+import com.kiero.presentation.parent.schedule.mission.auto.component.ParentAutoMissionAwardInfo
+import com.kiero.presentation.parent.schedule.mission.auto.component.ParentAutoMissionAwardSelect
+import com.kiero.presentation.parent.schedule.mission.auto.component.ParentAutoMissionCalendar
 import com.kiero.presentation.parent.schedule.mission.auto.component.ParentLocalKieroSnackbar
-import com.kiero.presentation.parent.schedule.mission.auto.component.ParentMissionEditForm
 import com.kiero.presentation.parent.schedule.mission.auto.component.ParentMissionNavigator
+import com.kiero.presentation.parent.schedule.mission.component.datepicker.component.CalendarBottomSheet
+import com.kiero.presentation.parent.schedule.mission.component.missionadd.MissionAwardInfo
+import com.kiero.presentation.parent.schedule.mission.component.missionadd.MissionAwardSelect
+import com.kiero.presentation.parent.schedule.mission.component.missionmain.MissionCalendar
 import com.kiero.presentation.parent.schedule.mission.auto.viewmodel.AutoMissionViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -65,6 +75,8 @@ fun ParentAutoResultScreen(
     val missions by viewModel.missions.collectAsState()
     val currentIndex by viewModel.currentIndex.collectAsState()
     val isSaving by viewModel.isSaving.collectAsState()
+    val showBottomSheet by viewModel.showBottomSheet.collectAsState()
+    val selectedDate by viewModel.selectedDate.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
     val currentMission = missions.getOrNull(currentIndex)
@@ -114,19 +126,49 @@ fun ParentAutoResultScreen(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
+                .padding(horizontal = 16.dp)
         ) {
             currentMission?.let { mission ->
-                ParentMissionEditForm(
-                    missionName = mission.name,
-                    dueDate = mission.dueAt.format(DateTimeFormatter.ofPattern("yyyy.MM.dd.(E)")),
-                    reward = mission.reward,
-                    onNameChange = { viewModel.updateMissionName(it) },
-                    onDateClick = { /* TODO */ },
-                    onRewardChange = { viewModel.updateMissionReward(it) },
+                Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 16.dp)
-                )
+                        .background(
+                            color = KieroTheme.colors.gray900,
+                            shape = RoundedCornerShape(15.dp)
+                        )
+                        .padding(
+                            top = 12.dp,
+                            start = 14.dp,
+                            end = 14.dp,
+                            bottom = 12.dp
+                        ),
+                ) {
+                    ParentAutoInputField(
+                        text = mission.name,
+                        onTextChange = { viewModel.updateMissionName(it) },
+                        placeholder = "미션 이름을 입력해주세요.",
+                        maxLength = 15,
+                        singleLine = true
+                    )
+
+                    ParentAutoMissionCalendar(
+                        dateText = selectedDate ?: mission.dueAt.format(
+                            DateTimeFormatter.ofPattern(
+                                "yyyy.MM.dd.(E)"
+                            )
+                        ),
+                        onDateClick = { viewModel.onDateClick() }
+                    )
+
+                    ParentAutoMissionAwardInfo()
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    ParentAutoMissionAwardSelect(
+                        textFieldState = viewModel.awardTextFieldState,
+                        onAwardClick = { viewModel.updateMissionReward(it) }
+                    )
+                }
             }
 
             Box(
@@ -156,6 +198,13 @@ fun ParentAutoResultScreen(
         )
 
         Spacer(modifier = Modifier.height(28.dp))
+
+        if (showBottomSheet) {
+            CalendarBottomSheet(
+                onDismissRequest = { viewModel.onDismissBottomSheet() },
+                onDateSelected = { viewModel.onDateSelected(it) }
+            )
+        }
     }
 }
 
@@ -203,18 +252,44 @@ private fun ParentAutoResultScreen_WithSnackbarPreview() {
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
             ) {
-                ParentMissionEditForm(
-                    missionName = "수학 익힘책 풀기",
-                    dueDate = "2024.01.20.(월)",
-                    reward = 500,
-                    onNameChange = {},
-                    onDateClick = {},
-                    onRewardChange = {},
+                Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 16.dp)
-                )
+                        .background(
+                            color = KieroTheme.colors.gray900,
+                            shape = RoundedCornerShape(15.dp)
+                        )
+                        .padding(
+                            top = 12.dp,
+                            start = 14.dp,
+                            end = 14.dp,
+                            bottom = 12.dp
+                        ),
+                ) {
+                    ParentAutoInputField(
+                        text = "",
+                        onTextChange = {},
+                        placeholder = "미션 이름을 입력해주세요.",
+                        maxLength = 15,
+                        singleLine = true
+                    )
+
+                    ParentAutoMissionCalendar(
+                        dateText = "2024.01.20.(월)",
+                        onDateClick = {}
+                    )
+
+                    ParentAutoMissionAwardInfo()
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    ParentAutoMissionAwardSelect(
+                        textFieldState = TextFieldState(),
+                        onAwardClick = {}
+                    )
+                }
 
                 Box(
                     modifier = Modifier
@@ -225,6 +300,7 @@ private fun ParentAutoResultScreen_WithSnackbarPreview() {
                     SnackbarHost(hostState = snackbarHostState) { data ->
                         ParentLocalKieroSnackbar(
                             message = data.visuals.message,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }
