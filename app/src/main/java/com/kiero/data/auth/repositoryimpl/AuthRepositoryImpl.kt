@@ -1,10 +1,12 @@
 package com.kiero.data.auth.repositoryimpl
 
 import android.content.Context
-import com.kiero.core.common.extension.toHandleErrorMessage
 import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.core.localstorage.TokenManager
+import com.kiero.data.auth.model.AuthKidModel
+import com.kiero.data.auth.model.AuthKidResponseModel
 import com.kiero.data.auth.model.ChildrenModel
+import com.kiero.data.auth.model.toDto
 import com.kiero.data.auth.model.toModel
 import com.kiero.data.auth.remote.datasource.AuthDataSource
 import com.kiero.data.auth.remote.dto.response.AuthLoginResponseDto
@@ -31,9 +33,6 @@ class AuthRepositoryImpl @Inject constructor(
         )
 
         loginResponse
-    }.onFailure { throwable ->
-        Timber.e(throwable, "❌ 로그인 과정 중 에러 발생")
-        throw Exception(throwable.toHandleErrorMessage())
     }
 
     override suspend fun saveAuthTokens(accessToken: String, refreshToken: String) = suspendRunCatching {
@@ -48,4 +47,12 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun getChildren(): Result<List<ChildrenModel>> = suspendRunCatching {
         authRemoteDataSource.getChildren().data!!.map { it.toModel() }
     }
+
+    override suspend fun postAuthKidLogin(request: AuthKidModel): Result<AuthKidResponseModel> = suspendRunCatching {
+        authRemoteDataSource.postAuthKidLogin(
+            authKidRequestDto = request.toDto()
+        ).data!!.toModel()
+    }
+
+
 }

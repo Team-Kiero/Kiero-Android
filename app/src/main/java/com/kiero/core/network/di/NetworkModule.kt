@@ -106,4 +106,27 @@ object NetworkModule {
         .addConverterFactory(converterFactory)
         .client(client)
         .build()
+
+    @Provides
+    @Singleton
+    @KidRefreshNetwork
+    fun providesKidRefreshOkHttpClient(
+        loggingInterceptor: HttpLoggingInterceptor
+    ): OkHttpClient = OkHttpClient.Builder()
+        .connectTimeout(10, TimeUnit.SECONDS)
+        .readTimeout(10, TimeUnit.SECONDS)
+        .addInterceptor(loggingInterceptor)
+        .build()
+
+    @Provides
+    @Singleton
+    @KidRefreshNetwork
+    fun providesKidRefreshRetrofit(
+        @KidRefreshNetwork client: OkHttpClient,
+        converterFactory: Converter.Factory,
+    ): Retrofit = Retrofit.Builder()
+        .baseUrl(BuildConfig.BASE_URL)
+        .addConverterFactory(converterFactory)
+        .client(client)
+        .build()
 }

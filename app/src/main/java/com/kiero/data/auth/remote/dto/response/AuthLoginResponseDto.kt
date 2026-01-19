@@ -5,13 +5,11 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class AuthLoginResponseDto(
-    @SerialName("name")
-    val name: String,
-    @SerialName("email")
-    val email: String,
-    @SerialName("image")
-    val image: String,
+data class AuthKidResponseDto(
+    @SerialName("lastName")
+    val lastName: String,
+    @SerialName("firstName")
+    val firstName: String,
     @SerialName("role")
     val role: String,
     @SerialName("accessToken")

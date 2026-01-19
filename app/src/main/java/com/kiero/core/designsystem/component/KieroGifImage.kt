@@ -1,5 +1,6 @@
 package com.kiero.core.designsystem.component
 
+import android.graphics.Bitmap
 import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -18,6 +19,8 @@ fun KieroGifImage(
     val imageRequest = remember(drawableId) {
         ImageRequest.Builder(context)
             .data(drawableId)
+            .bitmapConfig(Bitmap.Config.ARGB_8888)
+            .allowHardware(false)
             .build()
     }
 

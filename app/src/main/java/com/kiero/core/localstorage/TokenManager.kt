@@ -1,5 +1,7 @@
 package com.kiero.core.localstorage
 
+import com.kiero.core.model.auth.UserRole
+
 interface TokenManager {
     suspend fun saveAccessToken(token: String)
     suspend fun saveRefreshToken(token: String)
@@ -7,4 +9,7 @@ interface TokenManager {
     suspend fun getAccessToken(): String?
     suspend fun getRefreshToken(): String?
     suspend fun clearTokens()
+
+    suspend fun saveUserRole(role: UserRole)
+    suspend fun getUserRole(): UserRole?
 }
