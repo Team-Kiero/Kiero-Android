@@ -22,29 +22,32 @@ import com.kiero.core.designsystem.theme.KieroTheme
 fun ParentAutoInputField(
     text: String,
     onTextChange: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    placeholder: String = "알림장 내용을 입력하세요.",
+    maxLength: Int = 1000,
+    maxLines: Int = Int.MAX_VALUE,
+    singleLine: Boolean = false
 ) {
     val focusManager = LocalFocusManager.current
 
     TextField(
         value = text,
         onValueChange = { newText ->
-            if (newText.length <= 1000) {
+            if (newText.length <= maxLength) {
                 onTextChange(newText)
             }
         },
         placeholder = {
             Text(
-                text = "알림장 내용을 입력하세요.",
-                style = KieroTheme.typography.regular.body3,
+                text = placeholder,
+                style = KieroTheme.typography.regular.body1,
                 color = KieroTheme.colors.gray400
             )
         },
         modifier = modifier.fillMaxWidth(),
-        textStyle = KieroTheme.typography.regular.body3.copy(
+        textStyle = KieroTheme.typography.regular.body1.copy(
             color = KieroTheme.colors.gray400
         ),
-
         colors = TextFieldDefaults.colors(
             focusedContainerColor = KieroTheme.colors.gray900,
             unfocusedContainerColor = KieroTheme.colors.gray900,
@@ -55,7 +58,8 @@ fun ParentAutoInputField(
             cursorColor = KieroTheme.colors.white
         ),
         shape = RoundedCornerShape(15.dp),
-        maxLines = Int.MAX_VALUE,
+        maxLines = maxLines,
+        singleLine = singleLine,
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Done
         ),
@@ -96,6 +100,26 @@ private fun ParentAutoInputFieldWithTextPreview() {
             ParentAutoInputField(
                 text = "내일은 독서록을 가져오세요. 수학 익힘책 30쪽까지 풀어오세요.",
                 onTextChange = {}
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun ParentAutoInputFieldMissionNamePreview() {
+    KieroTheme {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            ParentAutoInputField(
+                text = "독서록 챙기기",
+                onTextChange = {},
+                placeholder = "미션 이름을 입력해주세요.",
+                maxLength = 15,
+                singleLine = true
             )
         }
     }
