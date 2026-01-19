@@ -6,6 +6,7 @@ import com.kiero.data.schedule.datasource.ScheduleDataSource
 import com.kiero.data.schedule.dto.request.ScheduleCompleteRequestDto
 import com.kiero.data.schedule.dto.request.ScheduleImageUploadRequestDto
 import com.kiero.data.schedule.dto.response.ScheduleImageUploadResponseDto
+import com.kiero.data.schedule.dto.response.ScheduleSkipResponseDto
 import com.kiero.data.schedule.dto.response.TodayScheduleResponseDto
 import javax.inject.Inject
 
@@ -36,4 +37,9 @@ class ScheduleDataSourceImpl @Inject constructor(
                 imageUrl = imageUrl
             )
         )
+
+    override suspend fun patchScheduleSkip(
+        scheduleDetailId: Long
+    ): BaseResponse<ScheduleSkipResponseDto> =
+        service.patchScheduleSkip(scheduleDetailId)
 }

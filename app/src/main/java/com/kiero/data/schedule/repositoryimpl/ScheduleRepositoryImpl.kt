@@ -34,4 +34,12 @@ class ScheduleRepositoryImpl @Inject constructor(
             imageUrl = imageUrl
         ).data!!
     }
+
+    override suspend fun patchScheduleSkip(
+        scheduleDetailId: Long
+    ): Result<Long> = suspendRunCatching {
+        dataSource.patchScheduleSkip(
+            scheduleDetailId = scheduleDetailId
+        ).data!!.scheduleDetailId
+    }
 }

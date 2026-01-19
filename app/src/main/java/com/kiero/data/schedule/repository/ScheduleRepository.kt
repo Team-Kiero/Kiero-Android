@@ -15,4 +15,8 @@ interface ScheduleRepository {
         scheduleDetailId: Long,
         imageUrl: String
     ): Result<Unit>
+
+    suspend fun patchScheduleSkip(
+        scheduleDetailId: Long
+    ): Result<Long>
 }

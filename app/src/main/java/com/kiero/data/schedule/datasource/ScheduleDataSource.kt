@@ -2,6 +2,7 @@ package com.kiero.data.schedule.datasource
 
 import com.kiero.core.network.model.BaseResponse
 import com.kiero.data.schedule.dto.response.ScheduleImageUploadResponseDto
+import com.kiero.data.schedule.dto.response.ScheduleSkipResponseDto
 import com.kiero.data.schedule.dto.response.TodayScheduleResponseDto
 
 interface ScheduleDataSource {
@@ -16,4 +17,8 @@ interface ScheduleDataSource {
         scheduleDetailId: Long,
         imageUrl: String
     ): BaseResponse<Unit>
+
+    suspend fun patchScheduleSkip(
+        scheduleDetailId: Long
+    ): BaseResponse<ScheduleSkipResponseDto>
 }

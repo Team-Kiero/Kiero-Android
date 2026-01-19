@@ -4,6 +4,7 @@ import com.kiero.core.network.model.BaseResponse
 import com.kiero.data.schedule.dto.request.ScheduleCompleteRequestDto
 import com.kiero.data.schedule.dto.request.ScheduleImageUploadRequestDto
 import com.kiero.data.schedule.dto.response.ScheduleImageUploadResponseDto
+import com.kiero.data.schedule.dto.response.ScheduleSkipResponseDto
 import com.kiero.data.schedule.dto.response.TodayScheduleResponseDto
 import retrofit2.http.Body
 import retrofit2.http.PATCH
@@ -24,4 +25,9 @@ interface ScheduleService {
         @Path("scheduleDetailId") scheduleDetailId: Long,
         @Body request: ScheduleCompleteRequestDto
     ): BaseResponse<Unit>
+
+    @PATCH("/api/v1/schedules/skip/{scheduleDetailId}")
+    suspend fun patchScheduleSkip(
+        @Path("scheduleDetailId") scheduleDetailId: Long
+    ): BaseResponse<ScheduleSkipResponseDto>
 }
