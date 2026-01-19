@@ -15,22 +15,22 @@ class ScheduleDataSourceImpl @Inject constructor(
     override suspend fun getTodaySchedule(): BaseResponse<TodayScheduleResponseDto> =
         service.getTodaySchedule()
 
-    override suspend fun getPresignedUrl(
+    override suspend fun postPresignedUrl(
         fileName: String,
         contentType: String
     ): BaseResponse<ScheduleImageUploadResponseDto> =
-        service.getPresignedUrl(
+        service.postPresignedUrl(
             request = ScheduleImageUploadRequestDto(
                 fileName = fileName,
                 contentType = contentType
             )
         )
 
-    override suspend fun postScheduleComplete(
+    override suspend fun patchScheduleComplete(
         scheduleDetailId: Long,
         imageUrl: String
     ): BaseResponse<Unit> =
-        service.postScheduleComplete(
+        service.patchScheduleComplete(
             scheduleDetailId = scheduleDetailId,
             request = ScheduleCompleteRequestDto(
                 imageUrl = imageUrl

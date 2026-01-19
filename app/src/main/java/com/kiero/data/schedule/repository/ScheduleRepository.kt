@@ -6,12 +6,12 @@ import com.kiero.data.schedule.model.TodayScheduleModel
 interface ScheduleRepository {
     suspend fun getTodaySchedule(): Result<TodayScheduleModel>
 
-    suspend fun getPresignedUrl(
+    suspend fun postPresignedUrl(
         fileName: String,
         contentType: String
     ): Result<ScheduleImageUploadModel>
 
-    suspend fun postScheduleComplete(
+    suspend fun patchScheduleComplete(
         scheduleDetailId: Long,
         imageUrl: String
     ): Result<Unit>

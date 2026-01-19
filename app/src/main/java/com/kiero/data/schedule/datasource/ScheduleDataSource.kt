@@ -7,12 +7,12 @@ import com.kiero.data.schedule.dto.response.TodayScheduleResponseDto
 interface ScheduleDataSource {
     suspend fun getTodaySchedule(): BaseResponse<TodayScheduleResponseDto>
 
-    suspend fun getPresignedUrl(
+    suspend fun postPresignedUrl(
         fileName: String,
         contentType: String
     ): BaseResponse<ScheduleImageUploadResponseDto>
 
-    suspend fun postScheduleComplete(
+    suspend fun patchScheduleComplete(
         scheduleDetailId: Long,
         imageUrl: String
     ): BaseResponse<Unit>

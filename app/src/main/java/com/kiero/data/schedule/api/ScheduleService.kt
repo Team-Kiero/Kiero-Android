@@ -15,12 +15,12 @@ interface ScheduleService {
     suspend fun getTodaySchedule(): BaseResponse<TodayScheduleResponseDto>
 
     @POST("api/v1/schedule/presigned-url")
-    suspend fun getPresignedUrl(
+    suspend fun postPresignedUrl(
         @Body request: ScheduleImageUploadRequestDto
     ): BaseResponse<ScheduleImageUploadResponseDto>
 
-    @POST("api/v1/schedule/complete/{scheduleDetailId}")
-    suspend fun postScheduleComplete(
+    @PATCH("/api/v1/schedules/{scheduleDetailId}")
+    suspend fun patchScheduleComplete(
         @Path("scheduleDetailId") scheduleDetailId: Long,
         @Body request: ScheduleCompleteRequestDto
     ): BaseResponse<Unit>

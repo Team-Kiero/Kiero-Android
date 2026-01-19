@@ -15,21 +15,21 @@ class ScheduleRepositoryImpl @Inject constructor(
         dataSource.getTodaySchedule().data!!.toModel()
     }
 
-    override suspend fun getPresignedUrl(
+    override suspend fun postPresignedUrl(
         fileName: String,
         contentType: String
     ): Result<ScheduleImageUploadModel> = suspendRunCatching {
-        dataSource.getPresignedUrl(
+        dataSource.postPresignedUrl(
             fileName = fileName,
             contentType = contentType
         ).data!!.toModel()
     }
 
-    override suspend fun postScheduleComplete(
+    override suspend fun patchScheduleComplete(
         scheduleDetailId: Long,
         imageUrl: String
     ): Result<Unit> = suspendRunCatching {
-        dataSource.postScheduleComplete(
+        dataSource.patchScheduleComplete(
             scheduleDetailId = scheduleDetailId,
             imageUrl = imageUrl
         ).data!!
