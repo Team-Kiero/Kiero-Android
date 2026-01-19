@@ -38,6 +38,7 @@ import com.kiero.R
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.kid.component.KidSpeechField
 import com.kiero.presentation.kid.journey.camera.component.StoneFloating
+import kotlinx.coroutines.delay
 import java.io.File
 
 @Composable
@@ -80,6 +81,13 @@ private fun KidCameraScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    LaunchedEffect(imageUri) {
+        if (imageUri != null) {
+            delay(4000)
+            onBackClick()
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
