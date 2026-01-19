@@ -1,35 +1,63 @@
 package com.kiero.presentation.parent.schedule.mission.component.model
 
+import androidx.compose.runtime.Immutable
+import com.kiero.data.mission.model.MissionByDateModel
+import com.kiero.data.mission.model.MissionListModel
+import com.kiero.data.mission.model.MissionModel
+import com.kiero.presentation.kid.mission.util.createDateTitle
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 
 
-data class MissionData(
-    val missionsByDate: List<MissionsByDate>,
+enum class ParentMissionAddValid(
+    val message: String,
+){
+    MISSION(
+        message ="미션 이름을 입력해주세요"
+    ),
+    AWARD(
+        message = "보상을 입력해주세요"
+    ),
+    MAX(
+        message = "최대 보상은 500개입니다."
+    )
+}
+@Immutable
+data class ParentMissionByDateUiModel(
+    val missionsByDate: ImmutableList<ParentMissionListUiModel> = persistentListOf(),
 )
 
-data class MissionsByDate(
+@Immutable
+data class ParentMissionListUiModel(
     val dueAt: String,
     val dayOfWeek: String,
-    val missions: List<Mission>,
+    val title: String,
+    val missions: ImmutableList<ParentMissionUiModel>,
+)
 
-    ) {
-    companion object {
-        val fakeMissionEvent = persistentListOf(
-            MissionsByDate(
-                dueAt = "2026-01-15",
-                dayOfWeek = "목요일",
-                missions = listOf(
-                    Mission(1, "장보기", 50, false),
-                    Mission(2, "설거지하기", 50, true)
-                )
-            )
-        )
-    }
-}
-
-data class Mission(
+@Immutable
+data class ParentMissionUiModel(
     val id: Long,
+    val isCompleted: Boolean,
     val name: String,
     val reward: Int,
-    val isCompleted: Boolean,
+)
+
+fun MissionByDateModel.toUiModel() = ParentMissionByDateUiModel(
+    missionsByDate = this.missionsByDate.map { it.toUiModel() }.toImmutableList()
+)
+
+fun MissionListModel.toUiModel() = ParentMissionListUiModel(
+    dueAt = this.dueAt,
+    dayOfWeek = this.dayOfWeek,
+    missions = this.missions.map { it.toUiModel() }.toImmutableList(),
+    title = createDateTitle(this.dueAt, this.dayOfWeek),
+)
+
+fun MissionModel.toUiModel() = ParentMissionUiModel(
+    id = this.id,
+    isCompleted = this.isCompleted,
+    name = this.name,
+    reward = this.reward
 )

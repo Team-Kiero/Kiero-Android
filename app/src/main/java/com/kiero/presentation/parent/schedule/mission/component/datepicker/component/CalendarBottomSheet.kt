@@ -1,9 +1,7 @@
 package com.kiero.presentation.parent.schedule.mission.component.datepicker.component
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -22,12 +20,14 @@ import com.kiero.presentation.parent.schedule.mission.component.datepicker.model
 import com.kiero.presentation.parent.schedule.plan.component.picker.PickerTopbar
 import java.time.LocalDate
 import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarBottomSheet(
     modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit,
+    onDateSelected: (String) -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState()
     var yearMonth by remember { mutableStateOf(YearMonth.now()) }
@@ -38,37 +38,38 @@ fun CalendarBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
         containerColor = KieroTheme.colors.gray900,
-        dragHandle = null
+        dragHandle = null,
     ) {
         Column(
             modifier = modifier
                 .fillMaxWidth()
-                .padding(vertical = 10.dp, horizontal = 30.dp)
+                .padding(vertical = 20.dp, horizontal = 30.dp)
+                .padding(bottom = 32.dp)
         ) {
             PickerTopbar(
                 title = "마감일",
                 leftIconRes = R.drawable.ic_close_light,
                 leftIconClick = onDismissRequest,
                 rightIconRes = R.drawable.ic_check,
-                rightIconClick = {}
+                rightIconClick = {
+                    selectedDate?.let { date ->
+                        val formattedDate = date.format(DateTimeFormatter.ISO_LOCAL_DATE)
+                        onDateSelected(formattedDate)
+                    }
+                }
             )
 
             KieroCalendar(
                 yearMonth = yearMonth,
                 selectedDate = selectedDate,
                 displayMode = CalendarDisplayMode.Normal(
-                    procedureCountByDate = mapOf(
-                        today.minusDays(2) to 3,
-                        today to 1,
-                        today.plusDays(10) to 2
-                    )
+                    procedureCountByDate = emptyMap()
                 ),
                 onDateClick = { selectedDate = it },
                 onMonthChange = { yearMonth = it },
                 modifier = Modifier.padding(vertical = 8.dp)
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
@@ -77,6 +78,9 @@ fun CalendarBottomSheet(
 @Composable
 private fun PreviewCalendarBottomSheet() {
     KieroTheme {
-        CalendarBottomSheet(onDismissRequest = {})
+        CalendarBottomSheet(
+            onDismissRequest = {},
+            onDateSelected = {}
+        )
     }
 }

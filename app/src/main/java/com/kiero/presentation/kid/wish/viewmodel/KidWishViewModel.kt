@@ -26,6 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class KidWishViewModel @Inject constructor(
     private val repository: CoinRepository,
+    private val missionRepository: MissionRepository,
     private val wishRepository: WishRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow<UiState<KidWishState>>(UiState.Loading)

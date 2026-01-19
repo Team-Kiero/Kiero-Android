@@ -64,7 +64,6 @@ fun ColorPickerBottomSheet(
             ColorPicker(
                 selectedColor = selectedColor,
                 onColorSelected = onColorSelected,
-                modifier = Modifier.padding(horizontal = 16.dp)
             )
 
             Spacer(modifier = Modifier.height(125.dp))
@@ -81,7 +80,7 @@ fun ColorPicker(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 46.dp),
+            .padding(horizontal = 30.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         ColorType.entries.forEach { colorType ->
