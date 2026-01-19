@@ -21,6 +21,7 @@ import com.kiero.R
 
 @Composable
 fun StoneFloating(
+    stoneImageRes: Int,
     modifier: Modifier = Modifier
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "floating")
@@ -40,7 +41,7 @@ fun StoneFloating(
     )
 
     Image(
-        painter = painterResource(id = R.drawable.img_kid_journey_stone_blue),
+        painter = painterResource(id = stoneImageRes),
         contentDescription = null,
         contentScale = ContentScale.Crop,
         modifier = modifier
@@ -55,5 +56,7 @@ fun StoneFloating(
 @Preview
 @Composable
 private fun StoneFloatingPreview() {
-    StoneFloating()
+    StoneFloating(
+        stoneImageRes = R.drawable.img_kid_journey_stone_blue
+    )
 }

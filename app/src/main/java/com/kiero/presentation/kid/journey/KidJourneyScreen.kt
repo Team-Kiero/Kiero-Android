@@ -52,6 +52,7 @@ import com.kiero.presentation.kid.journey.model.KidJourneyButtonType
 import com.kiero.presentation.kid.journey.model.KidJourneyContentUiModel
 import com.kiero.presentation.kid.journey.model.KidJourneyHeaderUiModel
 import com.kiero.presentation.kid.journey.model.KidJourneyScheduleUiModel
+import com.kiero.presentation.kid.journey.model.StoneUiType
 import com.kiero.presentation.kid.journey.state.KidJourneySideEffect
 import com.kiero.presentation.kid.journey.state.KidJourneyState
 import com.kiero.presentation.kid.journey.util.KidJourneyContentUtil
@@ -61,7 +62,7 @@ import com.kiero.presentation.kid.journey.viewmodel.KidJourneyViewModel
 fun KidJourneyRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
-    navigateToCamera: () -> Unit,
+    navigateToCamera: (Long, StoneUiType) -> Unit,
     navigateToFire: () -> Unit,
     viewModel: KidJourneyViewModel = hiltViewModel()
 ) {
@@ -84,11 +85,29 @@ fun KidJourneyRoute(
         }
     }
 
+    val onNavigateToCamera = {
+        val content = state.content
+        when (content) {
+            is KidJourneyContentUiModel.FirstSchedule -> {
+                navigateToCamera(content.scheduleDetailId!!, content.stoneType!!)
+            }
+            is KidJourneyContentUiModel.NowSchedule -> {
+                navigateToCamera(content.scheduleDetailId!!, content.stoneType!!)
+            }
+            is KidJourneyContentUiModel.NextSchedule -> {
+                navigateToCamera(content.scheduleDetailId!!, content.stoneType!!)
+            }
+            else -> {
+                // 데이터가 없는 상태에서 호출된 경우
+            }
+        }
+    }
+
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            navigateToCamera()
+            onNavigateToCamera()
         }
     }
 
@@ -104,7 +123,7 @@ fun KidJourneyRoute(
                     ) == PackageManager.PERMISSION_GRANTED
 
                     if (hasPermission) {
-                        navigateToCamera()
+                        onNavigateToCamera()
                     } else {
                         permissionLauncher.launch(Manifest.permission.CAMERA)
                     }
@@ -251,7 +270,7 @@ private fun KidJourneyScreenPreview() {
                 content = KidJourneyContentUiModel.NowSchedule(
                     scheduleDetailId = 1,
                     scheduleName = "피아노 학원 가기",
-                    stoneType = "용기의 불조각",
+                    stoneType = StoneUiType.WISDOM,
                     scheduleInfo = KidJourneyScheduleUiModel(
                         order = 4,
                         startTime = "14:00:00",

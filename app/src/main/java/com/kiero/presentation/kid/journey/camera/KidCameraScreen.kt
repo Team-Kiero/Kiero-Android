@@ -33,20 +33,26 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.kiero.R
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.kid.component.KidSpeechField
 import com.kiero.presentation.kid.journey.camera.component.StoneFloating
+import com.kiero.presentation.kid.journey.camera.viewModel.KidCameraViewModel
+import com.kiero.presentation.kid.journey.model.StoneUiType
 import kotlinx.coroutines.delay
 import java.io.File
 
 @Composable
 fun KidCameraRoute(
     navigateUp: () -> Unit,
+    viewModel: KidCameraViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     var imageUri by remember { mutableStateOf<Uri?>(null) }
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     val tempUri = remember {
         val directory = File(context.cacheDir, "images")
@@ -71,6 +77,7 @@ fun KidCameraRoute(
 
     KidCameraScreen(
         imageUri = imageUri,
+        stoneType = state.stoneType,
         onBackClick = navigateUp
     )
 }
@@ -78,6 +85,7 @@ fun KidCameraRoute(
 @Composable
 private fun KidCameraScreen(
     imageUri: Uri?,
+    stoneType: StoneUiType,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -114,7 +122,7 @@ private fun KidCameraScreen(
                     text = buildAnnotatedString {
                         append("우와! ")
                         withStyle(style = SpanStyle(color = KieroTheme.colors.main)) {
-                            append("용기의 불조각")
+                            append(stoneType.text)
                         }
                         append(" 을 손에 넣었어!")
                     },
@@ -128,7 +136,7 @@ private fun KidCameraScreen(
                     .align(Alignment.BottomCenter),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                StoneFloating()
+                StoneFloating(stoneImageRes = stoneType.imageRes)
 
                 Spacer(modifier = Modifier.height(19.dp))
 
@@ -153,6 +161,7 @@ private fun KidCameraScreenPreview() {
     KieroTheme {
         KidCameraScreen(
             imageUri = null,
+            stoneType = StoneUiType.COURAGE,
             onBackClick = {}
         )
     }

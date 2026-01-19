@@ -6,6 +6,7 @@ import com.kiero.presentation.kid.journey.model.KidJourneyButtonType
 import com.kiero.presentation.kid.journey.model.KidJourneyContentUiModel
 import com.kiero.presentation.kid.journey.model.KidJourneyHeaderUiModel
 import com.kiero.presentation.kid.journey.model.KidJourneyScheduleUiModel
+import com.kiero.presentation.kid.journey.model.StoneUiType
 
 @Immutable
 data class KidJourneyState(
@@ -60,10 +61,10 @@ data class KidJourneyState(
                 earnedStones = 7,
                 totalScheduleCount = 7
             ),
-            content = KidJourneyContentUiModel.NextSchedule(
+            content = KidJourneyContentUiModel.NowSchedule(
                 scheduleDetailId = 1,
                 scheduleName = "피아노 학원 가기",
-                stoneType = "용기의 불조각",
+                stoneType = StoneUiType.WISDOM,
                 scheduleInfo = KidJourneyScheduleUiModel(
                     order = 1,
                     startTime = "14:00:00",

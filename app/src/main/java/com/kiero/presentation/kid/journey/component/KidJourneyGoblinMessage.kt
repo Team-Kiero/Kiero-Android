@@ -10,6 +10,7 @@ import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.kid.component.KidSpeechField
 import com.kiero.presentation.kid.journey.model.KidJourneyContentUiModel
 import com.kiero.presentation.kid.journey.model.KidJourneyScheduleUiModel
+import com.kiero.presentation.kid.journey.model.StoneUiType
 
 @Composable
 fun KidJourneyGoblinMessage(
@@ -71,7 +72,7 @@ fun KidJourneyGoblinMessage(
                 text = buildAnnotatedString {
                     append("여정을 진행하면 ")
                     withStyle(SpanStyle(color = mainColor)) {
-                        append(content.stoneType)
+                        append(content.stoneType?.text)
                     }
                     append(" 을 줄게.")
                 },
@@ -97,7 +98,7 @@ fun KidJourneyGoblinMessage(
                 text = buildAnnotatedString {
                     append("다음 여정을 진행하면 ")
                     withStyle(SpanStyle(color = mainColor)) {
-                        append(content.stoneType)
+                        append(content.stoneType?.text)
                     }
                     append(" 을 줄게.")
                 },
@@ -153,7 +154,7 @@ private fun KidJourneyGoblinMessagePreview() {
                 content = KidJourneyContentUiModel.NowSchedule(
                     scheduleDetailId = 1,
                     scheduleName = "피아노 학원 가기",
-                    stoneType = "용기의 불조각",
+                    stoneType = StoneUiType.WISDOM,
                     scheduleInfo = KidJourneyScheduleUiModel(
                         order = 4,
                         startTime = "14:00:00",
