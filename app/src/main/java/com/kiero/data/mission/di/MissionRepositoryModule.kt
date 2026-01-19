@@ -1,6 +1,8 @@
 package com.kiero.data.mission.di
 
+import com.kiero.data.mission.repository.AutoMissionRepository
 import com.kiero.data.mission.repository.MissionRepository
+import com.kiero.data.mission.repositoryimpl.AutoMissionRepositoryImpl
 import com.kiero.data.mission.repositoryimpl.MissionRepositoryImpl
 import dagger.Binds
 import dagger.Module
@@ -18,4 +20,9 @@ interface MissionRepositoryModule {
         missionRepositoryImpl: MissionRepositoryImpl
     ): MissionRepository
 
+    @Binds
+    @Singleton
+    fun bindAutoMissionRepository(
+        autoMissionRepositoryImpl: AutoMissionRepositoryImpl
+    ): AutoMissionRepository
 }
