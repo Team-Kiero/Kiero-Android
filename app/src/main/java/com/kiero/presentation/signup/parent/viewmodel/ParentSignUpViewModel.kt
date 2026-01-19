@@ -130,6 +130,11 @@ class ParentSignUpViewModel @Inject constructor(
                 startTimer()
             }.onFailure {
                 _sideEffect.emit(ParentSignUpSideEffect.ShowSnackbar(it.toHandleErrorMessage()))
+                _state.update { currentState ->
+                    currentState.copy(
+                        isLoading = false
+                    )
+                }
             }
         }
     }

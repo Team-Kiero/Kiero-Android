@@ -200,12 +200,14 @@ fun MainScreen(
             ) { paddingValues ->
                 if (dialogState.dialogState.isVisible) {
                     KieroDialog(
-                        title = "인터넷 연결 확인해주세요!",
+                        title = "인터넷 연결을 확인해주세요!",
                         confirmAction = KieroConfirmAction(
-                            text = "확인",
+                            text = "재시도",
                             onClick = {
                                 if (!isOffline) {
                                     dialogState.dismissDialog()
+                                } else {
+                                    onShowToast("네트워크가 아직 연결되지 않았습니다.")
                                 }
                             }
                         ),
