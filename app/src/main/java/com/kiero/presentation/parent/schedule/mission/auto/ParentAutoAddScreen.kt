@@ -2,26 +2,13 @@ package com.kiero.presentation.parent.schedule.mission.auto
 
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kiero.R
@@ -29,68 +16,115 @@ import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.component.button.KieroButtonMedium
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.schedule.mission.auto.component.ParentAutoInputField
-import com.kiero.presentation.parent.schedule.mission.auto.state.AutoMissionContract
-import com.kiero.presentation.parent.schedule.mission.auto.state.AutoMissionEvent
-import com.kiero.presentation.parent.schedule.mission.auto.state.AutoMissionSideEffect
 import com.kiero.presentation.parent.schedule.mission.auto.viewmodel.AutoMissionViewModel
 
-// Todo : 네비게이션 연결
+//@Composable
+//fun ParentAutoAddRoute(
+//    paddingValues: PaddingValues,
+//    navigateUp: () -> Unit,
+//    childId: Long,
+//    viewModel: AutoMissionViewModel = hiltViewModel()
+//) {
+//    val noticeText by viewModel.noticeText.collectAsState()
+//    val isAnalyzing by viewModel.isAnalyzing.collectAsState()
+//    val missions by viewModel.missions.collectAsState()
+//
+//    val context = LocalContext.current
+//
+//    LaunchedEffect(Unit) {
+//        viewModel.toastMessage.collect { message ->
+//            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+//        }
+//    }
+//
+//    LaunchedEffect(Unit) {
+//        viewModel.shouldNavigateBack.collect {
+//            navigateUp()
+//        }
+//    }
+//
+//    when {
+//        isAnalyzing -> ParentAutoLoadingScreen(paddingValues = paddingValues)
+//
+//        missions.isNotEmpty() -> ParentAutoResultScreen(
+//            paddingValues = paddingValues,
+//            viewModel = viewModel,
+//            childId = childId,
+//            navigateUp = navigateUp
+//        )
+//
+//        else -> ParentAutoAddScreen(
+//            paddingValues = paddingValues,
+//            navigateUp = { viewModel.handleCancel() },
+//            noticeText = noticeText,
+//            isAnalyzeEnabled = noticeText.length >= 10,
+//            onTextChange = { viewModel.updateNoticeText(it) },
+//            onAnalyzeClick = { viewModel.analyzeNotice() }
+//        )
+//    }
+//}
+
 @Composable
 fun ParentAutoAddRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
+    childId: Long,
+    viewModel: AutoMissionViewModel = hiltViewModel()
 ) {
-    val viewModel: AutoMissionViewModel = hiltViewModel()
-    val state by viewModel.state.collectAsState()
-    val context = LocalContext.current
+    val noticeText by viewModel.noticeText.collectAsState()
+    val isAnalyzing by viewModel.isAnalyzing.collectAsState()
+    val missions by viewModel.missions.collectAsState()
+
+    // 1. 스낵바 상태 생성 (여기서 만듦)
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // State 기반 화면 이동
-    LaunchedEffect(state.shouldNavigateBack) {
-        if (state.shouldNavigateBack) {
+    // 2. Toast 대신 스낵바를 띄우도록 수정
+    LaunchedEffect(Unit) {
+        viewModel.toastMessage.collect { message ->
+            // 기존: Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            // 변경: 스낵바 상태에 메시지 전달
+            snackbarHostState.showSnackbar(message)
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.shouldNavigateBack.collect {
             navigateUp()
         }
     }
 
-    // SideEffect 처리 (Toast, ScrollToPage)
-    LaunchedEffect(Unit) {
-        viewModel.sideEffect.collect { effect ->
-            when (effect) {
-                is AutoMissionSideEffect.ShowToast -> {
-                    Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
-                }
-                is AutoMissionSideEffect.ScrollToPage -> {
-                    // TODO: HorizontalPager와 연동
-                }
-            }
-        }
-    }
+    when {
+        // 3. 여기가 에러 원인이었습니다. 생성한 state를 전달해줍니다.
+        isAnalyzing -> ParentAutoLoadingScreen(
+            paddingValues = paddingValues,
+            snackbarHostState = snackbarHostState // 👈 추가됨
+        )
 
-    when (state.currentScreen) {
-        AutoMissionContract.Screen.INPUT -> ParentAutoAddScreen(
+        missions.isNotEmpty() -> ParentAutoResultScreen(
             paddingValues = paddingValues,
-            navigateUp = { viewModel.onEvent(AutoMissionEvent.OnCancelClick) },
-            state = state,
-            onEvent = viewModel::onEvent,
+            viewModel = viewModel,
+            childId = childId,
+            navigateUp = navigateUp
         )
-        AutoMissionContract.Screen.LOADING -> ParentAutoLoadingScreen(
+
+        else -> ParentAutoAddScreen(
             paddingValues = paddingValues,
-        )
-        AutoMissionContract.Screen.RESULT -> ParentAutoResultScreen(
-            paddingValues = paddingValues,
-            state = state,
-            onEvent = viewModel::onEvent,
-            navigateUp = { viewModel.onEvent(AutoMissionEvent.OnCancelClick) }  // ✅ 이벤트로
+            navigateUp = { viewModel.handleCancel() },
+            noticeText = noticeText,
+            isAnalyzeEnabled = noticeText.length >= 10,
+            onTextChange = { viewModel.updateNoticeText(it) },
+            onAnalyzeClick = { viewModel.analyzeNotice() }
         )
     }
 }
-
 @Composable
 fun ParentAutoAddScreen(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
-    state: AutoMissionContract,
-    onEvent: (AutoMissionEvent) -> Unit,
+    noticeText: String,
+    isAnalyzeEnabled: Boolean,
+    onTextChange: (String) -> Unit,
+    onAnalyzeClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -114,18 +148,14 @@ fun ParentAutoAddScreen(
             text = "이곳에 알림장 내용을 붙여넣어 주세요.",
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(
-                    top = 24.dp,
-                    start = 20.dp,
-                    end = 20.dp
-                ),
+                .padding(top = 24.dp, start = 20.dp, end = 20.dp),
             style = KieroTheme.typography.semiBold.title3,
             color = KieroTheme.colors.gray200
         )
 
         ParentAutoInputField(
-            text = state.noticeText,
-            onTextChange = { onEvent(AutoMissionEvent.OnNoticeTextChanged(it)) },
+            text = noticeText,
+            onTextChange = onTextChange,
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 20.dp)
@@ -135,50 +165,13 @@ fun ParentAutoAddScreen(
 
         KieroButtonMedium(
             text = "분석하고 미션 추가하기",
-            onClick = { onEvent(AutoMissionEvent.OnAnalyzeClick) },
-            isEnabled = state.isAnalyzeEnabled,
+            onClick = onAnalyzeClick,
+            isEnabled = isAnalyzeEnabled,
             containerColor = KieroTheme.colors.main,
             contentColor = KieroTheme.colors.black,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
 
         Spacer(modifier = Modifier.height(28.dp))
-    }
-}
-
-@Preview
-@Composable
-private fun ParentAutoAddScreenPreview() {
-    KieroTheme {
-        ParentAutoAddScreen(
-            paddingValues = PaddingValues(),
-            navigateUp = {},
-            state = AutoMissionContract(),
-            onEvent = {},
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun ParentAutoAddScreenWithLongTextPreview() {
-    KieroTheme {
-        ParentAutoAddScreen(
-            paddingValues = PaddingValues(),
-            navigateUp = {},
-            state = AutoMissionContract(
-                noticeText = """
-                    안녕하세요. 내일 준비물 안내드립니다.
-                    
-                    1. 독서록 제출하기
-                    2. 수학 익힘책 30-35쪽 풀어오기
-                    3. 과학 준비물: 페트병, 풍선
-                    4. 미술 준비물: 스케치북, 색연필
-                    
-                    감사합니다.
-                """.trimIndent()
-            ),
-            onEvent = {},
-        )
     }
 }
