@@ -46,6 +46,7 @@ class SplashViewModel @Inject constructor(
                     UserRole.PARENT -> {
                         authRepository.getChildren()
                             .onSuccess { children ->
+                                Timber.e("children $children")
                                 if (children.isEmpty()) {
                                     _sideEffect.emit(SplashSideEffect.NavigateToParentGraph)
                                 } else {
