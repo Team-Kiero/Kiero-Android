@@ -101,8 +101,25 @@ class KidJourneyViewModel @Inject constructor(
     }
 
     fun onNextClick() {
-        viewModelScope.launch {
-            _sideEffect.emit(KidJourneySideEffect.ShowDialog)
+        val content = _state.value.content
+        val scheduleDetailId = when (content) {
+            is KidJourneyContentUiModel.FirstSchedule -> content.scheduleDetailId
+            is KidJourneyContentUiModel.NowSchedule -> content.scheduleDetailId
+            is KidJourneyContentUiModel.NextSchedule -> content.scheduleDetailId
+            else -> null
+        }
+
+        if (scheduleDetailId != null) {
+            viewModelScope.launch {
+                repository.patchScheduleSkip(scheduleDetailId)
+                    .onSuccess {
+                        fetchTodaySchedule()
+                        Timber.d("patchScheduleSkip: $it")
+                    }
+                    .onFailure {
+                        Timber.d("patchScheduleSkip: $it")
+                    }
+            }
         }
     }
 
