@@ -61,6 +61,7 @@ data class KidJourneyState(
                 totalScheduleCount = 7
             ),
             content = KidJourneyContentUiModel.NextSchedule(
+                scheduleDetailId = 1,
                 scheduleName = "피아노 학원 가기",
                 stoneType = "용기의 불조각",
                 scheduleInfo = KidJourneyScheduleUiModel(

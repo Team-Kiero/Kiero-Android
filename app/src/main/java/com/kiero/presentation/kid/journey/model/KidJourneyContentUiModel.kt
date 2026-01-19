@@ -16,6 +16,7 @@ sealed interface KidJourneyContentUiModel {
      * - 일정 이름만 필요
      */
     data class FirstSchedule(
+        val scheduleDetailId: Long?,
         val scheduleName: String?,
         val scheduleInfo: KidJourneyScheduleUiModel,
         val isSkippable: Boolean
@@ -26,6 +27,7 @@ sealed interface KidJourneyContentUiModel {
      * - 일정 이름, 불조각 타입 필요
      */
     data class NowSchedule(
+        val scheduleDetailId: Long?,
         val scheduleName: String?,
         val stoneType: String?,
         val scheduleInfo: KidJourneyScheduleUiModel,
@@ -37,6 +39,7 @@ sealed interface KidJourneyContentUiModel {
      * - 일정 이름, 불조각 타입 필요
      */
     data class NextSchedule(
+        val scheduleDetailId: Long?,
         val scheduleName: String?,
         val stoneType: String?,
         val scheduleInfo: KidJourneyScheduleUiModel,

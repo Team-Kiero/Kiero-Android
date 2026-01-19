@@ -38,7 +38,7 @@ class KidJourneyViewModel @Inject constructor(
         fetchTodaySchedule()
     }
 
-    private fun fetchTodaySchedule() {
+    fun fetchTodaySchedule() {
         viewModelScope.launch {
             repository.getTodaySchedule()
                 .onSuccess { scheduleData ->
@@ -54,6 +54,7 @@ class KidJourneyViewModel @Inject constructor(
                             ScheduleStatus.NO_SCHEDULE -> KidJourneyContentUiModel.NoSchedule
 
                             ScheduleStatus.FIRST_SCHEDULE -> KidJourneyContentUiModel.FirstSchedule(
+                                scheduleDetailId = scheduleData.scheduleDetailId,
                                 scheduleName = scheduleData.name,
                                 scheduleInfo = KidJourneyScheduleUiModel(
                                     order = scheduleData.scheduleOrder,
@@ -64,6 +65,7 @@ class KidJourneyViewModel @Inject constructor(
                             )
 
                             ScheduleStatus.NOW_SCHEDULE_EXIST -> KidJourneyContentUiModel.NowSchedule(
+                                scheduleDetailId = scheduleData.scheduleDetailId,
                                 scheduleName = scheduleData.name,
                                 stoneType = scheduleData.stoneType,
                                 scheduleInfo = KidJourneyScheduleUiModel(
@@ -75,6 +77,7 @@ class KidJourneyViewModel @Inject constructor(
                             )
 
                             ScheduleStatus.NEXT_SCHEDULE_EXIST -> KidJourneyContentUiModel.NextSchedule(
+                                scheduleDetailId = scheduleData.scheduleDetailId,
                                 scheduleName = scheduleData.name,
                                 stoneType = scheduleData.stoneType,
                                 scheduleInfo = KidJourneyScheduleUiModel(

@@ -151,6 +151,7 @@ private fun KidJourneyGoblinMessagePreview() {
         ) {
             KidJourneyGoblinMessage(
                 content = KidJourneyContentUiModel.NowSchedule(
+                    scheduleDetailId = 1,
                     scheduleName = "피아노 학원 가기",
                     stoneType = "용기의 불조각",
                     scheduleInfo = KidJourneyScheduleUiModel(
