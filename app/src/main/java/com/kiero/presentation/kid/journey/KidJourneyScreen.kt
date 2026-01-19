@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -67,6 +68,11 @@ fun KidJourneyRoute(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val globalTrigger = LocalGlobalUiEventTrigger.current
     val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchCoin()
+        viewModel.fetchTodaySchedule()
+    }
 
     viewModel.sideEffect.collectSideEffect { sideEffect ->
         when (sideEffect) {
@@ -243,6 +249,7 @@ private fun KidJourneyScreenPreview() {
                     totalScheduleCount = 7
                 ),
                 content = KidJourneyContentUiModel.NowSchedule(
+                    scheduleDetailId = 1,
                     scheduleName = "피아노 학원 가기",
                     stoneType = "용기의 불조각",
                     scheduleInfo = KidJourneyScheduleUiModel(

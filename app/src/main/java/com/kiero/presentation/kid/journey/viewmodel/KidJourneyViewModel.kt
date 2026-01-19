@@ -33,11 +33,6 @@ class KidJourneyViewModel @Inject constructor(
     private val _sideEffect = MutableSharedFlow<KidJourneySideEffect>()
     val sideEffect: SharedFlow<KidJourneySideEffect> = _sideEffect.asSharedFlow()
 
-    init {
-        fetchCoin()
-        fetchTodaySchedule()
-    }
-
     fun fetchTodaySchedule() {
         viewModelScope.launch {
             repository.getTodaySchedule()
