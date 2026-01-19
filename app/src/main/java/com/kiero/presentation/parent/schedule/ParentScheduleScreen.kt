@@ -22,7 +22,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.component.MissionTabFab
-import com.kiero.presentation.parent.component.ParentFloatingButton
 import com.kiero.presentation.parent.component.ParentTabRow
 import com.kiero.presentation.parent.component.ParentUserSection
 import com.kiero.presentation.parent.component.PlanTabFab
@@ -93,7 +92,7 @@ private fun ParentScheduleScreen(
 
             when (selectedTabIndex) {
                 0 -> ParentPlanScreen(events = ScheduleData.fakeScheduleEvents)
-                1 -> ParentMissionRoute()
+                1 -> ParentMissionRoute(paddingValues)
             }
         }
 
@@ -122,7 +121,7 @@ private fun ParentScheduleScreen(
             1 -> MissionTabFab(
                 isExpanded = isMissionFabExpanded,
                 onExpandedChange = { isMissionFabExpanded = it },
-                onMissionAdd =  navigateToMissionAdd,
+                onMissionAdd = navigateToMissionAdd,
                 onMissionRecommend = { /* 규현이 화면 */ },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)

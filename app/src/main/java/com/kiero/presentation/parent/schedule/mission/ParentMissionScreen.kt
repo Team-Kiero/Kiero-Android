@@ -1,38 +1,59 @@
 package com.kiero.presentation.parent.schedule.mission
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kiero.R
 import com.kiero.core.designsystem.theme.KieroTheme
-import com.kiero.presentation.parent.schedule.mission.component.model.Mission
-import com.kiero.presentation.parent.schedule.mission.component.model.MissionsByDate
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
+import com.kiero.core.model.UiState
+import com.kiero.presentation.parent.schedule.mission.state.ParentMissionState
+import com.kiero.presentation.parent.schedule.mission.viewmodel.ParentMissionViewModel
 
 @Composable
 fun ParentMissionRoute(
+    paddingValues: PaddingValues,
+    viewModel: ParentMissionViewModel = hiltViewModel(),
 ) {
-    val dummyData = MissionsByDate.fakeMissionEvent
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
-    ParentMissionScreen(
-        missionsByDateList = dummyData,
-        onMissionClick = { missionId ->
-            // TODO: 미션 클릭 처리
+    when (val uiState = state) {
+        is UiState.Success -> {
+            ParentMissionScreen(
+                state = uiState.data,
+            )
         }
-    )
+
+        is UiState.Loading -> {
+            CircularProgressIndicator()
+        }
+
+        is UiState.Failure -> {}
+
+        UiState.Empty -> {
+            Image(
+                painter = painterResource(id = R.drawable.img_mission_empty_view),
+                contentDescription = null,
+            )
+        }
+    }
 }
 
 @Composable
 fun ParentMissionScreen(
-    missionsByDateList: ImmutableList<MissionsByDate>,
-    onMissionClick: (Long) -> Unit,
+    state: ParentMissionState,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -42,15 +63,12 @@ fun ParentMissionScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(16.dp)
     ) {
-        itemsIndexed(
-            items = missionsByDateList,
-            key = { index, missionsByDate ->
-                "${missionsByDate.dueAt}_$index"
-            }
-        ) { index, missionsByDate ->
+        items(
+            items = state.kidMissionByDateList.missionsByDate,
+            key = { missionsByDate -> missionsByDate.dueAt }
+        ) { missionsByDate ->
             MissionDateGroup(
                 missionsByDate = missionsByDate,
-                onMissionClick = onMissionClick
             )
         }
     }
@@ -60,18 +78,8 @@ fun ParentMissionScreen(
 @Composable
 private fun ParentMissionScreenPreview() {
     KieroTheme {
-        ParentMissionScreen(
-            missionsByDateList = persistentListOf(
-                MissionsByDate(
-                    dueAt = "2026-01-15",
-                    dayOfWeek = "목요일",
-                    missions = listOf(
-                        Mission(1, "장보기", 50, false),
-                        Mission(2, "설거지하기", 50, true)
-                    )
-                )
-            ),
-            onMissionClick = {}
+        ParentMissionRoute(
+            paddingValues = PaddingValues()
         )
     }
 }
