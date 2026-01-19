@@ -1,6 +1,7 @@
 package com.kiero.data.parent.signup.repositoryimpl
 
 import com.kiero.core.common.util.suspendRunCatching
+import com.kiero.data.parent.signup.model.LinkageKidModel
 import com.kiero.data.parent.signup.model.ParentSignUpModel
 import com.kiero.data.parent.signup.model.toModel
 import com.kiero.data.parent.signup.remote.datasource.ParentSignUpDataSource
@@ -15,6 +16,16 @@ class ParentSignUpRepositoryImpl @Inject constructor(
         childFirstName: String
     ): Result<ParentSignUpModel> = suspendRunCatching {
         parentSignUpDataSource.postSignUp(
+            childLastName = childLastName,
+            childFirstName = childFirstName
+        ).data!!.toModel()
+    }
+
+    override suspend fun getLinkageKid(
+        childLastName: String,
+        childFirstName: String
+    ): Result<LinkageKidModel> = suspendRunCatching {
+        parentSignUpDataSource.getLinkageKid(
             childLastName = childLastName,
             childFirstName = childFirstName
         ).data!!.toModel()
