@@ -1,7 +1,7 @@
 package com.kiero.presentation.parent.schedule.mission.auto.state
 
 import androidx.compose.runtime.Immutable
-import com.kiero.presentation.parent.schedule.mission.model.MissionUiModel
+import com.kiero.presentation.parent.schedule.mission.auto.model.MissionUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import java.time.LocalDate
