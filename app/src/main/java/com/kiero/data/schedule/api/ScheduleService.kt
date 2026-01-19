@@ -3,6 +3,7 @@ package com.kiero.data.schedule.api
 import com.kiero.core.network.model.BaseResponse
 import com.kiero.data.schedule.dto.request.ScheduleCompleteRequestDto
 import com.kiero.data.schedule.dto.request.ScheduleImageUploadRequestDto
+import com.kiero.data.schedule.dto.response.ScheduleFireResponseDto
 import com.kiero.data.schedule.dto.response.ScheduleImageUploadResponseDto
 import com.kiero.data.schedule.dto.response.ScheduleSkipResponseDto
 import com.kiero.data.schedule.dto.response.ScheduleTodayResponseDto
@@ -13,7 +14,7 @@ import retrofit2.http.Path
 
 interface ScheduleService {
     @PATCH("/api/v1/schedules/today")
-    suspend fun getTodaySchedule(): BaseResponse<ScheduleTodayResponseDto>
+    suspend fun patchScheduleToday(): BaseResponse<ScheduleTodayResponseDto>
 
     @POST("api/v1/schedule/presigned-url")
     suspend fun postPresignedUrl(
@@ -30,4 +31,7 @@ interface ScheduleService {
     suspend fun patchScheduleSkip(
         @Path("scheduleDetailId") scheduleDetailId: Long
     ): BaseResponse<ScheduleSkipResponseDto>
+
+    @PATCH("/api/v1/schedules/fire-lit")
+    suspend fun patchScheduleFireLit(): BaseResponse<ScheduleFireResponseDto>
 }

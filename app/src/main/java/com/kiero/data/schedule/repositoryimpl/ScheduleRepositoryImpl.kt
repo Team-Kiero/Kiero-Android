@@ -2,8 +2,10 @@ package com.kiero.data.schedule.repositoryimpl
 
 import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.data.schedule.datasource.ScheduleDataSource
+import com.kiero.data.schedule.model.ScheduleFireModel
 import com.kiero.data.schedule.model.ScheduleImageUploadModel
-import com.kiero.data.schedule.model.TodayScheduleModel
+import com.kiero.data.schedule.model.ScheduleSkipModel
+import com.kiero.data.schedule.model.ScheduleTodayModel
 import com.kiero.data.schedule.model.toModel
 import com.kiero.data.schedule.repository.ScheduleRepository
 import javax.inject.Inject
@@ -11,8 +13,8 @@ import javax.inject.Inject
 class ScheduleRepositoryImpl @Inject constructor(
     private val dataSource: ScheduleDataSource
 ) : ScheduleRepository {
-    override suspend fun getTodaySchedule(): Result<TodayScheduleModel> = suspendRunCatching {
-        dataSource.getTodaySchedule().data!!.toModel()
+    override suspend fun patchScheduleToday(): Result<ScheduleTodayModel> = suspendRunCatching {
+        dataSource.patchScheduleToday().data!!.toModel()
     }
 
     override suspend fun postPresignedUrl(
@@ -37,9 +39,12 @@ class ScheduleRepositoryImpl @Inject constructor(
 
     override suspend fun patchScheduleSkip(
         scheduleDetailId: Long
-    ): Result<Long> = suspendRunCatching {
-        dataSource.patchScheduleSkip(
-            scheduleDetailId = scheduleDetailId
-        ).data!!.scheduleDetailId
+    ): Result<ScheduleSkipModel> = suspendRunCatching {
+        dataSource.patchScheduleSkip(scheduleDetailId).data!!.toModel()
+    }
+
+    override suspend fun patchScheduleFireLit(
+    ): Result<ScheduleFireModel> = suspendRunCatching {
+        dataSource.patchScheduleFireLit().data!!.toModel()
     }
 }

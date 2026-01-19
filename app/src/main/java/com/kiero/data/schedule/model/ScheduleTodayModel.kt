@@ -2,7 +2,7 @@ package com.kiero.data.schedule.model
 
 import com.kiero.data.schedule.dto.response.ScheduleTodayResponseDto
 
-data class TodayScheduleModel(
+data class ScheduleTodayModel(
     val scheduleDetailId: Long?,
     val scheduleOrder: Int?,
     val startTime: String?,
@@ -25,7 +25,7 @@ enum class ScheduleStatus {
     FIRE_LIT
 }
 
-fun ScheduleTodayResponseDto.toModel() = TodayScheduleModel(
+fun ScheduleTodayResponseDto.toModel() = ScheduleTodayModel(
     scheduleDetailId = this.scheduleDetailId,
     scheduleOrder = this.scheduleOrder,
     startTime = this.startTime,

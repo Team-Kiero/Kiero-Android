@@ -1,10 +1,12 @@
 package com.kiero.data.schedule.repository
 
+import com.kiero.data.schedule.model.ScheduleFireModel
 import com.kiero.data.schedule.model.ScheduleImageUploadModel
-import com.kiero.data.schedule.model.TodayScheduleModel
+import com.kiero.data.schedule.model.ScheduleSkipModel
+import com.kiero.data.schedule.model.ScheduleTodayModel
 
 interface ScheduleRepository {
-    suspend fun getTodaySchedule(): Result<TodayScheduleModel>
+    suspend fun patchScheduleToday(): Result<ScheduleTodayModel>
 
     suspend fun postPresignedUrl(
         fileName: String,
@@ -18,5 +20,7 @@ interface ScheduleRepository {
 
     suspend fun patchScheduleSkip(
         scheduleDetailId: Long
-    ): Result<Long>
+    ): Result<ScheduleSkipModel>
+
+    suspend fun patchScheduleFireLit(): Result<ScheduleFireModel>
 }

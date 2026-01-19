@@ -36,7 +36,7 @@ class KidJourneyViewModel @Inject constructor(
 
     fun fetchTodaySchedule() {
         viewModelScope.launch {
-            repository.getTodaySchedule()
+            repository.patchScheduleToday()
                 .onSuccess { scheduleData ->
                     _state.value = _state.value.copy(
                         header = KidJourneyHeaderUiModel(

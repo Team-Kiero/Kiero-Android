@@ -1,7 +1,7 @@
 package com.kiero.presentation.kid.journey.model
 
 import androidx.compose.runtime.Immutable
-import com.kiero.data.schedule.model.TodayScheduleModel
+import com.kiero.data.schedule.model.ScheduleTodayModel
 
 @Immutable
 data class KidJourneyHeaderUiModel(
@@ -12,7 +12,7 @@ data class KidJourneyHeaderUiModel(
     val totalScheduleCount: Int? = 0
 )
 
-fun TodayScheduleModel.toUiModel() : KidJourneyHeaderUiModel {
+fun ScheduleTodayModel.toUiModel() : KidJourneyHeaderUiModel {
     return KidJourneyHeaderUiModel(
         kidName = "주완",
         currentDate = "12월 5일 목요일",
