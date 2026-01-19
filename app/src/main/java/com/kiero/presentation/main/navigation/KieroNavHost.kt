@@ -74,6 +74,7 @@ fun KieroNavHost(
             navigateUp = appState::navigateUp,
             navigateToParentGraph = appState::navigateToParentGraph,
             navigateToParentSignUp = appState::navigateToParentSignUp,
+            onEasterEggClick = appState::navigateToKidOnboarding
         )
 
         parentSignUpNavGraph(

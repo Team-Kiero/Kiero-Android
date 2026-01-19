@@ -28,7 +28,7 @@ class KieroApplication : Application(), ImageLoaderFactory {
     }
 
     private fun setDayMode() {
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
     }
     private fun initKakaoSdk() {
         try {
@@ -50,7 +50,7 @@ class KieroApplication : Application(), ImageLoaderFactory {
                 }
             }
             .crossfade(false)
-            .bitmapConfig(Bitmap.Config.ARGB_8888)
+            .bitmapConfig(Bitmap.Config.HARDWARE)
             .build()
     }
 }
