@@ -11,9 +11,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import com.kiero.core.network.monitor.NetworkMonitor
 import com.kiero.presentation.auth.navigation.AuthGraph
+import com.kiero.presentation.auth.navigation.navigateToAuth
 import com.kiero.presentation.kid.journey.camera.navigation.navigateToCamera
 import com.kiero.presentation.kid.journey.fire.navigation.navigateToFire
-import com.kiero.presentation.auth.navigation.navigateToAuth
+import com.kiero.presentation.kid.journey.model.StoneUiType
 import com.kiero.presentation.kid.journey.navigation.navigateToJourney
 import com.kiero.presentation.kid.mission.navigation.navigateToMission
 import com.kiero.presentation.kid.navigation.Journey
@@ -28,8 +29,8 @@ import com.kiero.presentation.parent.navigation.ParentGraph
 import com.kiero.presentation.parent.navigation.Schedule
 import com.kiero.presentation.parent.schedule.mission.navigation.navigateToMissionAdd
 import com.kiero.presentation.parent.schedule.navigation.navigateToSchedule
-import com.kiero.presentation.signup.parent.navigation.navigateToParentSignUp
 import com.kiero.presentation.parent.schedule.plan.navigation.navigateToScheduleAdd
+import com.kiero.presentation.signup.parent.navigation.navigateToParentSignUp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -187,9 +188,16 @@ class MainAppState(
 
     fun navigateToKidOnboarding(navOptions: NavOptions? = null) =
         navController.navigateToKidOnboarding(navOptions)
-        
-    fun navigateToCamera(navOptions: NavOptions? = null) =
-        navController.navigateToCamera(navOptions)
+
+    fun navigateToCamera(
+        scheduleDetailId: Long,
+        stoneType: StoneUiType,
+        navOptions: NavOptions? = null
+    ) = navController.navigateToCamera(
+        scheduleDetailId = scheduleDetailId,
+        stoneType = stoneType,
+        navOptions = navOptions
+    )
 
     fun navigateToFire(navOptions: NavOptions? = null) =
         navController.navigateToFire(navOptions)

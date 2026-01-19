@@ -53,7 +53,9 @@ fun NavGraphBuilder.kidNavGraph(
         kidJourneyNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
-            navigateToCamera = navController::navigateToCamera,
+            navigateToCamera = { scheduleDetailId, stoneType ->
+                navController.navigateToCamera(scheduleDetailId, stoneType)
+            },
             navigateToFire = navController::navigateToFire
         )
 

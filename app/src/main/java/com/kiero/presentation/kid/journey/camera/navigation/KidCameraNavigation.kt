@@ -7,12 +7,18 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.kiero.core.navigation.Route
 import com.kiero.presentation.kid.journey.camera.KidCameraRoute
+import com.kiero.presentation.kid.journey.model.StoneUiType
 import kotlinx.serialization.Serializable
 
 fun NavController.navigateToCamera(
+    scheduleDetailId: Long,
+    stoneType: StoneUiType,
     navOptions: NavOptions? = null,
 ) {
-    navigate(Camera, navOptions)
+    navigate(Camera(
+        scheduleDetailId = scheduleDetailId,
+        stoneType = stoneType
+    ), navOptions)
 }
 
 fun NavGraphBuilder.kidJourneyCameraNavGraph(
@@ -27,4 +33,7 @@ fun NavGraphBuilder.kidJourneyCameraNavGraph(
 }
 
 @Serializable
-data object Camera : Route
+data class Camera(
+    val scheduleDetailId : Long,
+    val stoneType: StoneUiType,
+) : Route
