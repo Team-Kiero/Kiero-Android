@@ -18,9 +18,11 @@ class AutoMissionDataSourceImpl @Inject constructor(
         noticeText: String
     ): Result<MissionSuggestionModel> =
         runCatching {
-            missionService.getSuggestions(
+            val response = missionService.getSuggestions(
                 MissionSuggestionRequestDto(noticeText)
-            ).data.toModel()
+            )
+            response.data?.toModel()
+                ?: throw IllegalStateException("알림장 분석 응답 데이터가 없습니다.")
         }
 
     override suspend fun saveBatchMissions(
@@ -28,9 +30,11 @@ class AutoMissionDataSourceImpl @Inject constructor(
         missions: List<MissionCreateDto>
     ): Result<List<MissionCompleteModel>> =
         runCatching {
-            missionService.createMissionsBulk(
+            val response = missionService.createMissionsBulk(
                 childId = childId,
                 request = MissionBulkCreateRequestDto(missions)
-            ).data.map { it.toModel() }
+            )
+            response.data?.map { it.toModel() }
+                ?: throw IllegalStateException("미션 생성 응답 데이터가 없습니다.")
         }
 }
