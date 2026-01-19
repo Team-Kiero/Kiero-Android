@@ -127,10 +127,10 @@ fun KidJourneyGoblinMessage(
             )
         }
 
-        // "오늘의 불조각을 모두 모았어\n내일도 우리 함께하자!"
+        // "오늘의 여정은 모두 끝났어\n내일도 우리 함께하자!"
         is KidJourneyContentUiModel.FireLit -> {
             Text(
-                text = "오늘의 불조각을 모두 모았어",
+                text = "오늘의 여정은 모두 끝났어",
                 color = defaultColor,
                 style = textStyle
             )
