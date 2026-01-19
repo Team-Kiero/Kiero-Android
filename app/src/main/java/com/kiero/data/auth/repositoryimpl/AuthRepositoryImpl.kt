@@ -1,7 +1,6 @@
 package com.kiero.data.auth.repositoryimpl
 
 import android.content.Context
-import com.kiero.core.common.extension.toHandleErrorMessage
 import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.core.localstorage.TokenManager
 import com.kiero.data.auth.model.AuthKidModel
@@ -34,9 +33,6 @@ class AuthRepositoryImpl @Inject constructor(
         )
 
         loginResponse
-    }.onFailure { throwable ->
-        Timber.e(throwable, "❌ 로그인 과정 중 에러 발생")
-        throw Exception(throwable.toHandleErrorMessage())
     }
 
     override suspend fun saveAuthTokens(accessToken: String, refreshToken: String) = suspendRunCatching {

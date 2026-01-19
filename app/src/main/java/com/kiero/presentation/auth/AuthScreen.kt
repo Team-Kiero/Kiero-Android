@@ -22,6 +22,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.kiero.R
 import com.kiero.core.common.extension.collectSingleEvent
 import com.kiero.core.common.extension.forcePixelToDp
+import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.auth.UserRole
 import com.kiero.presentation.auth.component.AuthButton
@@ -33,6 +34,7 @@ fun AuthRoute(
     paddingValues: PaddingValues,
     navigateToParent: () -> Unit,
     navigateToKid: () -> Unit,
+    onEasterEggClick: () -> Unit,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     viewModel.sideEffect.collectSingleEvent {
@@ -45,7 +47,8 @@ fun AuthRoute(
 
     AuthScreen(
         paddingValues = paddingValues,
-        onClickAuth = viewModel::fetchRole
+        onClickAuth = viewModel::fetchRole,
+        onEasterEggClick = onEasterEggClick
     )
 }
 
@@ -54,6 +57,7 @@ fun AuthScreen(
     paddingValues: PaddingValues,
     onClickAuth: (UserRole) -> Unit,
     modifier: Modifier = Modifier,
+    onEasterEggClick:() -> Unit = {},
 ) {
     val logoPainter = painterResource(id = R.drawable.img_auth_app_logo)
 
@@ -81,6 +85,7 @@ fun AuthScreen(
             color = KieroTheme.colors.schedule1,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
+                .noRippleClickable(onClick = onEasterEggClick)
         )
 
         Spacer(modifier = Modifier.weight(1f))
