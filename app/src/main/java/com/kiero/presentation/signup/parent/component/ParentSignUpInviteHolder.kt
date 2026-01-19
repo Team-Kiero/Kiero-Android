@@ -1,7 +1,6 @@
 package com.kiero.presentation.signup.parent.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,7 +28,9 @@ import com.kiero.core.designsystem.theme.KieroTheme
 fun ParentSignUpInviteHolder(
     code: String,
     expiredTime: String,
+    isExpired: Boolean,
     onCopyClick: () -> Unit,
+    onReIssueClick:() -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -42,7 +43,7 @@ fun ParentSignUpInviteHolder(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Column (
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
@@ -68,15 +69,19 @@ fun ParentSignUpInviteHolder(
 
         Spacer(modifier = Modifier.height(11.dp))
 
-        Row (
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
-                    color = KieroTheme.colors.black,
+                    color = if (isExpired) KieroTheme.colors.black.copy(alpha = 0.3f) else KieroTheme.colors.black,
                     shape = RoundedCornerShape(8.dp)
                 )
                 .noRippleClickable(
-                    onClick = onCopyClick
+                    onClick = {
+                        if (!isExpired) {
+                            onCopyClick()
+                        }
+                    }
                 )
                 .padding(vertical = 10.dp, horizontal = 37.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -85,13 +90,13 @@ fun ParentSignUpInviteHolder(
             Icon(
                 imageVector = ImageVector.vectorResource(R.drawable.ic_copy),
                 contentDescription = null,
-                tint = Color.Unspecified
+                tint = if (isExpired) KieroTheme.colors.white.copy(0.3f) else Color.Unspecified
             )
-            
+
             Text(
                 text = "복사하기",
                 style = KieroTheme.typography.semiBold.title3,
-                color = KieroTheme.colors.white,
+                color = if (isExpired) KieroTheme.colors.white.copy(0.3f) else KieroTheme.colors.white,
                 modifier = Modifier
                     .fillMaxWidth(),
                 textAlign = TextAlign.Center
@@ -100,11 +105,35 @@ fun ParentSignUpInviteHolder(
 
         Spacer(modifier = Modifier.height(19.dp))
 
-        Text(
-            text = "유효기간 $expiredTime",
-            style = KieroTheme.typography.regular.body4,
-            color = KieroTheme.colors.schedule1,
-        )
+        if (!isExpired) {
+            Text(
+                text = "유효기간 $expiredTime",
+                style = KieroTheme.typography.regular.body4,
+                color = KieroTheme.colors.schedule1,
+            )
+        } else {
+            Row (
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                modifier = Modifier
+                    .padding(horizontal = 50.dp)
+                    .noRippleClickable(
+                        onClick = onReIssueClick
+                    )
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_signup_reload),
+                    contentDescription = null,
+                    tint = Color.Unspecified
+                )
+
+                Text(
+                    text = "코드 재발급하기",
+                    style = KieroTheme.typography.regular.body4,
+                    color = KieroTheme.colors.point,
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height(9.dp))
 
@@ -125,7 +154,9 @@ private fun ParentSignUpInviteHolderPreview() {
         ParentSignUpInviteHolder(
             code = "213123",
             expiredTime = "10:00",
-            onCopyClick = {}
+            onCopyClick = {},
+            isExpired = false,
+            onReIssueClick = {}
         )
     }
 }

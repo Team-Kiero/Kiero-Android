@@ -42,6 +42,7 @@ fun NavGraphBuilder.authNavGraph(
     navigateUp: () -> Unit,
     navigateToParentGraph: () -> Unit,
     navigateToParentSignUp: (String, String) -> Unit,
+    onEasterEggClick: () -> Unit
 ) {
     navigation<AuthGraph>(
         startDestination = Selection
@@ -51,6 +52,7 @@ fun NavGraphBuilder.authNavGraph(
                 paddingValues = paddingValues,
                 navigateToParent = navController::navigateToAuthParent,
                 navigateToKid = navController::navigateToKidSignup,
+                onEasterEggClick = onEasterEggClick
             )
         }
 

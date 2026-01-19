@@ -72,7 +72,7 @@ fun ParentSignUpForm(
             Spacer(modifier = Modifier.width(4.dp))
 
             Text(
-                text = "특수문자, 이모지, 공백을 포함하지 않은 이름을 입력해주세요",
+                text = "특수문자나 이모지를 포함하지 않은 이름을 입력해주세요",
                 style = KieroTheme.typography.regular.body5,
                 color = KieroTheme.colors.point,
             )

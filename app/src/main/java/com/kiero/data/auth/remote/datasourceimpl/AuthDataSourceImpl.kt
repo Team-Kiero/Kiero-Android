@@ -10,6 +10,8 @@ import com.kiero.core.network.model.BaseResponse
 import com.kiero.data.auth.remote.api.AuthParentService
 import com.kiero.data.auth.remote.api.AuthService
 import com.kiero.data.auth.remote.datasource.AuthDataSource
+import com.kiero.data.auth.remote.dto.request.kid.AuthKidRequestDto
+import com.kiero.data.auth.remote.dto.response.AuthKidResponseDto
 import com.kiero.data.auth.remote.dto.response.AuthLoginResponseDto
 import com.kiero.data.auth.remote.dto.response.ChildrenResponseDto
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -19,7 +21,7 @@ import kotlin.coroutines.resume
 
 class AuthDataSourceImpl @Inject constructor(
     private val authService: AuthService,
-    private val authParentService: AuthParentService
+    private val authParentService: AuthParentService,
 ) : AuthDataSource {
 
     override suspend fun getKakaoToken(context: Context): Result<OAuthToken> =
@@ -83,5 +85,8 @@ class AuthDataSourceImpl @Inject constructor(
     override suspend fun postLogout(): BaseResponse<Unit> = authParentService.postAuthLogout()
 
     override suspend fun getChildren(): BaseResponse<List<ChildrenResponseDto>> = authParentService.getChildren()
+
+    override suspend fun postAuthKidLogin(authKidRequestDto: AuthKidRequestDto): BaseResponse<AuthKidResponseDto> =
+        authService.postAuthKidLogin(body = authKidRequestDto)
 
 }
