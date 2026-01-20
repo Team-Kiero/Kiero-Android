@@ -111,7 +111,6 @@ class SseDataSourceImpl @Inject constructor(
     }
 
     private fun getBaseUrl(): String {
-        // BuildConfig.BASE_URL에서 마지막 / 제거
         return com.kiero.BuildConfig.BASE_URL.removeSuffix("/")
     }
 }

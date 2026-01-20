@@ -139,7 +139,7 @@ object NetworkModule {
         cookieInterceptor: CookieInterceptor
     ): OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(10, TimeUnit.SECONDS)
-        .readTimeout(10, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
         .addInterceptor(loggingInterceptor)
         .addInterceptor(cookieInterceptor)
         .build()

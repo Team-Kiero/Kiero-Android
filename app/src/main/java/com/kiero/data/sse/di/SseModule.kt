@@ -1,6 +1,7 @@
 package com.kiero.data.sse.di
 
 import com.kiero.core.network.di.SseNetwork
+import com.kiero.data.sse.manager.SseManager
 import com.kiero.data.sse.remote.api.SseService
 import com.kiero.data.sse.remote.datasource.SseDataSource
 import com.kiero.data.sse.remote.datasourceimpl.SseDataSourceImpl
@@ -41,5 +42,13 @@ object SseModule {
         sseDataSource: SseDataSource
     ): SseRepository {
         return SseRepositoryImpl(sseDataSource)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSseManager(
+        sseRepository: SseRepository
+    ): SseManager {
+        return SseManager(sseRepository)
     }
 }
