@@ -1,4 +1,4 @@
-package com.kiero.presentation.kid.wish.model
+package com.kiero.presentation.kid.model
 
 import androidx.compose.runtime.Immutable
 import com.kiero.data.kid.coin.model.CoinModel
