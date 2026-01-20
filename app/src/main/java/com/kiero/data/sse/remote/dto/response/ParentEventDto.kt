@@ -1,38 +1,34 @@
-package com.kiero.data.sse.remote.dto.response
+package com.kiero.data.sse.remote.dto.event
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-sealed class SseEvent {
-    data object Connected : SseEvent()
 
-    data class Invite(
-        val data: InviteDataDto
-    ) : SseEvent()
-
-    data class Feed(
-        val data: FeedDataDto
-    ) : SseEvent()
-}
-
+// Invite 이벤트 (CHILD_JOINED)
 @Serializable
 data class InviteDataDto(
     @SerialName("eventType")
-    val eventType: String,  // CHILD_JOINED
+    val eventType: String,  // "CHILD_JOINED"
+
     @SerialName("childId")
     val childId: Long
 )
 
+// Feed 이벤트 (MISSION_COMPLETED, SCHEDULE_COMPLETED, FIRE_LIT, COUPON_PURCHASED)
 @Serializable
 data class FeedDataDto(
     @SerialName("eventType")
     val eventType: String,
+
     @SerialName("feedItemId")
     val feedItemId: Long? = null,
+
     @SerialName("childId")
     val childId: Long,
+
     @SerialName("occurredAt")
     val occurredAt: String,
+
     @SerialName("metadata")
     val metadata: EventMetadataDto
 )
@@ -41,8 +37,10 @@ data class FeedDataDto(
 data class EventMetadataDto(
     @SerialName("content")
     val content: String? = null,
+
     @SerialName("imageUrl")
     val imageUrl: String? = null,
+
     @SerialName("amount")
     val amount: Int? = null
 )

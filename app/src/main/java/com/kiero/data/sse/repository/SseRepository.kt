@@ -1,6 +1,6 @@
 package com.kiero.data.sse.repository
 
-import com.kiero.data.sse.remote.dto.response.SseEvent
+import com.kiero.data.sse.model.SseEvent
 import kotlinx.coroutines.flow.Flow
 
 interface SseRepository {

@@ -1,6 +1,6 @@
 package com.kiero.data.sse.manager
 
-import com.kiero.data.sse.remote.dto.response.SseEvent
+import com.kiero.data.sse.model.SseEvent
 import com.kiero.data.sse.repository.SseRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -24,16 +24,26 @@ class SseManager @Inject constructor(
     private var sseJob: Job? = null
     private var tokenRefreshJob: Job? = null
 
+    // 부모 이벤트
     private val _parentInviteEvents = MutableSharedFlow<SseEvent.Invite>(replay = 0)
     val parentInviteEvents: SharedFlow<SseEvent.Invite> = _parentInviteEvents.asSharedFlow()
 
     private val _parentFeedEvents = MutableSharedFlow<SseEvent.Feed>(replay = 0)
     val parentFeedEvents: SharedFlow<SseEvent.Feed> = _parentFeedEvents.asSharedFlow()
 
+    // 자녀 이벤트
+    private val _childMissionEvents = MutableSharedFlow<SseEvent.Mission>(replay = 0)
+    val childMissionEvents: SharedFlow<SseEvent.Mission> = _childMissionEvents.asSharedFlow()
+
+    private val _childScheduleEvents = MutableSharedFlow<SseEvent.Schedule>(replay = 0)
+    val childScheduleEvents: SharedFlow<SseEvent.Schedule> = _childScheduleEvents.asSharedFlow()
+
+    // 연결 상태
     private val _connectionState = MutableSharedFlow<Boolean>(replay = 1)
     val connectionState: SharedFlow<Boolean> = _connectionState.asSharedFlow()
 
     private var isSubscribed = false
+    private var isParentMode = true
 
     fun startParentSubscription() {
         if (isSubscribed) {
@@ -42,6 +52,7 @@ class SseManager @Inject constructor(
         }
 
         isSubscribed = true
+        isParentMode = true
         stopSubscription()
 
         sseJob = scope.launch {
@@ -63,21 +74,58 @@ class SseManager @Inject constructor(
         }
     }
 
+    fun startChildSubscription() {
+        if (isSubscribed) {
+            Timber.d("SSE 이미 구독 중 - 중복 시작 방지")
+            return
+        }
+
+        isSubscribed = true
+        isParentMode = false
+        stopSubscription()
+
+        sseJob = scope.launch {
+            sseRepository.issueSubscribeToken()
+                .onSuccess { accessToken ->
+                    _connectionState.emit(true)
+                    startTokenRefreshTimer()
+
+                    sseRepository.subscribeEvents(accessToken)
+                        .collect { event ->
+                            handleChildEvent(event)
+                        }
+                }
+                .onFailure { e ->
+                    Timber.e(e, "SSE 구독 실패")
+                    isSubscribed = false
+                    _connectionState.emit(false)
+                }
+        }
+    }
+
     private fun startTokenRefreshTimer() {
         tokenRefreshJob?.cancel()
 
         tokenRefreshJob = scope.launch {
             while (isActive) {
-                delay(290_000L) // 4분 50초
-                Timber.d("SSE 토큰 자동 갱신")
+                delay(180_000L)
+                Timber.d("🔄 SSE 토큰 자동 갱신 (3분 주기)")
                 restartSubscription()
             }
         }
     }
 
     private fun restartSubscription() {
+        Timber.d("🔄 SSE 재연결 시작")
         sseJob?.cancel()
-        startParentSubscription()
+
+        isSubscribed = false
+
+        if (isParentMode) {
+            startParentSubscription()
+        } else {
+            startChildSubscription()
+        }
     }
 
     private suspend fun handleParentEvent(event: SseEvent) {
@@ -86,12 +134,36 @@ class SseManager @Inject constructor(
                 Timber.d("SSE 연결 완료")
             }
             is SseEvent.Invite -> {
-                Timber.d("초대 이벤트: ${event.data.childId}")
+                Timber.d("📨 초대 이벤트: childId=${event.data.childId}")
                 _parentInviteEvents.emit(event)
             }
             is SseEvent.Feed -> {
-                Timber.d("피드 이벤트: ${event.data.eventType}")
+                Timber.d("📢 피드 이벤트: ${event.data.eventType}")
                 _parentFeedEvents.emit(event)
+            }
+            is SseEvent.Mission,
+            is SseEvent.Schedule -> {
+                Timber.w("부모 SSE에서 자녀 이벤트 수신: $event")
+            }
+        }
+    }
+
+    private suspend fun handleChildEvent(event: SseEvent) {
+        when (event) {
+            is SseEvent.Connected -> {
+                Timber.d("SSE 연결 완료")
+            }
+            is SseEvent.Mission -> {
+                Timber.d("📋 미션 이벤트: ${event.data.missionName}, 보상: ${event.data.reward}금화")
+                _childMissionEvents.emit(event)
+            }
+            is SseEvent.Schedule -> {
+                Timber.d("📅 일정 이벤트: ${event.data.scheduleName}")
+                _childScheduleEvents.emit(event)
+            }
+            is SseEvent.Invite,
+            is SseEvent.Feed -> {
+                Timber.w("자녀 SSE에서 부모 이벤트 수신: $event")
             }
         }
     }

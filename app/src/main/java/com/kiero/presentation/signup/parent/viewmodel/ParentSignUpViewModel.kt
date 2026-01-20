@@ -66,6 +66,7 @@ class ParentSignUpViewModel @Inject constructor(
             parentProfileImage = parentInfo.parentProfileImage
         )
         checkExistingChild()
+        sseManager.startParentSubscription()
         collectInviteEvents()
     }
 

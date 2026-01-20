@@ -14,20 +14,14 @@ data class ParentSignUpState(
     val isLogoutDialogVisible: Boolean = false,
     val isExpired: Boolean = false,
     val isLoading: Boolean = false,
-
-
     val isSseConnected: Boolean = false,
-    val isChildJoined: Boolean = false,
-    val sseErrorMessage: String? = null
+    val isChildJoined: Boolean = false
 )
 
 sealed interface ParentSignUpSideEffect {
     data object NavigateToParent : ParentSignUpSideEffect
     data object NavigateToSelection : ParentSignUpSideEffect
-
     data class CopyText(val message: String, val targetText: String) : ParentSignUpSideEffect
-
     data class ShowSnackbar(val message: String) : ParentSignUpSideEffect
-
     data class OnChildJoined(val childId: Long) : ParentSignUpSideEffect
 }
