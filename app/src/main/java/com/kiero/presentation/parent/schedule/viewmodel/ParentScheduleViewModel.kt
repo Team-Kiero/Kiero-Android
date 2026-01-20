@@ -3,16 +3,20 @@ package com.kiero.presentation.parent.schedule.viewmodel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
+import com.kiero.core.common.extension.updateSuccess
+import com.kiero.core.common.util.suspendRunCatching
+import com.kiero.core.localstorage.TokenManager
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.model.UiState
 import com.kiero.data.auth.repository.AuthRepository
+import com.kiero.data.demo.repository.DemoRepository
 import com.kiero.data.parent.plan.repository.PlanRepository
 import com.kiero.presentation.parent.schedule.plan.state.ParentScheduleState
-import com.kiero.presentation.signup.parent.navigation.ParentSignUp
 import com.kiero.presentation.signup.parent.state.ParentSignUpSideEffect
 import com.kiero.presentation.signup.parent.state.ParentSignUpState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -21,6 +25,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.time.DayOfWeek
 import javax.inject.Inject
 
@@ -30,8 +35,9 @@ class ParentScheduleViewModel @Inject constructor(
     private val planRepository: PlanRepository,
     private val authRepository: AuthRepository,
     private val userInfoManager: UserInfoManager,
+    private val demoRepository: DemoRepository,
+    private val tokenManager: TokenManager
 ) : ViewModel() {
-
     private val _state = MutableStateFlow<UiState<ParentScheduleState>>(UiState.Loading)
     val state = _state.asStateFlow()
 
@@ -42,17 +48,18 @@ class ParentScheduleViewModel @Inject constructor(
     val sideEffect: SharedFlow<ParentSignUpSideEffect> = _sideEffect.asSharedFlow()
 
     init {
-        fetchSchedule(1L)
+        fetchSchedule()
         initFetchParentInfo()
     }
 
 
-    fun fetchSchedule(childId: Long) {
+    fun fetchSchedule() {
         val currentState = (_state.value as? UiState.Success)?.data ?: ParentScheduleState()
         val monday = currentState.currentDate.with(DayOfWeek.MONDAY).toString()
         val sunday = currentState.currentDate.with(DayOfWeek.SUNDAY).toString()
 
         viewModelScope.launch {
+            val childId: Long = userInfoManager.getChildIdInfo() ?: return@launch
 
             _state.value = UiState.Success(currentState.copy(isFetching = true))
             planRepository.getPlanAll(childId, monday, sunday)
@@ -83,8 +90,23 @@ class ParentScheduleViewModel @Inject constructor(
     }
 
     fun logOut() {
+        Timber.e("로그아웃 되었습니다")
         viewModelScope.launch {
-            authRepository.postLogout()
+            val logoutDeferred = async {
+                suspendRunCatching { authRepository.postLogout() }
+            }
+            val demoDeferred = async {
+                suspendRunCatching { demoRepository.deleteDemo() }
+            }
+            val tokenDeferred = async {
+                suspendRunCatching { tokenManager.clearTokens() }
+            }
+
+            awaitAll(logoutDeferred, demoDeferred, tokenDeferred)
+
+            _state.updateSuccess {
+                it.copy(isLoading = false)
+            }
 
             _sideEffect.emit(ParentSignUpSideEffect.NavigateToSelection)
         }
@@ -98,7 +120,35 @@ class ParentScheduleViewModel @Inject constructor(
                 1
             )
         _state.value = UiState.Success(currentState.copy(currentDate = newDate))
-        fetchSchedule(1L)
+
+        viewModelScope.launch {
+            if (userInfoManager.getChildIdInfo() != null) {
+                fetchSchedule()
+            }
+        }
+    }
+
+    fun onProfileClick() {
+        _state.updateSuccess {
+            it.copy(isLogoutDialogVisible = true)
+        }
+    }
+
+    fun onLogoutCancel() {
+        _state.updateSuccess {
+            it.copy(isLogoutDialogVisible = false)
+        }
+    }
+
+    fun onLogoutConfirm() {
+        _state.updateSuccess {
+            it.copy(
+                isLogoutDialogVisible = false,
+                isLoading = true
+            )
+        }
+
+        logOut()
     }
 }
 

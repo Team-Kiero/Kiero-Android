@@ -1,5 +1,6 @@
 package com.kiero.presentation.parent.schedule.plan.state
 
+import androidx.compose.runtime.Immutable
 import com.kiero.data.parent.plan.model.NormalScheduleModel
 import com.kiero.data.parent.plan.model.PlanAllModel
 import com.kiero.data.parent.plan.model.RecurringScheduleModel
@@ -8,11 +9,14 @@ import com.kiero.presentation.signup.parent.model.ParentInfoUiModel
 import java.time.DayOfWeek
 import java.time.LocalDate
 
+@Immutable
 data class ParentScheduleState(
     val planAllModel: PlanAllModel? = null,
     val parentInfo: ParentInfoUiModel = ParentInfoUiModel(),
     val currentDate: LocalDate = LocalDate.now(),
     val isFetching: Boolean = false,
+    val isLogoutDialogVisible : Boolean = false,
+    val isLoading: Boolean = false
 ) {
     val dateRangeText: String
         get() {

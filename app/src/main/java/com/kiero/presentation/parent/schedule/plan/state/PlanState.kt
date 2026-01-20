@@ -19,6 +19,7 @@ data class ParentPlanState(
     val selectedDate: String = LocalDate.now().toString(),
     val currentReferenceDate: LocalDate = LocalDate.now(),
     val isLoading: Boolean = false,
+    val isLogoutDialogVisible: Boolean = false
 ) {
 
     val formattedDays: String?

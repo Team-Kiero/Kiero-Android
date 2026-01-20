@@ -38,6 +38,7 @@ fun NavGraphBuilder.parentNavGraph(
     navController: NavHostController,
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
+    navigateToSelection: () -> Unit
 ) {
     navigation<ParentGraph>(
         startDestination = Schedule
@@ -47,7 +48,8 @@ fun NavGraphBuilder.parentNavGraph(
             navigateUp = navigateUp,
             navigateToScheduleAdd = navController::navigateToScheduleAdd,
             navigateToMissionAdd = navController::navigateToMissionAdd,
-            navigateToAutoMissionAdd = navController::navigateToAutoMissionAdd
+            navigateToAutoMissionAdd = navController::navigateToAutoMissionAdd,
+            navigateToSelection = navigateToSelection
         )
 
         parentScheduleAddNavGraph(

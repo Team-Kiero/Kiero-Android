@@ -35,11 +35,15 @@ class ParentMissionViewModel @Inject constructor(
 
             missionRepository.getMissions()
                 .onSuccess { result ->
-                    _state.value = UiState.Success(
-                        ParentMissionState(
-                            kidMissionByDateList = result.toUiModel()
+                    if (result.missionsByDate.isEmpty()) {
+                        _state.value = UiState.Empty
+                    } else {
+                        _state.value = UiState.Success(
+                            ParentMissionState(
+                                kidMissionByDateList = result.toUiModel()
+                            )
                         )
-                    )
+                    }
                 }
                 .onFailure {
                     _state.value = UiState.Failure(it.message.toString())
