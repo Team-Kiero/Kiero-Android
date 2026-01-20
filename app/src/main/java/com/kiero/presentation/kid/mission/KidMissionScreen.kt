@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
@@ -33,6 +34,9 @@ import com.kiero.R
 import com.kiero.core.common.extension.forcePixelToDp
 import com.kiero.core.designsystem.component.chip.KieroChip
 import com.kiero.core.designsystem.component.chip.action.KieroCoinAction
+import com.kiero.core.designsystem.component.dialog.KieroDialog
+import com.kiero.core.designsystem.component.dialog.action.KieroCancelAction
+import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
 import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.component.pulltorefresh.KieroPullToRefresh
 import com.kiero.core.designsystem.theme.KieroTheme
@@ -56,8 +60,10 @@ fun KidMissionRoute(
                 paddingValues = paddingValues,
                 state = state.data,
                 navigateUp = navigateUp,
-                onMissionCompleted = viewModel::onMissionCompleted,
-                onRefresh = { viewModel.fetchMissions(isRefreshing = true) }
+                onMissionCompleted = viewModel::openMissionDialog,
+                onRefresh = { viewModel.fetchMissions(isRefreshing = true) },
+                dismissDialog = viewModel::dismissDialog,
+                onClickConfirm = viewModel::onMissionCompleted
             )
         }
 
@@ -70,7 +76,6 @@ fun KidMissionRoute(
     }
 }
 
-// Todo 서버 값으로 변경
 @Composable
 private fun KidMissionScreen(
     paddingValues: PaddingValues,
@@ -78,6 +83,8 @@ private fun KidMissionScreen(
     navigateUp: () -> Unit,
     onRefresh: () -> Unit,
     onMissionCompleted: (missionId: Long) -> Unit,
+    dismissDialog: () -> Unit,
+    onClickConfirm: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val painterGoblin = painterResource(id = R.drawable.img_kid_wish_goblin)
@@ -121,7 +128,7 @@ private fun KidMissionScreen(
             item {
                 Spacer(modifier = Modifier.height(5.dp))
 
-                Box (
+                Box(
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
@@ -132,7 +139,7 @@ private fun KidMissionScreen(
                             .forcePixelToDp(painterGoblin)
                     )
 
-                    KidSpeechField (
+                    KidSpeechField(
                         name = "꾸비",
                         isVisibleButton = false,
                         modifier = Modifier.padding(top = 100.dp)
@@ -184,7 +191,10 @@ private fun KidMissionScreen(
                         Text(
                             text = section.title,
                             style = KieroTheme.typography.regular.body4,
-                            color = KieroTheme.colors.gray200
+                            color = KieroTheme.colors.gray200,
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            textAlign = TextAlign.Start
                         )
                     }
 
@@ -204,6 +214,44 @@ private fun KidMissionScreen(
                 }
             }
         }
+
+        if (state.isVisibleDialog) {
+            KieroDialog(
+                onDismiss = dismissDialog,
+                title = if (!state.isCompletedMission) "[${state.selectedMissionItem!!.name}]" else null,
+                subDescription = if (!state.isCompletedMission) "미션을 완료했다면\n" +
+                        "아래 버튼을 눌러줘!" else "금 나와라 뚝딱!\n" +
+                        "금화 50개를 만들었어!",
+                cancelAction = if (state.isCompletedMission) {
+                    null
+                } else {
+                    KieroCancelAction(
+                        onClick = dismissDialog
+                    )
+                },
+                confirmAction = KieroConfirmAction(
+                    text = "확인",
+                    onClick = if (state.isCompletedMission) {
+                        onClickConfirm
+                    } else {
+                        dismissDialog
+                    }
+                )
+            ) {
+                if (state.isCompletedMission) {
+                    val coinImage = painterResource(R.drawable.img_kid_camera_goblin)
+
+                    Image(
+                        painter = coinImage,
+                        contentDescription = null,
+                        modifier = Modifier.size(
+                            width = 62.dp,
+                            height = 70.dp
+                        )
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -216,7 +264,9 @@ private fun KidWishScreenPreview() {
             navigateUp = {},
             onMissionCompleted = {},
             state = KidMissionState(),
-            onRefresh = {}
+            onRefresh = {},
+            dismissDialog = {},
+            onClickConfirm = {}
         )
     }
 }

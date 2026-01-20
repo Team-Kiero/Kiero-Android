@@ -3,6 +3,7 @@ package com.kiero.presentation.kid.mission
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.common.extension.updateSuccess
+import com.kiero.core.common.util.successData
 import com.kiero.core.model.UiState
 import com.kiero.data.kid.coin.repository.CoinRepository
 import com.kiero.data.mission.repository.MissionRepository
@@ -90,16 +91,18 @@ class KidMissionViewModel @Inject constructor(
         }
     }
 
-    fun onMissionCompleted(missionId: Long) {
+    fun onMissionCompleted() {
         viewModelScope.launch {
-            missionRepository.patchMission(missionId)
+            val selectedMission = _state.value.successData?.selectedMissionItem ?: return@launch
+
+            missionRepository.patchMission(selectedMission.id)
                 .onSuccess {
                     _state.updateSuccess { currentState ->
                         val updatedGroups =
                             currentState.kidMissionByDateList.missionsByDate.map { group ->
                                 group.copy(
                                     missions = group.missions.map { mission ->
-                                        if (mission.id == missionId) {
+                                        if (mission.id == selectedMission.id) {
                                             mission.copy(isCompleted = true)
                                         } else {
                                             mission
@@ -111,13 +114,39 @@ class KidMissionViewModel @Inject constructor(
                         currentState.copy(
                             kidMissionByDateList = currentState.kidMissionByDateList.copy(
                                 missionsByDate = updatedGroups
-                            )
+                            ),
+                            isCompletedMission = true
                         )
                     }
                 }
                 .onFailure { exception ->
                     _sideEffect.emit(KidMissionSideEffect.ShowSnackbar(exception.message.toString()))
                 }
+        }
+    }
+
+    fun openMissionDialog(targetId: Long) {
+        val currentState = _state.value.successData ?: return
+
+        val selectedMission = currentState.kidMissionByDateList.missionsByDate
+            .flatMap { it.missions }
+            .find { it.id == targetId }
+            ?: return
+
+        _state.updateSuccess { state ->
+            state.copy(
+                isVisibleDialog = true,
+                selectedMissionItem = selectedMission
+            )
+        }
+    }
+
+    fun dismissDialog() {
+        _state.updateSuccess { state ->
+            state.copy(
+                isVisibleDialog = false,
+                isCompletedMission = false
+            )
         }
     }
 }
