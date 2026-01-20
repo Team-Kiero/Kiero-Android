@@ -6,6 +6,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.kiero.core.localstorage.TokenManager
 import com.kiero.core.localstorage.TokenManagerImpl
+import com.kiero.core.localstorage.info.UserInfoManager
+import com.kiero.core.localstorage.info.UserInfoManagerImpl
 import com.kiero.core.localstorage.onboarding.OnboardingManager
 import com.kiero.core.localstorage.onboarding.OnboardingManagerImpl
 import com.kiero.core.security.CryptoManager
@@ -42,5 +44,13 @@ object LocalStorageModule {
         dataStore: DataStore<Preferences>,
     ): OnboardingManager {
         return OnboardingManagerImpl(dataStore)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserInfoManager(
+        dataStore: DataStore<Preferences>,
+    ): UserInfoManager {
+        return UserInfoManagerImpl(dataStore)
     }
 }

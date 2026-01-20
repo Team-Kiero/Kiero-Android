@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.model.UiState
 import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.data.parent.plan.repository.PlanRepository
@@ -28,6 +29,7 @@ class ParentScheduleViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val planRepository: PlanRepository,
     private val authRepository: AuthRepository,
+    private val userInfoManager: UserInfoManager,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<UiState<ParentScheduleState>>(UiState.Loading)
@@ -39,21 +41,9 @@ class ParentScheduleViewModel @Inject constructor(
     private val _sideEffect = MutableSharedFlow<ParentSignUpSideEffect>()
     val sideEffect: SharedFlow<ParentSignUpSideEffect> = _sideEffect.asSharedFlow()
 
-    val info = savedStateHandle.toRoute<ParentSignUp>()
-
-
     init {
         fetchSchedule(1L)
-
-        val parentName = info.parentName
-        val profileImage = info.parentProfileImage
-
-        initFetchParentInfo(
-            parentName = parentName,
-            parentProfileImage = profileImage
-        )
-
-
+        initFetchParentInfo()
     }
 
 
@@ -77,16 +67,15 @@ class ParentScheduleViewModel @Inject constructor(
         }
     }
 
-    fun initFetchParentInfo(
-        parentName: String,
-        parentProfileImage: String,
-    ) {
+    fun initFetchParentInfo() {
         viewModelScope.launch {
+            val parentInfo = userInfoManager.getParentInfo()!!
+
             _authstate.update { currentState ->
                 currentState.copy(
                     parentInfo = currentState.parentInfo.copy(
-                        parentName = parentName,
-                        parentProfileImage = parentProfileImage
+                        parentName = parentInfo.name,
+                        parentProfileImage = parentInfo.profileImage
                     )
                 )
             }
