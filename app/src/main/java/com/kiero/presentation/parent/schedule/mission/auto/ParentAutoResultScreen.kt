@@ -208,7 +208,7 @@ fun ParentAutoResultScreen(
     }
 }
 
-@Preview(showBackground = true, heightDp = 800)
+@Preview
 @Composable
 private fun ParentAutoResultScreen_WithSnackbarPreview() {
     val snackbarHostState = remember { SnackbarHostState() }

@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -26,7 +27,9 @@ fun ParentAutoInputField(
     placeholder: String = "알림장 내용을 입력하세요.",
     maxLength: Int = 1000,
     maxLines: Int = Int.MAX_VALUE,
-    singleLine: Boolean = false
+    singleLine: Boolean = false,
+    textStyle: TextStyle = KieroTheme.typography.regular.body1,
+    textColor: Color = KieroTheme.colors.gray400
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -40,13 +43,13 @@ fun ParentAutoInputField(
         placeholder = {
             Text(
                 text = placeholder,
-                style = KieroTheme.typography.regular.body1,
-                color = KieroTheme.colors.gray400
+                style = textStyle,
+                color = textColor
             )
         },
         modifier = modifier.fillMaxWidth(),
-        textStyle = KieroTheme.typography.regular.body1.copy(
-            color = KieroTheme.colors.gray400
+        textStyle = textStyle.copy(
+            color = textColor
         ),
         colors = TextFieldDefaults.colors(
             focusedContainerColor = KieroTheme.colors.gray900,
