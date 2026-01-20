@@ -1,7 +1,7 @@
 package com.kiero.core.common.util
 
 object InputValidator {
-    private val NAME_REGEX = Regex("^[가-힣ㄱ-ㅎㅏ-ㅣ]*$")
+    private val NAME_REGEX = Regex("^[가-힣]+$")
 
     fun isValidName(input: String): Boolean {
         return input.matches(NAME_REGEX)
