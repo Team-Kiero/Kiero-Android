@@ -91,8 +91,8 @@ fun KidWishRoute(
                     if (data.isVisibleDialog) {
                         KieroDialog(
                             onDismiss = viewModel::dismissDialog,
-                            title = data.selectedWishItem!!.name,
-                            subDescription = if (data.isCompletedWish) "${data.selectedWishItem.name}를 \n획득했어!" else "금화를 사용해 소원을 빌까?",
+                            title = if (!data.isCompletedWish) data.selectedWishItem!!.name else null,
+                            subDescription = if (data.isCompletedWish) "${data.selectedWishItem!!.name}를 \n획득했어!" else "금화를 사용해 소원을 빌까?",
                             cancelAction = if (data.isCompletedWish) {
                                 null
                             } else {
@@ -105,7 +105,11 @@ fun KidWishRoute(
                             confirmAction = KieroConfirmAction(
                                 text = "확인",
                                 onClick = {
-                                    viewModel.prayWish(data.selectedWishItem.couponId)
+                                    if (data.isCompletedWish) {
+                                        viewModel.prayWish(data.selectedWishItem?.couponId ?: -1)
+                                    } else {
+                                        viewModel.dismissDialog()
+                                    }
                                 }
                             )
                         ) {
@@ -124,7 +128,7 @@ fun KidWishRoute(
                                     Spacer(modifier = Modifier.width(10.dp))
 
                                     Text(
-                                        text = "${data.selectedWishItem.price} 개",
+                                        text = "${data.selectedWishItem?.price} 개",
                                         color = KieroTheme.colors.main,
                                         style = KieroTheme.typography.semiBold.title4,
                                     )

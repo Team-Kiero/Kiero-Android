@@ -3,6 +3,7 @@ package com.kiero.presentation.kid.wish.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.common.extension.updateSuccess
+import com.kiero.core.common.util.successData
 import com.kiero.core.model.UiState
 import com.kiero.data.kid.coin.repository.CoinRepository
 import com.kiero.data.kid.wish.repository.WishRepository
@@ -112,7 +113,8 @@ class KidWishViewModel @Inject constructor(
                 .onSuccess {
                     _state.updateSuccess {
                         it.copy(
-                            isVisibleDialog = false
+                            isVisibleDialog = false,
+                            isCompletedWish = true
                         )
                     }
 
@@ -125,21 +127,32 @@ class KidWishViewModel @Inject constructor(
     }
 
     fun openDialogWithItem(targetId: Long) {
-        Timber.e("openDialogWithItem: $targetId")
-        _state.updateSuccess { state ->
-            val selectedItem = state.kidWishList.find { it.couponId == targetId }
+        val currentState = _state.value.successData ?: return
 
-            state.copy(
-                isVisibleDialog = true,
-                selectedWishItem = selectedItem
-            )
+        val selectedItem = currentState.kidWishList.find { it.couponId == targetId } ?: return
+
+        val myCoin = currentState.coinUiModel.coinAmount
+        val itemPrice = selectedItem.price
+
+        if (myCoin >= itemPrice) {
+            _state.updateSuccess { state ->
+                state.copy(
+                    isVisibleDialog = true,
+                    selectedWishItem = selectedItem
+                )
+            }
+        } else {
+            viewModelScope.launch {
+                _sideEffect.emit(KidWishSideEffect.ShowSnackBar("금화가 부족해! 미션을 더 하고 오자!"))
+            }
         }
     }
 
     fun dismissDialog() {
         _state.updateSuccess { state ->
             state.copy(
-                isVisibleDialog = false
+                isVisibleDialog = false,
+                isCompletedWish = false
             )
         }
     }
