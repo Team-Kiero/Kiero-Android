@@ -55,15 +55,12 @@ private fun KidFIreScreen(
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Todo: 오른쪽 아이콘 제거 필요
             KieroTopbar(
                 title = "12월 5일 목요일",
                 leftIconRes = R.drawable.ic_arrow_left,
-                rightIconRes = R.drawable.ic_arrow_right,
-                leftIconClick = {},
-                rightIconClick = {},
+                leftIconClick = navigateUp,
                 modifier = Modifier
-                    .padding(top = 10.dp),
+                    .padding(top = 20.dp),
                 textColor = KieroTheme.colors.gray500,
                 textStyle = KieroTheme.typography.regular.body3
             )

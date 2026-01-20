@@ -18,11 +18,13 @@ fun NavController.navigateToFireResult(
 fun NavGraphBuilder.kidJourneyFireResultNavGraph(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
+    navigateToJourney: () -> Unit
 ) {
     composable<FireResult> {
         KidFireResultRoute(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
+            navigateToJourney = navigateToJourney
         )
     }
 }

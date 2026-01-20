@@ -13,11 +13,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
-import com.kiero.R
 import kotlinx.coroutines.delay
 
 @Composable
 fun StoneMoving(
+    stoneRes: Int,
     modifier: Modifier = Modifier
 ) {
     var currentState by remember { mutableStateOf(StoneAnimationState.Invisible) }
@@ -64,7 +64,7 @@ fun StoneMoving(
     }
 
     Image(
-        painter = painterResource(id = R.drawable.img_kid_journey_stone_blue),
+        painter = painterResource(id = stoneRes),
         contentDescription = null,
         modifier = modifier
             .graphicsLayer {
