@@ -12,6 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -35,6 +38,7 @@ fun AuthKidSignupRoute(
     navigateUp: () -> Unit = {},
     viewmodel: KidSignupViewModel = hiltViewModel(),
 ) {
+    val focusManager = LocalFocusManager.current
     val eventTrigger = LocalGlobalUiEventTrigger.current
     val state by viewmodel.state.collectAsStateWithLifecycle()
 
@@ -55,7 +59,13 @@ fun AuthKidSignupRoute(
     AuthKidSignupScreen(
         paddingValues = paddingValues,
         state = state,
-        onSignupClick = viewmodel::onSignupClick
+        onSignupClick = viewmodel::onSignupClick,
+        onDone = {
+            focusManager.clearFocus()
+        },
+        nextFocus = {
+            focusManager.moveFocus(FocusDirection.Down)
+        }
     )
 }
 
@@ -64,6 +74,8 @@ fun AuthKidSignupScreen(
     paddingValues: PaddingValues,
     state: KidSignUpState,
     onSignupClick: () -> Unit,
+    nextFocus: () -> Unit,
+    onDone: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     with(state.kidSignUpUiModel) {
@@ -101,12 +113,16 @@ fun AuthKidSignupScreen(
                 fieldTitle = "성",
                 fieldInputText = "성을 입력해줘!",
                 fieldState = lastName,
+                isError = state.kidSignUpUiModel.lastName.text.isNotEmpty() && !validateLastName,
+                onImeAction = nextFocus
             )
 
             KidInputField(
                 fieldTitle = "이름",
                 fieldInputText = "이름을 입력해줘!",
-                fieldState = firstName
+                fieldState = firstName,
+                isError = state.kidSignUpUiModel.firstName.text.isNotEmpty() && !validateFirstName,
+                onImeAction = nextFocus
             )
 
             Spacer(modifier = Modifier.height(31.dp))
@@ -114,7 +130,9 @@ fun AuthKidSignupScreen(
             KidInputField(
                 fieldTitle = "초대 코드",
                 fieldInputText = "부모님께 받은 비밀 암호를 입력해줘!",
-                fieldState = inviteCode
+                fieldState = inviteCode,
+                onImeAction = onDone,
+                imeAction = ImeAction.Done
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -138,7 +156,9 @@ private fun KidSignupScreenPreview() {
         AuthKidSignupScreen(
             state = KidSignUpState(),
             onSignupClick = {},
-            paddingValues = PaddingValues()
+            paddingValues = PaddingValues(),
+            nextFocus = {},
+            onDone = {}
         )
     }
 }

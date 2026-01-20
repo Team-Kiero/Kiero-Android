@@ -18,7 +18,7 @@ data class ParentSignUpChildInfoUiModel(
         get() = InputValidator.isValidName(childFirstName.text.toString())
 }
 
-fun ParentSignUpModel.toState() = ParentSignUpChildInfoUiModel(
+fun ParentSignUpModel.toUiModel() = ParentSignUpChildInfoUiModel(
     code = this.code,
     childLastName = TextFieldState(initialText = this.childLastName),
     childFirstName = TextFieldState(initialText = this.childFirstName)

@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -89,7 +90,9 @@ fun KieroDialog(
                 Text(
                     text = title.orEmpty(),
                     color = KieroTheme.colors.white,
-                    style = KieroTheme.typography.semiBold.title2
+                    style = KieroTheme.typography.semiBold.title2,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
                 )
 
                 if (content != null) {
@@ -101,7 +104,9 @@ fun KieroDialog(
                 Text(
                     text = subDescription.orEmpty(),
                     color = KieroTheme.colors.gray100,
-                    style = KieroTheme.typography.regular.body3
+                    style = KieroTheme.typography.regular.body3,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
                 )
 
                 Spacer(modifier = Modifier.height(18.dp))

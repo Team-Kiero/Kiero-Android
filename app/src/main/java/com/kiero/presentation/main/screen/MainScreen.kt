@@ -30,8 +30,10 @@ import com.kiero.core.designsystem.component.dialog.KieroDialog
 import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
 import com.kiero.core.model.trigger.DialogTrigger
 import com.kiero.core.model.trigger.GlobalUiEventHolder
+import com.kiero.core.model.trigger.RefreshState
 import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
+import com.kiero.core.trigger.LocalRefreshState
 import com.kiero.presentation.main.navigation.KidMainTab
 import com.kiero.presentation.main.navigation.KieroNavHost
 import com.kiero.presentation.main.navigation.MainAppState
@@ -98,7 +100,9 @@ fun MainScreen(
 
     val currentTab =
         if (showParentBottomBar) currentParentTab else if (showKidBottomBar) currentKidTab else null
+
     val dialogState = rememberDialogStateHolder()
+    val refreshState = remember { RefreshState() }
 
     val onShowToast: (String) -> Unit = remember {
         { message ->
@@ -164,7 +168,8 @@ fun MainScreen(
     )
 
     CompositionLocalProvider(
-        LocalGlobalUiEventTrigger provides eventHolder
+        LocalGlobalUiEventTrigger provides eventHolder,
+        LocalRefreshState provides refreshState
     ) {
         Box(
             modifier = modifier
@@ -179,7 +184,7 @@ fun MainScreen(
                             // TODO: 디자인 확정 후 스낵바 높이 및 패딩 수정 필요
                             modifier = Modifier
                                 .padding(horizontal = 16.dp)
-                                .padding(bottom = 90.dp)
+                                .padding(bottom = 30.dp)
                         )
                     }
                 },
@@ -190,9 +195,15 @@ fun MainScreen(
                         tabs = tabs,
                         currentTab = currentTab,
                         onTabSelected = { tab ->
-                            when (tab) {
-                                is ParentMainTab -> appState.navigateParentTab(tab)
-                                is KidMainTab -> appState.navigateKidTab(tab)
+                            if (currentTab == tab) {
+                                scope.launch {
+                                    refreshState.trigger(tab)
+                                }
+                            } else {
+                                when (tab) {
+                                    is ParentMainTab -> appState.navigateParentTab(tab)
+                                    is KidMainTab -> appState.navigateKidTab(tab)
+                                }
                             }
                         }
                     )

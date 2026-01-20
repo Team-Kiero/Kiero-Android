@@ -50,7 +50,7 @@ fun KidWishDescription(
 
         Text(
             text = "미션을 통해 얻은 금화로 소원을 살 수 있어!",
-            style = KieroTheme.typography.regular.body2,
+            style = KieroTheme.typography.regular.body4,
             color = KieroTheme.colors.gray300
         )
     }

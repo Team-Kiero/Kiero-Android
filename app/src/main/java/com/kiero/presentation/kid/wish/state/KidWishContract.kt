@@ -1,7 +1,7 @@
 package com.kiero.presentation.kid.wish.state
 
 import androidx.compose.runtime.Immutable
-import com.kiero.presentation.kid.wish.model.KidCoinUiModel
+import com.kiero.presentation.kid.model.KidCoinUiModel
 import com.kiero.presentation.kid.wish.model.KidWishUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -10,6 +10,7 @@ import kotlinx.collections.immutable.persistentListOf
 data class KidWishState(
     val isVisibleDialog: Boolean = false,
     val isCompletedWish: Boolean = false,
+    val isRefreshing: Boolean = false,
     val selectedWishItem: KidWishUiModel? = null,
     val coinUiModel: KidCoinUiModel = KidCoinUiModel(),
     val kidWishList: ImmutableList<KidWishUiModel> = persistentListOf(),

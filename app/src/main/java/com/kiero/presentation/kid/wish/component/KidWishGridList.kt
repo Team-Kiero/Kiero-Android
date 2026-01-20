@@ -23,7 +23,6 @@ fun KidWishGridList(
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         wishList.chunked(2).forEach { columnItems ->
-
             Column(
                 verticalArrangement = Arrangement.spacedBy(13.dp)
             ) {
