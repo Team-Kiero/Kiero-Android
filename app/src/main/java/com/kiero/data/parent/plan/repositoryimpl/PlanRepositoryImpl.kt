@@ -36,11 +36,7 @@ class PlanRepositoryImpl @Inject constructor(
             dayOfWeek = dayOfWeek,
             date = date
         )
-        val response = dataSource.postPlan(childId, requestDto)
-
-        if (response.status !in 200..299) {
-            throw Exception(response.message ?: "일정 추가에 실패했습니다")
-        }
+        dataSource.postPlan(childId, requestDto)
         Unit
     }
 

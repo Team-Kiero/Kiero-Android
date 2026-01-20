@@ -3,10 +3,12 @@ package com.kiero.presentation.parent.schedule.viewmodel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.kiero.core.model.UiState
 import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.data.parent.plan.repository.PlanRepository
 import com.kiero.presentation.parent.schedule.plan.state.ParentScheduleState
+import com.kiero.presentation.signup.parent.navigation.ParentSignUp
 import com.kiero.presentation.signup.parent.state.ParentSignUpSideEffect
 import com.kiero.presentation.signup.parent.state.ParentSignUpState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,19 +39,20 @@ class ParentScheduleViewModel @Inject constructor(
     private val _sideEffect = MutableSharedFlow<ParentSignUpSideEffect>()
     val sideEffect: SharedFlow<ParentSignUpSideEffect> = _sideEffect.asSharedFlow()
 
+    val info = savedStateHandle.toRoute<ParentSignUp>()
+
 
     init {
         fetchSchedule(1L)
 
-        val name = savedStateHandle.get<String>("parentName")
-        val image = savedStateHandle.get<String>("parentProfileImage")
+        val parentName = info.parentName
+        val profileImage = info.parentProfileImage
 
-        if (name != null || image != null) {
-            initFetchParentInfo(
-                parentName = name ?: "사용자",
-                parentProfileImage = image ?: ""
-            )
-        }
+        initFetchParentInfo(
+            parentName = parentName,
+            parentProfileImage = profileImage
+        )
+
 
     }
 
