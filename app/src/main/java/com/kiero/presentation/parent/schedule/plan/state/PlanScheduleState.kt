@@ -51,7 +51,7 @@ data class ParentScheduleState(
 
 }
 
-fun RecurringScheduleModel.toScheduleEvent() = ScheduleEvent(
+fun RecurringScheduleModel.toUiModel() = ScheduleEvent(
     id = "recurring_${name}_${startTime}",
     name = name,
     isRecurring = true,
@@ -62,7 +62,7 @@ fun RecurringScheduleModel.toScheduleEvent() = ScheduleEvent(
     date = null
 )
 
-fun NormalScheduleModel.toScheduleEvent() = ScheduleEvent(
+fun NormalScheduleModel.toUiModel() = ScheduleEvent(
     id = "normal_${name}_${date}",
     name = name,
     isRecurring = false,
