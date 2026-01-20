@@ -4,6 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.kiero.core.common.extension.updateSuccess
+import com.kiero.core.model.UiState
 import com.kiero.data.kid.schedule.repository.ScheduleRepository
 import com.kiero.presentation.kid.journey.camera.navigation.Camera
 import com.kiero.presentation.kid.journey.camera.state.KidCameraSideEffect
@@ -26,10 +28,12 @@ class KidCameraViewModel @Inject constructor(
 ) : ViewModel() {
     private val camera = savedStateHandle.toRoute<Camera>()
 
-    private val _state = MutableStateFlow(
-        KidCameraState(
-            scheduleDetailId = camera.scheduleDetailId,
-            stoneType = camera.stoneType
+    private val _state = MutableStateFlow<UiState<KidCameraState>>(
+        UiState.Success(
+            KidCameraState(
+                scheduleDetailId = camera.scheduleDetailId,
+                stoneType = camera.stoneType
+            )
         )
     )
     val state = _state.asStateFlow()
@@ -37,11 +41,26 @@ class KidCameraViewModel @Inject constructor(
     private val _sideEffect = MutableSharedFlow<KidCameraSideEffect>()
     val sideEffect: SharedFlow<KidCameraSideEffect> = _sideEffect.asSharedFlow()
 
+    fun updateTempUri(uri: String) {
+        _state.updateSuccess {
+            it.copy(tempUri = uri)
+        }
+    }
+
+    fun updateImageUri() {
+        _state.updateSuccess {
+            it.copy(imageUri = it.tempUri)
+        }
+    }
+
     fun postImage(
         fileName: String,
         contentType: String
     ) {
         viewModelScope.launch {
+            val currentState = (_state.value as? UiState.Success)?.data ?: return@launch
+            _state.updateSuccess { it.copy(isLoading = true) }
+
             repository.postPresignedUrl(
                 fileName = fileName,
                 contentType = contentType
@@ -49,7 +68,7 @@ class KidCameraViewModel @Inject constructor(
                 Timber.e("postImage success: $result")
                 val deferred = async {
                     repository.patchScheduleComplete(
-                        scheduleDetailId = state.value.scheduleDetailId,
+                        scheduleDetailId = currentState.scheduleDetailId,
                         imageUrl = result.presignedUrl.split("?").first()
                     )
                 }
@@ -59,19 +78,15 @@ class KidCameraViewModel @Inject constructor(
                 scheduleComplete.onSuccess {
                     Timber.e("deferred success: $it")
                     _sideEffect.emit(KidCameraSideEffect.NavigateUp)
+                    _state.updateSuccess { it.copy(isLoading = false) }
                 }.onFailure {
                     Timber.e("deferred fail: $it")
+                    _state.updateSuccess { it.copy(isLoading = false) }
                 }
             }.onFailure {
                 Timber.e("postImage fail: $it")
+                _state.updateSuccess { it.copy(isLoading = false) }
             }
         }
     }
-
-    fun patchScheduleComplete() {
-        viewModelScope.launch {
-
-        }
-    }
-
 }

@@ -3,6 +3,7 @@ package com.kiero.presentation.kid.journey.fire.viewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.navigation.toRoute
+import com.kiero.core.model.UiState
 import com.kiero.presentation.kid.journey.fire.navigation.Fire
 import com.kiero.presentation.kid.journey.fire.state.KidFireState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,11 +18,13 @@ class KidFireViewModel @Inject constructor(
 
     private val fire = savedStateHandle.toRoute<Fire>()
 
-    private val _State = MutableStateFlow(
-        KidFireState(
-            date = fire.date,
-            stones = fire.stones
+    private val _fireState = MutableStateFlow<UiState<KidFireState>>(
+        UiState.Success(
+            KidFireState(
+                date = fire.date,
+                stones = fire.stones
+            )
         )
     )
-    val fireState = _State.asStateFlow()
+    val fireState = _fireState.asStateFlow()
 }

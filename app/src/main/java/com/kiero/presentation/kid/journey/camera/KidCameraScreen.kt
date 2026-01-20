@@ -17,9 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -33,12 +30,16 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.kiero.R
 import com.kiero.core.common.extension.collectSideEffect
+import com.kiero.core.common.util.successData
+import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.core.model.UiState
 import com.kiero.presentation.kid.component.KidSpeechField
 import com.kiero.presentation.kid.journey.camera.component.StoneFloating
 import com.kiero.presentation.kid.journey.camera.state.KidCameraSideEffect
@@ -52,22 +53,24 @@ fun KidCameraRoute(
     navigateUp: () -> Unit,
     viewModel: KidCameraViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
-    val tempUri = remember {
-        val directory = File(context.cacheDir, "images")
-        directory.mkdirs()
-        val file = File(directory, "${System.currentTimeMillis()}.jpg")
-        FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+    LaunchedEffect(Unit) {
+        if (state.successData?.tempUri == null) {
+            val directory = File(context.cacheDir, "images")
+            directory.mkdirs()
+            val file = File(directory, "${System.currentTimeMillis()}.jpg")
+            val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+            viewModel.updateTempUri(uri.toString())
+        }
     }
 
     val systemCameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
         if (success) {
-            imageUri = tempUri
+            viewModel.updateImageUri()
         }
     }
 
@@ -79,22 +82,31 @@ fun KidCameraRoute(
         }
     }
 
-    LaunchedEffect(Unit) {
-        if (imageUri == null) {
-            systemCameraLauncher.launch(tempUri)
+    LaunchedEffect(state.successData?.tempUri) {
+        if (state.successData?.tempUri != null && state.successData?.imageUri == null) {
+            systemCameraLauncher.launch(state.successData?.tempUri!!.toUri())
         }
     }
 
-    KidCameraScreen(
-        imageUri = imageUri,
-        stoneType = state.stoneType,
-        onBack = {
-            viewModel.postImage(
-                fileName = "${System.currentTimeMillis()}.jpg",
-                contentType = "image/jpeg"
+    when (val state = state) {
+        is UiState.Success -> {
+            KidCameraScreen(
+                imageUri = state.successData?.imageUri?.toUri(),
+                stoneType = state.successData?.stoneType!!,
+                onBack = {
+                    viewModel.postImage(
+                        fileName = "${System.currentTimeMillis()}.jpg",
+                        contentType = "image/jpeg"
+                    )
+                }
             )
         }
-    )
+        is UiState.Loading -> {
+            KieroLoadingIndicator()
+        }
+        is UiState.Failure -> {}
+        else -> {}
+    }
 }
 
 @Composable

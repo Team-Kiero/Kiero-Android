@@ -37,7 +37,9 @@ import com.kiero.core.designsystem.component.KieroToolTip
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.component.chip.KieroChip
 import com.kiero.core.designsystem.component.chip.action.KieroTextAction
+import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.core.model.UiState
 import com.kiero.presentation.kid.component.KidSpeechField
 import com.kiero.presentation.kid.journey.fire.component.StoneMoving
 import com.kiero.presentation.kid.journey.fire.state.KidFireResultState
@@ -54,12 +56,21 @@ fun KidFireResultRoute(
 ) {
     val state by viewModel.fireResultState.collectAsStateWithLifecycle()
 
-    KidFIreResultScreen(
-        paddingValues = paddingValues,
-        state = state,
-        navigateUp = navigateUp,
-        navigateToJourney = navigateToJourney
-    )
+    when (val state = state) {
+        is UiState.Success -> {
+            KidFIreResultScreen(
+                paddingValues = paddingValues,
+                state = state.data,
+                navigateUp = navigateUp,
+                navigateToJourney = navigateToJourney
+            )
+        }
+        is UiState.Loading -> {
+            KieroLoadingIndicator()
+        }
+        is UiState.Failure -> {}
+        else -> {}
+    }
 }
 
 @Composable
