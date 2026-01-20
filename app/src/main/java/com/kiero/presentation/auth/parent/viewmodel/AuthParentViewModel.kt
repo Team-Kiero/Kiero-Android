@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.common.extension.toHandleErrorMessage
+import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.model.UiState
 import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.presentation.auth.state.AuthSideEffect
@@ -23,6 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthParentViewModel @Inject constructor(
     private val authRepository: AuthRepository,
+    private val userInfoManager: UserInfoManager
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AuthState())
@@ -36,6 +38,11 @@ class AuthParentViewModel @Inject constructor(
 
         authRepository.loginWithKakao(context)
             .onSuccess { result ->
+                userInfoManager.saveParentInfo(
+                    parentName = result.name,
+                    parentProfileImage = result.image
+                )
+
                 val childrenDeferred = async { authRepository.getChildren() }
 
                 val childrenResult = childrenDeferred.await()

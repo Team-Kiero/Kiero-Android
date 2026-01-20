@@ -4,6 +4,7 @@ import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.data.mission.model.MissionCompleteModel
 import com.kiero.data.mission.model.MissionSuggestionModel
 import com.kiero.data.mission.model.SuggestedMissionModel
+import com.kiero.data.mission.model.toModel
 import com.kiero.data.mission.remote.datasource.AutoMissionDataSource
 import com.kiero.data.mission.remote.dto.request.MissionCreateDto
 import com.kiero.data.mission.repository.AutoMissionRepository
@@ -18,7 +19,7 @@ class AutoMissionRepositoryImpl @Inject constructor(
         noticeText: String
     ): Result<MissionSuggestionModel> = suspendRunCatching {
         withTimeout(15000L) {
-            autoMissionDataSource.analyzeNotice(noticeText).data!!
+            autoMissionDataSource.analyzeNotice(noticeText).data!!.toModel()
         }
     }
 
@@ -33,6 +34,6 @@ class AutoMissionRepositoryImpl @Inject constructor(
                 dueAt = mission.dueAt
             )
         }
-        autoMissionDataSource.saveBatchMissions(childId, requestDto).data!!
+        autoMissionDataSource.saveBatchMissions(childId, requestDto).data!!.map { it.toModel() }
     }
 }
