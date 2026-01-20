@@ -132,10 +132,15 @@ fun KidJourneyRoute(
                                 permissionLauncher.launch(Manifest.permission.CAMERA)
                             }
                         }
+
                         KidJourneyButtonType.FIRE -> {
-                            navigateToFire(state.data.header!!.currentDate, state.data.header.earnedStones!!)
+                            navigateToFire(
+                                state.data.header!!.currentDate,
+                                state.data.header.earnedStones!!
+                            )
                         }
-                        else -> { }
+
+                        else -> {}
                     }
                 },
                 onNextClick = viewModel::onNextClick,
@@ -195,7 +200,10 @@ private fun KidJourneyScreen(
         ) {
             // 헤더
             state.header?.let { header ->
-                KidJourneyHeader(header = header)
+                KidJourneyHeader(
+                    header = header,
+                    isFireLit = state.content == KidJourneyContentUiModel.FireLit
+                )
             }
 
             Spacer(modifier = Modifier.height(22.dp))

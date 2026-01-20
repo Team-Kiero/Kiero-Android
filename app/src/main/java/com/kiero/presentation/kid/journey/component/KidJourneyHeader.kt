@@ -21,7 +21,8 @@ import com.kiero.presentation.kid.journey.model.KidJourneyHeaderUiModel
 @Composable
 fun KidJourneyHeader(
     header: KidJourneyHeaderUiModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isFireLit: Boolean = false
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -55,7 +56,7 @@ fun KidJourneyHeader(
                     onClick = {}
                 ),
                 isEnabled = true,
-                isCompleted = header.earnedStones == header.totalScheduleCount
+                isCompleted = !isFireLit && header.earnedStones == header.totalScheduleCount
                         && header.totalScheduleCount > 0
             )
         }
@@ -71,9 +72,10 @@ private fun KidJourneyHeaderPreview() {
                 kidName = "주완",
                 currentDate = "12월 5일 목요일",
                 coinCount = 350,
-                earnedStones = 5,
+                earnedStones = 7,
                 totalScheduleCount = 7
-            )
+            ),
+            isFireLit = true
         )
     }
 }
