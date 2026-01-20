@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -14,34 +15,39 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.theme.KieroTheme
-import com.kiero.presentation.parent.schedule.plan.model.DayList
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toPersistentList
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 fun ScheduleWeekTopbar(
-    dayList: ImmutableList<DayList>,
+    currentDate: LocalDate,
     modifier: Modifier = Modifier,
 ) {
+    val weekDaysList = remember(currentDate) {
+        val monday = currentDate.with(java.time.DayOfWeek.MONDAY)
+        val formatter = DateTimeFormatter.ofPattern("d(E)", Locale.KOREAN)
+
+        (0..6).map { offset ->
+            monday.plusDays(offset.toLong()).format(formatter)
+        }
+    }
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(
-                color = Color.Unspecified
-            )
+            .background(color = Color.Unspecified)
             .padding(start = 28.dp, end = 7.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(3.dp)
     ) {
-        dayList.forEachIndexed { index, date ->
+        weekDaysList.forEachIndexed { index, day ->
             Text(
-                text = date.day,
+                text = day,
                 color = if (index == 0) KieroTheme.colors.main else KieroTheme.colors.gray100,
                 style = KieroTheme.typography.regular.body5,
                 textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .weight(1f)
+                modifier = Modifier.weight(1f)
             )
         }
     }
@@ -52,15 +58,7 @@ fun ScheduleWeekTopbar(
 private fun WeekTopbarPreview() {
     KieroTheme {
         ScheduleWeekTopbar(
-            dayList = listOf(
-                DayList("8(월)"),
-                DayList("9(화)"),
-                DayList("10(수)"),
-                DayList("11(목)"),
-                DayList("12(금)"),
-                DayList("13(토)"),
-                DayList("14(일)")
-            ).toPersistentList()
+            currentDate = LocalDate.of(2026, 1, 20)
         )
     }
 }
