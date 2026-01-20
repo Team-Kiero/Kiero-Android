@@ -13,6 +13,8 @@ import com.kiero.presentation.parent.schedule.mission.navigation.parentMissionAd
 import com.kiero.presentation.parent.schedule.navigation.parentScheduleNavGraph
 import com.kiero.presentation.parent.schedule.plan.navigation.navigateToScheduleAdd
 import com.kiero.presentation.parent.schedule.plan.navigation.parentScheduleAddNavGraph
+import com.kiero.presentation.parent.schedule.mission.auto.navigation.navigateToAutoMissionAdd
+import com.kiero.presentation.parent.schedule.mission.auto.navigation.parentAutoMissionAddNavGraph
 import kotlinx.serialization.Serializable
 
 sealed interface ParentTab : Route
@@ -44,7 +46,8 @@ fun NavGraphBuilder.parentNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
             navigateToScheduleAdd = navController::navigateToScheduleAdd,
-            navigateToMissionAdd = navController::navigateToMissionAdd
+            navigateToMissionAdd = navController::navigateToMissionAdd,
+            navigateToAutoMissionAdd = navController::navigateToAutoMissionAdd
         )
 
         parentScheduleAddNavGraph(
@@ -55,6 +58,11 @@ fun NavGraphBuilder.parentNavGraph(
         parentMissionAddNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
+        )
+
+        parentAutoMissionAddNavGraph(
+            paddingValues = paddingValues,
+            navigateUp = navigateUp
         )
 
         parentAlarmNavGraph(

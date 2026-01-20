@@ -43,6 +43,7 @@ fun ParentScheduleRoute(
     navigateUp: () -> Unit,
     navigateToScheduleAdd: () -> Unit,
     navigateToMissionAdd: () -> Unit,
+    navigateToAutoMissionAdd: (Long) -> Unit,
     viewModel: ParentScheduleViewModel = hiltViewModel(),
 ) {
 
@@ -65,7 +66,8 @@ fun ParentScheduleRoute(
                 onTabSelected = { selectedTabIndex = it },
                 onDateChange = viewModel::onDateChange,
                 navigateToScheduleAdd = navigateToScheduleAdd,
-                navigateToMissionAdd = navigateToMissionAdd
+                navigateToMissionAdd = navigateToMissionAdd,
+                navigateToAutoMissionAdd = navigateToAutoMissionAdd,
             )
         }
 
@@ -82,7 +84,8 @@ fun ParentScheduleRoute(
                 onTabSelected = { selectedTabIndex = it },
                 onDateChange = viewModel::onDateChange,
                 navigateToScheduleAdd = navigateToScheduleAdd,
-                navigateToMissionAdd = navigateToMissionAdd
+                navigateToMissionAdd = navigateToMissionAdd,
+                navigateToAutoMissionAdd = navigateToAutoMissionAdd,
             )
         }
     }
@@ -93,6 +96,7 @@ private fun ParentScheduleScreen(
     paddingValues: PaddingValues,
     state: ParentSignUpState,
     scheduleState: ParentScheduleState,
+    navigateToAutoMissionAdd: (Long) -> Unit,
     selectedTabIndex: Int,
     modifier: Modifier = Modifier,
     onTabSelected: (Int) -> Unit,
@@ -169,7 +173,9 @@ private fun ParentScheduleScreen(
                 isExpanded = isMissionFabExpanded,
                 onExpandedChange = { isMissionFabExpanded = it },
                 onMissionAdd = navigateToMissionAdd,
-                onMissionRecommend = { /* 규현이 화면 */ },
+                onMissionRecommend = {
+                    navigateToAutoMissionAdd(10) // 임시 ChildID
+                },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(end = 16.dp, bottom = 52.dp)
@@ -186,7 +192,8 @@ private fun ParentScheduleScreenPreview() {
             paddingValues = PaddingValues(),
             navigateUp = {},
             navigateToScheduleAdd = {},
-            navigateToMissionAdd = {}
+            navigateToMissionAdd = {},
+            navigateToAutoMissionAdd = {}
         )
     }
 }

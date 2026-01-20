@@ -1,5 +1,6 @@
 package com.kiero.data.mission.model
 
+import com.kiero.data.mission.remote.dto.response.CreatedMissionDto
 import com.kiero.data.mission.remote.dto.response.MissionByDateResponseDto
 import com.kiero.data.mission.remote.dto.response.MissionListResponseDto
 import com.kiero.data.mission.remote.dto.response.MissionResponseDto
@@ -37,4 +38,12 @@ fun MissionResponseDto.toModel() = MissionModel(
     isCompleted = this.isCompleted,
     name = this.name,
     reward = this.reward
+)
+
+fun CreatedMissionDto.toModel() = MissionCompleteModel(
+    id = this.id,
+    name = this.name,
+    reward = this.reward,
+    dueAt = this.dueAt,
+    isCompleted = this.isCompleted
 )

@@ -1,6 +1,8 @@
 package com.kiero.data.mission.di
 
+import com.kiero.data.mission.repository.AutoMissionRepository
 import com.kiero.data.mission.repository.MissionRepository
+import com.kiero.data.mission.repositoryimpl.AutoMissionRepositoryImpl
 import com.kiero.data.mission.repositoryimpl.MissionRepositoryImpl
 import com.kiero.data.parent.repository.ParentMissionAddRepository
 import com.kiero.data.parent.repositoryimpl.ParentMissionAddRepositoryImpl
@@ -26,4 +28,9 @@ interface MissionRepositoryModule {
         parentMissionAddRepositoryImpl: ParentMissionAddRepositoryImpl,
     ): ParentMissionAddRepository
 
+    @Binds
+    @Singleton
+    fun bindAutoMissionRepository(
+        autoMissionRepositoryImpl: AutoMissionRepositoryImpl
+    ): AutoMissionRepository
 }
