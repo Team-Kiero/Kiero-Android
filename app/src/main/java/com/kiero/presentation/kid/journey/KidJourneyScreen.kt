@@ -40,7 +40,9 @@ import com.kiero.core.designsystem.component.KieroGifImage
 import com.kiero.core.designsystem.component.dialog.KieroDialog
 import com.kiero.core.designsystem.component.dialog.action.KieroCancelAction
 import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
+import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.core.model.UiState
 import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
 import com.kiero.presentation.kid.component.KidSpeechField
@@ -85,58 +87,70 @@ fun KidJourneyRoute(
         }
     }
 
-    val onNavigateToCamera = {
-        val content = state.content
-        when (content) {
-            is KidJourneyContentUiModel.FirstSchedule -> {
-                navigateToCamera(content.scheduleDetailId!!, content.stoneType!!)
-            }
-            is KidJourneyContentUiModel.NowSchedule -> {
-                navigateToCamera(content.scheduleDetailId!!, content.stoneType!!)
-            }
-            is KidJourneyContentUiModel.NextSchedule -> {
-                navigateToCamera(content.scheduleDetailId!!, content.stoneType!!)
-            }
-            else -> {
-                // 데이터가 없는 상태에서 호출된 경우
-            }
-        }
-    }
-
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            onNavigateToCamera()
-        }
-    }
-
-    KidJourneyScreen(
-        paddingValues = paddingValues,
-        state = state,
-        onButtonClick = {
-            when (state.buttonType) {
-                KidJourneyButtonType.AUTH -> {
-                    val hasPermission = ContextCompat.checkSelfPermission(
-                        context,
-                        Manifest.permission.CAMERA
-                    ) == PackageManager.PERMISSION_GRANTED
-
-                    if (hasPermission) {
-                        onNavigateToCamera()
-                    } else {
-                        permissionLauncher.launch(Manifest.permission.CAMERA)
+    when (val state = state) {
+        is UiState.Success -> {
+            val onNavigateToCamera = {
+                val content = state.data.content
+                when (content) {
+                    is KidJourneyContentUiModel.FirstSchedule -> {
+                        navigateToCamera(content.scheduleDetailId!!, content.stoneType!!)
+                    }
+                    is KidJourneyContentUiModel.NowSchedule -> {
+                        navigateToCamera(content.scheduleDetailId!!, content.stoneType!!)
+                    }
+                    is KidJourneyContentUiModel.NextSchedule -> {
+                        navigateToCamera(content.scheduleDetailId!!, content.stoneType!!)
+                    }
+                    else -> {
+                        // 데이터가 없는 상태에서 호출된 경우
                     }
                 }
-                KidJourneyButtonType.FIRE -> {
-                    navigateToFire(state.header!!.currentDate, state.header!!.earnedStones!!)
-                }
-                else -> { }
             }
-        },
-        onNextClick = viewModel::onNextClick,
-        navigateUp = navigateUp,
-    )
+
+            val permissionLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.RequestPermission()
+            ) { isGranted ->
+                if (isGranted) {
+                    onNavigateToCamera()
+                }
+            }
+
+            KidJourneyScreen(
+                paddingValues = paddingValues,
+                state = state.data,
+                onButtonClick = {
+                    when (state.data.buttonType) {
+                        KidJourneyButtonType.AUTH -> {
+                            val hasPermission = ContextCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.CAMERA
+                            ) == PackageManager.PERMISSION_GRANTED
+
+                            if (hasPermission) {
+                                onNavigateToCamera()
+                            } else {
+                                permissionLauncher.launch(Manifest.permission.CAMERA)
+                            }
+                        }
+                        KidJourneyButtonType.FIRE -> {
+                            navigateToFire(state.data.header!!.currentDate, state.data.header.earnedStones!!)
+                        }
+                        else -> { }
+                    }
+                },
+                onNextClick = viewModel::onNextClick,
+                navigateUp = navigateUp,
+            )
+        }
+
+        UiState.Empty -> {}
+        is UiState.Failure -> {}
+
+        UiState.Loading -> {
+            KieroLoadingIndicator()
+        }
+    }
+
 }
 
 @Composable

@@ -8,7 +8,6 @@ import com.kiero.presentation.kid.journey.model.KidJourneyHeaderUiModel
 
 @Immutable
 data class KidJourneyState(
-    val isLoading: Boolean = false,
     val header: KidJourneyHeaderUiModel? = null,
     val content: KidJourneyContentUiModel = KidJourneyContentUiModel.NoSchedule
 ) {
@@ -80,6 +79,17 @@ data class KidJourneyState(
             content = KidJourneyContentUiModel.FireNotLit(
                 kidName = "주완"
             )
+//            content = KidJourneyContentUiModel.NowSchedule(
+//                scheduleDetailId = 1,
+//                scheduleName = "피아노 학원 가기",
+//                stoneType = StoneUiType.WISDOM,
+//                scheduleInfo = KidJourneyScheduleUiModel(
+//                    order = 1,
+//                    startTime = "14:00:00",
+//                    endTime = "16:00:00"
+//                ),
+//                isSkippable = true
+//            )
         )
     }
 }
