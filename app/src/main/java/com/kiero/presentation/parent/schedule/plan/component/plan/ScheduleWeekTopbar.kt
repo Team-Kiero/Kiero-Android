@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.theme.KieroTheme
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -24,12 +25,12 @@ fun ScheduleWeekTopbar(
     currentDate: LocalDate,
     modifier: Modifier = Modifier,
 ) {
-    val weekDaysList = remember(currentDate) {
-        val monday = currentDate.with(java.time.DayOfWeek.MONDAY)
-        val formatter = DateTimeFormatter.ofPattern("d(E)", Locale.KOREAN)
+   val DAY_FORMATTER = DateTimeFormatter.ofPattern("d(E)", Locale.KOREAN)
 
-        (0..6).map { offset ->
-            monday.plusDays(offset.toLong()).format(formatter)
+    val weekDaysList = remember(currentDate) {
+        val startOfWeek = currentDate.with(DayOfWeek.MONDAY)
+        (0L..6L).map { offset ->
+            startOfWeek.plusDays(offset).format(DAY_FORMATTER)
         }
     }
 

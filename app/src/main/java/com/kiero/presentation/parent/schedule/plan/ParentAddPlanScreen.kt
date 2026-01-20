@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
+import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.trigger.SnackbarState
@@ -43,19 +43,18 @@ fun ParentScheduleAddRoute(
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val globalTrigger = LocalGlobalUiEventTrigger.current
 
-    LaunchedEffect(Unit) {
-        viewModel.sideEffect.collect { effect ->
-            when (effect) {
-                is ParentPlanSideEffect.ShowSnackBar -> globalTrigger.showSnackbar(
-                    SnackbarState(effect.message)
-                )
+    viewModel.sideEffect.collectSideEffect { effect ->
+        when (effect) {
+            is ParentPlanSideEffect.ShowSnackBar -> globalTrigger.showSnackbar(
+                SnackbarState(effect.message)
+            )
 
-                is ParentPlanSideEffect.navigateUp -> {
-                    navigateUp()
-                }
-
+            is ParentPlanSideEffect.navigateUp -> {
+                navigateUp()
             }
+
         }
+
     }
 
     ScheduleAddScreen(

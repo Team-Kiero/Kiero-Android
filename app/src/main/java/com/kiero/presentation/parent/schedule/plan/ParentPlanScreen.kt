@@ -19,7 +19,7 @@ import com.kiero.presentation.parent.schedule.plan.component.plan.ScheduleDateba
 import com.kiero.presentation.parent.schedule.plan.component.plan.ScheduleTimeTable
 import com.kiero.presentation.parent.schedule.plan.component.plan.ScheduleWeekTopbar
 import com.kiero.presentation.parent.schedule.plan.state.ParentScheduleState
-import com.kiero.presentation.parent.schedule.plan.state.toScheduleEvent
+import com.kiero.presentation.parent.schedule.plan.state.toUiModel
 
 @Composable
 fun ParentPlanScreen(
@@ -28,12 +28,14 @@ fun ParentPlanScreen(
     modifier: Modifier = Modifier,
 ) {
     val events = remember(state.planAllModel) {
-        val recurring =
-            state.planAllModel?.recurringSchedules?.map { it.toScheduleEvent() } ?: emptyList()
-        val normal =
-            state.planAllModel?.normalSchedules?.map { it.toScheduleEvent() } ?: emptyList()
-        recurring + normal
+        state.planAllModel?.let { model ->
+            buildList {
+                addAll(model.recurringSchedules.map { it.toUiModel() })
+                addAll(model.normalSchedules.map { it.toUiModel() })
+            }
+        } ?: emptyList()
     }
+
 
     Column(
         modifier = modifier
