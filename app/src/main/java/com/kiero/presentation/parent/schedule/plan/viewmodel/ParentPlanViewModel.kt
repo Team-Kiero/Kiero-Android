@@ -89,8 +89,7 @@ class ParentPlanViewModel @Inject constructor(
                 _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar("일정이 등록되었습니다"))
                 kotlinx.coroutines.delay(200)
             }.onFailure { error ->
-                val errorMessage = error.message ?: "해당 시간에 이미 등록된 일정이 있습니다"
-                _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar(errorMessage))
+                _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar("해당 시간에 이미 등록된 일정이 있습니다"))
                 _state.update { it.copy(isLoading = false) }
             }
         }
