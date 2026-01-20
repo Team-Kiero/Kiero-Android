@@ -48,9 +48,17 @@ fun ParentAutoResultRoute(
     navigateUp: () -> Unit,
     viewModel: AutoMissionViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(Unit) {
+    val missions by viewModel.missions.collectAsState()
+
+    LaunchedEffect(viewModel) {
         viewModel.shouldNavigateBack.collect {
             navigateUp()
+        }
+    }
+
+    LaunchedEffect(missions) {
+        if (missions.isNotEmpty() && viewModel.currentIndex.value == 0) {
+            viewModel.updateCurrentIndex(0)
         }
     }
 
@@ -75,6 +83,7 @@ fun ParentAutoResultScreen(
     val isSaving by viewModel.isSaving.collectAsState()
     val showBottomSheet by viewModel.showBottomSheet.collectAsState()
     val selectedDate by viewModel.selectedDate.collectAsState()
+    val hasViewedLastPage by viewModel.hasViewedLastPage.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
     val pagerState = rememberPagerState(
@@ -82,7 +91,7 @@ fun ParentAutoResultScreen(
         pageCount = { missions.size }
     )
 
-    val isSaveEnabled = missions.all {
+    val isSaveEnabled = hasViewedLastPage && missions.all {
         it.name.isNotBlank() && !it.dueAt.isBefore(LocalDate.now()) && it.reward > 0
     }
 
@@ -116,13 +125,8 @@ fun ParentAutoResultScreen(
         KieroTopbar(
             title = "알림장 미션 추가",
             leftIconRes = R.drawable.ic_close_light,
-            rightIconRes = if (isSaveEnabled) R.drawable.ic_check else null,
             leftIconClick = { viewModel.handleCancel() },
-            rightIconClick = if (isSaveEnabled) {
-                { viewModel.saveAllMissions(childId) }
-            } else {
-                {}
-            }
+            rightIconClick = {}
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -207,9 +211,7 @@ private fun ParentAutoResultScreen_WithSnackbarPreview() {
             KieroTopbar(
                 title = "알림장 미션 추가",
                 leftIconRes = R.drawable.ic_close_light,
-                rightIconRes = R.drawable.ic_check,
                 leftIconClick = {},
-                rightIconClick = {}
             )
 
             Spacer(Modifier.height(16.dp))

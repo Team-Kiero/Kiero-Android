@@ -70,7 +70,6 @@ private fun ParentAutoMissionAwardButton(
                 shape = RoundedCornerShape(15.dp)
             )
             .noRippleClickable(onClick = onAwardClick),
-            //.padding(horizontal = 14.dp, vertical = 11.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(

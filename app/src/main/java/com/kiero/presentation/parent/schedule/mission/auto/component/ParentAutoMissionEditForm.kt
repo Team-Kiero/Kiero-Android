@@ -58,7 +58,7 @@ fun ParentAutoMissionEditForm(
 
         ParentAutoMissionAwardSelect(
             textFieldState = viewModel.awardTextFieldState,
-            onAwardClick = { viewModel.updateMissionReward(it) }
+            onAwardClick = viewModel::onAwardClick
         )
     }
 }

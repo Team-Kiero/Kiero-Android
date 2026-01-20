@@ -1,10 +1,11 @@
 package com.kiero.presentation.parent.schedule.mission.auto.viewmodel
 
-
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.data.mission.repository.AutoMissionRepository
 import com.kiero.presentation.parent.schedule.mission.auto.model.MissionUiModel
+import com.kiero.presentation.parent.schedule.mission.component.model.MissionAwardDefaults
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
@@ -46,6 +48,17 @@ class AutoMissionViewModel @Inject constructor(
     private val _scrollToPage = MutableSharedFlow<Int>()
     val scrollToPage: SharedFlow<Int> = _scrollToPage.asSharedFlow()
 
+    private val _showBottomSheet = MutableStateFlow(false)
+    val showBottomSheet: StateFlow<Boolean> = _showBottomSheet.asStateFlow()
+
+    private val _selectedDate = MutableStateFlow<String?>(null)
+    val selectedDate: StateFlow<String?> = _selectedDate.asStateFlow()
+
+    val awardTextFieldState = TextFieldState()
+
+    private val _hasViewedLastPage = MutableStateFlow(false)
+    val hasViewedLastPage: StateFlow<Boolean> = _hasViewedLastPage.asStateFlow()
+
     fun updateNoticeText(text: String) {
         if (text.length > 1000) return
         _noticeText.value = text
@@ -59,6 +72,7 @@ class AutoMissionViewModel @Inject constructor(
                 .onSuccess { missions ->
                     _missions.value = missions
                     _currentIndex.value = 0
+                    _hasViewedLastPage.value = (missions.size == 1)
                 }
                 .onFailure { e ->
                     val message = when (e) {
@@ -79,6 +93,7 @@ class AutoMissionViewModel @Inject constructor(
 
     fun updateMissionDate(date: LocalDate) {
         updateMissionInList { it.copy(dueAt = date) }
+        _selectedDate.value = date.format(DateTimeFormatter.ofPattern("yyyy.MM.dd.(E)"))
     }
 
     fun updateMissionReward(reward: Int) {
@@ -93,6 +108,17 @@ class AutoMissionViewModel @Inject constructor(
 
     fun updateCurrentIndex(index: Int) {
         _currentIndex.value = index
+
+        if (index == _missions.value.size - 1) {
+            _hasViewedLastPage.value = true
+        }
+
+        _missions.value.getOrNull(index)?.let { mission ->
+            _selectedDate.value = mission.dueAt.format(DateTimeFormatter.ofPattern("yyyy.MM.dd.(E)"))
+            awardTextFieldState.edit {
+                replace(0, length, mission.reward.toString())
+            }
+        }
     }
 
     fun saveAllMissions(childId: Long) {
@@ -131,16 +157,50 @@ class AutoMissionViewModel @Inject constructor(
 
     fun handleCancel() {
         viewModelScope.launch {
-            if (_missions.value.isEmpty()) {
-                _shouldNavigateBack.emit(Unit)
-            } else {
-                _missions.value = emptyList()
-                _currentIndex.value = 0
+            _shouldNavigateBack.emit(Unit)
+        }
+    }
+
+    fun onDateClick() {
+        _showBottomSheet.value = true
+    }
+
+    fun onDismissBottomSheet() {
+        _showBottomSheet.value = false
+    }
+
+    fun onDateSelected(dateString: String) {
+        try {
+            val date = LocalDate.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE)
+            updateMissionDate(date)
+            _showBottomSheet.value = false
+        } catch (e: Exception) {
+            viewModelScope.launch {
+                _toastMessage.emit("날짜 형식이 올바르지 않습니다.")
             }
         }
     }
 
-    // 내부 헬퍼 함수
+    fun onAwardClick(change: Int) {
+        val currentMission = _missions.value.getOrNull(_currentIndex.value) ?: return
+        val currentReward = currentMission.reward
+        val newReward = MissionAwardDefaults.applyChange(currentReward, change)
+
+        viewModelScope.launch {
+            if (currentReward + change < MissionAwardDefaults.MIN_AWARD) {
+                _toastMessage.emit("최소 보상은 ${MissionAwardDefaults.MIN_AWARD}개입니다.")
+            }
+            else if (currentReward + change > MissionAwardDefaults.MAX_AWARD) {
+                _toastMessage.emit("최대 보상은 ${MissionAwardDefaults.MAX_AWARD}개입니다.")
+            }
+        }
+
+        updateMissionReward(newReward)
+        awardTextFieldState.edit {
+            replace(0, length, newReward.toString())
+        }
+    }
+
     private fun updateMissionInList(transform: (MissionUiModel) -> MissionUiModel) {
         val currentList = _missions.value.toMutableList()
         val index = _currentIndex.value
