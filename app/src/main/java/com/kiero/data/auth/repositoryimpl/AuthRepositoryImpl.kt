@@ -49,10 +49,17 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun postAuthKidLogin(request: AuthKidModel): Result<AuthKidResponseModel> = suspendRunCatching {
-        authRemoteDataSource.postAuthKidLogin(
+        val loginResponse = authRemoteDataSource.postAuthKidLogin(
             authKidRequestDto = request.toDto()
         ).data!!.toModel()
+
+        tokenManager.saveTokens(
+            accessToken = loginResponse.accessToken,
+            refreshToken = loginResponse.refreshToken
+        )
+
+        Timber.e("postAuthKidLogin $loginResponse")
+
+        loginResponse
     }
-
-
 }
