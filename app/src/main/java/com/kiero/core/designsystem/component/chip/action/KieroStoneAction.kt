@@ -20,6 +20,7 @@ class KieroStoneAction(
     private val currentStoneCount: Int,
     private val maxStoneCount: Int,
     private val isEnabled: Boolean = true,
+    private val isFireLit: Boolean = false,
     private val onClick: () -> Unit
 ) : ChipAction {
     @Composable
@@ -30,7 +31,7 @@ class KieroStoneAction(
 
         val targetColor = when {
             !isEnabled -> KieroTheme.colors.gray500
-            isCompleted && maxStoneCount > 0 -> KieroTheme.colors.main
+            isCompleted && maxStoneCount > 0 && !isFireLit -> KieroTheme.colors.main
             else -> KieroTheme.colors.gray100
         }
 

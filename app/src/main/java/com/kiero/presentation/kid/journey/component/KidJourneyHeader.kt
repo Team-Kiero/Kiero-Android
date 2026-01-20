@@ -53,6 +53,7 @@ fun KidJourneyHeader(
                 action = KieroStoneAction(
                     currentStoneCount = header.earnedStones!!,
                     maxStoneCount = header.totalScheduleCount!!,
+                    isFireLit = isFireLit,
                     onClick = {}
                 ),
                 isEnabled = true,
