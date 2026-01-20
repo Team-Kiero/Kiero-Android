@@ -4,6 +4,7 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.mission.model.SuggestedMissionModel
 import com.kiero.data.mission.repository.AutoMissionRepository
 import com.kiero.presentation.parent.schedule.mission.auto.model.MissionUiModel
@@ -26,7 +27,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AutoMissionViewModel @Inject constructor(
-    private val autoMissionRepository: AutoMissionRepository
+    private val autoMissionRepository: AutoMissionRepository,
+    private val userInfoManager: UserInfoManager,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AutoMissionState())
@@ -52,8 +54,13 @@ class AutoMissionViewModel @Inject constructor(
     fun analyzeNotice() {
         viewModelScope.launch {
             _state.update { it.copy(isAnalyzing = true) }
+            val rawText = _state.value.noticeText
 
-            autoMissionRepository.analyzeNotice(_state.value.noticeText)
+            val escapedText = rawText
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+
+            autoMissionRepository.analyzeNotice(escapedText)
                 .onSuccess { domainData ->
                     val uiMissions = domainData.suggestedMissions.map { suggested ->
                         MissionUiModel(
@@ -177,8 +184,9 @@ class AutoMissionViewModel @Inject constructor(
         }
     }
 
-    fun saveAllMissions(childId: Long) {
+    fun saveAllMissions() {
         viewModelScope.launch {
+            val childId = userInfoManager.getChildIdInfo() ?: return@launch
             val currentState = _state.value
             val missions = currentState.missions
 

@@ -25,11 +25,7 @@ class ParentMissionViewModel @Inject constructor(
     private val _sideEffect = MutableSharedFlow<ParentMissionSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
 
-    init {
-        getMissions()
-    }
-
-    private fun getMissions() {
+    fun getMissions() {
         viewModelScope.launch {
             _state.value = UiState.Loading
 

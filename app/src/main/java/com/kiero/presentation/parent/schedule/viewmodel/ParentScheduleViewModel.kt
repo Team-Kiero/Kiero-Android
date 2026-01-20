@@ -48,7 +48,6 @@ class ParentScheduleViewModel @Inject constructor(
     val sideEffect: SharedFlow<ParentSignUpSideEffect> = _sideEffect.asSharedFlow()
 
     init {
-        fetchSchedule()
         initFetchParentInfo()
     }
 

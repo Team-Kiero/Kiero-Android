@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -57,6 +58,10 @@ fun ParentScheduleRoute(
 
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val authState by viewModel.authstate.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchSchedule()
+    }
 
     viewModel.sideEffect.collectSideEffect {
         when (it) {
