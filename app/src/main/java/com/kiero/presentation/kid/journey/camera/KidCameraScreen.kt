@@ -163,7 +163,10 @@ private fun KidCameraScreen(
                     .align(Alignment.BottomCenter),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                StoneFloating(stoneImageRes = stoneType.imageRes)
+                StoneFloating(
+                    stoneImageRes = stoneType.imageRes,
+                    modifier = Modifier.padding(horizontal = 110.dp)
+                )
 
                 Spacer(modifier = Modifier.height(19.dp))
 
