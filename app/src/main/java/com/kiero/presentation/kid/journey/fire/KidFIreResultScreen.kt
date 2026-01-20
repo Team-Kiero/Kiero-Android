@@ -76,10 +76,10 @@ private fun KidFIreResultScreen(
     var isFinished by remember { mutableStateOf(false) }
     var currentStone by remember { mutableStateOf<StoneUiType?>(null) }
 
-    LaunchedEffect(state.earnedStones) {
-        if (state.earnedStones.isNotEmpty()) {
+    LaunchedEffect(state.content.earnedStones) {
+        if (state.content.earnedStones.isNotEmpty()) {
             isFinished = false
-            state.earnedStones.forEach { stone ->
+            state.content.earnedStones.forEach { stone ->
                 currentStone = stone
                 delay(3000L)
             }
@@ -205,17 +205,27 @@ private fun KidFIreResultScreen(
                     color = KieroTheme.colors.gray300
                 )
 
-                if (state.earnedCoin == 0)
-                Text(
-                    text = buildAnnotatedString {
-                        append("선물로 금화 ")
-                        withStyle(style = SpanStyle(color = KieroTheme.colors.main)) {
-                            append(state.earnedCoin.toString())
-                        }
-                        append(" 개를 줄게")
-                    },
-                    color = KieroTheme.colors.gray300
-                )
+                if (state.content.earnedCoin != 0) {
+                    Text(
+                        text = buildAnnotatedString {
+                            append("선물로 금화 ")
+                            withStyle(style = SpanStyle(color = KieroTheme.colors.main)) {
+                                append(state.content.earnedCoin.toString())
+                            }
+                            append(" 개를 줄게")
+                        },
+                        color = KieroTheme.colors.gray300
+                    )
+                }
+                else {
+                    Text(
+                        text = buildAnnotatedString {
+                            append("오늘도 도와줘서 고마워.")
+                        },
+                        color = KieroTheme.colors.gray300
+                    )
+                }
+
             }
         }
     }
