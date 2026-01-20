@@ -18,7 +18,7 @@ class AutoMissionRepositoryImpl @Inject constructor(
         noticeText: String
     ): Result<MissionSuggestionModel> = suspendRunCatching {
         withTimeout(15000L) {
-            autoMissionDataSource.analyzeNotice(noticeText)
+            autoMissionDataSource.analyzeNotice(noticeText).data!!
         }
     }
 
@@ -33,6 +33,6 @@ class AutoMissionRepositoryImpl @Inject constructor(
                 dueAt = mission.dueAt
             )
         }
-        autoMissionDataSource.saveBatchMissions(childId, requestDto)
+        autoMissionDataSource.saveBatchMissions(childId, requestDto).data!!
     }
 }
