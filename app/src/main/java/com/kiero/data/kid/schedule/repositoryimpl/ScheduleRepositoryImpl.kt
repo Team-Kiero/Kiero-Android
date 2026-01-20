@@ -3,7 +3,6 @@ package com.kiero.data.kid.schedule.repositoryimpl
 import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.data.kid.schedule.model.ScheduleFireModel
 import com.kiero.data.kid.schedule.model.ScheduleImageUploadModel
-import com.kiero.data.kid.schedule.model.ScheduleSkipModel
 import com.kiero.data.kid.schedule.model.ScheduleTodayModel
 import com.kiero.data.kid.schedule.model.toModel
 import com.kiero.data.kid.schedule.remote.datasource.ScheduleDataSource
@@ -15,7 +14,6 @@ class ScheduleRepositoryImpl @Inject constructor(
 ) : ScheduleRepository {
     override suspend fun patchScheduleToday(): Result<ScheduleTodayModel> = suspendRunCatching {
         dataSource.patchScheduleToday().data!!.toModel()
-
     }
 
     override suspend fun postPresignedUrl(
@@ -41,8 +39,9 @@ class ScheduleRepositoryImpl @Inject constructor(
 
     override suspend fun patchScheduleSkip(
         scheduleDetailId: Long
-    ): Result<ScheduleSkipModel> = suspendRunCatching {
-        dataSource.patchScheduleSkip(scheduleDetailId).data!!.toModel()
+    ): Result<Unit> = suspendRunCatching {
+        dataSource.patchScheduleSkip(scheduleDetailId)
+        Unit
     }
 
     override suspend fun patchScheduleFireLit(

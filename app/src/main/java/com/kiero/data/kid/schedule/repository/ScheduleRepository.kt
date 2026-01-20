@@ -2,7 +2,6 @@ package com.kiero.data.kid.schedule.repository
 
 import com.kiero.data.kid.schedule.model.ScheduleFireModel
 import com.kiero.data.kid.schedule.model.ScheduleImageUploadModel
-import com.kiero.data.kid.schedule.model.ScheduleSkipModel
 import com.kiero.data.kid.schedule.model.ScheduleTodayModel
 
 interface ScheduleRepository {
@@ -20,7 +19,7 @@ interface ScheduleRepository {
 
     suspend fun patchScheduleSkip(
         scheduleDetailId: Long
-    ): Result<ScheduleSkipModel>
+    ): Result<Unit>
 
     suspend fun patchScheduleFireLit(): Result<ScheduleFireModel>
 }
