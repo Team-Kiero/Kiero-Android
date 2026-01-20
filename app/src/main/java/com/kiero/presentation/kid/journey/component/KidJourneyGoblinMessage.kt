@@ -160,7 +160,8 @@ private fun KidJourneyGoblinMessagePreview() {
                         startTime = "14:00:00",
                         endTime = "16:00:00"
                     ),
-                    isSkippable = true
+                    isSkippable = true,
+                    isNowScheduleVerified = false
                 )
             )
         }

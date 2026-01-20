@@ -16,8 +16,20 @@ data class KidJourneyState(
     // 버튼 타입
     val buttonType: KidJourneyButtonType
         get() = when (content) {
-            is KidJourneyContentUiModel.FirstSchedule,
-            is KidJourneyContentUiModel.NextSchedule -> KidJourneyButtonType.AUTH
+            is KidJourneyContentUiModel.FirstSchedule-> {
+                if (content.isNowScheduleVerified) {
+                    KidJourneyButtonType.NONE
+                } else {
+                    KidJourneyButtonType.AUTH
+                }
+            }
+            is KidJourneyContentUiModel.NextSchedule-> {
+                if (content.isNowScheduleVerified) {
+                    KidJourneyButtonType.NONE
+                } else {
+                    KidJourneyButtonType.AUTH
+                }
+            }
             is KidJourneyContentUiModel.NowSchedule -> {
                 if (content.isNowScheduleVerified) {
                     KidJourneyButtonType.NONE
