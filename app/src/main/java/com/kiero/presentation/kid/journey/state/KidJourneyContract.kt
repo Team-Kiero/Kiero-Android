@@ -5,8 +5,6 @@ import com.kiero.R
 import com.kiero.presentation.kid.journey.model.KidJourneyButtonType
 import com.kiero.presentation.kid.journey.model.KidJourneyContentUiModel
 import com.kiero.presentation.kid.journey.model.KidJourneyHeaderUiModel
-import com.kiero.presentation.kid.journey.model.KidJourneyScheduleUiModel
-import com.kiero.presentation.kid.journey.model.StoneUiType
 
 @Immutable
 data class KidJourneyState(
@@ -19,8 +17,14 @@ data class KidJourneyState(
     val buttonType: KidJourneyButtonType
         get() = when (content) {
             is KidJourneyContentUiModel.FirstSchedule,
-            is KidJourneyContentUiModel.NowSchedule,
             is KidJourneyContentUiModel.NextSchedule -> KidJourneyButtonType.AUTH
+            is KidJourneyContentUiModel.NowSchedule -> {
+                if (content.isNowScheduleVerified) {
+                    KidJourneyButtonType.NONE
+                } else {
+                    KidJourneyButtonType.AUTH
+                }
+            }
             is KidJourneyContentUiModel.FireNotLit -> KidJourneyButtonType.FIRE
             is KidJourneyContentUiModel.NoSchedule,
             is KidJourneyContentUiModel.FireLit -> KidJourneyButtonType.NONE
@@ -55,23 +59,26 @@ data class KidJourneyState(
     companion object {
         fun fake() = KidJourneyState(
             header = KidJourneyHeaderUiModel(
-                kidName = "주완",
-                currentDate = "12월 5일 목요일",
+                kidName = "민성",
+                currentDate = "1월 5일 목요일",
                 coinCount = 350,
-                earnedStones = 7,
+                earnedStones = 4,
                 totalScheduleCount = 7
             ),
-            content = KidJourneyContentUiModel.NowSchedule(
-                scheduleDetailId = 1,
-                scheduleName = "피아노 학원 가기",
-                stoneType = StoneUiType.WISDOM,
-                scheduleInfo = KidJourneyScheduleUiModel(
-                    order = 1,
-                    startTime = "14:00:00",
-                    endTime = "16:00:00"
-                ),
-                isSkippable = true
+            content = KidJourneyContentUiModel.FireNotLit(
+                kidName = "주완"
             )
+//            content = KidJourneyContentUiModel.NowSchedule(
+//                scheduleDetailId = 1,
+//                scheduleName = "피아노 학원 가기",
+//                stoneType = StoneUiType.WISDOM,
+//                scheduleInfo = KidJourneyScheduleUiModel(
+//                    order = 1,
+//                    startTime = "14:00:00",
+//                    endTime = "16:00:00"
+//                ),
+//                isSkippable = true
+//            )
         )
     }
 }
