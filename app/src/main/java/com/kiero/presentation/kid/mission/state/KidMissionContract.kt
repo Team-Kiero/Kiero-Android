@@ -2,15 +2,20 @@ package com.kiero.presentation.kid.mission.state
 
 import androidx.compose.runtime.Immutable
 import com.kiero.presentation.kid.mission.model.KidMissionByDateUiModel
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
+import com.kiero.presentation.kid.model.KidCoinUiModel
 
 @Immutable
 data class KidMissionState(
-    val kidName: String = "",
+    val coinUiModel: KidCoinUiModel = KidCoinUiModel(),
+
     // 각 미션 섹션에 대한 정보
-    val kidMissionByDateList: KidMissionByDateUiModel = KidMissionByDateUiModel()
-)
+    val kidMissionByDateList: KidMissionByDateUiModel = KidMissionByDateUiModel(),
+
+    val isRefreshing : Boolean = false
+) {
+    val kidName: String
+        get() = "${coinUiModel.lastName}${coinUiModel.firstName}"
+}
 
 sealed interface KidMissionSideEffect {
     data class ShowSnackbar(val message : String) : KidMissionSideEffect
