@@ -4,11 +4,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -78,7 +82,7 @@ fun ParentAutoAddRoute(
         )
     }
 }
-
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ParentAutoAddScreen(
     paddingValues: PaddingValues,
@@ -90,11 +94,13 @@ fun ParentAutoAddScreen(
     modifier: Modifier = Modifier,
 ) {
     val focusManager = LocalFocusManager.current
+    val isImeVisible = WindowInsets.isImeVisible
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(KieroTheme.colors.black)
+            .imePadding()
             .padding(paddingValues)
             .pointerInput(Unit) {
                 detectTapGestures(onTap = {
@@ -128,19 +134,20 @@ fun ParentAutoAddScreen(
                 .weight(1f)
                 .padding(horizontal = 20.dp)
         )
+        if (!isImeVisible) {
+            Spacer(Modifier.height(48.dp))
 
-        Spacer(Modifier.height(48.dp))
+            KieroButtonMedium(
+                text = "분석하고 미션 추가하기",
+                onClick = onAnalyzeClick,
+                isEnabled = isAnalyzeEnabled,
+                containerColor = KieroTheme.colors.main,
+                contentColor = KieroTheme.colors.black,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
 
-        KieroButtonMedium(
-            text = "분석하고 미션 추가하기",
-            onClick = onAnalyzeClick,
-            isEnabled = isAnalyzeEnabled,
-            containerColor = KieroTheme.colors.main,
-            contentColor = KieroTheme.colors.black,
-            modifier = Modifier.padding(horizontal = 16.dp)
-        )
-
-        Spacer(Modifier.height(28.dp))
+            Spacer(Modifier.height(28.dp))
+        }
     }
 }
 
