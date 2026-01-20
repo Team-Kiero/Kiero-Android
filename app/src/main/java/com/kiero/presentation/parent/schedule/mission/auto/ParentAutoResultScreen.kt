@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.kiero.R
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.component.button.KieroButtonMedium
@@ -37,8 +38,7 @@ import java.time.format.DateTimeFormatter
 fun ParentAutoResultRoute(
     paddingValues: PaddingValues,
     state: AutoMissionState,
-    childId: Long,
-    viewModel: AutoMissionViewModel,
+    viewModel: AutoMissionViewModel = hiltViewModel(),
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -53,7 +53,7 @@ fun ParentAutoResultRoute(
         onDateSelected = viewModel::onDateSelected,
         onRewardClick = viewModel::onAwardClick,
         onIndexChange = viewModel::updateCurrentIndex,
-        onSaveClick = { viewModel.saveAllMissions(childId) },
+        onSaveClick = { viewModel.saveAllMissions() },
         onCancelClick = viewModel::handleCancel,
         onShowDatePicker = viewModel::showDatePicker,
         onDismissDatePicker = viewModel::dismissDatePicker,
@@ -99,8 +99,8 @@ fun ParentAutoResultScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(paddingValues)
-            .background(KieroTheme.colors.black),
+            .background(KieroTheme.colors.black)
+            .padding(paddingValues),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(44.dp))

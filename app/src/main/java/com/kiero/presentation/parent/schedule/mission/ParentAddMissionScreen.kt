@@ -47,10 +47,8 @@ fun ParentAddMissionRoute(
     val dateText = viewModel.displayDate
     val globalTrigger = LocalGlobalUiEventTrigger.current
 
-    // TODO : Test 용 고정값, 받아온 childId를 사용해야 됨.
-
     LaunchedEffect(Unit) {
-        viewModel.setChildId(1L)
+        viewModel.setChildId()
     }
 
     viewModel.sideEffect.collectSideEffect { effect ->

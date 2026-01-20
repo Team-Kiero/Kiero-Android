@@ -21,13 +21,10 @@ fun NavGraphBuilder.parentAutoMissionAddNavGraph(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
 ) {
-    composable<AutoMissionAdd> { backStackEntry ->
-        val route = backStackEntry.toRoute<AutoMissionAdd>()
-
+    composable<AutoMissionAdd> {
         ParentAutoAddRoute(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
-            childId = route.childId
         )
     }
 }

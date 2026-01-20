@@ -1,6 +1,7 @@
 package com.kiero.presentation.signup.parent
 
 import android.content.ClipData
+import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -54,13 +55,9 @@ fun ParentSignUpRoute(
 
     viewModel.sideEffect.collectSingleEvent {
         when (it) {
-            ParentSignUpSideEffect.NavigateToParent -> {
-                navigateToParent()
-            }
+            ParentSignUpSideEffect.NavigateToParent -> navigateToParent()
 
-            ParentSignUpSideEffect.NavigateToSelection -> {
-                navigateToSelection()
-            }
+            ParentSignUpSideEffect.NavigateToSelection -> navigateToSelection()
 
             is ParentSignUpSideEffect.CopyText -> {
                 clipboardManager.setClipEntry(
@@ -71,6 +68,14 @@ fun ParentSignUpRoute(
                         )
                     )
                 )
+
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+                    globalTrigger.showSnackbar(
+                        SnackbarState(
+                            message = it.message
+                        )
+                    )
+                }
             }
 
             is ParentSignUpSideEffect.ShowSnackbar -> {
