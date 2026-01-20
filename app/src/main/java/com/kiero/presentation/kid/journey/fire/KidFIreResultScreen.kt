@@ -52,7 +52,7 @@ fun KidFireResultRoute(
     navigateToJourney: () -> Unit,
     viewModel: KidFireResultVIewModel = hiltViewModel()
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val state by viewModel.fireResultState.collectAsStateWithLifecycle()
 
     KidFIreResultScreen(
         paddingValues = paddingValues,
@@ -101,7 +101,7 @@ private fun KidFIreResultScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             KieroTopbar(
-                title = "12월 5일 목요일",
+                title = state.date,
                 leftIconRes = R.drawable.ic_arrow_left,
                 leftIconClick = navigateUp,
                 modifier = Modifier
@@ -225,7 +225,6 @@ private fun KidFIreResultScreen(
                         color = KieroTheme.colors.gray300
                     )
                 }
-
             }
         }
     }

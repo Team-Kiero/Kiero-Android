@@ -63,7 +63,7 @@ fun KidJourneyRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
     navigateToCamera: (Long, StoneUiType) -> Unit,
-    navigateToFire: () -> Unit,
+    navigateToFire: (String, Int) -> Unit,
     viewModel: KidJourneyViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -129,7 +129,7 @@ fun KidJourneyRoute(
                     }
                 }
                 KidJourneyButtonType.FIRE -> {
-                    navigateToFire()
+                    navigateToFire(state.header!!.currentDate, state.header!!.earnedStones!!)
                 }
                 else -> { }
             }
@@ -276,7 +276,8 @@ private fun KidJourneyScreenPreview() {
                         startTime = "14:00:00",
                         endTime = "16:00:00"
                     ),
-                    isSkippable = true
+                    isSkippable = true,
+                    isNowScheduleVerified = true
                 )
             ),
             onButtonClick = {},

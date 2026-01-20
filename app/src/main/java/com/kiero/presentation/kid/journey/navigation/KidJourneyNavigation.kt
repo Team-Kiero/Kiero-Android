@@ -19,7 +19,7 @@ fun NavGraphBuilder.kidJourneyNavGraph(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
     navigateToCamera: (Long, StoneUiType) -> Unit,
-    navigateToFire: () -> Unit
+    navigateToFire: (String, Int) -> Unit
 ) {
     composable<Journey> {
         KidJourneyRoute(
@@ -28,7 +28,9 @@ fun NavGraphBuilder.kidJourneyNavGraph(
             navigateToCamera = { scheduleDetailId, stoneType ->
                 navigateToCamera(scheduleDetailId, stoneType)
             },
-            navigateToFire = navigateToFire
+            navigateToFire = { date, stones ->
+                navigateToFire(date, stones)
+            }
         )
     }
 }

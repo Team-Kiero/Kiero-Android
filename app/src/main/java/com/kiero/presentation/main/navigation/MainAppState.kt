@@ -12,10 +12,10 @@ import androidx.navigation.navOptions
 import com.kiero.core.network.monitor.NetworkMonitor
 import com.kiero.presentation.auth.navigation.AuthGraph
 import com.kiero.presentation.auth.navigation.navigateToAuth
-import com.kiero.presentation.auth.navigation.navigateToAuth
 import com.kiero.presentation.auth.parent.navigation.navigateToAuthParent
 import com.kiero.presentation.kid.journey.camera.navigation.navigateToCamera
 import com.kiero.presentation.kid.journey.fire.navigation.navigateToFire
+import com.kiero.presentation.kid.journey.fire.navigation.navigateToFireResult
 import com.kiero.presentation.kid.journey.model.StoneUiType
 import com.kiero.presentation.kid.journey.navigation.navigateToJourney
 import com.kiero.presentation.kid.mission.navigation.navigateToMission
@@ -31,8 +31,6 @@ import com.kiero.presentation.parent.navigation.ParentGraph
 import com.kiero.presentation.parent.navigation.Schedule
 import com.kiero.presentation.parent.schedule.mission.navigation.navigateToMissionAdd
 import com.kiero.presentation.parent.schedule.navigation.navigateToSchedule
-import com.kiero.presentation.parent.schedule.plan.navigation.navigateToScheduleAdd
-import com.kiero.presentation.signup.parent.navigation.navigateToParentSignUp
 import com.kiero.presentation.parent.schedule.plan.navigation.navigateToScheduleAdd
 import com.kiero.presentation.signup.parent.navigation.navigateToParentSignUp
 import com.kiero.presentation.splash.navigation.Splash
@@ -210,8 +208,23 @@ class MainAppState(
         navOptions = navOptions
     )
 
-    fun navigateToFire(navOptions: NavOptions? = null) =
-        navController.navigateToFire(navOptions)
+    fun navigateToFire(
+        date: String,
+        stones: Int,
+        navOptions: NavOptions? = null
+    ) = navController.navigateToFire(
+        date = date,
+        stones = stones,
+        navOptions = navOptions
+    )
+
+    fun navigateToFireResult(
+        date: String,
+        navOptions: NavOptions? = null
+    ) = navController.navigateToFireResult(
+        date = date,
+        navOptions = navOptions
+    )
 
     fun navigateToMissionAdd(navOptions: NavOptions? = null) =
         navController.navigateToMissionAdd(navOptions)

@@ -9,12 +9,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
 import com.kiero.core.common.extension.forcePixelToDp
 import com.kiero.core.designsystem.component.KieroToolTip
@@ -23,23 +26,30 @@ import com.kiero.core.designsystem.component.chip.KieroChip
 import com.kiero.core.designsystem.component.chip.action.KieroTextAction
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.kid.journey.fire.component.KieroButtonLarge
+import com.kiero.presentation.kid.journey.fire.state.KidFireState
+import com.kiero.presentation.kid.journey.fire.viewModel.KidFireViewModel
 
 @Composable
 fun KidFireRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
-    navigateToFireResult: () -> Unit
+    navigateToFireResult: (String) -> Unit,
+    viewModel: KidFireViewModel = hiltViewModel()
 ) {
+    val state by viewModel.fireState.collectAsStateWithLifecycle()
+
     KidFIreScreen(
         paddingValues = paddingValues,
+        state = state,
         navigateUp = navigateUp,
-        onClick = navigateToFireResult
+        onClick = { navigateToFireResult(state.date) }
     )
 }
 
 @Composable
 private fun KidFIreScreen(
     paddingValues: PaddingValues,
+    state: KidFireState,
     navigateUp: () -> Unit,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -56,7 +66,7 @@ private fun KidFIreScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             KieroTopbar(
-                title = "12월 5일 목요일",
+                title = state.date,
                 leftIconRes = R.drawable.ic_arrow_left,
                 leftIconClick = navigateUp,
                 modifier = Modifier
@@ -113,7 +123,7 @@ private fun KidFIreScreen(
                 )
             }
             KieroButtonLarge(
-                stoneCount = 7,
+                stoneCount = state.stones,
                 onClick = onClick,
                 modifier = Modifier
                     .padding(top = 80.dp, start = 16.dp, end = 16.dp)
@@ -128,6 +138,7 @@ private fun KidFIreScreenPreview() {
     KieroTheme {
         KidFIreScreen(
             paddingValues = PaddingValues(),
+            state = KidFireState(),
             navigateUp = {},
             onClick = {}
         )

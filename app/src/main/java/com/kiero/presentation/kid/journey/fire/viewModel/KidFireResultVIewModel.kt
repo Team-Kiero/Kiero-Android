@@ -1,9 +1,12 @@
 package com.kiero.presentation.kid.journey.fire.viewModel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kiero.data.schedule.repository.ScheduleRepository
+import androidx.navigation.toRoute
+import com.kiero.data.kid.schedule.repository.ScheduleRepository
 import com.kiero.presentation.kid.journey.fire.model.toUiModel
+import com.kiero.presentation.kid.journey.fire.navigation.FireResult
 import com.kiero.presentation.kid.journey.fire.state.KidFireResultState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,10 +18,18 @@ import javax.inject.Inject
 
 @HiltViewModel
 class KidFireResultVIewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val repository: ScheduleRepository
 ) : ViewModel() {
-    private val _state = MutableStateFlow(KidFireResultState())
-    val state = _state.asStateFlow()
+    private val fireResult = savedStateHandle.toRoute<FireResult>()
+
+    private val _state = MutableStateFlow(
+        KidFireResultState(
+            date = fireResult.date
+        )
+    )
+
+    val fireResultState = _state.asStateFlow()
 
     init {
         fetchFireResult()

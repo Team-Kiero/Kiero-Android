@@ -6,6 +6,7 @@ import com.kiero.presentation.kid.journey.model.StoneUiType
 
 @Immutable
 data class KidFireResultState(
+    val date: String = "",
     val content : KidFireUiModel = KidFireUiModel()
 ) {
     companion object{

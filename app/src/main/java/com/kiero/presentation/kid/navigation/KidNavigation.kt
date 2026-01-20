@@ -58,7 +58,9 @@ fun NavGraphBuilder.kidNavGraph(
             navigateToCamera = { scheduleDetailId, stoneType ->
                 navController.navigateToCamera(scheduleDetailId, stoneType)
             },
-            navigateToFire = navController::navigateToFire
+            navigateToFire = { date, stones->
+                navController.navigateToFire(date, stones)
+            }
         )
 
         kidMissionNavGraph(
