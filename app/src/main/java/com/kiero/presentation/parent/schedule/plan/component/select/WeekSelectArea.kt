@@ -16,10 +16,6 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -37,11 +33,14 @@ import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun WeekSelectArea(
+    selectedDays: Set<Int>,
+    isRecurring: Boolean,
+    onDayClick: (Int) -> Unit,
+    onAllDaysSelect: (Boolean) -> Unit,
+    onRecurringToggle: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var selectedDays by remember { mutableStateOf(setOf<Int>()) }
-    var isRepeatEnabled by remember { mutableStateOf(false) }
-    var isWeeklyRepeatEnabled by remember { mutableStateOf(false) }
+
 
     Column(
         modifier = modifier
@@ -56,36 +55,19 @@ fun WeekSelectArea(
         verticalArrangement = Arrangement.spacedBy(18.dp)
     ) {
         DaySection(
-            onValidClick = {
-                isWeeklyRepeatEnabled = !isWeeklyRepeatEnabled
-            },
-            isEnabled = isWeeklyRepeatEnabled
+            onValidClick = onRecurringToggle,
+            isEnabled = isRecurring
         )
 
         DayPickSection(
             selectedDays = selectedDays,
-            onDayClick = { dayIndex ->
-                selectedDays = if (selectedDays.contains(dayIndex)) {
-                    selectedDays - dayIndex
-                } else {
-                    selectedDays + dayIndex
-                }
-                if (isRepeatEnabled) {
-                    isRepeatEnabled = false
-                }
-            }
+            onDayClick = onDayClick
         )
-
         RepeatSection(
-            onAbleClick = { currentState ->
-                isRepeatEnabled = !currentState
-                selectedDays = if (!currentState) {
-                    setOf(0, 1, 2, 3, 4, 5, 6)
-                } else {
-                    emptySet()
-                }
+            onAbleClick = { isEnabled ->
+                onAllDaysSelect(isEnabled)
             },
-            isEnabled = isRepeatEnabled
+            isEnabled = selectedDays.size == 7
         )
 
     }
@@ -259,7 +241,9 @@ private fun DayToggle(
 private fun PreviewDayBox() {
     KieroTheme {
         Column {
-            WeekSelectArea()
+//            WeekSelectArea(
+//
+//            )
         }
     }
 }
