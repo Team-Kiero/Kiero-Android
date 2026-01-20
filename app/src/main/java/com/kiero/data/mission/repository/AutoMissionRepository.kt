@@ -1,12 +1,17 @@
 package com.kiero.data.mission.repository
 
-import com.kiero.presentation.parent.schedule.mission.auto.model.MissionUiModel
+import com.kiero.data.mission.model.MissionCompleteModel
+import com.kiero.data.mission.model.MissionSuggestionModel
+import com.kiero.data.mission.model.SuggestedMissionModel
 
 interface AutoMissionRepository {
-    suspend fun analyzeNotice(noticeText: String): Result<List<MissionUiModel>>
+
+    suspend fun analyzeNotice(
+        noticeText: String
+    ): Result<MissionSuggestionModel>
 
     suspend fun saveBatchMissions(
         childId: Long,
-        missions: List<MissionUiModel>
-    ): Result<Unit>
+        missions: List<SuggestedMissionModel>
+    ): Result<List<MissionCompleteModel>>
 }

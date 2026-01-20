@@ -4,6 +4,7 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.data.mission.model.SuggestedMissionModel
 import com.kiero.data.mission.repository.AutoMissionRepository
 import com.kiero.presentation.parent.schedule.mission.auto.model.MissionUiModel
 import com.kiero.presentation.parent.schedule.mission.auto.state.AutoMissionSideEffect
@@ -54,12 +55,20 @@ class AutoMissionViewModel @Inject constructor(
             _state.update { it.copy(isAnalyzing = true) }
 
             autoMissionRepository.analyzeNotice(_state.value.noticeText)
-                .onSuccess { missions ->
+                .onSuccess { domainData ->
+                    val uiMissions = domainData.suggestedMissions.map { suggested ->
+                        MissionUiModel(
+                            name = suggested.name,
+                            reward = suggested.reward,
+                            dueAt = LocalDate.parse(suggested.dueAt),
+                            isCompleted = false
+                        )
+                    }
                     _state.update {
                         it.copy(
-                            missions = missions,
+                            missions = uiMissions,
                             currentIndex = 0,
-                            hasViewedLastPage = missions.size == 1,
+                            hasViewedLastPage = uiMissions.size == 1,
                             isAnalyzing = false
                         )
                     }
@@ -91,7 +100,6 @@ class AutoMissionViewModel @Inject constructor(
 
     fun updateMissionDate(date: LocalDate) {
         _state.update { currentState ->
-            val formattedDate = date.format(DateTimeFormatter.ofPattern("yyyy.MM.dd.(E)"))
 
             val updatedMissions = currentState.missions.toMutableList().apply {
                 val index = currentState.currentIndex
@@ -193,8 +201,15 @@ class AutoMissionViewModel @Inject constructor(
             }
 
             _state.update { it.copy(isSaving = true) }
+            val domainMissions = missions.map { uiModel ->
+                SuggestedMissionModel(
+                    name = uiModel.name,
+                    reward = uiModel.reward,
+                    dueAt = uiModel.dueAt.toString()
+                )
+            }
 
-            autoMissionRepository.saveBatchMissions(childId, missions)
+            autoMissionRepository.saveBatchMissions(childId, domainMissions)
                 .onSuccess {
                     _sideEffect.emit(
                         AutoMissionSideEffect.ShowToast("미션이 등록되었습니다.")
