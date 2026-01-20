@@ -9,66 +9,110 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.core.model.trigger.SnackbarState
+import com.kiero.core.trigger.LocalGlobalUiEventTrigger
 import com.kiero.presentation.parent.schedule.plan.component.picker.ColorPickerBottomSheet
 import com.kiero.presentation.parent.schedule.plan.component.plan.ScheduleDatebar
-import com.kiero.presentation.parent.schedule.plan.component.select.ScheduleTextField
-import com.kiero.presentation.parent.schedule.plan.component.select.WeekSelectArea
 import com.kiero.presentation.parent.schedule.plan.component.select.ColorSelectArea
-import com.kiero.presentation.parent.schedule.screen.component.TimeSelectArea
+import com.kiero.presentation.parent.schedule.plan.component.select.ScheduleTextField
+import com.kiero.presentation.parent.schedule.plan.component.select.TimeSelectArea
+import com.kiero.presentation.parent.schedule.plan.component.select.WeekSelectArea
+import com.kiero.presentation.parent.schedule.plan.model.ColorType
+import com.kiero.presentation.parent.schedule.plan.state.ParentPlanSideEffect
+import com.kiero.presentation.parent.schedule.plan.viewmodel.ParentPlanViewModel
 
 
 @Composable
 fun ParentScheduleAddRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
+    viewModel: ParentPlanViewModel = hiltViewModel(),
 ) {
-    val textState = rememberTextFieldState()
-    var selectedColor by remember { mutableStateOf<Color?>(null) }
-    var showColorPicker by remember { mutableStateOf(false) }
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val globalTrigger = LocalGlobalUiEventTrigger.current
+
+    LaunchedEffect(Unit) {
+        viewModel.sideEffect.collect { effect ->
+            when (effect) {
+                is ParentPlanSideEffect.ShowSnackBar -> globalTrigger.showSnackbar(
+                    SnackbarState(effect.message)
+                )
+
+                is ParentPlanSideEffect.navigateUp -> {
+                    navigateUp()
+                }
+
+            }
+        }
+    }
 
     ScheduleAddScreen(
         paddingValues = paddingValues,
         navigateUp = navigateUp,
-        textState = textState,
-        selectedColor = selectedColor,
-        onColorClick = { showColorPicker = true }
+        textState = viewModel.textState,
+        selectedDays = uiState.selectedDays,
+        onDayClick = viewModel::onDayClick,
+        onAllDaysSelect = viewModel::onAllDaysSelect,
+        isRecurring = uiState.isRecurring,
+        onRecurringToggle = viewModel::onRecurringToggle,
+        selectedColorType = uiState.selectedColorType,
+        dateRangeText = uiState.dateRangeText,
+        startTime = uiState.startTime,
+        endTime = uiState.endTime,
+        onTimeSelected = viewModel::onTimeSelected,
+        isPreviousEnabled = uiState.canGoToPrevious,
+        onPreviousWeek = viewModel::onPreviousWeek,
+        onNextWeek = viewModel::onNextWeek,
+        onColorClick = { viewModel.toggleColorPicker(true) },
+        onCreatePlan = { viewModel.onCreatePlanClick() }
     )
 
-    if (showColorPicker) {
+    if (uiState.showColorPicker) {
         ColorPickerBottomSheet(
-            selectedColor = selectedColor ?: Color(0xFFCFFFFA),
-            onColorSelected = { color ->
-                selectedColor = color
+            selectedColorType = uiState.selectedColorType,
+            onColorConfirmed = { confirmedColorType ->
+                viewModel.onColorSelected(confirmedColorType)
             },
-            onDismissRequest = { showColorPicker = false }
+            onDismissRequest = { viewModel.toggleColorPicker(false) }
         )
     }
 }
-
 
 @Composable
 fun ScheduleAddScreen(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
     textState: TextFieldState,
-    selectedColor: Color?,
+    selectedDays: Set<Int>,
+    onAllDaysSelect: (Boolean) -> Unit,
+    isRecurring: Boolean,
+    onDayClick: (Int) -> Unit,
+    onRecurringToggle: () -> Unit,
+    selectedColorType: ColorType?,
+    dateRangeText: String,
+    startTime: String,
+    endTime: String,
+    onTimeSelected: (Boolean, String) -> Unit,
+    isPreviousEnabled: Boolean,
+    onPreviousWeek: () -> Unit,
+    onNextWeek: () -> Unit,
     onColorClick: () -> Unit,
+    onCreatePlan: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -84,13 +128,14 @@ fun ScheduleAddScreen(
             leftIconRes = R.drawable.ic_close_light,
             rightIconRes = R.drawable.ic_check,
             leftIconClick = navigateUp,
-            rightIconClick = { }
+            rightIconClick = onCreatePlan
         )
 
         ScheduleDatebar(
-            date = "12.8(월) - 12.14(일)",
-            onPreviousClick = { },
-            onNextClick = { }
+            date = dateRangeText,
+            onPreviousClick = onPreviousWeek,
+            onNextClick = onNextWeek,
+            isPreviousEnabled = isPreviousEnabled
         )
 
         ScheduleTextField(
@@ -98,14 +143,24 @@ fun ScheduleAddScreen(
             placeholder = "이름을 입력해주세요",
         )
 
-        WeekSelectArea()
+        WeekSelectArea(
+            selectedDays = selectedDays,
+            isRecurring = isRecurring,
+            onDayClick = onDayClick,
+            onAllDaysSelect = onAllDaysSelect,
+            onRecurringToggle = onRecurringToggle
+        )
 
-        TimeSelectArea()
+        TimeSelectArea(
+            startTime = startTime,
+            endTime = endTime,
+            onTimeSelected = onTimeSelected
+        )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         ColorSelectArea(
-            selectColor = selectedColor,
+            selectedColorType = selectedColorType,
             onColorClick = onColorClick
         )
     }
@@ -115,12 +170,9 @@ fun ScheduleAddScreen(
 @Composable
 private fun ParentAddPlanScreenPreview() {
     KieroTheme {
-        ScheduleAddScreen(
+        ParentScheduleAddRoute(
             paddingValues = PaddingValues(),
-            navigateUp = {},
-            textState = rememberTextFieldState(),
-            selectedColor = null,
-            onColorClick = {}
+            navigateUp = {}
         )
     }
 }

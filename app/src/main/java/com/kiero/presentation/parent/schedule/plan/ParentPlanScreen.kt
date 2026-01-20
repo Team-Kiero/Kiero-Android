@@ -9,21 +9,32 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.theme.KieroTheme
-import com.kiero.presentation.parent.schedule.model.ScheduleEvent
 import com.kiero.presentation.parent.schedule.plan.component.plan.ScheduleDatebar
 import com.kiero.presentation.parent.schedule.plan.component.plan.ScheduleTimeTable
-import com.kiero.presentation.parent.schedule.plan.model.ScheduleData
+import com.kiero.presentation.parent.schedule.plan.component.plan.ScheduleWeekTopbar
+import com.kiero.presentation.parent.schedule.plan.state.ParentScheduleState
+import com.kiero.presentation.parent.schedule.plan.state.toScheduleEvent
 
 @Composable
 fun ParentPlanScreen(
-    events: List<ScheduleEvent>,
+    state: ParentScheduleState,
+    onDateChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val events = remember(state.planAllModel) {
+        val recurring =
+            state.planAllModel?.recurringSchedules?.map { it.toScheduleEvent() } ?: emptyList()
+        val normal =
+            state.planAllModel?.normalSchedules?.map { it.toScheduleEvent() } ?: emptyList()
+        recurring + normal
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -35,20 +46,24 @@ fun ParentPlanScreen(
         Spacer(modifier = Modifier.height(15.dp))
 
         ScheduleDatebar(
-            date = "12월 4주차",
-            onPreviousClick = {},
-            onNextClick = {}
+            date = state.dateRangeText,
+            onPreviousClick = { onDateChange(false) },
+            onNextClick = { onDateChange(true) }
         )
 
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    color = KieroTheme.colors.black
-                ),
-        ) {
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
             item {
-                ScheduleTimeTable(events = events)
+                ScheduleWeekTopbar(
+                    currentDate = state.currentDate
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+            item {
+                ScheduleTimeTable(
+                    state = state,
+                    events = events
+                )
             }
         }
     }
@@ -59,7 +74,8 @@ fun ParentPlanScreen(
 private fun ParentPlanScreenPreview() {
     KieroTheme {
         ParentPlanScreen(
-            events = ScheduleData.fakeScheduleEvents
+            state = ParentScheduleState(),
+            onDateChange = {}
         )
     }
 }
