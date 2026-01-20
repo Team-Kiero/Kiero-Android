@@ -3,6 +3,7 @@ package com.kiero.presentation.parent.schedule.plan.viewmodel
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.parent.plan.repository.PlanRepository
 import com.kiero.presentation.parent.schedule.plan.model.ColorType
 import com.kiero.presentation.parent.schedule.plan.state.ParentPlanSideEffect
@@ -22,9 +23,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ParentPlanViewModel @Inject constructor(
     private val planRepository: PlanRepository,
+    private val userInfoManager: UserInfoManager
 ) : ViewModel() {
-
-
     private val _state = MutableStateFlow(ParentPlanState())
     val state = _state.asStateFlow()
 
@@ -34,7 +34,7 @@ class ParentPlanViewModel @Inject constructor(
     val textState = TextFieldState()
 
     init {
-        fetchDefaultColor(1L)
+        fetchDefaultColor()
     }
 
     fun onCreatePlanClick() {
@@ -72,12 +72,12 @@ class ParentPlanViewModel @Inject constructor(
             }
 
             val selectedColor = currentState.selectedColorType
-
+            val childId = userInfoManager.getChildIdInfo() ?: return@launch
 
             _state.update { it.copy(isLoading = true) }
 
             planRepository.postPlan(
-                childId = 1L,
+                childId = childId,
                 name = name,
                 isRecurring = currentState.isRecurring,
                 startTime = currentState.formatTimeForServer(currentState.startTime),
@@ -96,8 +96,10 @@ class ParentPlanViewModel @Inject constructor(
     }
 
 
-    fun fetchDefaultColor(childId: Long) {
+    fun fetchDefaultColor() {
         viewModelScope.launch {
+            val childId = userInfoManager.getChildIdInfo() ?: return@launch
+
             planRepository.getPlanColor(childId)
                 .onSuccess { result ->
                     val colorType = ColorType.entries.find { it.name == result.scheduleColor }

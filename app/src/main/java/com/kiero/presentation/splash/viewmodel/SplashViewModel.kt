@@ -3,10 +3,10 @@ package com.kiero.presentation.splash.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.localstorage.TokenManager
+import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.localstorage.onboarding.OnboardingManager
 import com.kiero.core.model.auth.UserRole
 import com.kiero.core.network.auth.TokenRefreshService
-import com.kiero.data.auth.remote.api.ReissueService
 import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.presentation.splash.state.SplashSideEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +22,7 @@ class SplashViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val tokenManager: TokenManager,
     private val onboardingManager: OnboardingManager,
+    private val userInfoManager: UserInfoManager,
     private val reIssueManager: TokenRefreshService,
 ) : ViewModel() {
     private val _sideEffect = Channel<SplashSideEffect>()
@@ -44,6 +45,11 @@ class SplashViewModel @Inject constructor(
                                 if (children.isEmpty()) {
                                     _sideEffect.send(SplashSideEffect.NavigateToParentGraph)
                                 } else {
+                                    // Todo : 추후 스프린트 시 수정 지금은 first
+                                    Timber.e("children.first().childId ${children.first().childId}")
+                                    delay(1000L)
+                                    userInfoManager.saveChildIdInfo(children.first().childId)
+
                                     _sideEffect.send(SplashSideEffect.NavigateToParentHome)
                                 }
                             }

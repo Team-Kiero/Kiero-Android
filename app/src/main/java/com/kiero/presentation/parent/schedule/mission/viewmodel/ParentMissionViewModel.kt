@@ -25,21 +25,21 @@ class ParentMissionViewModel @Inject constructor(
     private val _sideEffect = MutableSharedFlow<ParentMissionSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
 
-    init {
-        getMissions()
-    }
-
-    private fun getMissions() {
+    fun getMissions() {
         viewModelScope.launch {
             _state.value = UiState.Loading
 
             missionRepository.getMissions()
                 .onSuccess { result ->
-                    _state.value = UiState.Success(
-                        ParentMissionState(
-                            kidMissionByDateList = result.toUiModel()
+                    if (result.missionsByDate.isEmpty()) {
+                        _state.value = UiState.Empty
+                    } else {
+                        _state.value = UiState.Success(
+                            ParentMissionState(
+                                kidMissionByDateList = result.toUiModel()
+                            )
                         )
-                    )
+                    }
                 }
                 .onFailure {
                     _state.value = UiState.Failure(it.message.toString())

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -22,7 +23,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.common.extension.statusBarColor
+import com.kiero.core.common.util.successData
+import com.kiero.core.designsystem.component.dialog.KieroDialog
+import com.kiero.core.designsystem.component.dialog.action.KieroCancelAction
+import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
+import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.Gray900
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
@@ -35,12 +42,14 @@ import com.kiero.presentation.parent.schedule.model.TabItem
 import com.kiero.presentation.parent.schedule.plan.ParentPlanScreen
 import com.kiero.presentation.parent.schedule.plan.state.ParentScheduleState
 import com.kiero.presentation.parent.schedule.viewmodel.ParentScheduleViewModel
+import com.kiero.presentation.signup.parent.state.ParentSignUpSideEffect
 import com.kiero.presentation.signup.parent.state.ParentSignUpState
 
 @Composable
 fun ParentScheduleRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
+    navigateToSelection: () -> Unit,
     navigateToScheduleAdd: () -> Unit,
     navigateToMissionAdd: () -> Unit,
     navigateToAutoMissionAdd: (Long) -> Unit,
@@ -50,43 +59,86 @@ fun ParentScheduleRoute(
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val authState by viewModel.authstate.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit) {
+        viewModel.fetchSchedule()
+    }
+
+    viewModel.sideEffect.collectSideEffect {
+        when (it) {
+            is ParentSignUpSideEffect.NavigateToSelection -> navigateToSelection()
+
+            else -> {}
+        }
+    }
+
     var selectedTabIndex by remember { mutableIntStateOf(0) }
 
-    when (val state = uiState) {
-        is UiState.Loading -> {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        when (val state = uiState) {
+            is UiState.Loading -> {
 
+            }
+
+            is UiState.Success -> {
+                ParentScheduleScreen(
+                    paddingValues = paddingValues,
+                    state = authState,
+                    scheduleState = state.data,
+                    selectedTabIndex = selectedTabIndex,
+                    onTabSelected = { selectedTabIndex = it },
+                    onDateChange = viewModel::onDateChange,
+                    navigateToScheduleAdd = navigateToScheduleAdd,
+                    navigateToMissionAdd = navigateToMissionAdd,
+                    navigateToAutoMissionAdd = navigateToAutoMissionAdd,
+                    onUserNameClick = viewModel::onProfileClick
+                )
+            }
+
+            is UiState.Failure -> {
+                // 에러 시 스낵바나 재시도 버튼 표시
+            }
+
+            is UiState.Empty -> {
+                ParentScheduleScreen(
+                    paddingValues = paddingValues,
+                    state = authState,
+                    scheduleState = ParentScheduleState(),
+                    selectedTabIndex = selectedTabIndex,
+                    onTabSelected = { selectedTabIndex = it },
+                    onDateChange = viewModel::onDateChange,
+                    onUserNameClick = viewModel::onProfileClick,
+                    navigateToScheduleAdd = navigateToScheduleAdd,
+                    navigateToMissionAdd = navigateToMissionAdd,
+                    navigateToAutoMissionAdd = navigateToAutoMissionAdd,
+                )
+            }
         }
 
-        is UiState.Success -> {
-            ParentScheduleScreen(
-                paddingValues = paddingValues,
-                state = authState,
-                scheduleState = state.data,
-                selectedTabIndex = selectedTabIndex,
-                onTabSelected = { selectedTabIndex = it },
-                onDateChange = viewModel::onDateChange,
-                navigateToScheduleAdd = navigateToScheduleAdd,
-                navigateToMissionAdd = navigateToMissionAdd,
-                navigateToAutoMissionAdd = navigateToAutoMissionAdd,
+        if (uiState.successData?.isLogoutDialogVisible == true) {
+            KieroDialog(
+                title = "로그아웃",
+                subDescription = "로그아웃 하시겠습니까?",
+                onDismiss = viewModel::onLogoutCancel,
+                confirmAction = KieroConfirmAction(
+                    text = "확인",
+                    onClick = {
+                        viewModel.onLogoutConfirm()
+                    }
+                ),
+                cancelAction = KieroCancelAction(
+                    text = "취소",
+                    onClick = viewModel::onLogoutCancel
+                ),
+                isDisabled = true,
+                content = {}
             )
         }
 
-        is UiState.Failure -> {
-            // 에러 시 스낵바나 재시도 버튼 표시
-        }
-
-        is UiState.Empty -> {
-            ParentScheduleScreen(
-                paddingValues = paddingValues,
-                state = authState,
-                scheduleState = ParentScheduleState(),
-                selectedTabIndex = selectedTabIndex,
-                onTabSelected = { selectedTabIndex = it },
-                onDateChange = viewModel::onDateChange,
-                navigateToScheduleAdd = navigateToScheduleAdd,
-                navigateToMissionAdd = navigateToMissionAdd,
-                navigateToAutoMissionAdd = navigateToAutoMissionAdd,
-            )
+        if (uiState.successData?.isLoading == true) {
+            KieroLoadingIndicator()
         }
     }
 }
@@ -101,6 +153,7 @@ private fun ParentScheduleScreen(
     modifier: Modifier = Modifier,
     onTabSelected: (Int) -> Unit,
     onDateChange: (Boolean) -> Unit,
+    onUserNameClick: () -> Unit,
     navigateToScheduleAdd: () -> Unit,
     navigateToMissionAdd: () -> Unit,
 ) {
@@ -126,7 +179,7 @@ private fun ParentScheduleScreen(
             ParentUserSection(
                 userName = state.parentInfo.parentName,
                 profileImage = state.parentInfo.parentProfileImage,
-                onUserNameClick = {},
+                onUserNameClick = onUserNameClick,
                 modifier = Modifier
                     .background(color = KieroTheme.colors.gray900)
             )
@@ -193,7 +246,8 @@ private fun ParentScheduleScreenPreview() {
             navigateUp = {},
             navigateToScheduleAdd = {},
             navigateToMissionAdd = {},
-            navigateToAutoMissionAdd = {}
+            navigateToAutoMissionAdd = {},
+            navigateToSelection = {}
         )
     }
 }

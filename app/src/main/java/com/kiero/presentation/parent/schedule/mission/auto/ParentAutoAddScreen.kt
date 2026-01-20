@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,9 +31,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kiero.R
+import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.component.button.KieroButtonMedium
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.core.model.trigger.SnackbarState
+import com.kiero.core.trigger.LocalGlobalUiEventTrigger
 import com.kiero.presentation.parent.schedule.mission.auto.component.ScrollableAutoInputField
 import com.kiero.presentation.parent.schedule.mission.auto.state.AutoMissionSideEffect
 import com.kiero.presentation.parent.schedule.mission.auto.state.AutoMissionState
@@ -43,32 +47,28 @@ import kotlinx.coroutines.launch
 fun ParentAutoAddRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
-    childId: Long,
     viewModel: AutoMissionViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    val globalUiEventHolder = LocalGlobalUiEventTrigger.current
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
 
-    LaunchedEffect(Unit) {
-        viewModel.sideEffect.collect { effect ->
-            android.util.Log.d("AutoMission", "📨 SideEffect 수신: $effect")
-            when (effect) {
-                is AutoMissionSideEffect.ShowToast -> {
-                    // ✅ 비동기로 처리 (블록 안 함)
-                    scope.launch {
-                        snackbarHostState.showSnackbar(effect.message)
-                    }
-                }
+    viewModel.sideEffect.collectSideEffect { effect ->
+        when (effect) {
+            is AutoMissionSideEffect.ShowToast -> {
+                globalUiEventHolder.showSnackbar(
+                    SnackbarState(
+                        message = effect.message
+                    )
+                )
+            }
 
-                is AutoMissionSideEffect.NavigateBack -> {
-                    android.util.Log.d("AutoMission", "🚀 navigateUp() 호출")
-                    navigateUp()
-                }
+            is AutoMissionSideEffect.NavigateBack -> {
+                navigateUp()
+            }
 
-                is AutoMissionSideEffect.ScrollToPage -> {
-                    // 처리 안 함
-                }
+            is AutoMissionSideEffect.ScrollToPage -> {
+                // 처리 안 함
             }
         }
     }
@@ -85,7 +85,6 @@ fun ParentAutoAddRoute(
             ParentAutoResultRoute(
                 paddingValues = paddingValues,
                 state = state,
-                childId = childId,
                 viewModel = viewModel
             )
         }

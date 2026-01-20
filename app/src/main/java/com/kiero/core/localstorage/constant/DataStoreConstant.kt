@@ -12,4 +12,6 @@ object DataStoreConstant {
 
     val KEY_PARENT_NAME = stringPreferencesKey("parent_name")
     val KEY_PARENT_PROFILE_IMAGE = stringPreferencesKey("parent_profile_image")
+
+    val KEY_CHILD_ID = stringPreferencesKey("child_id")
 }

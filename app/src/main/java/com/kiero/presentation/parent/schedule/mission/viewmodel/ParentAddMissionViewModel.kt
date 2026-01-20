@@ -6,6 +6,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.common.extension.formatWithDayOfWeek
+import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.parent.repository.ParentMissionAddRepository
 import com.kiero.presentation.parent.schedule.mission.component.model.MissionAwardDefaults
 import com.kiero.presentation.parent.schedule.mission.component.model.ParentMissionAddValid
@@ -26,6 +27,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ParentAddMissionViewModel @Inject constructor(
     private val repository: ParentMissionAddRepository,
+    private val userInfoManager: UserInfoManager
 ) : ViewModel() {
 
     val missionNameState = TextFieldState()
@@ -126,8 +128,11 @@ class ParentAddMissionViewModel @Inject constructor(
         _showBottomSheet.value = false
     }
 
-    fun setChildId(childId: Long) {
-        _state.update { it.copy(childId = childId) }
+    fun setChildId() {
+        viewModelScope.launch {
+            val childId = userInfoManager.getChildIdInfo() ?: return@launch
+            _state.update { it.copy(childId = childId) }
+        }
     }
 
     fun onDateSelected(date: LocalDate) {

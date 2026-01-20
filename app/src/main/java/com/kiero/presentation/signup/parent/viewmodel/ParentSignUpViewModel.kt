@@ -6,7 +6,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.kiero.core.common.extension.toHandleErrorMessage
 import com.kiero.core.common.util.formatTime
+import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.core.common.viewmodel.throttleFirst
+import com.kiero.core.localstorage.TokenManager
+import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.data.demo.repository.DemoRepository
 import com.kiero.data.parent.signup.repository.ParentSignUpRepository
@@ -17,6 +20,8 @@ import com.kiero.presentation.signup.parent.state.ParentSignUpSideEffect
 import com.kiero.presentation.signup.parent.state.ParentSignUpState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,7 +39,9 @@ class ParentSignUpViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: ParentSignUpRepository,
     private val authRepository: AuthRepository,
-    private val demoRepository: DemoRepository
+    private val demoRepository: DemoRepository,
+    private val userInfoManager: UserInfoManager,
+    private val tokenManager: TokenManager
 ) : ViewModel() {
     private val _state = MutableStateFlow(ParentSignUpState())
     val state: StateFlow<ParentSignUpState> = _state.asStateFlow()
@@ -145,16 +152,25 @@ class ParentSignUpViewModel @Inject constructor(
     }
 
     fun logOut() {
+        Timber.e("로그아웃 되었습니다")
         viewModelScope.launch {
-            authRepository.postLogout()
-            demoRepository.deleteDemo()
+            val logoutDeferred = async {
+                suspendRunCatching { authRepository.postLogout() }
+            }
+            val demoDeferred = async {
+                suspendRunCatching { demoRepository.deleteDemo() }
+            }
+            val tokenDeferred = async {
+                suspendRunCatching { tokenManager.clearTokens() }
+            }
+
+            awaitAll(logoutDeferred, demoDeferred, tokenDeferred)
+
+            _state.update {
+                it.copy(isLoading = false)
+            }
 
             _sideEffect.emit(ParentSignUpSideEffect.NavigateToSelection)
-            _state.update {
-                it.copy(
-                    isLoading = false
-                )
-            }
         }
     }
 

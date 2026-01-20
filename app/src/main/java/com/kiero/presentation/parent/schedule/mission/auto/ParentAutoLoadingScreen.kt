@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -45,8 +44,7 @@ fun ParentAutoLoadingScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             KieroGifImage(
-                drawableId = R.drawable.gif_parent_analyze,
-                modifier = Modifier.size(200.dp)
+                drawableId = R.drawable.gif_parent_analyze
             )
 
             Spacer(modifier = Modifier.height(16.dp))

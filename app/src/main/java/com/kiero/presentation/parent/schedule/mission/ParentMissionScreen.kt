@@ -3,13 +3,16 @@ package com.kiero.presentation.parent.schedule.mission
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,6 +32,10 @@ fun ParentMissionRoute(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit) {
+        viewModel.getMissions()
+    }
+
     when (val uiState = state) {
         is UiState.Success -> {
             ParentMissionScreen(
@@ -43,10 +50,16 @@ fun ParentMissionRoute(
         is UiState.Failure -> {}
 
         UiState.Empty -> {
-            Image(
-                painter = painterResource(id = R.drawable.img_mission_empty_view),
-                contentDescription = null,
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.img_mission_empty_view),
+                    contentDescription = null,
+                )
+            }
         }
     }
 }
