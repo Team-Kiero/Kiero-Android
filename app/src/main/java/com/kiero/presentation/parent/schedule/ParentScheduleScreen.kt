@@ -36,6 +36,7 @@ fun ParentScheduleRoute(
     navigateUp: () -> Unit,
     navigateToScheduleAdd: () -> Unit,
     navigateToMissionAdd: () -> Unit,
+    navigateToAutoMissionAdd: (Long) -> Unit,
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
 
@@ -44,6 +45,7 @@ fun ParentScheduleRoute(
         navigateUp = navigateUp,
         navigateToScheduleAdd = navigateToScheduleAdd,
         navigateToMissionAdd = navigateToMissionAdd,
+        navigateToAutoMissionAdd = navigateToAutoMissionAdd,
         selectedTabIndex = selectedTabIndex,
         onTabSelected = { selectedTabIndex = it }
     )
@@ -55,6 +57,7 @@ private fun ParentScheduleScreen(
     navigateUp: () -> Unit,
     navigateToScheduleAdd: () -> Unit,
     navigateToMissionAdd: () -> Unit,
+    navigateToAutoMissionAdd: (Long) -> Unit,
     selectedTabIndex: Int,
     onTabSelected: (Int) -> Unit,
     modifier: Modifier = Modifier,
@@ -122,7 +125,9 @@ private fun ParentScheduleScreen(
                 isExpanded = isMissionFabExpanded,
                 onExpandedChange = { isMissionFabExpanded = it },
                 onMissionAdd = navigateToMissionAdd,
-                onMissionRecommend = { /* 규현이 화면 */ },
+                onMissionRecommend = {
+                    navigateToAutoMissionAdd(10) // 임시 ChildID
+                },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(end = 16.dp, bottom = 52.dp)
@@ -140,6 +145,7 @@ private fun ParentScheduleScreenPreview() {
             navigateUp = {},
             navigateToScheduleAdd = {},
             navigateToMissionAdd = {},
+            navigateToAutoMissionAdd = {},
             selectedTabIndex = 0,
             onTabSelected = {}
         )
