@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
+import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
@@ -42,6 +44,7 @@ fun ParentAddMissionRoute(
     val showBottomSheet by viewModel.showBottomSheet.collectAsStateWithLifecycle()
     val selectedDate by viewModel.selectedDate.collectAsStateWithLifecycle()
 
+    val dateText = viewModel.displayDate
     val globalTrigger = LocalGlobalUiEventTrigger.current
 
     // TODO : Test 용 고정값, 받아온 childId를 사용해야 됨.
@@ -50,16 +53,14 @@ fun ParentAddMissionRoute(
         viewModel.setChildId(1L)
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.sideEffect.collect { effect ->
-            when (effect) {
-                is ParentAddMissionSideEffect.ShowSnackbar -> globalTrigger.showSnackbar(
-                    SnackbarState(message = effect.message)
-                )
+    viewModel.sideEffect.collectSideEffect { effect ->
+        when (effect) {
+            is ParentAddMissionSideEffect.ShowSnackbar -> globalTrigger.showSnackbar(
+                SnackbarState(message = effect.message)
+            )
 
-                is ParentAddMissionSideEffect.NavigateToMissionList -> {
-                    navigateUp()
-                }
+            is ParentAddMissionSideEffect.NavigateToMissionList -> {
+                navigateUp()
             }
         }
     }
@@ -80,18 +81,11 @@ fun ParentAddMissionRoute(
                 navigateUp = navigateUp,
                 viewModel = viewModel,
                 showBottomSheet = showBottomSheet,
-                selectedDate = selectedDate,
+                selectedDate = dateText,
             )
         }
     }
 
-    ParentAddMissionScreen(
-        paddingValues = paddingValues,
-        navigateUp = navigateUp,
-        viewModel = viewModel,
-        showBottomSheet = showBottomSheet,
-        selectedDate = selectedDate,
-    )
 }
 
 @Composable
@@ -106,7 +100,8 @@ fun ParentAddMissionScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(color = KieroTheme.colors.black),
+            .background(color = KieroTheme.colors.black)
+            .padding(paddingValues),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(15.dp)
     ) {
