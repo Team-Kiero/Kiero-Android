@@ -7,13 +7,13 @@ import com.kiero.data.parent.plan.remote.dto.response.PlanColorResponseDto
 
 data class PlanColorModel(
     val scheduleColor : String,
-    val colorColor : String,
+    val colorCode : String,
 )
 
 
 fun PlanColorResponseDto.toModel() = PlanColorModel(
     scheduleColor = this.scheduleColor,
-    colorColor = this.colorCode,
+    colorCode = this.colorCode,
 )
 
 data class PlanAllModel(
