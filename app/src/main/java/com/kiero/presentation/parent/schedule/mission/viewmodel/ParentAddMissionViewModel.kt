@@ -5,6 +5,7 @@ import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.common.extension.formatWithDayOfWeek
 import com.kiero.data.parent.repository.ParentMissionAddRepository
 import com.kiero.presentation.parent.schedule.mission.component.model.MissionAwardDefaults
 import com.kiero.presentation.parent.schedule.mission.component.model.ParentMissionAddValid
@@ -18,6 +19,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
@@ -40,10 +43,18 @@ class ParentAddMissionViewModel @Inject constructor(
     private val _currentAwardValue = MutableStateFlow(MissionAwardDefaults.DEFAULT_AWARD)
     val currentAwardValue = _currentAwardValue.asStateFlow()
 
-    private val _selectedDate = MutableStateFlow<String?>(null)
+    private val _selectedDate = MutableStateFlow<String?>(
+        LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
+    )
     val selectedDate = _selectedDate.asStateFlow()
 
+    val displayDate: String
+        get() = _selectedDate.value?.formatWithDayOfWeek ?: "마감일을 선택해주세요"
+
     init {
+        _state.update {
+            it.copy(selectedDate = _selectedDate.value)
+        }
         observeAwardTextFieldChanges()
         observeCurrentAwardValueChanges()
         observeMissionNameChanges()
@@ -119,13 +130,21 @@ class ParentAddMissionViewModel @Inject constructor(
         _state.update { it.copy(childId = childId) }
     }
 
+    fun onDateSelected(date: LocalDate) {
+        val formattedDate = date.format(DateTimeFormatter.ISO_LOCAL_DATE)
+        _selectedDate.value = formattedDate
+        onDismissBottomSheet()
+    }
+
+
     fun createMission() {
         val currentState = _state.value
+        val awardValue = _currentAwardValue.value
 
         val validationError = when {
             currentState.missionName.isBlank() -> ParentMissionAddValid.MISSION
-            _currentAwardValue.value <= 0 -> ParentMissionAddValid.AWARD
-            _currentAwardValue.value > 500 -> ParentMissionAddValid.MAX
+            awardValue <= 0 -> ParentMissionAddValid.AWARD
+            awardValue > 500 -> ParentMissionAddValid.MAX
             else -> null
         }
 
@@ -137,23 +156,26 @@ class ParentAddMissionViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
+            val childId = currentState.childId ?: 1L
+            val name = currentState.missionName
+            val reward = currentState.reward
+            val dueAt = currentState.selectedDate ?: LocalDate.now().toString() // 만약의 null 대비
+
             _state.update { it.copy(isLoading = true) }
 
             repository.postParentMission(
-                childId = currentState.childId!!,
-                name = currentState.missionName,
-                reward = currentState.reward,
-                dueAt = currentState.selectedDate!!
+                childId = childId,
+                name = name,
+                reward = reward,
+                dueAt = dueAt
             ).onSuccess { mission ->
                 _state.update { it.copy(isLoading = false) }
-                _sideEffect.emit(ParentAddMissionSideEffect.ShowSnackbar(message = "미션이 등록되었습니다."))
+                _sideEffect.emit(ParentAddMissionSideEffect.ShowSnackbar("미션이 등록되었습니다."))
                 _sideEffect.emit(ParentAddMissionSideEffect.NavigateToMissionList(mission))
             }.onFailure { error ->
                 _state.update { it.copy(isLoading = false) }
                 _sideEffect.emit(
-                    ParentAddMissionSideEffect.ShowSnackbar(
-                        error.message ?: "미션 생성에 실패했습니다."
-                    )
+                    ParentAddMissionSideEffect.ShowSnackbar(error.message ?: "미션 생성에 실패했습니다.")
                 )
             }
         }
