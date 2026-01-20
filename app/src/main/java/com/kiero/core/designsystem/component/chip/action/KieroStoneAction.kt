@@ -30,7 +30,7 @@ class KieroStoneAction(
 
         val targetColor = when {
             !isEnabled -> KieroTheme.colors.gray500
-            isCompleted -> KieroTheme.colors.main
+            isCompleted && maxStoneCount > 0 -> KieroTheme.colors.main
             else -> KieroTheme.colors.gray100
         }
 
