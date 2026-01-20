@@ -24,7 +24,8 @@ class CoinRepositoryImpl @Inject constructor(
             it.copy(
                 lastName = newCoin.lastName,
                 firstName = newCoin.firstName,
-                coinAmount = newCoin.coinAmount
+                coinAmount = newCoin.coinAmount,
+                today = newCoin.today
             )
         }
 
