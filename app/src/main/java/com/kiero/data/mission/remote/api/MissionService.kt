@@ -5,6 +5,7 @@ import com.kiero.data.mission.remote.dto.response.MissionByDateResponseDto
 import com.kiero.data.mission.remote.dto.response.MissionCompleteResponseDto
 import retrofit2.http.GET
 import retrofit2.http.PATCH
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface MissionService {
@@ -15,6 +16,6 @@ interface MissionService {
 
     @PATCH("api/v1/missions/{missionId}/complete")
     suspend fun completeMission(
-        @Query("missionId") missionId: Long
+        @Path("missionId") missionId: Long
     ): BaseResponse<MissionCompleteResponseDto>
 }

@@ -23,9 +23,13 @@ class ParentMissionAddRepositoryImpl @Inject constructor(
             dueAt = dueAt
         )
 
-        dataSource.postParentMission(
+        val response = dataSource.postParentMission(
             childId = childId,
             requestDto = requestDto
-        ).data!!.toModel()
+        )
+
+        val responseData = response.data ?: throw Exception(response.message)
+
+        responseData.toModel()
     }
 }

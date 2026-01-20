@@ -3,16 +3,17 @@ package com.kiero.presentation.kid.wish.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.common.extension.updateSuccess
+import com.kiero.core.common.util.successData
 import com.kiero.core.model.UiState
 import com.kiero.data.kid.coin.repository.CoinRepository
 import com.kiero.data.kid.wish.repository.WishRepository
-import com.kiero.data.mission.repository.MissionRepository
-import com.kiero.presentation.kid.wish.model.toState
+import com.kiero.presentation.kid.model.toUiModel
 import com.kiero.presentation.kid.wish.model.toUiModel
 import com.kiero.presentation.kid.wish.state.KidWishSideEffect
 import com.kiero.presentation.kid.wish.state.KidWishState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -27,7 +28,6 @@ import javax.inject.Inject
 @HiltViewModel
 class KidWishViewModel @Inject constructor(
     private val repository: CoinRepository,
-    private val missionRepository: MissionRepository,
     private val wishRepository: WishRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow<UiState<KidWishState>>(UiState.Loading)
@@ -39,7 +39,7 @@ class KidWishViewModel @Inject constructor(
             is UiState.Success -> {
                 UiState.Success(
                     uiState.data.copy(
-                        coinUiModel = coinData.toState()
+                        coinUiModel = coinData.toUiModel()
                     )
                 )
             }
@@ -58,7 +58,6 @@ class KidWishViewModel @Inject constructor(
     val sideEffect = _sideEffect.asSharedFlow()
 
     init {
-        fetchCoin()
         fetchWish()
     }
 
@@ -74,33 +73,48 @@ class KidWishViewModel @Inject constructor(
         }
     }
 
-    fun fetchWish() {
+    fun fetchWish(isRefresh: Boolean = false) {
         viewModelScope.launch {
+            if (isRefresh) {
+                _state.updateSuccess { it.copy(isRefreshing = true) }
+            }
+
+            val minLoadingTime = launch {
+                if (isRefresh) delay(1000)
+            }
+
             wishRepository.getCoupons()
                 .onSuccess { result ->
-                    _state.updateSuccess {
-                        it.copy(
+                    minLoadingTime.join()
+
+                    _state.value = UiState.Success(
+                        data = KidWishState(
                             kidWishList = result.map { wish ->
                                 wish.toUiModel()
-                            }.toImmutableList()
+                            }.toImmutableList(),
+                            isRefreshing = false
                         )
-                    }
+                    )
                 }
                 .onFailure {
+                    minLoadingTime.join()
+                    Timber.e("fetchWish fail: $it")
+                    _state.updateSuccess { state -> state.copy(isRefreshing = false) }
                     _sideEffect.emit(KidWishSideEffect.ShowSnackBar(it.message.toString()))
                 }
         }
     }
 
     fun prayWish(
-        couponId: Long
+        couponId: Long,
     ) {
         viewModelScope.launch {
             wishRepository.patchCoupon(couponId)
                 .onSuccess {
                     _state.updateSuccess {
                         it.copy(
-                            isVisibleDialog = false
+                            isVisibleDialog = false,
+                            isCompletedWish = true
                         )
                     }
 
@@ -113,20 +127,32 @@ class KidWishViewModel @Inject constructor(
     }
 
     fun openDialogWithItem(targetId: Long) {
-        _state.updateSuccess { state ->
-            val selectedItem = state.kidWishList.find { it.couponId == targetId }
+        val currentState = _state.value.successData ?: return
 
-            state.copy(
-                isVisibleDialog = true,
-                selectedWishItem = selectedItem
-            )
+        val selectedItem = currentState.kidWishList.find { it.couponId == targetId } ?: return
+
+        val myCoin = currentState.coinUiModel.coinAmount
+        val itemPrice = selectedItem.price
+
+        if (myCoin >= itemPrice) {
+            _state.updateSuccess { state ->
+                state.copy(
+                    isVisibleDialog = true,
+                    selectedWishItem = selectedItem
+                )
+            }
+        } else {
+            viewModelScope.launch {
+                _sideEffect.emit(KidWishSideEffect.ShowSnackBar("금화가 부족해! 미션을 더 하고 오자!"))
+            }
         }
     }
 
     fun dismissDialog() {
         _state.updateSuccess { state ->
             state.copy(
-                isVisibleDialog = false
+                isVisibleDialog = false,
+                isCompletedWish = false
             )
         }
     }

@@ -2,6 +2,7 @@ package com.kiero.presentation.parent.schedule.plan.component.picker
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -107,6 +108,7 @@ fun TimePicker(
 fun TimePickerBottomSheet(
     onSelected: (String) -> Unit,
     onDismissRequest: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val sheetState = rememberModalBottomSheetState()
 
@@ -124,7 +126,12 @@ fun TimePickerBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
         containerColor = KieroTheme.colors.gray900,
-        dragHandle = {}
+        dragHandle = {},
+        modifier = modifier
+            .pointerInput(Unit) {
+                detectTapGestures {
+                }
+            }
     ) {
         Column(
             modifier = Modifier
@@ -256,7 +263,7 @@ fun TimeItemsPicker(
             override fun onPostScroll(
                 consumed: Offset,
                 available: Offset,
-                source: NestedScrollSource
+                source: NestedScrollSource,
             ): Offset {
                 return available
             }
