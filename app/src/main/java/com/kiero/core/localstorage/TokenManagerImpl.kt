@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.core.localstorage.constant.DataStoreConstant.KEY_ACCESS_TOKEN
+import com.kiero.core.localstorage.constant.DataStoreConstant.KEY_CHILD_ID
 import com.kiero.core.localstorage.constant.DataStoreConstant.KEY_REFRESH_TOKEN
 import com.kiero.core.localstorage.constant.DataStoreConstant.KEY_USER_ROLE
 import com.kiero.core.model.auth.UserRole
@@ -97,5 +98,27 @@ class TokenManagerImpl @Inject constructor(
             val roleName = dataStore.data.map { it[KEY_USER_ROLE] }.first()
             roleName?.let { UserRole.valueOf(it) }
         }.onFailure { Timber.e(it, "UserRole 로드 실패") }.getOrNull()
+    }
+    override suspend fun saveChildId(childId: Long) {
+        suspendRunCatching {
+            dataStore.edit {
+                it[KEY_CHILD_ID] = childId.toString()
+            }
+        }.onFailure { Timber.e(it, "ChildId 저장 실패") }
+    }
+
+    override suspend fun getChildId(): Long? {
+        return suspendRunCatching {
+            val childIdString = dataStore.data.map { it[KEY_CHILD_ID] }.first()
+            childIdString?.toLongOrNull()
+        }.onFailure { Timber.e(it, "ChildId 로드 실패") }.getOrNull()
+    }
+
+    override suspend fun clearChildId() {
+        suspendRunCatching {
+            dataStore.edit {
+                it.remove(KEY_CHILD_ID)
+            }
+        }.onFailure { Timber.e(it, "ChildId 삭제 실패") }
     }
 }

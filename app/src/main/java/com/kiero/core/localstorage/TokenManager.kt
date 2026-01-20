@@ -12,4 +12,8 @@ interface TokenManager {
 
     suspend fun saveUserRole(role: UserRole)
     suspend fun getUserRole(): UserRole?
+
+    suspend fun saveChildId(childId: Long)
+    suspend fun getChildId(): Long?
+    suspend fun clearChildId()
 }
