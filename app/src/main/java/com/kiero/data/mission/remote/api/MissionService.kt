@@ -10,8 +10,8 @@ import com.kiero.data.mission.remote.dto.response.MissionSuggestionResponseDto
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PATCH
-import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface MissionService {
@@ -22,7 +22,7 @@ interface MissionService {
 
     @PATCH("api/v1/missions/{missionId}/complete")
     suspend fun completeMission(
-        @Query("missionId") missionId: Long
+        @Path("missionId") missionId: Long
     ): BaseResponse<MissionCompleteResponseDto>
 
     @POST("api/v1/missions/suggestions")

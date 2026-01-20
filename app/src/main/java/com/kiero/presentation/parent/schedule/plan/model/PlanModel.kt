@@ -10,12 +10,20 @@ data class DayList(
     val day: String,
 )
 
-enum class ColorType(val color: Color) {
-    SCHEDULE1(Color(0xFFCFFFFA)),
-    SCHEDULE2(Color(0xFFFFFEE9)),
-    SCHEDULE3(Color(0xFFBFFFE3)),
-    SCHEDULE4(Color(0xFF34D9D3)),
-    SCHEDULE5(Color(0xFF7BBDFF)),
+enum class ColorType(val color: Color, val hexCode: String) {
+    SCHEDULE1(Color(0xFFCFFFFA), "#CFFFFA"),
+    SCHEDULE2(Color(0xFFFFFEE9), "#FFFEE9"),
+    SCHEDULE3(Color(0xFFBFFFE3), "#BFFFE3"),
+    SCHEDULE4(Color(0xFF34D9D3), "#34D9D3"),
+    SCHEDULE5(Color(0xFF7BBDFF), "#7BBDFF");
+
+    companion object {
+        fun fromHexCode(hexCode: String): ColorType {
+            return entries.find {
+                it.hexCode.equals(hexCode, ignoreCase = true)
+            } ?: SCHEDULE1
+        }
+    }
 }
 
 

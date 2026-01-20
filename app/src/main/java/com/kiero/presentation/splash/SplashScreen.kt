@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -46,6 +47,10 @@ fun SplashRoute(
             SplashSideEffect.NavigateToParentGraph -> navigateToParentGraph()
             SplashSideEffect.NavigateToKidOnboarding -> navigateToKidOnboarding()
         }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.checkLoginState()
     }
 
     SplashScreen()

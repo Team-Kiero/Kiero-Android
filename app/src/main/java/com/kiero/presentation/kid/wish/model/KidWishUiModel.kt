@@ -11,7 +11,7 @@ data class KidWishUiModel(
 )
 
 fun WishModel.toUiModel() = KidWishUiModel(
-    couponId = id,
+    couponId = couponId,
     name = name,
     price = price
 )

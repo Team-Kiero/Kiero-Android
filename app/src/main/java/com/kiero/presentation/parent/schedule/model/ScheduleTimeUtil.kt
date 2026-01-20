@@ -1,5 +1,8 @@
 package com.kiero.presentation.parent.schedule.model
 
+import androidx.compose.ui.graphics.Color
+import androidx.core.graphics.toColorInt
+
 fun ScheduleEvent.toScheduleBlocks(dayIndex: Int): List<ScheduleBlock> {
     val (startHour, startMinute) = parseTime(startTime)
     val (endHour, endMinute) = parseTime(endTime)
@@ -8,13 +11,21 @@ fun ScheduleEvent.toScheduleBlocks(dayIndex: Int): List<ScheduleBlock> {
     val endSlot = ((endHour - 8) * 2) + (endMinute / 30)
     val totalSlots = endSlot - startSlot
 
-    val color = when (scheduleColor) {
-        "SCHEDULE1" -> ScheduleColorType.SCHEDULE1.color
-        "SCHEDULE2" -> ScheduleColorType.SCHEDULE2.color
-        "SCHEDULE3" -> ScheduleColorType.SCHEDULE3.color
-        "SCHEDULE4" -> ScheduleColorType.SCHEDULE4.color
-        "SCHEDULE5" -> ScheduleColorType.SCHEDULE5.color
-        else -> ScheduleColorType.SCHEDULE1.color
+    val color = try {
+        if (scheduleColor.startsWith("#")) {
+            Color(scheduleColor.toColorInt())
+        } else {
+            when (scheduleColor) {
+                "SCHEDULE1" -> ScheduleColorType.SCHEDULE1.color
+                "SCHEDULE2" -> ScheduleColorType.SCHEDULE2.color
+                "SCHEDULE3" -> ScheduleColorType.SCHEDULE3.color
+                "SCHEDULE4" -> ScheduleColorType.SCHEDULE4.color
+                "SCHEDULE5" -> ScheduleColorType.SCHEDULE5.color
+                else -> ScheduleColorType.SCHEDULE1.color
+            }
+        }
+    } catch (e: Exception) {
+        ScheduleColorType.SCHEDULE1.color
     }
 
     if (totalSlots <= 2) {

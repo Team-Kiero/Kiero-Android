@@ -1,4 +1,4 @@
-package com.kiero.presentation.kid.wish.model
+package com.kiero.presentation.kid.model
 
 import androidx.compose.runtime.Immutable
 import com.kiero.data.kid.coin.model.CoinModel
@@ -10,7 +10,7 @@ data class KidCoinUiModel(
     val coinAmount : Int = 0,
 )
 
-fun CoinModel.toState() = KidCoinUiModel(
+fun CoinModel.toUiModel() = KidCoinUiModel(
     lastName = lastName,
     firstName = firstName,
     coinAmount = coinAmount

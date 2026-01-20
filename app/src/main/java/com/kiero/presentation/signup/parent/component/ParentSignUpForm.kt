@@ -21,6 +21,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
+import com.kiero.core.common.util.MaxLengthInputTransformation
 import com.kiero.core.designsystem.component.KieroTextField
 import com.kiero.core.designsystem.theme.KieroTheme
 
@@ -51,7 +52,11 @@ fun ParentSignUpForm(
             isError = isError,
             containerColor = KieroTheme.colors.gray900,
             keyboardOptions = KeyboardOptions(imeAction = imeAction),
-            onKeyboardAction = { onImeAction() }
+            onKeyboardAction = { performDefaultAction ->
+                onImeAction()
+                performDefaultAction()
+            },
+            inputTransformation = MaxLengthInputTransformation(5)
         )
 
         Row(

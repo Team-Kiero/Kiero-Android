@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -27,6 +26,7 @@ fun ScheduleDatebar(
     onPreviousClick: () -> Unit,
     onNextClick: () -> Unit,
     modifier: Modifier = Modifier,
+    isPreviousEnabled: Boolean = true,
 ) {
     Row(
         modifier = modifier
@@ -41,9 +41,11 @@ fun ScheduleDatebar(
         Icon(
             imageVector = ImageVector.vectorResource(id = R.drawable.ic_arrow_left),
             contentDescription = null,
-            tint = Color.Unspecified,
-            modifier = Modifier
-                .noRippleClickable(onClick = onPreviousClick)
+
+            tint = if (isPreviousEnabled) KieroTheme.colors.white else KieroTheme.colors.gray600,
+            modifier = Modifier.noRippleClickable(
+                onClick = { if (isPreviousEnabled) onPreviousClick() }
+            )
         )
 
         Spacer(modifier = Modifier.width(44.dp))

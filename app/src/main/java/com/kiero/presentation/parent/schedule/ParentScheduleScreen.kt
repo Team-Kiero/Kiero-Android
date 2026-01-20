@@ -20,9 +20,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.core.common.extension.statusBarColor
 import com.kiero.core.designsystem.theme.Gray900
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.core.model.UiState
 import com.kiero.presentation.parent.component.MissionTabFab
 import com.kiero.presentation.parent.component.ParentTabRow
 import com.kiero.presentation.parent.component.ParentUserSection
@@ -30,7 +33,9 @@ import com.kiero.presentation.parent.component.PlanTabFab
 import com.kiero.presentation.parent.schedule.mission.ParentMissionRoute
 import com.kiero.presentation.parent.schedule.model.TabItem
 import com.kiero.presentation.parent.schedule.plan.ParentPlanScreen
-import com.kiero.presentation.parent.schedule.plan.model.ScheduleData
+import com.kiero.presentation.parent.schedule.plan.state.ParentScheduleState
+import com.kiero.presentation.parent.schedule.viewmodel.ParentScheduleViewModel
+import com.kiero.presentation.signup.parent.state.ParentSignUpState
 
 @Composable
 fun ParentScheduleRoute(
@@ -39,30 +44,65 @@ fun ParentScheduleRoute(
     navigateToScheduleAdd: () -> Unit,
     navigateToMissionAdd: () -> Unit,
     navigateToAutoMissionAdd: (Long) -> Unit,
+    viewModel: ParentScheduleViewModel = hiltViewModel(),
 ) {
+
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val authState by viewModel.authstate.collectAsStateWithLifecycle()
+
     var selectedTabIndex by remember { mutableIntStateOf(0) }
 
-    ParentScheduleScreen(
-        paddingValues = paddingValues,
-        navigateUp = navigateUp,
-        navigateToScheduleAdd = navigateToScheduleAdd,
-        navigateToMissionAdd = navigateToMissionAdd,
-        navigateToAutoMissionAdd = navigateToAutoMissionAdd,
-        selectedTabIndex = selectedTabIndex,
-        onTabSelected = { selectedTabIndex = it }
-    )
+    when (val state = uiState) {
+        is UiState.Loading -> {
+
+        }
+
+        is UiState.Success -> {
+            ParentScheduleScreen(
+                paddingValues = paddingValues,
+                state = authState,
+                scheduleState = state.data,
+                selectedTabIndex = selectedTabIndex,
+                onTabSelected = { selectedTabIndex = it },
+                onDateChange = viewModel::onDateChange,
+                navigateToScheduleAdd = navigateToScheduleAdd,
+                navigateToMissionAdd = navigateToMissionAdd,
+                navigateToAutoMissionAdd = navigateToAutoMissionAdd,
+            )
+        }
+
+        is UiState.Failure -> {
+            // 에러 시 스낵바나 재시도 버튼 표시
+        }
+
+        is UiState.Empty -> {
+            ParentScheduleScreen(
+                paddingValues = paddingValues,
+                state = authState,
+                scheduleState = ParentScheduleState(),
+                selectedTabIndex = selectedTabIndex,
+                onTabSelected = { selectedTabIndex = it },
+                onDateChange = viewModel::onDateChange,
+                navigateToScheduleAdd = navigateToScheduleAdd,
+                navigateToMissionAdd = navigateToMissionAdd,
+                navigateToAutoMissionAdd = navigateToAutoMissionAdd,
+            )
+        }
+    }
 }
 
 @Composable
 private fun ParentScheduleScreen(
     paddingValues: PaddingValues,
-    navigateUp: () -> Unit,
-    navigateToScheduleAdd: () -> Unit,
-    navigateToMissionAdd: () -> Unit,
+    state: ParentSignUpState,
+    scheduleState: ParentScheduleState,
     navigateToAutoMissionAdd: (Long) -> Unit,
     selectedTabIndex: Int,
-    onTabSelected: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    onTabSelected: (Int) -> Unit,
+    onDateChange: (Boolean) -> Unit,
+    navigateToScheduleAdd: () -> Unit,
+    navigateToMissionAdd: () -> Unit,
 ) {
     val tabs = remember { TabItem.entries.map { it.title } }
     var isMissionFabExpanded by remember { mutableStateOf(false) }
@@ -84,7 +124,8 @@ private fun ParentScheduleScreen(
                 .padding(paddingValues)
         ) {
             ParentUserSection(
-                userName = "근영맘",
+                userName = state.parentInfo.parentName,
+                profileImage = state.parentInfo.parentProfileImage,
                 onUserNameClick = {},
                 modifier = Modifier
                     .background(color = KieroTheme.colors.gray900)
@@ -97,7 +138,11 @@ private fun ParentScheduleScreen(
             )
 
             when (selectedTabIndex) {
-                0 -> ParentPlanScreen(events = ScheduleData.fakeScheduleEvents)
+                0 -> ParentPlanScreen(
+                    state = scheduleState,
+                    onDateChange = onDateChange
+                )
+
                 1 -> ParentMissionRoute(paddingValues)
             }
         }
@@ -143,14 +188,12 @@ private fun ParentScheduleScreen(
 @Preview
 private fun ParentScheduleScreenPreview() {
     KieroTheme {
-        ParentScheduleScreen(
+        ParentScheduleRoute(
             paddingValues = PaddingValues(),
             navigateUp = {},
             navigateToScheduleAdd = {},
             navigateToMissionAdd = {},
-            navigateToAutoMissionAdd = {},
-            selectedTabIndex = 0,
-            onTabSelected = {}
+            navigateToAutoMissionAdd = {}
         )
     }
 }
