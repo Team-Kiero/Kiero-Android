@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.kiero.core.common.extension.toHandleErrorMessage
 import com.kiero.core.common.util.formatTime
+import com.kiero.core.common.viewmodel.throttleFirst
 import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.data.demo.repository.DemoRepository
 import com.kiero.data.parent.signup.repository.ParentSignUpRepository
@@ -44,6 +45,7 @@ class ParentSignUpViewModel @Inject constructor(
     private val parentInfo = savedStateHandle.toRoute<ParentSignUp>()
 
     private var timerJob: Job? = null
+    private var copyJob: Job? = null
     private val TIMER_DURATION_SECONDS = 10 * 1
 
     init {
@@ -58,12 +60,6 @@ class ParentSignUpViewModel @Inject constructor(
 
         when (currentState) {
             ParentSignUpStep.ADDCHILD -> {
-                _state.update {
-                    it.copy(
-                        currentStep = ParentSignUpStep.INVITE
-                    )
-                }
-
                 postChild()
             }
 
@@ -78,9 +74,10 @@ class ParentSignUpViewModel @Inject constructor(
     }
 
     fun onCopyClick() {
-        val copyText = _state.value.childInfo.code
+        if (copyJob?.isActive == true) return
 
-        viewModelScope.launch {
+        copyJob = throttleFirst {
+            val copyText = _state.value.childInfo.code
             _sideEffect.emit(
                 ParentSignUpSideEffect.CopyText(
                     message = "코드가 복사되었습니다.",
@@ -125,6 +122,14 @@ class ParentSignUpViewModel @Inject constructor(
                         childInfo = result.toState(),
                         isLoading = false
                     )
+                }
+
+                if (_state.value.currentStep == ParentSignUpStep.ADDCHILD) {
+                    _state.update {
+                        it.copy(
+                            currentStep = ParentSignUpStep.INVITE
+                        )
+                    }
                 }
 
                 startTimer()

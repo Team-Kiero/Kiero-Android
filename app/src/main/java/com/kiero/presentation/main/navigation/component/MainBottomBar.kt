@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import com.kiero.core.common.extension.dropShadow
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.presentation.parent.navigation.ParentTab
 import kotlinx.collections.immutable.ImmutableList
 
 @Composable
@@ -52,7 +53,7 @@ fun MainBottomBar(
         Box(
             modifier = Modifier
                 .then(
-                    if (isVisible) {
+                    if (isVisible && currentTab is ParentTab) {
                         Modifier.dropShadow(
                             shape = RoundedCornerShape(12.dp),
                             color = KieroTheme.colors.gray800,
