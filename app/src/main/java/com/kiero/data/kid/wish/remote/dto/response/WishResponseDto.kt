@@ -5,8 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class WishResponseDto(
-    @SerialName("id")
-    val id: Long,
+    @SerialName("couponId")
+    val couponId: Long,
     @SerialName("name")
     val name: String,
     @SerialName("price")
