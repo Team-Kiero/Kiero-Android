@@ -14,6 +14,7 @@ import com.kiero.presentation.kid.journey.model.StoneUiType
 import com.kiero.presentation.kid.journey.state.KidJourneySideEffect
 import com.kiero.presentation.kid.journey.state.KidJourneyState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -69,6 +71,24 @@ class KidJourneyViewModel @Inject constructor(
 
     private val _sideEffect = MutableSharedFlow<KidJourneySideEffect>()
     val sideEffect: SharedFlow<KidJourneySideEffect> = _sideEffect.asSharedFlow()
+
+    init {
+        startAutoRefresh()
+    }
+
+    fun fetchData() {
+        fetchTodaySchedule()
+        fetchCoin()
+    }
+
+    private fun startAutoRefresh() {
+        viewModelScope.launch {
+            while (isActive) {
+                fetchData()
+                delay(10_000L)
+            }
+        }
+    }
 
     fun fetchTodaySchedule() {
         viewModelScope.launch {

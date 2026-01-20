@@ -45,6 +45,7 @@ import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
 import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
+import com.kiero.core.trigger.LocalRefreshState
 import com.kiero.presentation.kid.component.KidSpeechField
 import com.kiero.presentation.kid.journey.component.KidJourneyActionButton
 import com.kiero.presentation.kid.journey.component.KidJourneyGoblinMessage
@@ -59,6 +60,7 @@ import com.kiero.presentation.kid.journey.state.KidJourneySideEffect
 import com.kiero.presentation.kid.journey.state.KidJourneyState
 import com.kiero.presentation.kid.journey.util.KidJourneyContentUtil
 import com.kiero.presentation.kid.journey.viewmodel.KidJourneyViewModel
+import com.kiero.presentation.main.navigation.KidMainTab
 
 @Composable
 fun KidJourneyRoute(
@@ -71,10 +73,18 @@ fun KidJourneyRoute(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val globalTrigger = LocalGlobalUiEventTrigger.current
     val context = LocalContext.current
+    val refreshState = LocalRefreshState.current
 
     LaunchedEffect(Unit) {
-        viewModel.fetchCoin()
-        viewModel.fetchTodaySchedule()
+        refreshState.refreshEvent.collect { tab ->
+            if (tab == KidMainTab.JOURNEY) {
+                viewModel.fetchData()
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchData()
     }
 
     viewModel.sideEffect.collectSideEffect { sideEffect ->
