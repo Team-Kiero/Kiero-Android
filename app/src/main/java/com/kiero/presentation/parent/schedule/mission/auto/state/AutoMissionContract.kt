@@ -3,6 +3,8 @@ package com.kiero.presentation.parent.schedule.mission.auto.state
 import androidx.compose.runtime.Immutable
 import com.kiero.presentation.parent.schedule.mission.auto.model.MissionUiModel
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Immutable
 data class AutoMissionState(
@@ -14,7 +16,7 @@ data class AutoMissionState(
     val missions: List<MissionUiModel> = emptyList(),
     val currentIndex: Int = 0,
 
-    val selectedDate: String? = null,
+    val selectedDate: LocalDate? = null,
     val showBottomSheet: Boolean = false,
     val hasViewedLastPage: Boolean = false
 ) {
@@ -42,7 +44,9 @@ data class AutoMissionState(
         }
 
     val displayDate: String
-        get() = selectedDate ?: "마감일을 선택해주세요"
+        get() = selectedDate?.format(
+            DateTimeFormatter.ofPattern("yyyy.MM.dd.(E)", Locale.KOREA)
+        ) ?: "마감일을 선택해주세요"
 
     enum class Screen {
         INPUT,

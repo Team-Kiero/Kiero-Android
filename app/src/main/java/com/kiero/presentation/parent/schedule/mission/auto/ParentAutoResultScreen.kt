@@ -175,16 +175,7 @@ fun ParentAutoResultScreen(
         if (state.showBottomSheet) {
             CalendarBottomSheet(
                 onDismissRequest = onDismissDatePicker,
-                onDateSelected = { dateString ->
-                    try {
-                        val date = LocalDate.parse(
-                            dateString,
-                            DateTimeFormatter.ISO_LOCAL_DATE
-                        )
-                        onDateSelected(date)
-                    } catch (e: Exception) {
-                    }
-                }
+                onDateSelected = onDateSelected
             )
         }
     }

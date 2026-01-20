@@ -7,10 +7,10 @@ import com.kiero.data.mission.remote.dto.request.MissionCreateDto
 interface AutoMissionDataSource {
     suspend fun analyzeNotice(
         noticeText: String
-    ): Result<MissionSuggestionModel>
+    ): MissionSuggestionModel
 
     suspend fun saveBatchMissions(
         childId: Long,
         missions: List<MissionCreateDto>
-    ): Result<List<MissionCompleteModel>>
+    ): List<MissionCompleteModel>
 }

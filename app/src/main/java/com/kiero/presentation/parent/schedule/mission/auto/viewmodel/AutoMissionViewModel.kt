@@ -102,7 +102,7 @@ class AutoMissionViewModel @Inject constructor(
 
             currentState.copy(
                 missions = updatedMissions,
-                selectedDate = formattedDate,
+                selectedDate = date,
                 showBottomSheet = false
             )
         }
@@ -163,11 +163,7 @@ class AutoMissionViewModel @Inject constructor(
         }
 
         _state.value.currentMission?.let { mission ->
-            val formattedDate = mission.dueAt.format(
-                DateTimeFormatter.ofPattern("yyyy.MM.dd.(E)")
-            )
-            _state.update { it.copy(selectedDate = formattedDate) }
-
+            _state.update { it.copy(selectedDate = mission.dueAt) }
             awardTextFieldState.edit {
                 replace(0, length, mission.reward.toString())
             }
