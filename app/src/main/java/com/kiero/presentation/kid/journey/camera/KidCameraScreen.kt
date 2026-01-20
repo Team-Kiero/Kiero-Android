@@ -37,9 +37,11 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.kiero.R
+import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.kid.component.KidSpeechField
 import com.kiero.presentation.kid.journey.camera.component.StoneFloating
+import com.kiero.presentation.kid.journey.camera.state.KidCameraSideEffect
 import com.kiero.presentation.kid.journey.camera.viewModel.KidCameraViewModel
 import com.kiero.presentation.kid.journey.model.StoneUiType
 import kotlinx.coroutines.delay
@@ -57,7 +59,7 @@ fun KidCameraRoute(
     val tempUri = remember {
         val directory = File(context.cacheDir, "images")
         directory.mkdirs()
-        val file = File(directory, "captured_image.jpg")
+        val file = File(directory, "${System.currentTimeMillis()}.jpg")
         FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
     }
 
@@ -66,6 +68,14 @@ fun KidCameraRoute(
     ) { success ->
         if (success) {
             imageUri = tempUri
+        }
+    }
+
+    viewModel.sideEffect.collectSideEffect {
+        when(it) {
+            is KidCameraSideEffect.NavigateUp -> {
+                navigateUp()
+            }
         }
     }
 
@@ -78,7 +88,12 @@ fun KidCameraRoute(
     KidCameraScreen(
         imageUri = imageUri,
         stoneType = state.stoneType,
-        onBackClick = navigateUp
+        onBack = {
+            viewModel.postImage(
+                fileName = "${System.currentTimeMillis()}.jpg",
+                contentType = "image/jpeg"
+            )
+        }
     )
 }
 
@@ -86,13 +101,13 @@ fun KidCameraRoute(
 private fun KidCameraScreen(
     imageUri: Uri?,
     stoneType: StoneUiType,
-    onBackClick: () -> Unit,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     LaunchedEffect(imageUri) {
         if (imageUri != null) {
             delay(4000)
-            onBackClick()
+            onBack()
         }
     }
 
@@ -162,7 +177,7 @@ private fun KidCameraScreenPreview() {
         KidCameraScreen(
             imageUri = null,
             stoneType = StoneUiType.COURAGE,
-            onBackClick = {}
+            onBack = {}
         )
     }
 }

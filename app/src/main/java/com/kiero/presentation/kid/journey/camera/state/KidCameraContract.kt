@@ -8,3 +8,7 @@ data class KidCameraState(
     val scheduleDetailId: Long = 0,
     val stoneType: StoneUiType = StoneUiType.WISDOM
 )
+
+sealed interface KidCameraSideEffect {
+    data object NavigateUp : KidCameraSideEffect
+}
