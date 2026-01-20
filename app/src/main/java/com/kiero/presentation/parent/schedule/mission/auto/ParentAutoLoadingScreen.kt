@@ -15,37 +15,15 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.kiero.R
 import com.kiero.core.designsystem.component.KieroGifImage
 import com.kiero.core.designsystem.component.KieroSnackbar
 import com.kiero.core.designsystem.theme.KieroTheme
-import com.kiero.presentation.parent.schedule.mission.auto.viewmodel.AutoMissionViewModel
-
-@Composable
-fun ParentAutoLoadingRoute(
-    paddingValues: PaddingValues,
-    viewModel: AutoMissionViewModel = hiltViewModel()
-) {
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    LaunchedEffect(Unit) {
-        viewModel.toastMessage.collect { message ->
-            snackbarHostState.showSnackbar(message)
-        }
-    }
-
-    ParentAutoLoadingScreen(
-        paddingValues = paddingValues,
-        snackbarHostState = snackbarHostState
-    )
-}
 
 @Composable
 fun ParentAutoLoadingScreen(

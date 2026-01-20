@@ -1,19 +1,24 @@
 package com.kiero.presentation.parent.schedule.mission.auto.viewmodel
 
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.data.mission.repository.AutoMissionRepository
 import com.kiero.presentation.parent.schedule.mission.auto.model.MissionUiModel
+import com.kiero.presentation.parent.schedule.mission.auto.state.AutoMissionSideEffect
+import com.kiero.presentation.parent.schedule.mission.auto.state.AutoMissionState
 import com.kiero.presentation.parent.schedule.mission.component.model.MissionAwardDefaults
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -24,97 +29,145 @@ class AutoMissionViewModel @Inject constructor(
     private val autoMissionRepository: AutoMissionRepository
 ) : ViewModel() {
 
-    private val _noticeText = MutableStateFlow("")
-    val noticeText: StateFlow<String> = _noticeText.asStateFlow()
+    private val _state = MutableStateFlow(AutoMissionState())
+    val state: StateFlow<AutoMissionState> = _state.asStateFlow()
 
-    private val _isAnalyzing = MutableStateFlow(false)
-    val isAnalyzing: StateFlow<Boolean> = _isAnalyzing.asStateFlow()
+    private val _sideEffect = MutableSharedFlow<AutoMissionSideEffect>(
+        extraBufferCapacity = 1
+    )
 
-    private val _missions = MutableStateFlow<List<MissionUiModel>>(emptyList())
-    val missions: StateFlow<List<MissionUiModel>> = _missions.asStateFlow()
-
-    private val _currentIndex = MutableStateFlow(0)
-    val currentIndex: StateFlow<Int> = _currentIndex.asStateFlow()
-
-    private val _isSaving = MutableStateFlow(false)
-    val isSaving: StateFlow<Boolean> = _isSaving.asStateFlow()
-
-    private val _toastMessage = MutableSharedFlow<String>()
-    val toastMessage: SharedFlow<String> = _toastMessage.asSharedFlow()
-
-    private val _shouldNavigateBack = MutableSharedFlow<Unit>()
-    val shouldNavigateBack: SharedFlow<Unit> = _shouldNavigateBack.asSharedFlow()
-
-    private val _scrollToPage = MutableSharedFlow<Int>()
-    val scrollToPage: SharedFlow<Int> = _scrollToPage.asSharedFlow()
-
-    private val _showBottomSheet = MutableStateFlow(false)
-    val showBottomSheet: StateFlow<Boolean> = _showBottomSheet.asStateFlow()
-
-    private val _selectedDate = MutableStateFlow<String?>(null)
-    val selectedDate: StateFlow<String?> = _selectedDate.asStateFlow()
+    val sideEffect: SharedFlow<AutoMissionSideEffect> = _sideEffect.asSharedFlow()
 
     val awardTextFieldState = TextFieldState()
 
-    private val _hasViewedLastPage = MutableStateFlow(false)
-    val hasViewedLastPage: StateFlow<Boolean> = _hasViewedLastPage.asStateFlow()
+    init {
+        observeAwardTextFieldChanges()
+    }
 
     fun updateNoticeText(text: String) {
         if (text.length > 1000) return
-        _noticeText.value = text
+        _state.update { it.copy(noticeText = text) }
     }
 
     fun analyzeNotice() {
         viewModelScope.launch {
-            _isAnalyzing.value = true
+            _state.update { it.copy(isAnalyzing = true) }
 
-            autoMissionRepository.analyzeNotice(_noticeText.value)
+            autoMissionRepository.analyzeNotice(_state.value.noticeText)
                 .onSuccess { missions ->
-                    _missions.value = missions
-                    _currentIndex.value = 0
-                    _hasViewedLastPage.value = (missions.size == 1)
+                    _state.update {
+                        it.copy(
+                            missions = missions,
+                            currentIndex = 0,
+                            hasViewedLastPage = missions.size == 1,
+                            isAnalyzing = false
+                        )
+                    }
                 }
                 .onFailure { e ->
                     val message = when (e) {
                         is TimeoutCancellationException -> "잠시 후 다시 시도해주세요."
                         else -> "알림장 내용을 분석하지 못했어요."
                     }
-                    _toastMessage.emit(message)
+                    _sideEffect.emit(AutoMissionSideEffect.ShowToast(message))
+                    _state.update { it.copy(isAnalyzing = false) }
                 }
-
-            _isAnalyzing.value = false
         }
     }
 
     fun updateMissionName(name: String) {
         val trimmedName = if (name.length > 15) name.substring(0, 15) else name
-        updateMissionInList { it.copy(name = trimmedName) }
+
+        _state.update { currentState ->
+            val updatedMissions = currentState.missions.toMutableList().apply {
+                val index = currentState.currentIndex
+                if (index in indices) {
+                    this[index] = this[index].copy(name = trimmedName)
+                }
+            }
+            currentState.copy(missions = updatedMissions)
+        }
     }
 
     fun updateMissionDate(date: LocalDate) {
-        updateMissionInList { it.copy(dueAt = date) }
-        _selectedDate.value = date.format(DateTimeFormatter.ofPattern("yyyy.MM.dd.(E)"))
+        _state.update { currentState ->
+            val formattedDate = date.format(DateTimeFormatter.ofPattern("yyyy.MM.dd.(E)"))
+
+            val updatedMissions = currentState.missions.toMutableList().apply {
+                val index = currentState.currentIndex
+                if (index in indices) {
+                    this[index] = this[index].copy(dueAt = date)
+                }
+            }
+
+            currentState.copy(
+                missions = updatedMissions,
+                selectedDate = formattedDate,
+                showBottomSheet = false
+            )
+        }
     }
 
-    fun updateMissionReward(reward: Int) {
+    fun onAwardClick(change: Int) {
+        val currentState = _state.value
+        val currentReward = currentState.currentReward
+        val newReward = MissionAwardDefaults.applyChange(currentReward, change)
+
         viewModelScope.launch {
-            val validatedReward = reward.coerceIn(1, 500)
-            if (reward > 500) {
-                _toastMessage.emit("최대 보상은 500개입니다.")
+            when {
+                currentReward + change < MissionAwardDefaults.MIN_AWARD -> {
+                    _sideEffect.emit(
+                        AutoMissionSideEffect.ShowToast(
+                            "최소 보상은 ${MissionAwardDefaults.MIN_AWARD}개입니다."
+                        )
+                    )
+                }
+
+                currentReward + change > MissionAwardDefaults.MAX_AWARD -> {
+                    _sideEffect.emit(
+                        AutoMissionSideEffect.ShowToast(
+                            "최대 보상은 ${MissionAwardDefaults.MAX_AWARD}개입니다."
+                        )
+                    )
+                }
             }
-            updateMissionInList { it.copy(reward = validatedReward) }
+        }
+
+        _state.update { currentState ->
+            val updatedMissions = currentState.missions.toMutableList().apply {
+                val index = currentState.currentIndex
+                if (index in indices) {
+                    this[index] = this[index].copy(reward = newReward)
+                }
+            }
+            currentState.copy(missions = updatedMissions)
+        }
+
+        awardTextFieldState.edit {
+            replace(0, length, newReward.toString())
         }
     }
 
     fun updateCurrentIndex(index: Int) {
-        _currentIndex.value = index
+        _state.update { currentState ->
+            val newHasViewedLastPage = if (index == currentState.missions.size - 1) {
+                true
+            } else {
+                currentState.hasViewedLastPage
+            }
 
-        if (index == _missions.value.size - 1) {
-            _hasViewedLastPage.value = true
+            currentState.copy(
+                currentIndex = index,
+                hasViewedLastPage = newHasViewedLastPage
+            )
         }
 
-        _missions.value.getOrNull(index)?.let { mission ->
-            _selectedDate.value = mission.dueAt.format(DateTimeFormatter.ofPattern("yyyy.MM.dd.(E)"))
+        _state.value.currentMission?.let { mission ->
+            val formattedDate = mission.dueAt.format(
+                DateTimeFormatter.ofPattern("yyyy.MM.dd.(E)")
+            )
+            _state.update { it.copy(selectedDate = formattedDate) }
+
             awardTextFieldState.edit {
                 replace(0, length, mission.reward.toString())
             }
@@ -123,91 +176,85 @@ class AutoMissionViewModel @Inject constructor(
 
     fun saveAllMissions(childId: Long) {
         viewModelScope.launch {
-            val missions = _missions.value
+            val currentState = _state.value
+            val missions = currentState.missions
 
             val firstErrorIndex = missions.indexOfFirst {
-                it.name.isBlank() || it.dueAt.isBefore(LocalDate.now()) || it.reward <= 0
+                it.name.isBlank() ||
+                        it.dueAt.isBefore(LocalDate.now()) ||
+                        it.reward <= 0
             }
 
             if (firstErrorIndex != -1) {
-                _currentIndex.value = firstErrorIndex
-                _scrollToPage.emit(firstErrorIndex)
-                _toastMessage.emit(getErrorMessage(missions[firstErrorIndex]))
+                _state.update { it.copy(currentIndex = firstErrorIndex) }
+                _sideEffect.tryEmit(AutoMissionSideEffect.ScrollToPage(firstErrorIndex))
+                _sideEffect.tryEmit(
+                    AutoMissionSideEffect.ShowToast(
+                        getErrorMessage(missions[firstErrorIndex])
+                    )
+                )
                 return@launch
             }
 
-            _isSaving.value = true
+            _state.update { it.copy(isSaving = true) }
 
             autoMissionRepository.saveBatchMissions(childId, missions)
                 .onSuccess {
-                    _toastMessage.emit("미션이 등록되었습니다.")
-                    _shouldNavigateBack.emit(Unit)
+                    _sideEffect.emit(
+                        AutoMissionSideEffect.ShowToast("미션이 등록되었습니다.")
+                    )
+                    delay(200)
+                    _sideEffect.emit(AutoMissionSideEffect.NavigateBack)
                 }
                 .onFailure { e ->
                     val message = when {
                         e.message?.contains("403") == true -> "해당 자녀에 대한 권한이 없습니다."
-                        else -> e.message ?: "미션 등록에 실패했습니다."
+                        else -> "미션 등록에 실패했습니다."
                     }
-                    _toastMessage.emit(message)
+                    _sideEffect.emit(AutoMissionSideEffect.ShowToast(message))
                 }
 
-            _isSaving.value = false
+            _state.update { it.copy(isSaving = false) }
         }
     }
 
     fun handleCancel() {
         viewModelScope.launch {
-            _shouldNavigateBack.emit(Unit)
+            _sideEffect.emit(AutoMissionSideEffect.NavigateBack)
         }
     }
 
-    fun onDateClick() {
-        _showBottomSheet.value = true
+    fun showDatePicker() {
+        _state.update { it.copy(showBottomSheet = true) }
     }
 
-    fun onDismissBottomSheet() {
-        _showBottomSheet.value = false
+    fun dismissDatePicker() {
+        _state.update { it.copy(showBottomSheet = false) }
     }
 
-    fun onDateSelected(dateString: String) {
-        try {
-            val date = LocalDate.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE)
-            updateMissionDate(date)
-            _showBottomSheet.value = false
-        } catch (e: Exception) {
-            viewModelScope.launch {
-                _toastMessage.emit("날짜 형식이 올바르지 않습니다.")
-            }
-        }
+    fun onDateSelected(date: LocalDate) {
+        updateMissionDate(date)
     }
 
-    fun onAwardClick(change: Int) {
-        val currentMission = _missions.value.getOrNull(_currentIndex.value) ?: return
-        val currentReward = currentMission.reward
-        val newReward = MissionAwardDefaults.applyChange(currentReward, change)
-
+    private fun observeAwardTextFieldChanges() {
         viewModelScope.launch {
-            if (currentReward + change < MissionAwardDefaults.MIN_AWARD) {
-                _toastMessage.emit("최소 보상은 ${MissionAwardDefaults.MIN_AWARD}개입니다.")
-            }
-            else if (currentReward + change > MissionAwardDefaults.MAX_AWARD) {
-                _toastMessage.emit("최대 보상은 ${MissionAwardDefaults.MAX_AWARD}개입니다.")
-            }
-        }
+            snapshotFlow { awardTextFieldState.text.toString() }
+                .collect { text ->
+                    val value = text.toIntOrNull() ?: return@collect
+                    val currentState = _state.value
 
-        updateMissionReward(newReward)
-        awardTextFieldState.edit {
-            replace(0, length, newReward.toString())
-        }
-    }
-
-    private fun updateMissionInList(transform: (MissionUiModel) -> MissionUiModel) {
-        val currentList = _missions.value.toMutableList()
-        val index = _currentIndex.value
-
-        if (index in currentList.indices) {
-            currentList[index] = transform(currentList[index])
-            _missions.value = currentList
+                    if (value in 1..500 && value != currentState.currentReward) {
+                        _state.update { state ->
+                            val updatedMissions = state.missions.toMutableList().apply {
+                                val index = state.currentIndex
+                                if (index in indices) {
+                                    this[index] = this[index].copy(reward = value)
+                                }
+                            }
+                            state.copy(missions = updatedMissions)
+                        }
+                    }
+                }
         }
     }
 

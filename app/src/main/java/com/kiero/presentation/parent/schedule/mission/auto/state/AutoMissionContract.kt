@@ -2,59 +2,51 @@ package com.kiero.presentation.parent.schedule.mission.auto.state
 
 import androidx.compose.runtime.Immutable
 import com.kiero.presentation.parent.schedule.mission.auto.model.MissionUiModel
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 import java.time.LocalDate
 
 @Immutable
-data class AutoMissionContract(
+data class AutoMissionState(
     val noticeText: String = "",
 
     val isAnalyzing: Boolean = false,
-
-    val missions: ImmutableList<MissionUiModel> = persistentListOf(),
-    val currentIndex: Int = 0,
-
     val isSaving: Boolean = false,
 
-    val shouldNavigateBack: Boolean = false,
+    val missions: List<MissionUiModel> = emptyList(),
+    val currentIndex: Int = 0,
+
+    val selectedDate: String? = null,
+    val showBottomSheet: Boolean = false,
+    val hasViewedLastPage: Boolean = false
 ) {
-    val isAnalyzeEnabled: Boolean = noticeText.trim().length in 10..1000
-
-    val currentMission: MissionUiModel? = missions.getOrNull(currentIndex)
-
-    val isSaveEnabled: Boolean = missions.isNotEmpty() &&
-            currentIndex == missions.size - 1
-
     val currentScreen: Screen
         get() = when {
             isAnalyzing -> Screen.LOADING
-            missions.isEmpty() -> Screen.INPUT
-            else -> Screen.RESULT
+            missions.isNotEmpty() -> Screen.RESULT
+            else -> Screen.INPUT
         }
+
+    val currentMission: MissionUiModel?
+        get() = missions.getOrNull(currentIndex)
+
+    val currentReward: Int
+        get() = currentMission?.reward ?: 20
+
+    val isAnalyzeEnabled: Boolean
+        get() = noticeText.length >= 10
+
+    val isSaveEnabled: Boolean
+        get() = hasViewedLastPage && missions.all {
+            it.name.isNotBlank() &&
+                    !it.dueAt.isBefore(LocalDate.now()) &&
+                    it.reward > 0
+        }
+
+    val displayDate: String
+        get() = selectedDate ?: "마감일을 선택해주세요"
 
     enum class Screen {
         INPUT,
         LOADING,
         RESULT
-    }
-
-    companion object {
-        val FAKE = AutoMissionContract(
-            noticeText = "내일은 독서록을 가져오세요. 수학 익힘책 30쪽까지 풀기.",
-            missions = persistentListOf(
-                MissionUiModel(
-                    name = "독서록 챙기기",
-                    dueAt = LocalDate.now().plusDays(1),
-                    reward = 20
-                ),
-                MissionUiModel(
-                    name = "수학 익힘책 풀기",
-                    dueAt = LocalDate.now().plusDays(1),
-                    reward = 50
-                )
-            ),
-            currentIndex = 0
-        )
     }
 }

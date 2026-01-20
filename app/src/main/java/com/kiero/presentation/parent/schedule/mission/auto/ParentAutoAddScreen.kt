@@ -21,6 +21,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -33,7 +34,10 @@ import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.component.button.KieroButtonMedium
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.schedule.mission.auto.component.ScrollableAutoInputField
+import com.kiero.presentation.parent.schedule.mission.auto.state.AutoMissionSideEffect
+import com.kiero.presentation.parent.schedule.mission.auto.state.AutoMissionState
 import com.kiero.presentation.parent.schedule.mission.auto.viewmodel.AutoMissionViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun ParentAutoAddRoute(
@@ -42,55 +46,70 @@ fun ParentAutoAddRoute(
     childId: Long,
     viewModel: AutoMissionViewModel = hiltViewModel()
 ) {
-    val noticeText by viewModel.noticeText.collectAsState()
-    val isAnalyzing by viewModel.isAnalyzing.collectAsState()
-    val missions by viewModel.missions.collectAsState()
+    val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
-        viewModel.toastMessage.collect { message ->
-            snackbarHostState.showSnackbar(message)
+        viewModel.sideEffect.collect { effect ->
+            android.util.Log.d("AutoMission", "📨 SideEffect 수신: $effect")
+            when (effect) {
+                is AutoMissionSideEffect.ShowToast -> {
+                    // ✅ 비동기로 처리 (블록 안 함)
+                    scope.launch {
+                        snackbarHostState.showSnackbar(effect.message)
+                    }
+                }
+
+                is AutoMissionSideEffect.NavigateBack -> {
+                    android.util.Log.d("AutoMission", "🚀 navigateUp() 호출")
+                    navigateUp()
+                }
+
+                is AutoMissionSideEffect.ScrollToPage -> {
+                    // 처리 안 함
+                }
+            }
         }
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.shouldNavigateBack.collect {
-            navigateUp()
+    when (state.currentScreen) {
+        AutoMissionState.Screen.LOADING -> {
+            ParentAutoLoadingScreen(
+                paddingValues = paddingValues,
+                snackbarHostState = snackbarHostState
+            )
         }
-    }
 
-    when {
-        isAnalyzing -> ParentAutoLoadingScreen(
-            paddingValues = paddingValues,
-            snackbarHostState = snackbarHostState
-        )
+        AutoMissionState.Screen.RESULT -> {
+            ParentAutoResultRoute(
+                paddingValues = paddingValues,
+                state = state,
+                childId = childId,
+                viewModel = viewModel
+            )
+        }
 
-        missions.isNotEmpty() -> ParentAutoResultScreen(
-            paddingValues = paddingValues,
-            viewModel = viewModel,
-            childId = childId,
-            navigateUp = navigateUp
-        )
-
-        else -> ParentAutoAddScreen(
-            paddingValues = paddingValues,
-            navigateUp = { viewModel.handleCancel() },
-            noticeText = noticeText,
-            isAnalyzeEnabled = noticeText.length >= 10,
-            onTextChange = { viewModel.updateNoticeText(it) },
-            onAnalyzeClick = { viewModel.analyzeNotice() }
-        )
+        AutoMissionState.Screen.INPUT -> {
+            ParentAutoAddScreen(
+                state = state,
+                onTextChange = viewModel::updateNoticeText,
+                onAnalyzeClick = viewModel::analyzeNotice,
+                onCancelClick = viewModel::handleCancel,
+                paddingValues = paddingValues
+            )
+        }
     }
 }
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ParentAutoAddScreen(
-    paddingValues: PaddingValues,
-    navigateUp: () -> Unit,
-    noticeText: String,
-    isAnalyzeEnabled: Boolean,
+    state: AutoMissionState,
     onTextChange: (String) -> Unit,
     onAnalyzeClick: () -> Unit,
+    onCancelClick: () -> Unit,
+    paddingValues: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
     val focusManager = LocalFocusManager.current
@@ -115,7 +134,7 @@ fun ParentAutoAddScreen(
         KieroTopbar(
             title = "알림장 미션 추가",
             leftIconRes = R.drawable.ic_close_light,
-            leftIconClick = navigateUp
+            leftIconClick = onCancelClick
         )
 
         Text(
@@ -128,19 +147,20 @@ fun ParentAutoAddScreen(
         )
 
         ScrollableAutoInputField(
-            text = noticeText,
+            text = state.noticeText,
             onTextChange = onTextChange,
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 20.dp)
         )
+
         if (!isImeVisible) {
             Spacer(Modifier.height(48.dp))
 
             KieroButtonMedium(
                 text = "분석하고 미션 추가하기",
                 onClick = onAnalyzeClick,
-                isEnabled = isAnalyzeEnabled,
+                isEnabled = state.isAnalyzeEnabled,  // ✅ Computed property
                 containerColor = KieroTheme.colors.main,
                 contentColor = KieroTheme.colors.black,
                 modifier = Modifier.padding(horizontal = 16.dp)
@@ -151,17 +171,17 @@ fun ParentAutoAddScreen(
     }
 }
 
+
 @Preview
 @Composable
 private fun ParentAutoAddScreen_EmptyPreview() {
     KieroTheme {
         ParentAutoAddScreen(
-            paddingValues = PaddingValues(),
-            navigateUp = {},
-            noticeText = "",
-            isAnalyzeEnabled = false,
+            state = AutoMissionState(),
             onTextChange = {},
-            onAnalyzeClick = {}
+            onAnalyzeClick = {},
+            onCancelClick = {},
+            paddingValues = PaddingValues()
         )
     }
 }
@@ -171,12 +191,13 @@ private fun ParentAutoAddScreen_EmptyPreview() {
 private fun ParentAutoAddScreen_FilledPreview() {
     KieroTheme {
         ParentAutoAddScreen(
-            paddingValues = PaddingValues(),
-            navigateUp = {},
-            noticeText = "내일은 체육복을 꼭 챙겨오세요. 수학 숙제 26~30페이지를 풀어오세요.",
-            isAnalyzeEnabled = true,
+            state = AutoMissionState(
+                noticeText = "내일은 체육복을 꼭 챙겨오세요. 수학 숙제 26~30페이지를 풀어오세요."
+            ),
             onTextChange = {},
-            onAnalyzeClick = {}
+            onAnalyzeClick = {},
+            onCancelClick = {},
+            paddingValues = PaddingValues()
         )
     }
 }

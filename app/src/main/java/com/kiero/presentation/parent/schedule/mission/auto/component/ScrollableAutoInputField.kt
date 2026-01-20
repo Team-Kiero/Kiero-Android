@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.theme.KieroTheme
@@ -29,14 +28,12 @@ fun ScrollableAutoInputField(
     maxLength: Int = 1000,
 ) {
     val scrollState = rememberScrollState()
-    val coroutineScope = rememberCoroutineScope()
     val previousLength = remember { mutableIntStateOf(text.length) }
 
     LaunchedEffect(text) {
         val lengthDiff = text.length - previousLength.intValue
         previousLength.intValue = text.length
 
-        // 붙여넣기(5자 이상) 감지 시 스크롤
         if (lengthDiff > 5) {
             delay(100)
             scrollState.animateScrollTo(scrollState.maxValue)
