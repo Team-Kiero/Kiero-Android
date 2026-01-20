@@ -1,4 +1,4 @@
-package com.kiero.presentation.parent.schedule.screen.component
+package com.kiero.presentation.parent.schedule.plan.component.select
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -30,10 +30,12 @@ import com.kiero.presentation.parent.schedule.plan.component.picker.TimePickerBo
 
 @Composable
 fun TimeSelectArea(
+    startTime: String,
+    endTime: String,
+    onTimeSelected: (Boolean, String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var startTime by remember { mutableStateOf("12:00 PM") }
-    var endTime by remember { mutableStateOf("12:00 PM") }
+
     var showStartTimePicker by remember { mutableStateOf(false) }
     var showEndTimePicker by remember { mutableStateOf(false) }
 
@@ -83,7 +85,7 @@ fun TimeSelectArea(
     if (showStartTimePicker) {
         TimePickerBottomSheet(
             onSelected = { time ->
-                startTime = time.validateAsStartTime()
+                onTimeSelected(true, time.validateAsStartTime())
                 showStartTimePicker = false
             },
             onDismissRequest = { showStartTimePicker = false }
@@ -93,7 +95,7 @@ fun TimeSelectArea(
     if (showEndTimePicker) {
         TimePickerBottomSheet(
             onSelected = { time ->
-                endTime = time
+                onTimeSelected(false, time)
                 showEndTimePicker = false
             },
             onDismissRequest = { showEndTimePicker = false }
@@ -151,6 +153,10 @@ private fun TimeBlock(
 @Composable
 private fun TimeSelectAreaPreview() {
     KieroTheme {
-        TimeSelectArea()
+//        TimeSelectArea(
+//            startTime = "12:00",
+//            endTime = "15:00",
+//            onTimeSelected = (true,"")
+//        )
     }
 }

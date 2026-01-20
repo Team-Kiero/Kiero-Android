@@ -106,7 +106,7 @@ class KidWishViewModel @Inject constructor(
     }
 
     fun prayWish(
-        couponId: Long
+        couponId: Long,
     ) {
         viewModelScope.launch {
             wishRepository.patchCoupon(couponId)

@@ -1,6 +1,8 @@
 package com.kiero.presentation.parent.schedule.mission.component.datepicker.component
 
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -12,6 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
@@ -20,16 +23,15 @@ import com.kiero.presentation.parent.schedule.mission.component.datepicker.model
 import com.kiero.presentation.parent.schedule.plan.component.picker.PickerTopbar
 import java.time.LocalDate
 import java.time.YearMonth
-import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarBottomSheet(
     modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit,
-    onDateSelected: (String) -> Unit,
+    onDateSelected: (LocalDate) -> Unit,
 ) {
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var yearMonth by remember { mutableStateOf(YearMonth.now()) }
     var selectedDate by remember { mutableStateOf<LocalDate?>(LocalDate.now()) }
     val today = LocalDate.now()
@@ -39,12 +41,17 @@ fun CalendarBottomSheet(
         sheetState = sheetState,
         containerColor = KieroTheme.colors.gray900,
         dragHandle = null,
+        modifier = modifier
+            .pointerInput(Unit) {
+                detectTapGestures {
+                }
+            }
     ) {
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
+                .fillMaxHeight(0.5f)
                 .padding(vertical = 20.dp, horizontal = 30.dp)
-                .padding(bottom = 32.dp)
         ) {
             PickerTopbar(
                 title = "마감일",
@@ -53,8 +60,7 @@ fun CalendarBottomSheet(
                 rightIconRes = R.drawable.ic_check,
                 rightIconClick = {
                     selectedDate?.let { date ->
-                        val formattedDate = date.format(DateTimeFormatter.ISO_LOCAL_DATE)
-                        onDateSelected(formattedDate)
+                        onDateSelected(date)
                     }
                 }
             )
