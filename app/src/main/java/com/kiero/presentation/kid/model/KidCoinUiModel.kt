@@ -10,7 +10,7 @@ data class KidCoinUiModel(
     val coinAmount : Int = 0,
 )
 
-fun CoinModel.toState() = KidCoinUiModel(
+fun CoinModel.toUiModel() = KidCoinUiModel(
     lastName = lastName,
     firstName = firstName,
     coinAmount = coinAmount

@@ -11,7 +11,7 @@ import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.data.demo.repository.DemoRepository
 import com.kiero.data.parent.signup.repository.ParentSignUpRepository
 import com.kiero.presentation.signup.parent.model.ParentSignUpStep
-import com.kiero.presentation.signup.parent.model.toState
+import com.kiero.presentation.signup.parent.model.toUiModel
 import com.kiero.presentation.signup.parent.navigation.ParentSignUp
 import com.kiero.presentation.signup.parent.state.ParentSignUpSideEffect
 import com.kiero.presentation.signup.parent.state.ParentSignUpState
@@ -119,7 +119,7 @@ class ParentSignUpViewModel @Inject constructor(
                 Timber.d("postChild $result")
                 _state.update {
                     it.copy(
-                        childInfo = result.toState(),
+                        childInfo = result.toUiModel(),
                         isLoading = false
                     )
                 }

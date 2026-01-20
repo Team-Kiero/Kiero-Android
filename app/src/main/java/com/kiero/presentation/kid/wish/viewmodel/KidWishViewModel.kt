@@ -7,7 +7,7 @@ import com.kiero.core.common.util.successData
 import com.kiero.core.model.UiState
 import com.kiero.data.kid.coin.repository.CoinRepository
 import com.kiero.data.kid.wish.repository.WishRepository
-import com.kiero.presentation.kid.model.toState
+import com.kiero.presentation.kid.model.toUiModel
 import com.kiero.presentation.kid.wish.model.toUiModel
 import com.kiero.presentation.kid.wish.state.KidWishSideEffect
 import com.kiero.presentation.kid.wish.state.KidWishState
@@ -39,7 +39,7 @@ class KidWishViewModel @Inject constructor(
             is UiState.Success -> {
                 UiState.Success(
                     uiState.data.copy(
-                        coinUiModel = coinData.toState()
+                        coinUiModel = coinData.toUiModel()
                     )
                 )
             }

@@ -10,7 +10,7 @@ import com.kiero.data.mission.repository.MissionRepository
 import com.kiero.presentation.kid.mission.model.toUiModel
 import com.kiero.presentation.kid.mission.state.KidMissionSideEffect
 import com.kiero.presentation.kid.mission.state.KidMissionState
-import com.kiero.presentation.kid.model.toState
+import com.kiero.presentation.kid.model.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.delay
@@ -39,7 +39,7 @@ class KidMissionViewModel @Inject constructor(
             is UiState.Success -> {
                 UiState.Success(
                     uiState.data.copy(
-                        coinUiModel = coinData.toState()
+                        coinUiModel = coinData.toUiModel()
                     )
                 )
             }
