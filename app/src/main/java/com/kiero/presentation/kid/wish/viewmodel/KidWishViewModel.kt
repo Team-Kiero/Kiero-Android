@@ -6,7 +6,6 @@ import com.kiero.core.common.extension.updateSuccess
 import com.kiero.core.model.UiState
 import com.kiero.data.kid.coin.repository.CoinRepository
 import com.kiero.data.kid.wish.repository.WishRepository
-import com.kiero.data.mission.repository.MissionRepository
 import com.kiero.presentation.kid.wish.model.toState
 import com.kiero.presentation.kid.wish.model.toUiModel
 import com.kiero.presentation.kid.wish.state.KidWishSideEffect
@@ -27,8 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class KidWishViewModel @Inject constructor(
     private val repository: CoinRepository,
-    private val missionRepository: MissionRepository,
-    private val wishRepository: WishRepository
+    private val wishRepository: WishRepository,
 ) : ViewModel() {
     private val _state = MutableStateFlow<UiState<KidWishState>>(UiState.Loading)
     val state: StateFlow<UiState<KidWishState>> = combine(
@@ -93,7 +91,7 @@ class KidWishViewModel @Inject constructor(
     }
 
     fun prayWish(
-        couponId: Long
+        couponId: Long,
     ) {
         viewModelScope.launch {
             wishRepository.patchCoupon(couponId)
