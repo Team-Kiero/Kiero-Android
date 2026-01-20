@@ -18,7 +18,8 @@ import com.kiero.presentation.signup.parent.state.ParentSignUpState
 fun ParentSignUpInviteScreen(
     state: ParentSignUpState,
     onStartClick: () -> Unit,
-    onCopyClick: () -> Unit
+    onCopyClick: () -> Unit,
+    onReIssueClick: () -> Unit
 ) {
     Column {
         Spacer(modifier = Modifier.height(38.dp))
@@ -36,7 +37,9 @@ fun ParentSignUpInviteScreen(
         ParentSignUpInviteHolder(
             code = state.childInfo.code,
             expiredTime = state.expiredTime,
-            onCopyClick = onCopyClick
+            isExpired = state.isExpired,
+            onCopyClick = onCopyClick,
+            onReIssueClick = onReIssueClick
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -58,7 +61,8 @@ private fun ParentSignUpInvitePreview() {
         ParentSignUpInviteScreen(
             state = ParentSignUpState(),
             onStartClick = {},
-            onCopyClick = {}
+            onCopyClick = {},
+            onReIssueClick = {}
         )
     }
 }

@@ -20,7 +20,9 @@ sealed interface AuthSideEffect {
         val parentProfileImage: String,
     ) : AuthSideEffect
 
-    data class ShowSnackbar(val message: String): AuthSideEffect
+    data class ShowSnackbar(val message: String) : AuthSideEffect
 
     data object NavigateToParentGraph : AuthSideEffect
+    data object NavigateToParent : AuthSideEffect
+    data object NavigateToKid : AuthSideEffect
 }

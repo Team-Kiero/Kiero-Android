@@ -60,6 +60,11 @@ class AuthParentViewModel @Inject constructor(
                             message = throwable.toHandleErrorMessage()
                         )
                     )
+                    _state.update { currentState ->
+                        currentState.copy(
+                            uiState = UiState.Failure(throwable.toHandleErrorMessage())
+                        )
+                    }
                 }
 
             }.onFailure { throwable ->

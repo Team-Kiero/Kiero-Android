@@ -20,6 +20,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.kiero.core.common.extension.statusBarColor
+import com.kiero.core.designsystem.theme.Gray900
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.component.MissionTabFab
 import com.kiero.presentation.parent.component.ParentTabRow
@@ -78,6 +80,7 @@ private fun ParentScheduleScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .statusBarColor(backgroundColor = Gray900)
                 .padding(paddingValues)
         ) {
             ParentUserSection(

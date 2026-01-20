@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -147,9 +146,13 @@ fun MainScreen(
     LaunchedEffect(isOffline) {
         Timber.e("네트워크 상태 변경 감지: isOffline = $isOffline")
 
-        if (isOffline && !dialogState.dialogState.isVisible) {
-            eventHolder.dialogTrigger.show {
-                eventHolder.dialogTrigger.dismiss()
+        if (isOffline) {
+            if (!dialogState.dialogState.isVisible) {
+                eventHolder.dialogTrigger.show {}
+            }
+        } else {
+            if (dialogState.dialogState.isVisible) {
+                dialogState.dismissDialog()
             }
         }
     }
@@ -166,7 +169,6 @@ fun MainScreen(
         Box(
             modifier = modifier
                 .fillMaxSize()
-                .statusBarsPadding()
                 .navigationBarsPadding()
         ) {
             Scaffold(
@@ -198,15 +200,21 @@ fun MainScreen(
             ) { paddingValues ->
                 if (dialogState.dialogState.isVisible) {
                     KieroDialog(
-                        title = "인터넷 연결 확인해주세요!",
+                        title = "인터넷 연결을 확인해주세요!",
                         confirmAction = KieroConfirmAction(
-                            text = "확인",
+                            text = "재시도",
                             onClick = {
-                                dialogState.dismissDialog()
+                                if (!isOffline) {
+                                    dialogState.dismissDialog()
+                                } else {
+                                    onShowToast("네트워크가 아직 연결되지 않았습니다.")
+                                }
                             }
                         ),
                         onDismiss = {
-                            dialogState.dismissDialog()
+                            if (!isOffline) {
+                                dialogState.dismissDialog()
+                            }
                         }
                     )
                 }

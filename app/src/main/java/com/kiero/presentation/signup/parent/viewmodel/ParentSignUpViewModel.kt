@@ -107,6 +107,13 @@ class ParentSignUpViewModel @Inject constructor(
     }
 
     fun postChild() {
+        _state.update {
+            it.copy(
+                isLoading = true,
+                isExpired = false
+            )
+        }
+
         viewModelScope.launch {
             repository.postSignUp(
                 childLastName = _state.value.childInfo.childLastName.text.toString(),
@@ -115,13 +122,19 @@ class ParentSignUpViewModel @Inject constructor(
                 Timber.d("postChild $result")
                 _state.update {
                     it.copy(
-                        childInfo = result.toState()
+                        childInfo = result.toState(),
+                        isLoading = false
                     )
                 }
 
                 startTimer()
             }.onFailure {
                 _sideEffect.emit(ParentSignUpSideEffect.ShowSnackbar(it.toHandleErrorMessage()))
+                _state.update { currentState ->
+                    currentState.copy(
+                        isLoading = false
+                    )
+                }
             }
         }
     }
@@ -132,6 +145,11 @@ class ParentSignUpViewModel @Inject constructor(
             demoRepository.deleteDemo()
 
             _sideEffect.emit(ParentSignUpSideEffect.NavigateToSelection)
+            _state.update {
+                it.copy(
+                    isLoading = false
+                )
+            }
         }
     }
 
@@ -151,8 +169,11 @@ class ParentSignUpViewModel @Inject constructor(
                 }
 
                 if (remainingTime == 0) {
-                    _sideEffect.emit(ParentSignUpSideEffect.ShowSnackbar("인증 시간이 만료되어 코드가 갱신됩니다."))
-                    postChild()
+                    _state.update {
+                        it.copy(
+                            isExpired = true
+                        )
+                    }
                     break
                 }
 
@@ -176,7 +197,10 @@ class ParentSignUpViewModel @Inject constructor(
 
     fun onLogoutConfirm() {
         _state.update {
-            it.copy(isLogoutDialogVisible = false)
+            it.copy(
+                isLogoutDialogVisible = false,
+                isLoading = true
+            )
         }
 
         logOut()

@@ -53,7 +53,6 @@ fun ParentSignUpRoute(
     val globalTrigger = LocalGlobalUiEventTrigger.current
     val focusManager = LocalFocusManager.current
 
-    var isLoading by remember { mutableStateOf(false) }
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     viewModel.sideEffect.collectSingleEvent {
@@ -120,6 +119,7 @@ fun ParentSignUpRoute(
                         state = state,
                         onStartClick = viewModel::onNextClick,
                         onCopyClick = viewModel::onCopyClick,
+                        onReIssueClick = viewModel::postChild
                     )
                 }
             }
@@ -133,7 +133,6 @@ fun ParentSignUpRoute(
                 confirmAction = KieroConfirmAction(
                     text = "확인",
                     onClick = {
-                        isLoading = true
                         viewModel.onLogoutConfirm()
                     }
                 ),
@@ -146,7 +145,7 @@ fun ParentSignUpRoute(
             )
         }
 
-        if (isLoading) {
+        if (state.isLoading) {
             KieroLoadingIndicator()
         }
     }

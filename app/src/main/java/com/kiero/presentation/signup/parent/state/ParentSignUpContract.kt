@@ -7,11 +7,13 @@ import com.kiero.presentation.signup.parent.model.ParentSignUpStep
 
 @Immutable
 data class ParentSignUpState(
-    val parentInfo : ParentInfoUiModel = ParentInfoUiModel(),
+    val parentInfo: ParentInfoUiModel = ParentInfoUiModel(),
     val childInfo: ParentSignUpChildInfoUiModel = ParentSignUpChildInfoUiModel(),
     val expiredTime: String = "",
     val currentStep: ParentSignUpStep = ParentSignUpStep.ADDCHILD,
-    val isLogoutDialogVisible: Boolean = false
+    val isLogoutDialogVisible: Boolean = false,
+    val isExpired: Boolean = false,
+    val isLoading: Boolean = false
 )
 
 sealed interface ParentSignUpSideEffect {
