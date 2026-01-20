@@ -13,7 +13,12 @@ data class ParentSignUpState(
     val currentStep: ParentSignUpStep = ParentSignUpStep.ADDCHILD,
     val isLogoutDialogVisible: Boolean = false,
     val isExpired: Boolean = false,
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+
+
+    val isSseConnected: Boolean = false,
+    val isChildJoined: Boolean = false,
+    val sseErrorMessage: String? = null
 )
 
 sealed interface ParentSignUpSideEffect {
@@ -23,4 +28,6 @@ sealed interface ParentSignUpSideEffect {
     data class CopyText(val message: String, val targetText: String) : ParentSignUpSideEffect
 
     data class ShowSnackbar(val message: String) : ParentSignUpSideEffect
+
+    data class OnChildJoined(val childId: Long) : ParentSignUpSideEffect
 }
