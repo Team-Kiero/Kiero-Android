@@ -1,6 +1,6 @@
-package com.kiero.data.schedule.model
+package com.kiero.data.kid.schedule.model
 
-import com.kiero.data.schedule.dto.response.ScheduleTodayResponseDto
+import com.kiero.data.kid.schedule.remote.dto.response.ScheduleTodayResponseDto
 
 data class ScheduleTodayModel(
     val scheduleDetailId: Long?,

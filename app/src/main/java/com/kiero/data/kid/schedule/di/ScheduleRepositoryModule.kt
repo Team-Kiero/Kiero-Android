@@ -1,7 +1,7 @@
-package com.kiero.data.schedule.di
+package com.kiero.data.kid.schedule.di
 
-import com.kiero.data.schedule.repository.ScheduleRepository
-import com.kiero.data.schedule.repositoryimpl.ScheduleRepositoryImpl
+import com.kiero.data.kid.schedule.repository.ScheduleRepository
+import com.kiero.data.kid.schedule.repositoryimpl.ScheduleRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

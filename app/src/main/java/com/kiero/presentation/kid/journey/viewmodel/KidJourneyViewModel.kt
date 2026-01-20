@@ -3,8 +3,8 @@ package com.kiero.presentation.kid.journey.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.data.kid.coin.repository.CoinRepository
-import com.kiero.data.schedule.model.ScheduleStatus
-import com.kiero.data.schedule.repository.ScheduleRepository
+import com.kiero.data.kid.schedule.model.ScheduleStatus
+import com.kiero.data.kid.schedule.repository.ScheduleRepository
 import com.kiero.presentation.kid.journey.model.KidJourneyContentUiModel
 import com.kiero.presentation.kid.journey.model.KidJourneyHeaderUiModel
 import com.kiero.presentation.kid.journey.model.KidJourneyScheduleUiModel
@@ -58,7 +58,8 @@ class KidJourneyViewModel @Inject constructor(
                                     startTime = scheduleData.startTime,
                                     endTime = scheduleData.endTime
                                 ),
-                                isSkippable = scheduleData.isSkippable
+                                isSkippable = scheduleData.isSkippable,
+                                isNowScheduleVerified = scheduleData.isNowScheduleVerified
                             )
 
                             ScheduleStatus.NOW_SCHEDULE_EXIST -> KidJourneyContentUiModel.NowSchedule(
@@ -70,7 +71,8 @@ class KidJourneyViewModel @Inject constructor(
                                     startTime = scheduleData.startTime,
                                     endTime = scheduleData.endTime
                                 ),
-                                isSkippable = scheduleData.isSkippable
+                                isSkippable = scheduleData.isSkippable,
+                                isNowScheduleVerified = scheduleData.isNowScheduleVerified
                             )
 
                             ScheduleStatus.NEXT_SCHEDULE_EXIST -> KidJourneyContentUiModel.NextSchedule(
@@ -82,7 +84,8 @@ class KidJourneyViewModel @Inject constructor(
                                     startTime = scheduleData.startTime,
                                     endTime = scheduleData.endTime
                                 ),
-                                isSkippable = scheduleData.isSkippable
+                                isSkippable = scheduleData.isSkippable,
+                                isNowScheduleVerified = scheduleData.isNowScheduleVerified
                             )
 
                             ScheduleStatus.FIRE_NOT_LIT -> KidJourneyContentUiModel.FireNotLit(

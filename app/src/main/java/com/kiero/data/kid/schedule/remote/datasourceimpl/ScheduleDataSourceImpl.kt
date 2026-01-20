@@ -1,14 +1,14 @@
-package com.kiero.data.schedule.datasourceimpl
+package com.kiero.data.kid.schedule.remote.datasourceimpl
 
 import com.kiero.core.network.model.BaseResponse
-import com.kiero.data.schedule.api.ScheduleService
-import com.kiero.data.schedule.datasource.ScheduleDataSource
-import com.kiero.data.schedule.dto.request.ScheduleCompleteRequestDto
-import com.kiero.data.schedule.dto.request.ScheduleImageUploadRequestDto
-import com.kiero.data.schedule.dto.response.ScheduleFireResponseDto
-import com.kiero.data.schedule.dto.response.ScheduleImageUploadResponseDto
-import com.kiero.data.schedule.dto.response.ScheduleSkipResponseDto
-import com.kiero.data.schedule.dto.response.ScheduleTodayResponseDto
+import com.kiero.data.kid.schedule.remote.api.ScheduleService
+import com.kiero.data.kid.schedule.remote.datasource.ScheduleDataSource
+import com.kiero.data.kid.schedule.remote.dto.request.ScheduleCompleteRequestDto
+import com.kiero.data.kid.schedule.remote.dto.request.ScheduleImageUploadRequestDto
+import com.kiero.data.kid.schedule.remote.dto.response.ScheduleFireResponseDto
+import com.kiero.data.kid.schedule.remote.dto.response.ScheduleImageUploadResponseDto
+import com.kiero.data.kid.schedule.remote.dto.response.ScheduleSkipResponseDto
+import com.kiero.data.kid.schedule.remote.dto.response.ScheduleTodayResponseDto
 import javax.inject.Inject
 
 class ScheduleDataSourceImpl @Inject constructor(

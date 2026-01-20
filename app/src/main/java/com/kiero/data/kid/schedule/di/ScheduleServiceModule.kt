@@ -1,7 +1,7 @@
-package com.kiero.data.schedule.di
+package com.kiero.data.kid.schedule.di
 
 import com.kiero.core.network.di.AuthNetwork
-import com.kiero.data.schedule.api.ScheduleService
+import com.kiero.data.kid.schedule.remote.api.ScheduleService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

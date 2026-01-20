@@ -1,10 +1,10 @@
-package com.kiero.data.schedule.datasource
+package com.kiero.data.kid.schedule.remote.datasource
 
 import com.kiero.core.network.model.BaseResponse
-import com.kiero.data.schedule.dto.response.ScheduleFireResponseDto
-import com.kiero.data.schedule.dto.response.ScheduleImageUploadResponseDto
-import com.kiero.data.schedule.dto.response.ScheduleSkipResponseDto
-import com.kiero.data.schedule.dto.response.ScheduleTodayResponseDto
+import com.kiero.data.kid.schedule.remote.dto.response.ScheduleFireResponseDto
+import com.kiero.data.kid.schedule.remote.dto.response.ScheduleImageUploadResponseDto
+import com.kiero.data.kid.schedule.remote.dto.response.ScheduleSkipResponseDto
+import com.kiero.data.kid.schedule.remote.dto.response.ScheduleTodayResponseDto
 
 interface ScheduleDataSource {
     suspend fun patchScheduleToday(): BaseResponse<ScheduleTodayResponseDto>

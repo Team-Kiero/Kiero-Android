@@ -1,6 +1,6 @@
-package com.kiero.data.schedule.model
+package com.kiero.data.kid.schedule.model
 
-import com.kiero.data.schedule.dto.response.ScheduleFireResponseDto
+import com.kiero.data.kid.schedule.remote.dto.response.ScheduleFireResponseDto
 
 data class ScheduleFireModel(
     val gotStones: List<String>,

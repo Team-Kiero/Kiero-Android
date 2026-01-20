@@ -1,7 +1,7 @@
 package com.kiero.presentation.kid.journey.model
 
 import androidx.compose.runtime.Immutable
-import com.kiero.data.schedule.model.ScheduleTodayModel
+import com.kiero.data.kid.schedule.model.ScheduleTodayModel
 
 @Immutable
 data class KidJourneyHeaderUiModel(
