@@ -2,7 +2,6 @@ package com.kiero.presentation.kid.wish
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -13,7 +12,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,6 +35,7 @@ import com.kiero.core.designsystem.component.dialog.KieroDialog
 import com.kiero.core.designsystem.component.dialog.action.KieroCancelAction
 import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
 import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
+import com.kiero.core.designsystem.component.pulltorefresh.KieroPullToRefresh
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
 import com.kiero.core.model.trigger.SnackbarState
@@ -76,8 +77,9 @@ fun KidWishRoute(
         }
         is UiState.Success -> {
             with(state) {
-                Box(
-                    modifier = Modifier.fillMaxSize()
+                KieroPullToRefresh(
+                    isRefreshing = data.isRefreshing,
+                    onRefresh = { viewModel.fetchWish(isRefresh = true) }
                 ) {
                     KidWishScreen(
                         paddingValues = paddingValues,
@@ -90,7 +92,7 @@ fun KidWishRoute(
                         KieroDialog(
                             onDismiss = viewModel::dismissDialog,
                             title = data.selectedWishItem!!.name,
-                            subDescription = if (data.isCompletedWish) "${data.selectedWishItem.name}를 \n획득했어!" else null,
+                            subDescription = if (data.isCompletedWish) "${data.selectedWishItem.name}를 \n획득했어!" else "금화를 사용해 소원을 빌까?",
                             cancelAction = if (data.isCompletedWish) {
                                 null
                             } else {
@@ -100,14 +102,12 @@ fun KidWishRoute(
                                     }
                                 )
                             },
-                            confirmAction = {
-                                KieroConfirmAction(
-                                    text = "확인",
-                                    onClick = {
-                                        viewModel.prayWish(data.selectedWishItem.couponId)
-                                    }
-                                )
-                            }
+                            confirmAction = KieroConfirmAction(
+                                text = "확인",
+                                onClick = {
+                                    viewModel.prayWish(data.selectedWishItem.couponId)
+                                }
+                            )
                         ) {
                             if (!data.isCompletedWish) {
                                 Row(
@@ -163,6 +163,7 @@ private fun KidWishScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .background(
                 color = KieroTheme.colors.black
             )
@@ -191,7 +192,9 @@ private fun KidWishScreen(
 
         Spacer(modifier = Modifier.height(15.dp))
 
-        KidWishDescription()
+        KidWishDescription(
+            modifier = Modifier.fillMaxWidth()
+        )
 
         Spacer(modifier = Modifier.height(17.dp))
 

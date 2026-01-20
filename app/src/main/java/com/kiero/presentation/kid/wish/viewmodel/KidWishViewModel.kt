@@ -6,13 +6,13 @@ import com.kiero.core.common.extension.updateSuccess
 import com.kiero.core.model.UiState
 import com.kiero.data.kid.coin.repository.CoinRepository
 import com.kiero.data.kid.wish.repository.WishRepository
-import com.kiero.data.mission.repository.MissionRepository
-import com.kiero.presentation.kid.wish.model.toState
+import com.kiero.presentation.kid.model.toState
 import com.kiero.presentation.kid.wish.model.toUiModel
 import com.kiero.presentation.kid.wish.state.KidWishSideEffect
 import com.kiero.presentation.kid.wish.state.KidWishState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -27,7 +27,6 @@ import javax.inject.Inject
 @HiltViewModel
 class KidWishViewModel @Inject constructor(
     private val repository: CoinRepository,
-    private val missionRepository: MissionRepository,
     private val wishRepository: WishRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow<UiState<KidWishState>>(UiState.Loading)
@@ -58,7 +57,6 @@ class KidWishViewModel @Inject constructor(
     val sideEffect = _sideEffect.asSharedFlow()
 
     init {
-        fetchCoin()
         fetchWish()
     }
 
@@ -74,19 +72,33 @@ class KidWishViewModel @Inject constructor(
         }
     }
 
-    fun fetchWish() {
+    fun fetchWish(isRefresh: Boolean = false) {
         viewModelScope.launch {
+            if (isRefresh) {
+                _state.updateSuccess { it.copy(isRefreshing = true) }
+            }
+
+            val minLoadingTime = launch {
+                if (isRefresh) delay(1000)
+            }
+
             wishRepository.getCoupons()
                 .onSuccess { result ->
-                    _state.updateSuccess {
-                        it.copy(
+                    minLoadingTime.join()
+
+                    _state.value = UiState.Success(
+                        data = KidWishState(
                             kidWishList = result.map { wish ->
                                 wish.toUiModel()
-                            }.toImmutableList()
+                            }.toImmutableList(),
+                            isRefreshing = false
                         )
-                    }
+                    )
                 }
                 .onFailure {
+                    minLoadingTime.join()
+                    Timber.e("fetchWish fail: $it")
+                    _state.updateSuccess { state -> state.copy(isRefreshing = false) }
                     _sideEffect.emit(KidWishSideEffect.ShowSnackBar(it.message.toString()))
                 }
         }
@@ -113,6 +125,7 @@ class KidWishViewModel @Inject constructor(
     }
 
     fun openDialogWithItem(targetId: Long) {
+        Timber.e("openDialogWithItem: $targetId")
         _state.updateSuccess { state ->
             val selectedItem = state.kidWishList.find { it.couponId == targetId }
 
