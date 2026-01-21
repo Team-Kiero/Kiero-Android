@@ -30,6 +30,7 @@ fun ParentSignUpAddChildScreen(
             textState = state.childInfo.childLastName,
             isError = state.childInfo.childLastName.text.isNotEmpty() && !state.childInfo.validateLastName,
             onImeAction = nextFocus,
+            imeAction = ImeAction.Next
         )
 
         Spacer(modifier = Modifier.height(18.dp))

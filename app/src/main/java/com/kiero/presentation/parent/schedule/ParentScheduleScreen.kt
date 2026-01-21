@@ -76,7 +76,7 @@ fun ParentScheduleRoute(
     ) {
         when (val state = uiState) {
             is UiState.Loading -> {
-
+                KieroLoadingIndicator()
             }
 
             is UiState.Success -> {

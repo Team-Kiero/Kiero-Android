@@ -39,8 +39,8 @@ fun KieroButtonMedium(
         enabled = isEnabled,
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
-        color = if (isEnabled) containerColor else KieroTheme.colors.gray300,
-        contentColor = if (isEnabled) contentColor else KieroTheme.colors.gray600
+        color = if (isEnabled) containerColor else KieroTheme.colors.gray900,
+        contentColor = if (isEnabled) contentColor else KieroTheme.colors.white
     ) {
         Row(
             modifier = Modifier.padding(vertical = 13.dp, horizontal = 16.dp),
@@ -76,7 +76,7 @@ private fun KieroButtonMediumPreview() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             KieroButtonMedium(
-                text = "시작하기", onClick = { })
+                text = "시작하기", onClick = { }, isEnabled = false)
             KieroButtonMedium(
                 text = "일정 추가하기",
                 leadingIcon = ImageVector.vectorResource(id = com.kiero.R.drawable.ic_kid_camera),
