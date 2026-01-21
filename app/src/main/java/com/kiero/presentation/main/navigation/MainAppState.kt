@@ -201,8 +201,6 @@ class MainAppState(
     fun navigateToKidOnboarding(navOptions: NavOptions? = null) =
         navController.navigateToKidOnboarding(navOptions)
 
-    fun navigateToKidOnboarding(navOptions: NavOptions? = null) =
-        navController.navigateToKidOnboarding(navOptions)
     fun navigateToCamera(
         scheduleDetailId: Long,
         stoneType: StoneUiType,
