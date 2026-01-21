@@ -5,10 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.kiero.core.common.extension.toHandleErrorMessage
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.alarm.repository.AlarmRepository
+import com.kiero.data.sse.manager.SseManager
 import com.kiero.presentation.parent.alarm.model.toUiModel
 import com.kiero.presentation.parent.alarm.state.AlarmFeedState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -23,6 +25,7 @@ import javax.inject.Inject
 class ParentAlarmViewModel @Inject constructor(
     private val repository: AlarmRepository,
     private val userInfoManager: UserInfoManager,
+    private val sseManager: SseManager
 ) : ViewModel() {
 
     private val _localState = MutableStateFlow(LocalState())
@@ -54,6 +57,18 @@ class ParentAlarmViewModel @Inject constructor(
 
     init {
         loadChildIdAndAlarms()
+        collectFeedEvents()
+    }
+
+    private fun collectFeedEvents() {
+        viewModelScope.launch {
+            sseManager.parentFeedEvents.collect { feedEvent ->
+                Timber.d("📢 새 알림 도착: ${feedEvent.data.eventType}")
+                // ✅ 서버 DB 동기화를 위해 약간 지연
+                delay(500) // 0.5초 대기
+                refresh()
+            }
+        }
     }
 
     private fun loadChildIdAndAlarms() {

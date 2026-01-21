@@ -11,6 +11,7 @@ import com.kiero.core.model.UiState
 import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.data.demo.repository.DemoRepository
 import com.kiero.data.parent.plan.repository.PlanRepository
+import com.kiero.data.sse.manager.SseManager
 import com.kiero.presentation.parent.schedule.plan.state.ParentScheduleState
 import com.kiero.presentation.signup.parent.state.ParentSignUpSideEffect
 import com.kiero.presentation.signup.parent.state.ParentSignUpState
@@ -38,7 +39,8 @@ class ParentScheduleViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val userInfoManager: UserInfoManager,
     private val demoRepository: DemoRepository,
-    private val tokenManager: TokenManager
+    private val tokenManager: TokenManager,
+    private val sseManager: SseManager
 ) : ViewModel() {
     private val _state = MutableStateFlow<UiState<ParentScheduleState>>(UiState.Loading)
     val state = _state.asStateFlow()
@@ -54,6 +56,30 @@ class ParentScheduleViewModel @Inject constructor(
 
     init {
         initFetchParentInfo()
+        ensureChildIdAndStartSse()
+    }
+    private fun ensureChildIdAndStartSse() {
+        viewModelScope.launch {
+            var childId = userInfoManager.getChildIdInfo()
+
+            if (childId == null) {
+                Timber.d("📌 childId 없음 - 자녀 목록 조회")
+                authRepository.getChildren()
+                    .onSuccess { children ->
+                        if (children.isNotEmpty()) {
+                            childId = children.first().childId
+                            userInfoManager.saveChildIdInfo(childId!!)
+                            Timber.d("📌 childId 저장 완료: $childId")
+                        }
+                    }
+                    .onFailure {
+                        Timber.e(it, "📌 자녀 목록 조회 실패")
+                    }
+            }
+
+            Timber.d("📢 SSE 구독 시작")
+            sseManager.startParentSubscription()
+        }
     }
 
     fun updateTabIndex(index: Int) {
