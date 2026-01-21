@@ -3,6 +3,7 @@ package com.kiero.core.network.di
 import com.kiero.BuildConfig
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.kiero.core.network.auth.AuthInterceptor
+import com.kiero.core.network.auth.CookieInterceptor
 import com.kiero.core.network.auth.TokenAuthenticator
 import dagger.Module
 import dagger.Provides
@@ -123,6 +124,31 @@ object NetworkModule {
     @KidRefreshNetwork
     fun providesKidRefreshRetrofit(
         @KidRefreshNetwork client: OkHttpClient,
+        converterFactory: Converter.Factory,
+    ): Retrofit = Retrofit.Builder()
+        .baseUrl(BuildConfig.BASE_URL)
+        .addConverterFactory(converterFactory)
+        .client(client)
+        .build()
+
+    @Provides
+    @Singleton
+    @SseNetwork
+    fun providesSseOkHttpClient(
+        loggingInterceptor: HttpLoggingInterceptor,
+        cookieInterceptor: CookieInterceptor
+    ): OkHttpClient = OkHttpClient.Builder()
+        .connectTimeout(10, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
+        .addInterceptor(loggingInterceptor)
+        .addInterceptor(cookieInterceptor)
+        .build()
+
+    @Provides
+    @Singleton
+    @SseNetwork
+    fun providesSseRetrofit(
+        @SseNetwork client: OkHttpClient,
         converterFactory: Converter.Factory,
     ): Retrofit = Retrofit.Builder()
         .baseUrl(BuildConfig.BASE_URL)
