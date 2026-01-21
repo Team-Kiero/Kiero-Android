@@ -5,14 +5,15 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import com.kiero.core.navigation.Route
 import com.kiero.presentation.parent.schedule.plan.ParentScheduleAddRoute
 import kotlinx.serialization.Serializable
 
 fun NavController.navigateToScheduleAdd(
+    initialDate: String,
+    isFireLit: Boolean,
     navOptions: NavOptions? = null,
 ) {
-    navigate(ScheduleAdd, navOptions)
+    navigate(ScheduleAdd(initialDate = initialDate, isFireLit = isFireLit), navOptions)
 }
 
 fun NavGraphBuilder.parentScheduleAddNavGraph(
@@ -27,5 +28,9 @@ fun NavGraphBuilder.parentScheduleAddNavGraph(
     }
 }
 
+// ScheduleAdd navigation data class에 isFireLit 추가
 @Serializable
-data object ScheduleAdd : Route
+data class ScheduleAdd(
+    val initialDate: String,
+    val isFireLit: Boolean, // 이 값을 추가로 받습니다.
+)
