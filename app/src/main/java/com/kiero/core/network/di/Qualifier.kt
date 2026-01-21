@@ -13,3 +13,7 @@ annotation class NoAuthNetwork
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class KidRefreshNetwork
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class SseNetwork
