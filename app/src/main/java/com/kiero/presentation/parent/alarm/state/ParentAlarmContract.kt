@@ -3,10 +3,10 @@ package com.kiero.presentation.parent.alarm.state
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
+import com.kiero.R
 import com.kiero.presentation.parent.alarm.model.ParentAlarmUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import com.kiero.R
 
 @Immutable
 data class AlarmFeedState(

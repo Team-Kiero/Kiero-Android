@@ -1,9 +1,9 @@
 package com.kiero.presentation.parent.alarm.viewmodel
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.common.extension.toHandleErrorMessage
+import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.alarm.repository.AlarmRepository
 import com.kiero.presentation.parent.alarm.model.toUiModel
 import com.kiero.presentation.parent.alarm.state.AlarmFeedState
@@ -22,11 +22,11 @@ import javax.inject.Inject
 @HiltViewModel
 class ParentAlarmViewModel @Inject constructor(
     private val repository: AlarmRepository,
-    savedStateHandle: SavedStateHandle
+    private val userInfoManager: UserInfoManager,
 ) : ViewModel() {
 
     private val _localState = MutableStateFlow(LocalState())
-    private val childId: Long = savedStateHandle.get<Long>("childId") ?: -1L
+    private var childId: Long? = null
 
 
     val state: StateFlow<AlarmFeedState> = combine(
@@ -53,37 +53,50 @@ class ParentAlarmViewModel @Inject constructor(
     )
 
     init {
-        if (childId != -1L) {
-            loadAlarms()
-        } else {
-            Timber.e("초기화 실패: childId가 전달되지 않았습니다.")
-            _localState.update { it.copy(errorMessage = "자녀 정보를 불러올 수 없습니다.") }
+        loadChildIdAndAlarms()
+    }
+
+    private fun loadChildIdAndAlarms() {
+        viewModelScope.launch {
+            childId = userInfoManager.getChildIdInfo()
+
+            if (childId != null) {
+                Timber.d("📌 childId 확인: $childId")
+                loadAlarms()
+            } else {
+                Timber.e("📌 childId가 없습니다")
+                _localState.update { it.copy(errorMessage = "자녀 정보를 불러올 수 없습니다.") }
+            }
         }
     }
 
     fun loadAlarms(refresh: Boolean = false) {
-        if (childId == -1L) return // 방어 코드
+        val id = childId ?: return
 
         viewModelScope.launch {
             _localState.update { it.copy(isLoading = true, errorMessage = null) }
-            // 멤버 변수 childId 사용
-            repository.loadAlarms(childId, refresh = refresh)
+            repository.loadAlarms(id, refresh = refresh)
                 .onSuccess { _localState.update { it.copy(isLoading = false) } }
                 .onFailure { error ->
-                    _localState.update { it.copy(isLoading = false, errorMessage = error.toHandleErrorMessage()) }
+                    _localState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = error.toHandleErrorMessage()
+                        )
+                    }
                 }
         }
     }
 
     fun loadMore() {
-        if (childId == -1L) return
+        val id = childId ?: return
 
         val currentState = _localState.value
         if (currentState.isLoadingMore || state.value.nextCursor == null) return
 
         viewModelScope.launch {
             _localState.update { it.copy(isLoadingMore = true) }
-            repository.loadMore(childId)
+            repository.loadMore(id)
                 .onSuccess { _localState.update { it.copy(isLoadingMore = false) } }
         }
     }
