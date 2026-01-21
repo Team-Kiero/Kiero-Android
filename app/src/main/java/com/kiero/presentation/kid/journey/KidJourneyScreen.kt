@@ -7,6 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,7 +27,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,9 +40,12 @@ import com.kiero.core.designsystem.component.KieroGifImage
 import com.kiero.core.designsystem.component.dialog.KieroDialog
 import com.kiero.core.designsystem.component.dialog.action.KieroCancelAction
 import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
+import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.core.model.UiState
 import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
+import com.kiero.core.trigger.LocalRefreshState
 import com.kiero.presentation.kid.component.KidSpeechField
 import com.kiero.presentation.kid.journey.component.KidJourneyActionButton
 import com.kiero.presentation.kid.journey.component.KidJourneyGoblinMessage
@@ -51,24 +55,37 @@ import com.kiero.presentation.kid.journey.model.KidJourneyButtonType
 import com.kiero.presentation.kid.journey.model.KidJourneyContentUiModel
 import com.kiero.presentation.kid.journey.model.KidJourneyHeaderUiModel
 import com.kiero.presentation.kid.journey.model.KidJourneyScheduleUiModel
+import com.kiero.presentation.kid.journey.model.StoneUiType
 import com.kiero.presentation.kid.journey.state.KidJourneySideEffect
 import com.kiero.presentation.kid.journey.state.KidJourneyState
 import com.kiero.presentation.kid.journey.util.KidJourneyContentUtil
 import com.kiero.presentation.kid.journey.viewmodel.KidJourneyViewModel
-import java.time.LocalDate
-import java.time.LocalTime
+import com.kiero.presentation.main.navigation.KidMainTab
 
 @Composable
 fun KidJourneyRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
-    navigateToCamera: () -> Unit,
-    navigateToFire: () -> Unit,
+    navigateToCamera: (Long, StoneUiType) -> Unit,
+    navigateToFire: (String, Int) -> Unit,
     viewModel: KidJourneyViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val globalTrigger = LocalGlobalUiEventTrigger.current
     val context = LocalContext.current
+    val refreshState = LocalRefreshState.current
+
+    LaunchedEffect(Unit) {
+        refreshState.refreshEvent.collect { tab ->
+            if (tab == KidMainTab.JOURNEY) {
+                viewModel.fetchData()
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchData()
+    }
 
     viewModel.sideEffect.collectSideEffect { sideEffect ->
         when (sideEffect) {
@@ -80,40 +97,75 @@ fun KidJourneyRoute(
         }
     }
 
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            navigateToCamera()
+    when (val state = state) {
+        is UiState.Success -> {
+            val onNavigateToCamera = {
+                val content = state.data.content
+                when (content) {
+                    is KidJourneyContentUiModel.FirstSchedule -> {
+                        navigateToCamera(content.scheduleDetailId!!, content.stoneType!!)
+                    }
+                    is KidJourneyContentUiModel.NowSchedule -> {
+                        navigateToCamera(content.scheduleDetailId!!, content.stoneType!!)
+                    }
+                    is KidJourneyContentUiModel.NextSchedule -> {
+                        navigateToCamera(content.scheduleDetailId!!, content.stoneType!!)
+                    }
+                    else -> {
+                        // 데이터가 없는 상태에서 호출된 경우
+                    }
+                }
+            }
+
+            val permissionLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.RequestPermission()
+            ) { isGranted ->
+                if (isGranted) {
+                    onNavigateToCamera()
+                }
+            }
+
+            KidJourneyScreen(
+                paddingValues = paddingValues,
+                state = state.data,
+                onButtonClick = {
+                    when (state.data.buttonType) {
+                        KidJourneyButtonType.AUTH -> {
+                            val hasPermission = ContextCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.CAMERA
+                            ) == PackageManager.PERMISSION_GRANTED
+
+                            if (hasPermission) {
+                                onNavigateToCamera()
+                            } else {
+                                permissionLauncher.launch(Manifest.permission.CAMERA)
+                            }
+                        }
+
+                        KidJourneyButtonType.FIRE -> {
+                            navigateToFire(
+                                state.data.header!!.currentDate,
+                                state.data.header.earnedStones!!
+                            )
+                        }
+
+                        else -> {}
+                    }
+                },
+                onNextClick = viewModel::onNextClick,
+                navigateUp = navigateUp,
+            )
+        }
+
+        UiState.Empty -> {}
+        is UiState.Failure -> {}
+
+        UiState.Loading -> {
+            KieroLoadingIndicator()
         }
     }
 
-    KidJourneyScreen(
-        paddingValues = paddingValues,
-        state = state,
-        onButtonClick = {
-            when (state.buttonType) {
-                KidJourneyButtonType.AUTH -> {
-                    val hasPermission = ContextCompat.checkSelfPermission(
-                        context,
-                        Manifest.permission.CAMERA
-                    ) == PackageManager.PERMISSION_GRANTED
-
-                    if (hasPermission) {
-                        navigateToCamera()
-                    } else {
-                        permissionLauncher.launch(Manifest.permission.CAMERA)
-                    }
-                }
-                KidJourneyButtonType.FIRE -> {
-                    navigateToFire()
-                }
-                else -> { }
-            }
-        },
-        onNextClick = viewModel::onNextClick,
-        navigateUp = navigateUp,
-    )
 }
 
 @Composable
@@ -125,17 +177,16 @@ private fun KidJourneyScreen(
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    val imageWidth = screenWidth + 8.dp
-
     var showDialog by remember { mutableStateOf(false) }
 
-    Box(
+    BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
             .background(KieroTheme.colors.black)
             .padding(paddingValues)
     ) {
+        val imageWidth = maxWidth + 8.dp
+
         // 배경 이미지
         Image(
             painter = painterResource(id = R.drawable.img_kid_journey_mask_background),
@@ -158,7 +209,10 @@ private fun KidJourneyScreen(
         ) {
             // 헤더
             state.header?.let { header ->
-                KidJourneyHeader(header = header)
+                KidJourneyHeader(
+                    header = header,
+                    isFireLit = state.content == KidJourneyContentUiModel.FireLit
+                )
             }
 
             Spacer(modifier = Modifier.height(22.dp))
@@ -239,20 +293,22 @@ private fun KidJourneyScreenPreview() {
             state = KidJourneyState(
                 header = KidJourneyHeaderUiModel(
                     kidName = "주완",
-                    currentDate = LocalDate.of(2024, 12, 5),
+                    currentDate = "12월 5일 목요일",
                     coinCount = 350,
                     earnedStones = 5,
                     totalScheduleCount = 7
                 ),
                 content = KidJourneyContentUiModel.NowSchedule(
+                    scheduleDetailId = 1,
                     scheduleName = "피아노 학원 가기",
-                    stoneType = "용기의 불조각",
+                    stoneType = StoneUiType.WISDOM,
                     scheduleInfo = KidJourneyScheduleUiModel(
                         order = 4,
-                        startTime = LocalTime.of(14, 0),
-                        endTime = LocalTime.of(16, 0)
+                        startTime = "14:00:00",
+                        endTime = "16:00:00"
                     ),
-                    isSkippable = true
+                    isSkippable = true,
+                    isNowScheduleVerified = true
                 )
             ),
             onButtonClick = {},

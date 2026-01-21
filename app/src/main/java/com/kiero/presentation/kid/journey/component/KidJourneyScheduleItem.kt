@@ -17,24 +17,31 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.kid.journey.model.KidJourneyScheduleUiModel
-import java.time.LocalTime
 
 @Composable
 fun KidJourneyScheduleItem(
     item: KidJourneyScheduleUiModel,
     modifier: Modifier = Modifier
 ) {
+    val formattedStart = item.getFormattedStartTime()
+    val formattedEnd = item.getFormattedEndTime()
+
     val timeAnnotatedString = buildAnnotatedString {
         val amPmStyle = KieroTheme.typography.regular.body5.toSpanStyle().copy(
             baselineShift = BaselineShift(0.05f)
         )
 
-        withStyle(style = amPmStyle) { append(item.startTime.format(item.amPmFormatter)) }
-        append("  ${item.startTime.format(item.timeNumberFormatter)}  ~  ")
+        withStyle(style = amPmStyle) {
+            append(formattedStart.substring(0, 2))
+        }
+        append(formattedStart.substring(2))
 
+        append("  ~  ")
 
-        withStyle(style = amPmStyle) { append(item.endTime.format(item.amPmFormatter)) }
-        append("  ${item.endTime.format(item.timeNumberFormatter)}")
+        withStyle(style = amPmStyle) {
+            append(formattedEnd.substring(0, 2))
+        }
+        append(formattedEnd.substring(2))
     }
 
     Row(
@@ -67,8 +74,8 @@ private fun KidJourneyScheduleItemPreview() {
     KidJourneyScheduleItem(
         item = KidJourneyScheduleUiModel(
             order = 1,
-            startTime = LocalTime.of(9, 0),
-            endTime = LocalTime.of(10, 0)
+            startTime = "14:00:00",
+            endTime = "16:00:00"
         )
     )
 }

@@ -10,7 +10,7 @@ import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.kid.component.KidSpeechField
 import com.kiero.presentation.kid.journey.model.KidJourneyContentUiModel
 import com.kiero.presentation.kid.journey.model.KidJourneyScheduleUiModel
-import java.time.LocalTime
+import com.kiero.presentation.kid.journey.model.StoneUiType
 
 @Composable
 fun KidJourneyGoblinMessage(
@@ -72,7 +72,7 @@ fun KidJourneyGoblinMessage(
                 text = buildAnnotatedString {
                     append("여정을 진행하면 ")
                     withStyle(SpanStyle(color = mainColor)) {
-                        append(content.stoneType)
+                        append(content.stoneType?.text)
                     }
                     append(" 을 줄게.")
                 },
@@ -98,7 +98,7 @@ fun KidJourneyGoblinMessage(
                 text = buildAnnotatedString {
                     append("다음 여정을 진행하면 ")
                     withStyle(SpanStyle(color = mainColor)) {
-                        append(content.stoneType)
+                        append(content.stoneType?.text)
                     }
                     append(" 을 줄게.")
                 },
@@ -127,10 +127,10 @@ fun KidJourneyGoblinMessage(
             )
         }
 
-        // "오늘의 불조각을 모두 모았어\n내일도 우리 함께하자!"
+        // "오늘의 여정은 모두 끝났어\n내일도 우리 함께하자!"
         is KidJourneyContentUiModel.FireLit -> {
             Text(
-                text = "오늘의 불조각을 모두 모았어",
+                text = "오늘의 여정은 모두 끝났어",
                 color = defaultColor,
                 style = textStyle
             )
@@ -152,14 +152,16 @@ private fun KidJourneyGoblinMessagePreview() {
         ) {
             KidJourneyGoblinMessage(
                 content = KidJourneyContentUiModel.NowSchedule(
+                    scheduleDetailId = 1,
                     scheduleName = "피아노 학원 가기",
-                    stoneType = "용기의 불조각",
+                    stoneType = StoneUiType.WISDOM,
                     scheduleInfo = KidJourneyScheduleUiModel(
                         order = 4,
-                        startTime = LocalTime.of(14, 0),
-                        endTime = LocalTime.of(16, 0)
+                        startTime = "14:00:00",
+                        endTime = "16:00:00"
                     ),
-                    isSkippable = true
+                    isSkippable = true,
+                    isNowScheduleVerified = false
                 )
             )
         }

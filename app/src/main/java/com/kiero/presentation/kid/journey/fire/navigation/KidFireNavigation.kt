@@ -10,24 +10,34 @@ import com.kiero.presentation.kid.journey.fire.KidFireRoute
 import kotlinx.serialization.Serializable
 
 fun NavController.navigateToFire(
-    navOptions: NavOptions? = null,
+    date: String,
+    stones: Int,
+    navOptions: NavOptions? = null
 ) {
-    navigate(Fire, navOptions)
+    navigate(Fire(
+        date = date,
+        stones = stones
+    ), navOptions)
 }
 
 fun NavGraphBuilder.kidJourneyFireNavGraph(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
-    navigateToFireResult: () -> Unit,
+    navigateToFireResult: (String) -> Unit,
 ) {
     composable<Fire> {
         KidFireRoute(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
-            navigateToFireResult = navigateToFireResult
+            navigateToFireResult = { date ->
+                navigateToFireResult(date)
+            }
         )
     }
 }
 
 @Serializable
-data object Fire : Route
+data class Fire(
+    val date: String,
+    val stones: Int
+) : Route

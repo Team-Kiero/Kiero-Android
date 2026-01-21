@@ -15,6 +15,8 @@ import com.kiero.presentation.auth.navigation.navigateToAuth
 import com.kiero.presentation.auth.parent.navigation.navigateToAuthParent
 import com.kiero.presentation.kid.journey.camera.navigation.navigateToCamera
 import com.kiero.presentation.kid.journey.fire.navigation.navigateToFire
+import com.kiero.presentation.kid.journey.fire.navigation.navigateToFireResult
+import com.kiero.presentation.kid.journey.model.StoneUiType
 import com.kiero.presentation.kid.journey.navigation.navigateToJourney
 import com.kiero.presentation.kid.mission.navigation.navigateToMission
 import com.kiero.presentation.kid.navigation.Journey
@@ -193,13 +195,36 @@ class MainAppState(
     fun navigateToScheduleAdd(navOptions: NavOptions? = null) =
         navController.navigateToScheduleAdd(navOptions)
 
-    fun navigateToKidOnboarding(navOptions: NavOptions? = null) = navController.navigateToKidOnboarding(navOptions)
-        
-    fun navigateToCamera(navOptions: NavOptions? = null) =
-        navController.navigateToCamera(navOptions)
+    fun navigateToKidOnboarding(navOptions: NavOptions? = null) =
+        navController.navigateToKidOnboarding(navOptions)
 
-    fun navigateToFire(navOptions: NavOptions? = null) =
-        navController.navigateToFire(navOptions)
+    fun navigateToCamera(
+        scheduleDetailId: Long,
+        stoneType: StoneUiType,
+        navOptions: NavOptions? = null
+    ) = navController.navigateToCamera(
+        scheduleDetailId = scheduleDetailId,
+        stoneType = stoneType,
+        navOptions = navOptions
+    )
+
+    fun navigateToFire(
+        date: String,
+        stones: Int,
+        navOptions: NavOptions? = null
+    ) = navController.navigateToFire(
+        date = date,
+        stones = stones,
+        navOptions = navOptions
+    )
+
+    fun navigateToFireResult(
+        date: String,
+        navOptions: NavOptions? = null
+    ) = navController.navigateToFireResult(
+        date = date,
+        navOptions = navOptions
+    )
 
     fun navigateToMissionAdd(navOptions: NavOptions? = null) =
         navController.navigateToMissionAdd(navOptions)
