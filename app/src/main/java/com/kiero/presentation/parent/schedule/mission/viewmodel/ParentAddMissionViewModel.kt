@@ -27,7 +27,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ParentAddMissionViewModel @Inject constructor(
     private val repository: ParentMissionAddRepository,
-    private val userInfoManager: UserInfoManager
+    private val userInfoManager: UserInfoManager,
 ) : ViewModel() {
 
     val missionNameState = TextFieldState()
@@ -118,14 +118,32 @@ class ParentAddMissionViewModel @Inject constructor(
     }
 
     fun onAwardClick(change: Int) {
-        _currentAwardValue.value =
-            MissionAwardDefaults.applyChange(_currentAwardValue.value, change)
-    }
+        val currentReward = _currentAwardValue.value
+        val nextReward = currentReward + change
 
-    fun onDateSelected(date: String) {
-        _selectedDate.value = date
-        _state.update { it.copy(selectedDate = date) }
-        _showBottomSheet.value = false
+        viewModelScope.launch {
+            when {
+                nextReward < MissionAwardDefaults.MIN_AWARD -> {
+                    _sideEffect.emit(
+                        ParentAddMissionSideEffect.ShowSnackbar(
+                            "최소 보상은 ${MissionAwardDefaults.MIN_AWARD}개입니다."
+                        )
+                    )
+                }
+
+                nextReward > MissionAwardDefaults.MAX_AWARD -> {
+                    _sideEffect.emit(
+                        ParentAddMissionSideEffect.ShowSnackbar(
+                            "최대 보상은 ${MissionAwardDefaults.MAX_AWARD}개입니다."
+                        )
+                    )
+                }
+
+                else -> {
+                    _currentAwardValue.value = nextReward
+                }
+            }
+        }
     }
 
     fun setChildId() {
@@ -138,6 +156,8 @@ class ParentAddMissionViewModel @Inject constructor(
     fun onDateSelected(date: LocalDate) {
         val formattedDate = date.format(DateTimeFormatter.ISO_LOCAL_DATE)
         _selectedDate.value = formattedDate
+
+        _state.update { it.copy(selectedDate = formattedDate) }
         onDismissBottomSheet()
     }
 
@@ -164,8 +184,7 @@ class ParentAddMissionViewModel @Inject constructor(
             val childId = currentState.childId ?: 1L
             val name = currentState.missionName
             val reward = currentState.reward
-            val dueAt = currentState.selectedDate ?: LocalDate.now().toString() // 만약의 null 대비
-
+            val dueAt = currentState.selectedDate ?: LocalDate.now().toString()
             _state.update { it.copy(isLoading = true) }
 
             repository.postParentMission(

@@ -25,7 +25,7 @@ class PlanRepositoryImpl @Inject constructor(
         endTime: String,
         scheduleColor: String,
         dayOfWeek: String?,
-        date: String?,
+        dates: String?,
     ): Result<Unit> = suspendRunCatching {
         val requestDto = PlanAddRequestDto(
             name = name,
@@ -34,7 +34,7 @@ class PlanRepositoryImpl @Inject constructor(
             endTime = endTime,
             scheduleColor = scheduleColor,
             dayOfWeek = dayOfWeek,
-            date = date
+            dates = dates
         )
         dataSource.postPlan(childId, requestDto)
         Unit

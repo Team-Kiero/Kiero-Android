@@ -17,7 +17,7 @@ fun NavController.navigateToSchedule(
 fun NavGraphBuilder.parentScheduleNavGraph(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
-    navigateToScheduleAdd: () -> Unit,
+    navigateToScheduleAdd: (String, Boolean) -> Unit,
     navigateToMissionAdd: () -> Unit,
     navigateToAutoMissionAdd: (Long) -> Unit,
     navigateToSelection: () -> Unit

@@ -15,12 +15,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
 import com.kiero.core.common.extension.collectSideEffect
+import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
@@ -46,6 +48,7 @@ fun ParentAddMissionRoute(
 
     val dateText = viewModel.displayDate
     val globalTrigger = LocalGlobalUiEventTrigger.current
+    val focusManager = LocalFocusManager.current
 
     LaunchedEffect(Unit) {
         viewModel.setChildId()
@@ -53,9 +56,13 @@ fun ParentAddMissionRoute(
 
     viewModel.sideEffect.collectSideEffect { effect ->
         when (effect) {
-            is ParentAddMissionSideEffect.ShowSnackbar -> globalTrigger.showSnackbar(
-                SnackbarState(message = effect.message)
-            )
+            is ParentAddMissionSideEffect.ShowSnackbar -> {
+                focusManager.clearFocus()
+
+                globalTrigger.showSnackbar(
+                    SnackbarState(message = effect.message),
+                )
+            }
 
             is ParentAddMissionSideEffect.NavigateToMissionList -> {
                 navigateUp()
@@ -95,11 +102,16 @@ fun ParentAddMissionScreen(
     selectedDate: String?,
     modifier: Modifier = Modifier,
 ) {
+    val focusManager = LocalFocusManager.current
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(color = KieroTheme.colors.black)
-            .padding(paddingValues),
+            .padding(paddingValues)
+            .noRippleClickable {
+                focusManager.clearFocus()
+            },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(15.dp)
     ) {

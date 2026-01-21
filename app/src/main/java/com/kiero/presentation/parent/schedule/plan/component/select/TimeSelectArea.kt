@@ -24,7 +24,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
 import com.kiero.core.common.extension.noRippleClickable
-import com.kiero.core.common.extension.validateAsStartTime
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.schedule.plan.component.picker.TimePickerBottomSheet
 
@@ -84,8 +83,10 @@ fun TimeSelectArea(
 
     if (showStartTimePicker) {
         TimePickerBottomSheet(
+            pickerTitle = "시작",
+            initialTime = startTime,
             onSelected = { time ->
-                onTimeSelected(true, time.validateAsStartTime())
+                onTimeSelected(true, time)
                 showStartTimePicker = false
             },
             onDismissRequest = { showStartTimePicker = false }
@@ -94,6 +95,8 @@ fun TimeSelectArea(
 
     if (showEndTimePicker) {
         TimePickerBottomSheet(
+            pickerTitle = "종료",
+            initialTime = endTime,
             onSelected = { time ->
                 onTimeSelected(false, time)
                 showEndTimePicker = false

@@ -10,9 +10,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.component.chip.KieroChip
@@ -65,6 +69,20 @@ fun MissionInfo(
     modifier: Modifier = Modifier,
     dayOfWeek: String? = null,
 ) {
+    val annotateDate = remember(dueAt) {
+        buildAnnotatedString {
+            val splitIndex = dueAt.lastIndexOf(".(")
+            if (splitIndex != -1) {
+                append(dueAt.substring(0, splitIndex))
+
+                withStyle(style = SpanStyle()) {
+                    append(dueAt.substring(splitIndex))
+                }
+            } else {
+                append(dueAt)
+            }
+        }
+    }
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -80,7 +98,7 @@ fun MissionInfo(
         }
 
         Text(
-            text = dueAt,
+            text = annotateDate,
             color = KieroTheme.colors.gray500,
             style = KieroTheme.typography.regular.body3
         )

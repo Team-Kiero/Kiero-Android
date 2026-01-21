@@ -57,7 +57,7 @@ val String.formatWithDayOfWeek: String
             val date = LocalDate.parse(this, inputFormatter)
 
             val outputFormatter =
-                DateTimeFormatter.ofPattern("yyyy.M.d(E)", java.util.Locale.KOREAN)
+                DateTimeFormatter.ofPattern("yyyy.M.d.(E)", java.util.Locale.KOREAN)
 
             date.format(outputFormatter)
         } catch (e: Exception) {

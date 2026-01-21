@@ -2,9 +2,11 @@ package com.kiero.presentation.parent.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -33,41 +35,51 @@ fun ParentUserSection(
     onUserNameClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(
+    Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(color = Color.Transparent)
-            .padding(horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.End
+            .background(
+                color = KieroTheme.colors.gray900
+            )
     ) {
-        Text(
-            text = userName,
-            style = KieroTheme.typography.regular.body2,
-            color = KieroTheme.colors.white
-        )
+        Spacer(modifier = Modifier.height(33.dp))
 
-        Spacer(modifier = Modifier.width(4.dp))
-
-        if (profileImage.isEmpty()) {
-            Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.ic_parent_profile),
-                contentDescription = null,
-                tint = Color.Unspecified,
-                modifier = Modifier.noRippleClickable(onClick = onUserNameClick)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = Color.Transparent)
+                .padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
+        ) {
+            Text(
+                text = userName,
+                style = KieroTheme.typography.regular.body2,
+                color = KieroTheme.colors.white
             )
-        } else {
-            Spacer(modifier = Modifier.width(5.dp))
 
-            AsyncImage(
-                model = profileImage,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(30.dp)
-                    .clip(CircleShape)
-                    .noRippleClickable(onClick = onUserNameClick)
-            )
+            Spacer(modifier = Modifier.width(4.dp))
+
+            if (profileImage.isEmpty()) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_parent_profile),
+                    contentDescription = null,
+                    tint = Color.Unspecified,
+                    modifier = Modifier.noRippleClickable(onClick = onUserNameClick)
+                )
+            } else {
+                Spacer(modifier = Modifier.width(5.dp))
+
+                AsyncImage(
+                    model = profileImage,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clip(CircleShape)
+                        .noRippleClickable(onClick = onUserNameClick)
+                )
+            }
         }
     }
 }

@@ -45,7 +45,7 @@ import kotlinx.coroutines.flow.stateIn
 class MainAppState(
     val navController: NavHostController,
     coroutineScope: CoroutineScope,
-    networkMonitor: NetworkMonitor
+    networkMonitor: NetworkMonitor,
 ) {
     val startDestination = Splash
 
@@ -192,12 +192,17 @@ class MainAppState(
     fun navigateToWish(navOptions: NavOptions? = null) =
         navController.navigateToWish(navOptions)
 
-    fun navigateToScheduleAdd(navOptions: NavOptions? = null) =
-        navController.navigateToScheduleAdd(navOptions)
+    fun navigateToScheduleAdd(
+        initialDate: String,
+        isFireLit: Boolean,
+        navOptions: NavOptions? = null,
+    ) = navController.navigateToScheduleAdd(initialDate, isFireLit, navOptions)
 
     fun navigateToKidOnboarding(navOptions: NavOptions? = null) =
         navController.navigateToKidOnboarding(navOptions)
 
+    fun navigateToKidOnboarding(navOptions: NavOptions? = null) =
+        navController.navigateToKidOnboarding(navOptions)
     fun navigateToCamera(
         scheduleDetailId: Long,
         stoneType: StoneUiType,

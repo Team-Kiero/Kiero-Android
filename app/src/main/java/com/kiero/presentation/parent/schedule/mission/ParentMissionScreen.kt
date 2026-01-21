@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,6 +23,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
+import com.kiero.core.trigger.LocalRefreshState
+import com.kiero.presentation.main.navigation.ParentMainTab
 import com.kiero.presentation.parent.schedule.mission.state.ParentMissionState
 import com.kiero.presentation.parent.schedule.mission.viewmodel.ParentMissionViewModel
 
@@ -69,7 +72,19 @@ fun ParentMissionScreen(
     state: ParentMissionState,
     modifier: Modifier = Modifier,
 ) {
+    val refreshState = LocalRefreshState.current
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(Unit) {
+        refreshState.refreshEvent.collect { tab ->
+            if (tab == ParentMainTab.SCHEDULE) {
+                listState.animateScrollToItem(0)
+            }
+        }
+    }
+
     LazyColumn(
+        state = listState,
         modifier = modifier
             .fillMaxSize()
             .background(color = KieroTheme.colors.black),

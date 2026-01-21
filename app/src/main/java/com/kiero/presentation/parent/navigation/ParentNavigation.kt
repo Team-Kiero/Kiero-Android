@@ -8,13 +8,13 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.navigation
 import com.kiero.core.navigation.Route
 import com.kiero.presentation.parent.alarm.navigation.parentAlarmNavGraph
+import com.kiero.presentation.parent.schedule.mission.auto.navigation.navigateToAutoMissionAdd
+import com.kiero.presentation.parent.schedule.mission.auto.navigation.parentAutoMissionAddNavGraph
 import com.kiero.presentation.parent.schedule.mission.navigation.navigateToMissionAdd
 import com.kiero.presentation.parent.schedule.mission.navigation.parentMissionAddNavGraph
 import com.kiero.presentation.parent.schedule.navigation.parentScheduleNavGraph
 import com.kiero.presentation.parent.schedule.plan.navigation.navigateToScheduleAdd
 import com.kiero.presentation.parent.schedule.plan.navigation.parentScheduleAddNavGraph
-import com.kiero.presentation.parent.schedule.mission.auto.navigation.navigateToAutoMissionAdd
-import com.kiero.presentation.parent.schedule.mission.auto.navigation.parentAutoMissionAddNavGraph
 import kotlinx.serialization.Serializable
 
 sealed interface ParentTab : Route
@@ -38,7 +38,7 @@ fun NavGraphBuilder.parentNavGraph(
     navController: NavHostController,
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
-    navigateToSelection: () -> Unit
+    navigateToSelection: () -> Unit,
 ) {
     navigation<ParentGraph>(
         startDestination = Schedule
@@ -46,7 +46,12 @@ fun NavGraphBuilder.parentNavGraph(
         parentScheduleNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
-            navigateToScheduleAdd = navController::navigateToScheduleAdd,
+            navigateToScheduleAdd = { date, fireLit ->
+                navController.navigateToScheduleAdd(
+                    initialDate = date,
+                    isFireLit = fireLit
+                )
+            },
             navigateToMissionAdd = navController::navigateToMissionAdd,
             navigateToAutoMissionAdd = navController::navigateToAutoMissionAdd,
             navigateToSelection = navigateToSelection

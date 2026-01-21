@@ -10,6 +10,13 @@ data class DayList(
     val day: String,
 )
 
+@Immutable
+data class TimeValidationResult(
+    val isValid: Boolean,
+    val message: String?,
+    val adjustedTime: String
+)
+
 enum class ColorType(val color: Color, val hexCode: String) {
     SCHEDULE1(Color(0xFFCFFFFA), "#CFFFFA"),
     SCHEDULE2(Color(0xFFFFFEE9), "#FFFEE9"),
