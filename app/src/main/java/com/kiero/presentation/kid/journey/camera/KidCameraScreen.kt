@@ -17,9 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -33,53 +30,90 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.kiero.R
+import com.kiero.core.common.extension.collectSideEffect
+import com.kiero.core.common.util.successData
+import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.core.model.UiState
 import com.kiero.presentation.kid.component.KidSpeechField
 import com.kiero.presentation.kid.journey.camera.component.StoneFloating
+import com.kiero.presentation.kid.journey.camera.state.KidCameraSideEffect
+import com.kiero.presentation.kid.journey.camera.viewModel.KidCameraViewModel
+import com.kiero.presentation.kid.journey.model.StoneUiType
 import java.io.File
 
 @Composable
 fun KidCameraRoute(
     navigateUp: () -> Unit,
+    viewModel: KidCameraViewModel = hiltViewModel()
 ) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
 
-    val tempUri = remember {
-        val directory = File(context.cacheDir, "images")
-        directory.mkdirs()
-        val file = File(directory, "captured_image.jpg")
-        FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+    LaunchedEffect(Unit) {
+        if (state.successData?.tempUri == null) {
+            val directory = File(context.cacheDir, "images")
+            directory.mkdirs()
+            val file = File(directory, "${System.currentTimeMillis()}.jpg")
+            val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+            viewModel.updateTempUri(uri.toString())
+        }
     }
 
     val systemCameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
         if (success) {
-            imageUri = tempUri
+            viewModel.updateImageUri()
+
+            viewModel.postImage(
+                fileName = "schedule/${System.currentTimeMillis()}.jpg",
+                contentType = "image/jpeg"
+            )
         }
     }
 
-    LaunchedEffect(Unit) {
-        if (imageUri == null) {
-            systemCameraLauncher.launch(tempUri)
+    viewModel.sideEffect.collectSideEffect {
+        when(it) {
+            is KidCameraSideEffect.NavigateUp -> {
+                navigateUp()
+            }
         }
     }
 
-    KidCameraScreen(
-        imageUri = imageUri,
-        onBackClick = navigateUp
-    )
+    LaunchedEffect(state.successData?.tempUri) {
+        if (state.successData?.tempUri != null && state.successData?.imageUri == null) {
+            systemCameraLauncher.launch(state.successData?.tempUri!!.toUri())
+        }
+    }
+
+    when (val state = state) {
+        is UiState.Success -> {
+            KidCameraScreen(
+                imageUri = state.successData?.imageUri?.toUri(),
+                stoneType = state.successData?.stoneType!!
+            )
+        }
+        is UiState.Loading -> {
+            KieroLoadingIndicator()
+        }
+        is UiState.Failure -> {}
+        else -> {}
+    }
 }
 
 @Composable
 private fun KidCameraScreen(
     imageUri: Uri?,
-    onBackClick: () -> Unit,
+    stoneType: StoneUiType,
     modifier: Modifier = Modifier
 ) {
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -106,7 +140,7 @@ private fun KidCameraScreen(
                     text = buildAnnotatedString {
                         append("우와! ")
                         withStyle(style = SpanStyle(color = KieroTheme.colors.main)) {
-                            append("용기의 불조각")
+                            append(stoneType.text)
                         }
                         append(" 을 손에 넣었어!")
                     },
@@ -120,7 +154,10 @@ private fun KidCameraScreen(
                     .align(Alignment.BottomCenter),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                StoneFloating()
+                StoneFloating(
+                    stoneImageRes = stoneType.imageRes,
+                    modifier = Modifier.padding(horizontal = 110.dp)
+                )
 
                 Spacer(modifier = Modifier.height(19.dp))
 
@@ -145,7 +182,7 @@ private fun KidCameraScreenPreview() {
     KieroTheme {
         KidCameraScreen(
             imageUri = null,
-            onBackClick = {}
+            stoneType = StoneUiType.COURAGE
         )
     }
 }

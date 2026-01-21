@@ -6,6 +6,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.kiero.presentation.kid.journey.KidJourneyRoute
+import com.kiero.presentation.kid.journey.model.StoneUiType
 import com.kiero.presentation.kid.navigation.Journey
 
 fun NavController.navigateToJourney(
@@ -17,15 +18,19 @@ fun NavController.navigateToJourney(
 fun NavGraphBuilder.kidJourneyNavGraph(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
-    navigateToCamera: () -> Unit,
-    navigateToFire: () -> Unit
+    navigateToCamera: (Long, StoneUiType) -> Unit,
+    navigateToFire: (String, Int) -> Unit
 ) {
     composable<Journey> {
         KidJourneyRoute(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
-            navigateToCamera = navigateToCamera,
-            navigateToFire = navigateToFire
+            navigateToCamera = { scheduleDetailId, stoneType ->
+                navigateToCamera(scheduleDetailId, stoneType)
+            },
+            navigateToFire = { date, stones ->
+                navigateToFire(date, stones)
+            }
         )
     }
 }

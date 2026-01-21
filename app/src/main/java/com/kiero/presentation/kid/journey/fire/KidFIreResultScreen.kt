@@ -1,8 +1,10 @@
 package com.kiero.presentation.kid.journey.fire
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,66 +14,106 @@ import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
 import com.kiero.core.designsystem.component.KieroGifImage
 import com.kiero.core.designsystem.component.KieroToolTip
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.component.chip.KieroChip
 import com.kiero.core.designsystem.component.chip.action.KieroTextAction
+import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.core.model.UiState
 import com.kiero.presentation.kid.component.KidSpeechField
 import com.kiero.presentation.kid.journey.fire.component.StoneMoving
+import com.kiero.presentation.kid.journey.fire.state.KidFireResultState
+import com.kiero.presentation.kid.journey.fire.viewModel.KidFireResultVIewModel
+import com.kiero.presentation.kid.journey.model.StoneUiType
+import kotlinx.coroutines.delay
 
 @Composable
 fun KidFireResultRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
+    navigateToJourney: () -> Unit,
+    viewModel: KidFireResultVIewModel = hiltViewModel()
 ) {
-    KidFIreResultScreen(
-        paddingValues = paddingValues,
-        navigateUp = navigateUp,
-    )
+    val state by viewModel.fireResultState.collectAsStateWithLifecycle()
+
+    when (val state = state) {
+        is UiState.Success -> {
+            KidFIreResultScreen(
+                paddingValues = paddingValues,
+                state = state.data,
+                navigateUp = navigateUp,
+                navigateToJourney = navigateToJourney
+            )
+        }
+        is UiState.Loading -> {
+            KieroLoadingIndicator()
+        }
+        is UiState.Failure -> {}
+        else -> {}
+    }
 }
 
 @Composable
 private fun KidFIreResultScreen(
     paddingValues: PaddingValues,
+    state: KidFireResultState,
     navigateUp: () -> Unit,
-    modifier: Modifier = Modifier,
-    isFinished: Boolean = false
+    navigateToJourney: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    val imageWidth = screenWidth + 108.dp
+    var isFinished by remember { mutableStateOf(false) }
+    var currentStone by remember { mutableStateOf<StoneUiType?>(null) }
 
-    Box(
+    LaunchedEffect(state.content.earnedStones) {
+        if (state.content.earnedStones.isNotEmpty()) {
+            isFinished = false
+            state.content.earnedStones.forEach { stone ->
+                currentStone = stone
+                delay(3000L)
+            }
+            isFinished = true
+        } else {
+            isFinished = true
+        }
+    }
+
+    BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
             .background(KieroTheme.colors.black)
             .padding(paddingValues)
     ) {
+        val imageWidth = maxWidth + 108.dp
+
         Column(
             modifier = Modifier
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Todo: 오른쪽 아이콘 제거 필요
             KieroTopbar(
-                title = "12월 5일 목요일",
+                title = state.date,
                 leftIconRes = R.drawable.ic_arrow_left,
-                rightIconRes = R.drawable.ic_arrow_right,
-                leftIconClick = {},
-                rightIconClick = {},
+                leftIconClick = navigateUp,
                 modifier = Modifier
                     .padding(top = 20.dp)
                     .alpha(if (!isFinished) 1f else 0f),
@@ -117,7 +159,9 @@ private fun KidFIreResultScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 12.dp)
-                            .padding(bottom = 200.dp)
+                            .padding(bottom = 200.dp),
+                        repeatCount = 0,
+                        onSuccess = navigateToJourney
                     )
                 } else {
                     Image(
@@ -142,12 +186,16 @@ private fun KidFIreResultScreen(
             }
         }
 
-        if (!isFinished) {
-            StoneMoving(
+        if (!isFinished && currentStone != null) {
+            Crossfade(
+                targetState = currentStone,
+                label = "cross fade",
                 modifier = Modifier
                     .align(Alignment.Center)
                     .padding(top = 240.dp)
-            )
+            ) { stone ->
+                StoneMoving(stoneRes = stone!!.imageRes)
+            }
         }
 
         if (isFinished) {
@@ -167,16 +215,26 @@ private fun KidFIreResultScreen(
                     color = KieroTheme.colors.gray300
                 )
 
-                Text(
-                    text = buildAnnotatedString {
-                        append("선물로 금화 ")
-                        withStyle(style = SpanStyle(color = KieroTheme.colors.main)) {
-                            append("10")
-                        }
-                        append(" 개를 줄게")
-                    },
-                    color = KieroTheme.colors.gray300
-                )
+                if (state.content.earnedCoin != 0) {
+                    Text(
+                        text = buildAnnotatedString {
+                            append("선물로 금화 ")
+                            withStyle(style = SpanStyle(color = KieroTheme.colors.main)) {
+                                append(state.content.earnedCoin.toString())
+                            }
+                            append(" 개를 줄게")
+                        },
+                        color = KieroTheme.colors.gray300
+                    )
+                }
+                else {
+                    Text(
+                        text = buildAnnotatedString {
+                            append("오늘도 도와줘서 고마워.")
+                        },
+                        color = KieroTheme.colors.gray300
+                    )
+                }
             }
         }
     }
@@ -188,8 +246,9 @@ private fun KidFIreScreenPreview() {
     KieroTheme {
         KidFIreResultScreen(
             paddingValues = PaddingValues(),
+            state = KidFireResultState.fake(),
             navigateUp = {},
-            isFinished = true
+            navigateToJourney = {}
         )
     }
 }

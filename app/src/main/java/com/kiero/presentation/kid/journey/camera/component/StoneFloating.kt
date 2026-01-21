@@ -8,7 +8,6 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -16,11 +15,11 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.kiero.R
 
 @Composable
 fun StoneFloating(
+    stoneImageRes: Int,
     modifier: Modifier = Modifier
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "floating")
@@ -40,12 +39,11 @@ fun StoneFloating(
     )
 
     Image(
-        painter = painterResource(id = R.drawable.img_kid_journey_stone_blue),
+        painter = painterResource(id = stoneImageRes),
         contentDescription = null,
         contentScale = ContentScale.Crop,
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 110.dp)
             .graphicsLayer {
                 this.translationY = floatAnim
             }
@@ -55,5 +53,7 @@ fun StoneFloating(
 @Preview
 @Composable
 private fun StoneFloatingPreview() {
-    StoneFloating()
+    StoneFloating(
+        stoneImageRes = R.drawable.img_kid_journey_stone_blue
+    )
 }
