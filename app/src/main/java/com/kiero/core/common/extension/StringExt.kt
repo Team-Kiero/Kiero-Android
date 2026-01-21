@@ -32,6 +32,47 @@ val String.formattedDeadLine: String
         }
     }
 
+
+val String.toRelativeDayFromDate: String?
+    get() {
+        if (this.isBlank()) return null
+
+        return try {
+            val inputFormatter = DateTimeFormatter.ofPattern("u-M-d")
+            val dueDate = LocalDate.parse(this.take(10), inputFormatter)
+
+            val today = LocalDate.now()
+            val tomorrow = today.plusDays(1)
+
+            when {
+                dueDate.isEqual(today) -> "오늘"
+                dueDate.isEqual(tomorrow) -> "내일"
+                else -> null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+
+val String.formatWithDayOfWeek: String
+    get() {
+        if (this.isBlank()) return ""
+
+        return try {
+            val inputFormatter = DateTimeFormatter.ofPattern("u-M-d")
+            val date = LocalDate.parse(this, inputFormatter)
+
+            val outputFormatter =
+                DateTimeFormatter.ofPattern("yyyy.M.d(E)", java.util.Locale.KOREAN)
+
+            date.format(outputFormatter)
+        } catch (e: Exception) {
+            this
+        }
+    }
+
+
 private val SERVER_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")
 
 val String.formattedAlarmDate: String

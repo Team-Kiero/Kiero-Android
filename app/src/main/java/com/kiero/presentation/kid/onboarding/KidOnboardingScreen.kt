@@ -20,20 +20,31 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.component.button.KieroButtonMedium
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.kid.component.KidSpeechField
+import com.kiero.presentation.kid.onboarding.state.KidOnboardingSideEffect
+import com.kiero.presentation.kid.onboarding.viewmodel.KidOnboardingViewModel
 
 @Composable
 fun KidOnboardingRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
     navigateToKid: () -> Unit,
+    viewModel: KidOnboardingViewModel = hiltViewModel()
 ) {
+    viewModel.sideEffect.collectSideEffect {
+        when (it) {
+            KidOnboardingSideEffect.NavigateToKid -> navigateToKid()
+        }
+    }
+
     KidOnboardingScreen(
         paddingValues = paddingValues,
-        navigateToKid = navigateToKid,
+        navigateToKid = viewModel::startJourney,
         onSkipClick = {},
         onNextClick = {}
     )

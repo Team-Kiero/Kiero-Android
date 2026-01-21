@@ -1,6 +1,7 @@
 package com.kiero.presentation.parent.schedule.plan.component.picker
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,11 +17,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,12 +38,16 @@ import com.kiero.presentation.parent.schedule.plan.model.ColorType
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ColorPickerBottomSheet(
-    selectedColor: Color,
-    onColorSelected: (Color) -> Unit,
+    selectedColorType: ColorType,
+    onColorConfirmed: (ColorType) -> Unit,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val sheetState = rememberModalBottomSheetState()
+
+
+    var tempColorType by remember { mutableStateOf(selectedColorType) }
+
 
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -45,6 +55,10 @@ fun ColorPickerBottomSheet(
         containerColor = KieroTheme.colors.gray900,
         dragHandle = null,
         modifier = modifier
+            .pointerInput(Unit) {
+                detectTapGestures {
+                }
+            }
     ) {
         Column(
             modifier = Modifier
@@ -56,14 +70,16 @@ fun ColorPickerBottomSheet(
                 leftIconRes = R.drawable.ic_close_light,
                 leftIconClick = onDismissRequest,
                 rightIconRes = R.drawable.ic_check,
-                rightIconClick = onDismissRequest,
+                rightIconClick = {
+                    onColorConfirmed(tempColorType)
+                },
             )
 
             Spacer(modifier = Modifier.height(25.dp))
 
             ColorPicker(
-                selectedColor = selectedColor,
-                onColorSelected = onColorSelected,
+                selectedColorType = tempColorType,
+                onColorSelected = { colorType -> tempColorType = colorType },
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
 
@@ -74,21 +90,21 @@ fun ColorPickerBottomSheet(
 
 @Composable
 fun ColorPicker(
-    selectedColor: Color,
-    onColorSelected: (Color) -> Unit,
+    selectedColorType: ColorType,
+    onColorSelected: (ColorType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 46.dp),
+            .padding(horizontal = 30.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         ColorType.entries.forEach { colorType ->
             ColorPickerItem(
                 selectColor = colorType.color,
-                isSelected = selectedColor == colorType.color,
-                onClick = { onColorSelected(colorType.color) },
+                isSelected = selectedColorType == colorType,
+                onClick = { onColorSelected(colorType) },
             )
         }
     }
@@ -129,8 +145,8 @@ private fun ColorPickerPreview() {
     KieroTheme {
         Column(modifier = Modifier.padding(16.dp)) {
             ColorPicker(
-                selectedColor = ColorType.SCHEDULE1.color,
-                onColorSelected = {}
+                selectedColorType = ColorType.SCHEDULE2,
+                onColorSelected = {},
             )
         }
     }

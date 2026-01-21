@@ -33,8 +33,15 @@ class TokenAuthenticator @Inject constructor(
             }
 
             val refreshToken = tokenManager.getRefreshToken() ?: return@withLock null // 로그아웃 필요
+            val userRole = tokenManager.getUserRole()
 
-            val result = tokenRefreshService.refresh(refreshToken)
+            if (userRole == null) {
+                tokenManager.clearTokens()
+                return@withLock null
+            }
+
+            val result = tokenRefreshService.refresh(refreshToken, userRole)
+
             if (result.isSuccess) {
                 val (newAccess, newRefresh) = result.getOrThrow()
                 tokenManager.saveTokens(newAccess.value, newRefresh.value)

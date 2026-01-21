@@ -52,8 +52,8 @@ fun KidWishGridItem(
                     color = KieroTheme.colors.white,
                     shape = RoundedCornerShape(8.dp)
                 )
-                .padding(horizontal = 40.dp, vertical = 10.dp)
                 .noRippleClickable(onClick = onClickWish)
+                .padding(horizontal = 40.dp, vertical = 10.dp)
         ) {
             Text(
                 text = "소원빌기",

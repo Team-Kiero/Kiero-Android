@@ -74,12 +74,14 @@ private fun NormalDateContent(
     isSelected: Boolean = false,
 ) {
     val backgroundColor = when {
+        isSelected -> KieroTheme.colors.main
         isSelected && dateState == DateState.FUTURE -> KieroTheme.colors.main
         dateState == DateState.TODAY -> KieroTheme.colors.gray800
         else -> Color.Transparent
     }
 
     val borderColor = when {
+        isSelected -> KieroTheme.colors.main
         isSelected && dateState == DateState.FUTURE -> KieroTheme.colors.main
         dateState == DateState.TODAY -> KieroTheme.colors.gray800
         else -> Color.Transparent

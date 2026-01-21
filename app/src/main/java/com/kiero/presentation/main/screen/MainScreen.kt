@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -31,8 +30,10 @@ import com.kiero.core.designsystem.component.dialog.KieroDialog
 import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
 import com.kiero.core.model.trigger.DialogTrigger
 import com.kiero.core.model.trigger.GlobalUiEventHolder
+import com.kiero.core.model.trigger.RefreshState
 import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
+import com.kiero.core.trigger.LocalRefreshState
 import com.kiero.presentation.main.navigation.KidMainTab
 import com.kiero.presentation.main.navigation.KieroNavHost
 import com.kiero.presentation.main.navigation.MainAppState
@@ -99,7 +100,9 @@ fun MainScreen(
 
     val currentTab =
         if (showParentBottomBar) currentParentTab else if (showKidBottomBar) currentKidTab else null
+
     val dialogState = rememberDialogStateHolder()
+    val refreshState = remember { RefreshState() }
 
     val onShowToast: (String) -> Unit = remember {
         { message ->
@@ -147,9 +150,13 @@ fun MainScreen(
     LaunchedEffect(isOffline) {
         Timber.e("네트워크 상태 변경 감지: isOffline = $isOffline")
 
-        if (isOffline && !dialogState.dialogState.isVisible) {
-            eventHolder.dialogTrigger.show {
-                eventHolder.dialogTrigger.dismiss()
+        if (isOffline) {
+            if (!dialogState.dialogState.isVisible) {
+                eventHolder.dialogTrigger.show {}
+            }
+        } else {
+            if (dialogState.dialogState.isVisible) {
+                dialogState.dismissDialog()
             }
         }
     }
@@ -161,12 +168,12 @@ fun MainScreen(
     )
 
     CompositionLocalProvider(
-        LocalGlobalUiEventTrigger provides eventHolder
+        LocalGlobalUiEventTrigger provides eventHolder,
+        LocalRefreshState provides refreshState
     ) {
         Box(
             modifier = modifier
                 .fillMaxSize()
-                .statusBarsPadding()
                 .navigationBarsPadding()
         ) {
             Scaffold(
@@ -184,13 +191,20 @@ fun MainScreen(
                 bottomBar = {
                     MainBottomBar(
                         isVisible = isVisible,
+                        isParentMode = showParentBottomBar,
                         containerShape = containerShape,
                         tabs = tabs,
                         currentTab = currentTab,
                         onTabSelected = { tab ->
-                            when (tab) {
-                                is ParentMainTab -> appState.navigateParentTab(tab)
-                                is KidMainTab -> appState.navigateKidTab(tab)
+                            if (currentTab == tab) {
+                                scope.launch {
+                                    refreshState.trigger(tab)
+                                }
+                            } else {
+                                when (tab) {
+                                    is ParentMainTab -> appState.navigateParentTab(tab)
+                                    is KidMainTab -> appState.navigateKidTab(tab)
+                                }
                             }
                         }
                     )
@@ -198,15 +212,21 @@ fun MainScreen(
             ) { paddingValues ->
                 if (dialogState.dialogState.isVisible) {
                     KieroDialog(
-                        title = "인터넷 연결 확인해주세요!",
+                        title = "인터넷 연결을 확인해주세요!",
                         confirmAction = KieroConfirmAction(
-                            text = "확인",
+                            text = "재시도",
                             onClick = {
-                                dialogState.dismissDialog()
+                                if (!isOffline) {
+                                    dialogState.dismissDialog()
+                                } else {
+                                    onShowToast("네트워크가 아직 연결되지 않았습니다.")
+                                }
                             }
                         ),
                         onDismiss = {
-                            dialogState.dismissDialog()
+                            if (!isOffline) {
+                                dialogState.dismissDialog()
+                            }
                         }
                     )
                 }

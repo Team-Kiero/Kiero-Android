@@ -28,8 +28,8 @@ fun ParentSignUpAddChildScreen(
             title = "아이의 성을 입력해주세요.",
             placeholder = "성",
             textState = state.childInfo.childLastName,
-            isError = !state.childInfo.validateLastName,
-            onImeAction = nextFocus
+            isError = state.childInfo.childLastName.text.isNotEmpty() && !state.childInfo.validateLastName,
+            onImeAction = nextFocus,
         )
 
         Spacer(modifier = Modifier.height(18.dp))
@@ -38,7 +38,7 @@ fun ParentSignUpAddChildScreen(
             title = "아이의 이름을 입력해주세요.",
             placeholder = "이름",
             textState = state.childInfo.childFirstName,
-            isError = !state.childInfo.validateFirstName,
+            isError = state.childInfo.childFirstName.text.isNotEmpty() && !state.childInfo.validateFirstName,
             onImeAction = doneFocus,
             imeAction = ImeAction.Done
         )

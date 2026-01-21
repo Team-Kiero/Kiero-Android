@@ -64,9 +64,9 @@ fun AuthParentRoute(
                 )
             }
 
-            AuthSideEffect.NavigateToParentGraph -> {
-                navigateToParentGraph()
-            }
+            AuthSideEffect.NavigateToParentGraph -> navigateToParentGraph()
+
+            else -> {}
         }
     }
 

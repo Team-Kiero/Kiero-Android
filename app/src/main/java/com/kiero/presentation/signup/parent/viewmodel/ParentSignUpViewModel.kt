@@ -6,16 +6,22 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.kiero.core.common.extension.toHandleErrorMessage
 import com.kiero.core.common.util.formatTime
+import com.kiero.core.common.util.suspendRunCatching
+import com.kiero.core.common.viewmodel.throttleFirst
+import com.kiero.core.localstorage.TokenManager
+import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.data.demo.repository.DemoRepository
 import com.kiero.data.parent.signup.repository.ParentSignUpRepository
 import com.kiero.presentation.signup.parent.model.ParentSignUpStep
-import com.kiero.presentation.signup.parent.model.toState
+import com.kiero.presentation.signup.parent.model.toUiModel
 import com.kiero.presentation.signup.parent.navigation.ParentSignUp
 import com.kiero.presentation.signup.parent.state.ParentSignUpSideEffect
 import com.kiero.presentation.signup.parent.state.ParentSignUpState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,7 +39,9 @@ class ParentSignUpViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: ParentSignUpRepository,
     private val authRepository: AuthRepository,
-    private val demoRepository: DemoRepository
+    private val demoRepository: DemoRepository,
+    private val userInfoManager: UserInfoManager,
+    private val tokenManager: TokenManager
 ) : ViewModel() {
     private val _state = MutableStateFlow(ParentSignUpState())
     val state: StateFlow<ParentSignUpState> = _state.asStateFlow()
@@ -44,6 +52,7 @@ class ParentSignUpViewModel @Inject constructor(
     private val parentInfo = savedStateHandle.toRoute<ParentSignUp>()
 
     private var timerJob: Job? = null
+    private var copyJob: Job? = null
     private val TIMER_DURATION_SECONDS = 10 * 1
 
     init {
@@ -58,12 +67,6 @@ class ParentSignUpViewModel @Inject constructor(
 
         when (currentState) {
             ParentSignUpStep.ADDCHILD -> {
-                _state.update {
-                    it.copy(
-                        currentStep = ParentSignUpStep.INVITE
-                    )
-                }
-
                 postChild()
             }
 
@@ -78,9 +81,10 @@ class ParentSignUpViewModel @Inject constructor(
     }
 
     fun onCopyClick() {
-        val copyText = _state.value.childInfo.code
+        if (copyJob?.isActive == true) return
 
-        viewModelScope.launch {
+        copyJob = throttleFirst {
+            val copyText = _state.value.childInfo.code
             _sideEffect.emit(
                 ParentSignUpSideEffect.CopyText(
                     message = "코드가 복사되었습니다.",
@@ -107,6 +111,13 @@ class ParentSignUpViewModel @Inject constructor(
     }
 
     fun postChild() {
+        _state.update {
+            it.copy(
+                isLoading = true,
+                isExpired = false
+            )
+        }
+
         viewModelScope.launch {
             repository.postSignUp(
                 childLastName = _state.value.childInfo.childLastName.text.toString(),
@@ -115,21 +126,49 @@ class ParentSignUpViewModel @Inject constructor(
                 Timber.d("postChild $result")
                 _state.update {
                     it.copy(
-                        childInfo = result.toState()
+                        childInfo = result.toUiModel(),
+                        isLoading = false
                     )
+                }
+
+                if (_state.value.currentStep == ParentSignUpStep.ADDCHILD) {
+                    _state.update {
+                        it.copy(
+                            currentStep = ParentSignUpStep.INVITE
+                        )
+                    }
                 }
 
                 startTimer()
             }.onFailure {
                 _sideEffect.emit(ParentSignUpSideEffect.ShowSnackbar(it.toHandleErrorMessage()))
+                _state.update { currentState ->
+                    currentState.copy(
+                        isLoading = false
+                    )
+                }
             }
         }
     }
 
     fun logOut() {
+        Timber.e("로그아웃 되었습니다")
         viewModelScope.launch {
-            authRepository.postLogout()
-            demoRepository.deleteDemo()
+            val logoutDeferred = async {
+                suspendRunCatching { authRepository.postLogout() }
+            }
+            val demoDeferred = async {
+                suspendRunCatching { demoRepository.deleteDemo() }
+            }
+            val tokenDeferred = async {
+                suspendRunCatching { tokenManager.clearTokens() }
+            }
+
+            awaitAll(logoutDeferred, demoDeferred, tokenDeferred)
+
+            _state.update {
+                it.copy(isLoading = false)
+            }
 
             _sideEffect.emit(ParentSignUpSideEffect.NavigateToSelection)
         }
@@ -151,8 +190,11 @@ class ParentSignUpViewModel @Inject constructor(
                 }
 
                 if (remainingTime == 0) {
-                    _sideEffect.emit(ParentSignUpSideEffect.ShowSnackbar("인증 시간이 만료되어 코드가 갱신됩니다."))
-                    postChild()
+                    _state.update {
+                        it.copy(
+                            isExpired = true
+                        )
+                    }
                     break
                 }
 
@@ -176,7 +218,10 @@ class ParentSignUpViewModel @Inject constructor(
 
     fun onLogoutConfirm() {
         _state.update {
-            it.copy(isLogoutDialogVisible = false)
+            it.copy(
+                isLogoutDialogVisible = false,
+                isLoading = true
+            )
         }
 
         logOut()

@@ -18,6 +18,7 @@ data class DateTextStyle(
     val textColor: Color
         @Composable
         get() = when {
+            isSelected -> KieroTheme.colors.black
             isSelected && dateState == DateState.FUTURE -> KieroTheme.colors.black
             dateState == DateState.PAST -> KieroTheme.colors.gray700
             dateState == DateState.TODAY -> KieroTheme.colors.gray400

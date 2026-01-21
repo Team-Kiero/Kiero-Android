@@ -21,6 +21,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
+import com.kiero.core.common.util.MaxLengthInputTransformation
 import com.kiero.core.designsystem.component.KieroTextField
 import com.kiero.core.designsystem.theme.KieroTheme
 
@@ -51,7 +52,11 @@ fun ParentSignUpForm(
             isError = isError,
             containerColor = KieroTheme.colors.gray900,
             keyboardOptions = KeyboardOptions(imeAction = imeAction),
-            onKeyboardAction = { onImeAction() }
+            onKeyboardAction = { performDefaultAction ->
+                onImeAction()
+                performDefaultAction()
+            },
+            inputTransformation = MaxLengthInputTransformation(5)
         )
 
         Row(
@@ -72,7 +77,7 @@ fun ParentSignUpForm(
             Spacer(modifier = Modifier.width(4.dp))
 
             Text(
-                text = "특수문자, 이모지, 공백을 포함하지 않은 이름을 입력해주세요",
+                text = "특수문자나 이모지를 포함하지 않은 이름을 입력해주세요",
                 style = KieroTheme.typography.regular.body5,
                 color = KieroTheme.colors.point,
             )

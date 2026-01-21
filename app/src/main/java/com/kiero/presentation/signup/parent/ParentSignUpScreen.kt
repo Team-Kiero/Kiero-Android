@@ -1,6 +1,7 @@
 package com.kiero.presentation.signup.parent
 
 import android.content.ClipData
+import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -13,9 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.ClipEntry
@@ -53,18 +51,13 @@ fun ParentSignUpRoute(
     val globalTrigger = LocalGlobalUiEventTrigger.current
     val focusManager = LocalFocusManager.current
 
-    var isLoading by remember { mutableStateOf(false) }
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     viewModel.sideEffect.collectSingleEvent {
         when (it) {
-            ParentSignUpSideEffect.NavigateToParent -> {
-                navigateToParent()
-            }
+            ParentSignUpSideEffect.NavigateToParent -> navigateToParent()
 
-            ParentSignUpSideEffect.NavigateToSelection -> {
-                navigateToSelection()
-            }
+            ParentSignUpSideEffect.NavigateToSelection -> navigateToSelection()
 
             is ParentSignUpSideEffect.CopyText -> {
                 clipboardManager.setClipEntry(
@@ -75,6 +68,14 @@ fun ParentSignUpRoute(
                         )
                     )
                 )
+
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+                    globalTrigger.showSnackbar(
+                        SnackbarState(
+                            message = it.message
+                        )
+                    )
+                }
             }
 
             is ParentSignUpSideEffect.ShowSnackbar -> {
@@ -120,6 +121,7 @@ fun ParentSignUpRoute(
                         state = state,
                         onStartClick = viewModel::onNextClick,
                         onCopyClick = viewModel::onCopyClick,
+                        onReIssueClick = viewModel::postChild
                     )
                 }
             }
@@ -133,7 +135,6 @@ fun ParentSignUpRoute(
                 confirmAction = KieroConfirmAction(
                     text = "확인",
                     onClick = {
-                        isLoading = true
                         viewModel.onLogoutConfirm()
                     }
                 ),
@@ -146,7 +147,7 @@ fun ParentSignUpRoute(
             )
         }
 
-        if (isLoading) {
+        if (state.isLoading) {
             KieroLoadingIndicator()
         }
     }

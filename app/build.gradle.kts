@@ -69,6 +69,20 @@ android {
         compose = true
         buildConfig = true
     }
+    flavorDimensions += "version"
+    productFlavors {
+        create("parent") {
+            dimension = "version"
+            applicationIdSuffix = ".parent"
+            resValue("string", "app_name", "Kiero_Parent")
+        }
+
+        create("child") {
+            dimension = "version"
+            applicationIdSuffix = ".child"
+            resValue("string", "app_name", "Kiero_Kid")
+        }
+    }
 }
 
 dependencies {

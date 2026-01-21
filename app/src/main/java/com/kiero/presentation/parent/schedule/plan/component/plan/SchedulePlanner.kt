@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,13 +23,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.schedule.model.ScheduleEvent
-import com.kiero.presentation.parent.schedule.model.toDayIndex
 import com.kiero.presentation.parent.schedule.model.toScheduleBlocks
-import com.kiero.presentation.parent.schedule.plan.model.ScheduleData
-
+import com.kiero.presentation.parent.schedule.plan.state.ParentScheduleState
 
 @Composable
 fun ScheduleTimeTable(
+    state: ParentScheduleState,
     events: List<ScheduleEvent>,
     modifier: Modifier = Modifier,
 ) {
@@ -37,16 +37,12 @@ fun ScheduleTimeTable(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(11.dp)
     ) {
-        ScheduleWeekTopbar(
-            dayList = ScheduleData.fakeDayList
-        )
-
         Row(
             modifier = Modifier.fillMaxWidth()
         ) {
             ScheduleTimeColumn()
 
-            SchedulePlanner(events = events)
+            SchedulePlanner(events = events, state = state)
         }
     }
 }
@@ -54,6 +50,7 @@ fun ScheduleTimeTable(
 @Composable
 fun SchedulePlanner(
     events: List<ScheduleEvent>,
+    state: ParentScheduleState,
     modifier: Modifier = Modifier,
     daysCount: Int = 7,
 ) {
@@ -61,8 +58,11 @@ fun SchedulePlanner(
     val hourHeight = with(density) { 38.dp.roundToPx().toDp() }
 
     val allBlocks = events.flatMap { event ->
-        val dayIndex = event.dayOfWeek?.toDayIndex() ?: 0
-        event.toScheduleBlocks(dayIndex)
+        val indices = state.run { event.getIndices() }
+
+        indices.flatMap { index ->
+            event.toScheduleBlocks(index)
+        }
     }
 
     BoxWithConstraints(
@@ -74,20 +74,43 @@ fun SchedulePlanner(
             .padding(4.dp)
     ) {
         val dayWidth = maxWidth / daysCount
-
-        allBlocks.forEach { block ->
-            val topOffset = hourHeight * (block.startHour - 8)
-            val blockHeight = hourHeight * block.durationInSlots
-
+        if (events.isEmpty()) {
             Box(
-                modifier = Modifier
-                    .offset(x = dayWidth * block.dayIndex, y = topOffset)
-                    .width(dayWidth)
-                    .height(blockHeight)
-                    .padding(horizontal = 3.dp)
+                modifier = modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
-                ScheduleEventBlock(block = block)
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "등록된 일정이 없어요",
+                        style = KieroTheme.typography.semiBold.title4,
+                        color = KieroTheme.colors.gray400
+                    )
+                    Text(
+                        text = "아이의 일정을 추가해 보세요!",
+                        style = KieroTheme.typography.semiBold.title4,
+                        color = KieroTheme.colors.gray400
+                    )
+                }
             }
+        } else {
+            allBlocks.forEach { block ->
+                val topOffset = hourHeight * (block.startHour - 8)
+                val blockHeight = hourHeight * block.durationInSlots
+
+                Box(
+                    modifier = Modifier
+                        .offset(x = dayWidth * block.dayIndex, y = topOffset)
+                        .width(dayWidth)
+                        .height(blockHeight)
+                        .padding(horizontal = 3.dp)
+                ) {
+                    ScheduleEventBlock(block = block)
+                }
+            }
+
         }
     }
 }
@@ -96,49 +119,6 @@ fun SchedulePlanner(
 @Composable
 private fun ScheduleTimeTablePreview() {
     KieroTheme {
-        ScheduleTimeTable(
-            events = listOf(
-                ScheduleEvent(
-                    id = "1",
-                    name = "학교",
-                    isRecurring = true,
-                    startTime = "08:00",
-                    endTime = "12:00",
-                    scheduleColor = "SCHEDULE4",
-                    dayOfWeek = "MON",
-                    date = null
-                ),
-                ScheduleEvent(
-                    id = "2",
-                    name = "수영",
-                    isRecurring = true,
-                    startTime = "08:00",
-                    endTime = "13:00",
-                    scheduleColor = "SCHEDULE2",
-                    dayOfWeek = "TUE",
-                    date = null
-                ),
-                ScheduleEvent(
-                    id = "5",
-                    name = "수영",
-                    isRecurring = true,
-                    startTime = "08:00",
-                    endTime = "9:00",
-                    scheduleColor = "SCHEDULE2",
-                    dayOfWeek = "WED",
-                    date = null
-                ),
-                ScheduleEvent(
-                    id = "3",
-                    name = "태권도",
-                    isRecurring = true,
-                    startTime = "14:00",
-                    endTime = "16:00",
-                    scheduleColor = "SCHEDULE2",
-                    dayOfWeek = "TUE",
-                    date = null
-                ),
-            )
-        )
+        // Preview implementation
     }
 }

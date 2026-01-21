@@ -22,10 +22,11 @@ import androidx.compose.ui.unit.dp
 import com.kiero.R
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.presentation.parent.schedule.plan.model.ColorType
 
 @Composable
 fun ColorSelectArea(
-    selectColor: Color?,
+    selectedColorType: ColorType?,
     onColorClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -45,13 +46,13 @@ fun ColorSelectArea(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        if (selectColor != null) {
+        if (selectedColorType != null) {
             Box(
                 modifier = Modifier
                     .size(35.dp)
                     .clip(RoundedCornerShape(5.dp))
                     .background(
-                        color = selectColor,
+                        color = selectedColorType.color,
                         shape = RoundedCornerShape(5.dp)
                     )
             )
@@ -73,7 +74,7 @@ fun ColorSelectArea(
 private fun PreviewColorSelectAreaPreivew() {
     KieroTheme {
         ColorSelectArea(
-            selectColor = null,
+            selectedColorType = ColorType.SCHEDULE2,
             onColorClick = {}
         )
     }

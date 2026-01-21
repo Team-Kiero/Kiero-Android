@@ -1,8 +1,6 @@
 package com.kiero.presentation.main.navigation.component
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -37,6 +35,7 @@ import kotlinx.collections.immutable.ImmutableList
 @Composable
 fun MainBottomBar(
     isVisible: Boolean,
+    isParentMode: Boolean,
     containerShape: Shape,
     tabs: ImmutableList<BottomBarTab>,
     currentTab: BottomBarTab?,
@@ -52,7 +51,7 @@ fun MainBottomBar(
         Box(
             modifier = Modifier
                 .then(
-                    if (isVisible) {
+                    if (isVisible && isParentMode) {
                         Modifier.dropShadow(
                             shape = RoundedCornerShape(12.dp),
                             color = KieroTheme.colors.gray800,
