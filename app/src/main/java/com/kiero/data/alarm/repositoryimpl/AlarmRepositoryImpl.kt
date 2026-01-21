@@ -90,27 +90,6 @@ class AlarmRepositoryImpl @Inject constructor(
         model
     }
 
-    override fun subscribeAlarmFeed(childId: Long): Flow<AlarmItemModel> = flow {
-        dataSource.subscribeAlarmFeed(childId).collect { dto ->
-            dto.toModel()?.let { model ->
-                addNewAlarm(model)
-                emit(model)
-            }
-        }
-    }.flowOn(Dispatchers.IO)
-
-    override suspend fun addNewAlarm(item: AlarmItemModel) {
-        Timber.d("addNewAlarm - item: $item")
-
-        _cachedAlarms.update { current ->
-            if (current.any { it.id == item.id }) {
-                current
-            } else {
-                listOf(item) + current
-            }
-        }
-    }
-
     override fun clearCache() {
         Timber.d("clearCache")
 
@@ -118,6 +97,7 @@ class AlarmRepositoryImpl @Inject constructor(
         _childName.value = ""
         _nextCursor.value = null
     }
+
     companion object {
         private const val MAX_CACHE_SIZE = 100
     }

@@ -14,10 +14,4 @@ interface AlarmService {
         @Query("size") size: Int? = null,
         @Query("cursor") cursor: String? = null
     ): BaseResponse<AlarmFeedResponseDto>
-
-    @Streaming
-    @GET("api/v1/feeds/{childId}/subscribe")
-    suspend fun subscribeAlarmFeed(
-        @Path("childId") childId: Long
-    ): okhttp3.ResponseBody
 }

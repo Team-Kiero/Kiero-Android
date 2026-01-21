@@ -22,9 +22,5 @@ interface AlarmRepository {
         size: Int = 20
     ): Result<AlarmFeedModel>
 
-    fun subscribeAlarmFeed(childId: Long): Flow<AlarmItemModel>
-
-    suspend fun addNewAlarm(item: AlarmItemModel)
-
     fun clearCache()
 }

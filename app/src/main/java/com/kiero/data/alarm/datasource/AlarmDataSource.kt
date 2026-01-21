@@ -11,8 +11,4 @@ interface AlarmDataSource {
         size: Int?,
         cursor: String?
     ): BaseResponse<AlarmFeedResponseDto>
-
-    fun subscribeAlarmFeed(
-        childId: Long
-    ): Flow<FeedItemDto>
 }
