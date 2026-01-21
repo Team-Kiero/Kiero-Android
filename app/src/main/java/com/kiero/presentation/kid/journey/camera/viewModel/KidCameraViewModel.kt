@@ -12,6 +12,7 @@ import com.kiero.presentation.kid.journey.camera.state.KidCameraSideEffect
 import com.kiero.presentation.kid.journey.camera.state.KidCameraState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -61,32 +62,35 @@ class KidCameraViewModel @Inject constructor(
             val currentState = (_state.value as? UiState.Success)?.data ?: return@launch
             _state.updateSuccess { it.copy(isLoading = true) }
 
-            repository.postPresignedUrl(
-                fileName = fileName,
-                contentType = contentType
-            ).onSuccess { result ->
-                Timber.e("postImage success: $result")
-                val deferred = async {
+            val timerJob = async {
+                delay(4000L)
+            }
+
+            val apiJob = async {
+                repository.postPresignedUrl(
+                    fileName = fileName,
+                    contentType = contentType
+                ).mapCatching { result ->
                     repository.patchScheduleComplete(
                         scheduleDetailId = currentState.scheduleDetailId,
                         imageUrl = result.presignedUrl.split("?").first()
-                    )
+                    ).getOrThrow()
                 }
+            }
 
-                val scheduleComplete = deferred.await()
+            val apiResult = apiJob.await()
+            timerJob.await()
 
-                scheduleComplete.onSuccess {
-                    Timber.e("deferred success: $it")
+            apiResult
+                .onSuccess {
+                    Timber.d("scheduleComplete success")
                     _sideEffect.emit(KidCameraSideEffect.NavigateUp)
                     _state.updateSuccess { it.copy(isLoading = false) }
-                }.onFailure {
-                    Timber.e("deferred fail: $it")
+                }
+                .onFailure {
+                    Timber.e("postImage or scheduleComplete fail: $it")
                     _state.updateSuccess { it.copy(isLoading = false) }
                 }
-            }.onFailure {
-                Timber.e("postImage fail: $it")
-                _state.updateSuccess { it.copy(isLoading = false) }
-            }
         }
     }
 }

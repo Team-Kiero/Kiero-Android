@@ -45,7 +45,6 @@ import com.kiero.presentation.kid.journey.camera.component.StoneFloating
 import com.kiero.presentation.kid.journey.camera.state.KidCameraSideEffect
 import com.kiero.presentation.kid.journey.camera.viewModel.KidCameraViewModel
 import com.kiero.presentation.kid.journey.model.StoneUiType
-import kotlinx.coroutines.delay
 import java.io.File
 
 @Composable
@@ -71,6 +70,11 @@ fun KidCameraRoute(
     ) { success ->
         if (success) {
             viewModel.updateImageUri()
+
+            viewModel.postImage(
+                fileName = "schedule/${System.currentTimeMillis()}.jpg",
+                contentType = "image/jpeg"
+            )
         }
     }
 
@@ -92,13 +96,7 @@ fun KidCameraRoute(
         is UiState.Success -> {
             KidCameraScreen(
                 imageUri = state.successData?.imageUri?.toUri(),
-                stoneType = state.successData?.stoneType!!,
-                onBack = {
-                    viewModel.postImage(
-                        fileName = "${System.currentTimeMillis()}.jpg",
-                        contentType = "image/jpeg"
-                    )
-                }
+                stoneType = state.successData?.stoneType!!
             )
         }
         is UiState.Loading -> {
@@ -113,15 +111,8 @@ fun KidCameraRoute(
 private fun KidCameraScreen(
     imageUri: Uri?,
     stoneType: StoneUiType,
-    onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LaunchedEffect(imageUri) {
-        if (imageUri != null) {
-            delay(4000)
-            onBack()
-        }
-    }
 
     Box(
         modifier = Modifier
@@ -191,8 +182,7 @@ private fun KidCameraScreenPreview() {
     KieroTheme {
         KidCameraScreen(
             imageUri = null,
-            stoneType = StoneUiType.COURAGE,
-            onBack = {}
+            stoneType = StoneUiType.COURAGE
         )
     }
 }
