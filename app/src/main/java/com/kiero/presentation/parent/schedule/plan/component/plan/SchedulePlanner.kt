@@ -56,6 +56,7 @@ fun SchedulePlanner(
 ) {
     val density = LocalDensity.current
     val hourHeight = with(density) { 38.dp.roundToPx().toDp() }
+    val slotHeight = hourHeight / 4
 
     val allBlocks = events.flatMap { event ->
         val indices = state.run { event.getIndices() }
@@ -97,9 +98,11 @@ fun SchedulePlanner(
             }
         } else {
             allBlocks.forEach { block ->
-                val topOffset = hourHeight * (block.startHour - 8)
-                val blockHeight = hourHeight * block.durationInSlots
+                val hourOffset = hourHeight * (block.startHour - 8)
+                val minuteOffset = slotHeight * (block.startMinute / 15)
+                val topOffset = hourOffset + minuteOffset
 
+                val blockHeight = slotHeight * block.durationInSlots
                 Box(
                     modifier = Modifier
                         .offset(x = dayWidth * block.dayIndex, y = topOffset)
@@ -118,7 +121,14 @@ fun SchedulePlanner(
 @Preview(showBackground = true, backgroundColor = 0xFF2D2F34)
 @Composable
 private fun ScheduleTimeTablePreview() {
+    val mockEvents = ScheduleEvent.mock()
+
     KieroTheme {
-        // Preview implementation
+        Box(modifier = Modifier.padding(16.dp)) {
+            ScheduleTimeTable(
+                state = ParentScheduleState(),
+                events = mockEvents
+            )
+        }
     }
 }
