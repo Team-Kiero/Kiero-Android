@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
@@ -55,7 +56,11 @@ fun KidInputField(
             placeholder = fieldInputText,
             containerColor = KieroTheme.colors.gray900,
             isError = isError,
-            keyboardOptions = KeyboardOptions(imeAction = imeAction),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Uri,
+                autoCorrectEnabled = false,
+                imeAction = imeAction
+            ),
             onKeyboardAction = { performDefaultAction ->
                 onImeAction()
             }

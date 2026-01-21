@@ -37,6 +37,7 @@ class KidMissionViewModel @Inject constructor(
     ) { uiState, coinData ->
         when (uiState) {
             is UiState.Success -> {
+                Timber.e("combine $coinData")
                 UiState.Success(
                     uiState.data.copy(
                         coinUiModel = coinData.toUiModel()
@@ -126,7 +127,7 @@ class KidMissionViewModel @Inject constructor(
     }
 
     fun openMissionDialog(targetId: Long) {
-        val currentState = _state.value.successData ?: return
+        val currentState = state.value.successData ?: return
 
         val selectedMission = currentState.kidMissionByDateList.missionsByDate
             .flatMap { it.missions }
@@ -136,6 +137,7 @@ class KidMissionViewModel @Inject constructor(
         _state.updateSuccess { state ->
             state.copy(
                 isVisibleDialog = true,
+                isCompletedMission = false,
                 selectedMissionItem = selectedMission
             )
         }

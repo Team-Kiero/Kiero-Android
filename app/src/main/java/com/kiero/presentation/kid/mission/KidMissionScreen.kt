@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -117,7 +118,7 @@ private fun KidMissionScreen(
 
                     KieroChip(
                         action = KieroCoinAction(
-                            coinCount = 150,
+                            coinCount = state.coinUiModel.coinAmount,
                             isEnabled = true,
                             onClick = {}
                         )
@@ -137,12 +138,13 @@ private fun KidMissionScreen(
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .forcePixelToDp(painterGoblin)
+                            .offset(y = (-30).dp)
                     )
 
                     KidSpeechField(
                         name = "꾸비",
                         isVisibleButton = false,
-                        modifier = Modifier.padding(top = 100.dp)
+                        modifier = Modifier.padding(top = 40.dp)
                     ) {
                         Text(
                             text = buildAnnotatedString {
@@ -216,12 +218,13 @@ private fun KidMissionScreen(
         }
 
         if (state.isVisibleDialog) {
-            KieroDialog(
+            KieroDialog (
                 onDismiss = dismissDialog,
+                isDisabled = state.isCompletedMission,
                 title = if (!state.isCompletedMission) "[${state.selectedMissionItem!!.name}]" else null,
                 subDescription = if (!state.isCompletedMission) "미션을 완료했다면\n" +
                         "아래 버튼을 눌러줘!" else "금 나와라 뚝딱!\n" +
-                        "금화 50개를 만들었어!",
+                        "금화 ${state.selectedMissionItem?.reward}를 만들었어!",
                 cancelAction = if (state.isCompletedMission) {
                     null
                 } else {
@@ -231,10 +234,12 @@ private fun KidMissionScreen(
                 },
                 confirmAction = KieroConfirmAction(
                     text = "확인",
-                    onClick = if (state.isCompletedMission) {
-                        onClickConfirm
-                    } else {
-                        dismissDialog
+                    onClick = {
+                        if (state.isCompletedMission) {
+                            dismissDialog()
+                        } else {
+                            onClickConfirm()
+                        }
                     }
                 )
             ) {
@@ -244,6 +249,7 @@ private fun KidMissionScreen(
                     Image(
                         painter = coinImage,
                         contentDescription = null,
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier.size(
                             width = 62.dp,
                             height = 70.dp

@@ -18,7 +18,7 @@ data class KidMissionState(
     val selectedMissionItem: KidMissionUiModel? = null
 ) {
     val kidName: String
-        get() = "${coinUiModel.lastName}${coinUiModel.firstName}"
+        get() = coinUiModel.firstName
 }
 
 sealed interface KidMissionSideEffect {

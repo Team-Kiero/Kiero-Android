@@ -2,6 +2,7 @@ package com.kiero.presentation.auth.kid
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.localstorage.TokenManager
 import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.presentation.auth.kid.model.toModel
 import com.kiero.presentation.auth.kid.state.KidSignUpState
@@ -19,7 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class KidSignupViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val tokenRepository: TokenManager
 ) : ViewModel() {
     private val _state = MutableStateFlow(KidSignUpState())
     val state: StateFlow<KidSignUpState> = _state.asStateFlow()
@@ -51,6 +53,11 @@ class KidSignupViewModel @Inject constructor(
                 request = currentState.toModel()
             ).onSuccess {
                 Timber.d("postAuthKidLogin ${it.lastName}")
+                tokenRepository.saveTokens(
+                    accessToken = it.accessToken,
+                    refreshToken = it.refreshToken
+                )
+
                 _sideEffect.emit(KidSignupSideEffect.NavigateToKidOnboarding)
             }.onFailure {
                 viewModelScope.launch {
