@@ -99,26 +99,4 @@ class TokenManagerImpl @Inject constructor(
             roleName?.let { UserRole.valueOf(it) }
         }.onFailure { Timber.e(it, "UserRole 로드 실패") }.getOrNull()
     }
-    override suspend fun saveChildId(childId: Long) {
-        suspendRunCatching {
-            dataStore.edit {
-                it[KEY_CHILD_ID] = childId.toString()
-            }
-        }.onFailure { Timber.e(it, "ChildId 저장 실패") }
-    }
-
-    override suspend fun getChildId(): Long? {
-        return suspendRunCatching {
-            val childIdString = dataStore.data.map { it[KEY_CHILD_ID] }.first()
-            childIdString?.toLongOrNull()
-        }.onFailure { Timber.e(it, "ChildId 로드 실패") }.getOrNull()
-    }
-
-    override suspend fun clearChildId() {
-        suspendRunCatching {
-            dataStore.edit {
-                it.remove(KEY_CHILD_ID)
-            }
-        }.onFailure { Timber.e(it, "ChildId 삭제 실패") }
-    }
 }

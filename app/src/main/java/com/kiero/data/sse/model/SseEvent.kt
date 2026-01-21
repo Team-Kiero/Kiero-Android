@@ -5,26 +5,25 @@ import com.kiero.data.sse.remote.dto.event.InviteDataDto
 import com.kiero.data.sse.remote.dto.event.MissionDataDto
 import com.kiero.data.sse.remote.dto.event.ScheduleDataDto
 
-
-sealed class SseEvent {
+sealed interface SseEvent {
     // 공통
-    data object Connected : SseEvent()
+    data object Connected : SseEvent
 
     // 부모 전용 이벤트
     data class Invite(
         val data: InviteDataDto
-    ) : SseEvent()
+    ) : SseEvent
 
     data class Feed(
         val data: FeedDataDto
-    ) : SseEvent()
+    ) : SseEvent
 
     // 자녀 전용 이벤트
     data class Mission(
         val data: MissionDataDto
-    ) : SseEvent()
+    ) : SseEvent
 
     data class Schedule(
         val data: ScheduleDataDto
-    ) : SseEvent()
+    ) : SseEvent
 }

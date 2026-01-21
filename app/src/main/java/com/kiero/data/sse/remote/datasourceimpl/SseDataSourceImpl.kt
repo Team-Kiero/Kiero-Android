@@ -31,7 +31,7 @@ class SseDataSourceImpl @Inject constructor(
         accessToken: String
     ): Flow<RawSseEvent> = callbackFlow {
         val request = Request.Builder()
-            .url("${getBaseUrl()}/api/v1/subscribe")
+            .url("${BuildConfig.BASE_URL}/api/v1/subscribe")
             .header("Accept", "text/event-stream")
             .header("Authorization", "Bearer $accessToken")
             .build()
@@ -73,9 +73,5 @@ class SseDataSourceImpl @Inject constructor(
             Timber.d("SSE Flow 종료 - EventSource 취소")
             eventSource.cancel()
         }
-    }
-
-    private fun getBaseUrl(): String {
-        return BuildConfig.BASE_URL.removeSuffix("/")
     }
 }

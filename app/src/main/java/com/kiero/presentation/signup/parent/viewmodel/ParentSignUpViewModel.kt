@@ -260,7 +260,6 @@ class ParentSignUpViewModel @Inject constructor(
 
     private fun checkExistingChild() {
         viewModelScope.launch {
-            // tokenManager.getChildId() → userInfoManager.getChildIdInfo()
             val existingChildId = userInfoManager.getChildIdInfo()
 
             if (existingChildId != null) {

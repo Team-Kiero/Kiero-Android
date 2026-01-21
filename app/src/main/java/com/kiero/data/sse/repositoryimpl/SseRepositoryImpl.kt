@@ -4,6 +4,7 @@ import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.data.sse.remote.datasource.SseDataSource
 import com.kiero.data.sse.model.RawSseEvent
 import com.kiero.data.sse.model.SseEvent
+import com.kiero.data.sse.model.SseEventType
 import com.kiero.data.sse.remote.dto.event.FeedDataDto
 import com.kiero.data.sse.remote.dto.event.InviteDataDto
 import com.kiero.data.sse.remote.dto.event.MissionDataDto
@@ -16,17 +17,24 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class SseRepositoryImpl @Inject constructor(
-    private val sseDataSource: SseDataSource
+    private val sseDataSource: SseDataSource,
+    private val json: Json
 ) : SseRepository {
 
-    private val json = Json {
-        ignoreUnknownKeys = true
-        coerceInputValues = true
-    }
+    override suspend fun issueSubscribeToken(): Result<String> {
+        return try {
+            val response = sseDataSource.issueSubscribeToken()
 
-    override suspend fun issueSubscribeToken(): Result<String> = suspendRunCatching {
-        val response = sseDataSource.issueSubscribeToken()
-        response.data?.accessToken ?: throw IllegalStateException("토큰 발급 실패")
+            val accessToken = response.data?.accessToken
+            if (accessToken != null) {
+                Result.success(accessToken)
+            } else {
+                Result.failure(Exception("SSE 토큰이 null입니다"))
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "SSE 토큰 발급 실패")
+            Result.failure(e)
+        }
     }
 
     override suspend fun subscribeEvents(
@@ -39,18 +47,18 @@ class SseRepositoryImpl @Inject constructor(
     }
 
     private fun parseEvent(raw: RawSseEvent): SseEvent? {
-        return when (raw.type) {
-            "connected" -> {
+        return when (SseEventType.from(raw.type)) {
+            SseEventType.CONNECTED -> {
                 Timber.d("SSE connected 이벤트")
                 SseEvent.Connected
             }
 
-            "heartbeat" -> {
+            SseEventType.HEARTBEAT -> {
                 Timber.d("heartbeat 수신 (연결 유지 중)")
                 null
             }
 
-            "invite" -> {
+            SseEventType.INVITE -> {
                 try {
                     val data = json.decodeFromString<InviteDataDto>(raw.data)
                     Timber.d("Invite 이벤트 파싱 성공: childId=${data.childId}")
@@ -61,7 +69,7 @@ class SseRepositoryImpl @Inject constructor(
                 }
             }
 
-            "feed" -> {
+            SseEventType.FEED -> {
                 try {
                     val data = json.decodeFromString<FeedDataDto>(raw.data)
                     Timber.d("📢 Feed 이벤트 파싱 성공: ${data.eventType}")
@@ -72,7 +80,7 @@ class SseRepositoryImpl @Inject constructor(
                 }
             }
 
-            "mission" -> {
+            SseEventType.MISSION -> {
                 try {
                     val data = json.decodeFromString<MissionDataDto>(raw.data)
                     Timber.d("📋 Mission 이벤트 파싱 성공: ${data.missionName}")
@@ -83,7 +91,7 @@ class SseRepositoryImpl @Inject constructor(
                 }
             }
 
-            "schedule" -> {
+            SseEventType.SCHEDULE -> {
                 try {
                     val data = json.decodeFromString<ScheduleDataDto>(raw.data)
                     Timber.d("📅 Schedule 이벤트 파싱 성공: ${data.scheduleName}")
@@ -94,7 +102,7 @@ class SseRepositoryImpl @Inject constructor(
                 }
             }
 
-            else -> {
+            SseEventType.UNKNOWN -> {
                 Timber.w("알 수 없는 SSE 이벤트 타입: ${raw.type}")
                 null
             }
