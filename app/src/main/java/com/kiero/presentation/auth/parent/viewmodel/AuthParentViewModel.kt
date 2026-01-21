@@ -24,7 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthParentViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val userInfoManager: UserInfoManager
+    private val userInfoManager: UserInfoManager,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AuthState())
@@ -44,15 +44,14 @@ class AuthParentViewModel @Inject constructor(
                 )
 
                 val childrenDeferred = async { authRepository.getChildren() }
-
                 val childrenResult = childrenDeferred.await()
 
                 childrenResult.onSuccess { children ->
-                    userInfoManager.saveChildIdInfo(
-                        childId = children.first().childId
-                    )
-
+                    // 먼저 체크, 그 다음 저장
                     if (children.isNotEmpty()) {
+                        userInfoManager.saveChildIdInfo(
+                            childId = children.first().childId
+                        )
                         _sideEffect.emit(
                             AuthSideEffect.NavigateToParentGraph
                         )

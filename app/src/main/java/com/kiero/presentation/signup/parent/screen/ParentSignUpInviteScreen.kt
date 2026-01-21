@@ -44,10 +44,10 @@ fun ParentSignUpInviteScreen(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // Todo : SSE 이벤트로 이벤트 타입 받으면 수정하기
         KieroButtonMedium(
             text = "시작하기",
             onClick = onStartClick,
+            isEnabled = state.isChildJoined,
             containerColor = KieroTheme.colors.gray900,
             contentColor = KieroTheme.colors.white
         )
