@@ -7,6 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -26,7 +27,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -177,17 +177,16 @@ private fun KidJourneyScreen(
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    val imageWidth = screenWidth + 8.dp
-
     var showDialog by remember { mutableStateOf(false) }
 
-    Box(
+    BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
             .background(KieroTheme.colors.black)
             .padding(paddingValues)
     ) {
+        val imageWidth = maxWidth + 8.dp
+
         // 배경 이미지
         Image(
             painter = painterResource(id = R.drawable.img_kid_journey_mask_background),

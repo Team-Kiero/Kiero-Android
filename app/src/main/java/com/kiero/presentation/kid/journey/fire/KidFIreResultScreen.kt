@@ -4,6 +4,7 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -81,9 +81,6 @@ private fun KidFIreResultScreen(
     navigateToJourney: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    val imageWidth = screenWidth + 108.dp
-
     var isFinished by remember { mutableStateOf(false) }
     var currentStone by remember { mutableStateOf<StoneUiType?>(null) }
 
@@ -100,12 +97,14 @@ private fun KidFIreResultScreen(
         }
     }
 
-    Box(
+    BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
             .background(KieroTheme.colors.black)
             .padding(paddingValues)
     ) {
+        val imageWidth = maxWidth + 108.dp
+
         Column(
             modifier = Modifier
                 .fillMaxSize(),
