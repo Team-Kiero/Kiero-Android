@@ -120,7 +120,8 @@ private fun KidMissionScreen(
                             coinCount = 150,
                             isEnabled = true,
                             onClick = {}
-                        )
+                        ),
+                        isEnabled = true
                     )
                 }
             }
