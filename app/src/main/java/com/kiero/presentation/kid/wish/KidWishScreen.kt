@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -49,6 +50,7 @@ import com.kiero.presentation.kid.wish.state.KidWishSideEffect
 import com.kiero.presentation.kid.wish.state.KidWishState
 import com.kiero.presentation.kid.wish.viewmodel.KidWishViewModel
 import kotlinx.collections.immutable.ImmutableList
+import timber.log.Timber
 
 @Composable
 fun KidWishRoute(
@@ -106,12 +108,13 @@ fun KidWishRoute(
                                 text = "확인",
                                 onClick = {
                                     if (data.isCompletedWish) {
-                                        viewModel.prayWish(data.selectedWishItem?.couponId ?: -1)
-                                    } else {
                                         viewModel.dismissDialog()
+                                    } else {
+                                        viewModel.prayWish(data.selectedWishItem?.couponId ?: -1)
                                     }
                                 }
-                            )
+                            ),
+                            isDisabled = data.isCompletedWish
                         ) {
                             if (!data.isCompletedWish) {
                                 Row(
@@ -139,6 +142,7 @@ fun KidWishRoute(
                                 Image(
                                     painter = coinImage,
                                     contentDescription = null,
+                                    contentScale = ContentScale.Crop,
                                     modifier = Modifier.size(
                                         width = 62.dp,
                                         height = 70.dp
@@ -210,7 +214,7 @@ private fun KidWishScreen(
         Spacer(modifier = Modifier.height(17.dp))
 
         KidWishGridList(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxSize(),
             wishList = state.kidWishList,
             onClickWish = onClickWish
         )

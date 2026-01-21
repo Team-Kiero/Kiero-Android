@@ -16,7 +16,7 @@ data class KidWishState(
     val kidWishList: ImmutableList<KidWishUiModel> = persistentListOf(),
 ) {
     val kidName: String
-        get() = "${coinUiModel.lastName}${coinUiModel.firstName}"
+        get() = coinUiModel.firstName
 
     companion object {
         val FAKE = persistentListOf(
