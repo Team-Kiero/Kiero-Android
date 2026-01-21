@@ -15,9 +15,10 @@ data class ParentPlanState(
     val isRecurring: Boolean = false,
     val selectedDays: Set<Int> = emptySet(),
     val startTime: String = "12:00 PM",
-    val endTime: String = "01:00 PM",
+    val endTime: String = "12:00 PM",
     val selectedDate: String = LocalDate.now().toString(),
     val currentReferenceDate: LocalDate = LocalDate.now(),
+    val isFireLit: Boolean = false,
     val isLoading: Boolean = false,
     val isLogoutDialogVisible: Boolean = false
 ) {

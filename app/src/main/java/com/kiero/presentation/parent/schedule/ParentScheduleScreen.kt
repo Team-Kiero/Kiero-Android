@@ -6,14 +6,11 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -44,13 +41,14 @@ import com.kiero.presentation.parent.schedule.plan.state.ParentScheduleState
 import com.kiero.presentation.parent.schedule.viewmodel.ParentScheduleViewModel
 import com.kiero.presentation.signup.parent.state.ParentSignUpSideEffect
 import com.kiero.presentation.signup.parent.state.ParentSignUpState
+import java.time.LocalDate
 
 @Composable
 fun ParentScheduleRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
     navigateToSelection: () -> Unit,
-    navigateToScheduleAdd: () -> Unit,
+    navigateToScheduleAdd: (String, Boolean) -> Unit,
     navigateToMissionAdd: () -> Unit,
     navigateToAutoMissionAdd: (Long) -> Unit,
     viewModel: ParentScheduleViewModel = hiltViewModel(),
@@ -58,6 +56,7 @@ fun ParentScheduleRoute(
 
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val authState by viewModel.authstate.collectAsStateWithLifecycle()
+    val selectedTabIndex by viewModel.selectedTabIndex.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.fetchSchedule()
@@ -70,8 +69,6 @@ fun ParentScheduleRoute(
             else -> {}
         }
     }
-
-    var selectedTabIndex by remember { mutableIntStateOf(0) }
 
     Box(
         modifier = Modifier
@@ -88,9 +85,15 @@ fun ParentScheduleRoute(
                     state = authState,
                     scheduleState = state.data,
                     selectedTabIndex = selectedTabIndex,
-                    onTabSelected = { selectedTabIndex = it },
+                    onTabSelected = viewModel::updateTabIndex,
                     onDateChange = viewModel::onDateChange,
-                    navigateToScheduleAdd = navigateToScheduleAdd,
+                    onResetToToday = viewModel::resetToday,
+                    navigateToScheduleAdd = {
+                        navigateToScheduleAdd(
+                            state.data.currentDate.toString(),
+                            state.data.isFireLit
+                        )
+                    },
                     navigateToMissionAdd = navigateToMissionAdd,
                     navigateToAutoMissionAdd = navigateToAutoMissionAdd,
                     onUserNameClick = viewModel::onProfileClick
@@ -107,10 +110,13 @@ fun ParentScheduleRoute(
                     state = authState,
                     scheduleState = ParentScheduleState(),
                     selectedTabIndex = selectedTabIndex,
-                    onTabSelected = { selectedTabIndex = it },
+                    onTabSelected = viewModel::updateTabIndex,
+                    onResetToToday = viewModel::resetToday,
                     onDateChange = viewModel::onDateChange,
                     onUserNameClick = viewModel::onProfileClick,
-                    navigateToScheduleAdd = navigateToScheduleAdd,
+                    navigateToScheduleAdd = {
+                        navigateToScheduleAdd(LocalDate.now().toString(), false)
+                    },
                     navigateToMissionAdd = navigateToMissionAdd,
                     navigateToAutoMissionAdd = navigateToAutoMissionAdd,
                 )
@@ -151,6 +157,7 @@ private fun ParentScheduleScreen(
     navigateToAutoMissionAdd: (Long) -> Unit,
     selectedTabIndex: Int,
     modifier: Modifier = Modifier,
+    onResetToToday: () -> Unit,
     onTabSelected: (Int) -> Unit,
     onDateChange: (Boolean) -> Unit,
     onUserNameClick: () -> Unit,
@@ -164,12 +171,6 @@ private fun ParentScheduleScreen(
         modifier = modifier
             .background(color = KieroTheme.colors.black)
     ) {
-        Spacer(
-            modifier = Modifier
-                .background(color = KieroTheme.colors.gray900)
-                .height(33.dp)
-        )
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -193,7 +194,8 @@ private fun ParentScheduleScreen(
             when (selectedTabIndex) {
                 0 -> ParentPlanScreen(
                     state = scheduleState,
-                    onDateChange = onDateChange
+                    onDateChange = onDateChange,
+                    onResetToday = onResetToToday,
                 )
 
                 1 -> ParentMissionRoute(paddingValues)
@@ -244,7 +246,7 @@ private fun ParentScheduleScreenPreview() {
         ParentScheduleRoute(
             paddingValues = PaddingValues(),
             navigateUp = {},
-            navigateToScheduleAdd = {},
+            navigateToScheduleAdd = { _, _ -> },
             navigateToMissionAdd = {},
             navigateToAutoMissionAdd = {},
             navigateToSelection = {}
