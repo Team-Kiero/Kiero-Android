@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,31 +25,40 @@ fun KidJourneyHeader(
     modifier: Modifier = Modifier,
     isFireLit: Boolean = false
 ) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+    Column(
+        modifier = modifier.fillMaxWidth()
     ) {
-        Column {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Top
+        ) {
             KidProfileChip(kidName = header.kidName)
-            Text(
-                text = header.currentDate,
-                style = KieroTheme.typography.regular.body3,
-                color = KieroTheme.colors.gray500
-            )
-        }
 
-        Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(1f))
 
-        Column(horizontalAlignment = Alignment.End) {
             KieroChip(
                 action = KieroCoinAction(
                     coinCount = header.coinCount,
                     onClick = {}
                 ),
+                modifier = Modifier.padding(top = 5.dp),
                 isEnabled = true
             )
+        }
 
-            Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Top
+        ) {
+            Text(
+                text = header.currentDate,
+                style = KieroTheme.typography.regular.body3,
+                color = KieroTheme.colors.gray500
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
 
             KieroChip(
                 action = KieroStoneAction(
