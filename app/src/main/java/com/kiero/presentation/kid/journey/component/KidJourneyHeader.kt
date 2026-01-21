@@ -44,7 +44,8 @@ fun KidJourneyHeader(
                 action = KieroCoinAction(
                     coinCount = header.coinCount,
                     onClick = {}
-                )
+                ),
+                isEnabled = true
             )
 
             Spacer(modifier = Modifier.height(8.dp))
