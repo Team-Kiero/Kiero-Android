@@ -43,9 +43,7 @@ fun ColorPickerBottomSheet(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val sheetState = rememberModalBottomSheetState()
-
-
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var tempColorType by remember { mutableStateOf(selectedColorType) }
 
 
