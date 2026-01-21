@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
@@ -50,7 +51,9 @@ fun AuthButton(
         Image(
             painter = painter,
             contentDescription = null,
-            modifier = Modifier.forcePixelToDp(painter)
+            modifier = Modifier
+                .size(50.dp)
+                .forcePixelToDp(painter)
         )
 
         Text(
@@ -69,7 +72,7 @@ private fun AuthButtonPreview() {
     KieroTheme {
         AuthButton(
             text = "부모님으로 시작하기",
-            icon = com.kiero.R.drawable.img_auth_parent_goblin_small,
+            icon = com.kiero.R.drawable.img_auth_parent_goblin,
             onClickButton = {}
         )
     }

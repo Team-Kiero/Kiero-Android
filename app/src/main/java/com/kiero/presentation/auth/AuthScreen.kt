@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -59,7 +60,7 @@ fun AuthScreen(
     modifier: Modifier = Modifier,
     onEasterEggClick: () -> Unit = {},
 ) {
-    val logoPainter = painterResource(id = R.drawable.img_auth_app_logo)
+    val logoPainter = painterResource(id = R.drawable.ic_logo)
 
     Column(
         modifier = modifier
@@ -86,7 +87,9 @@ fun AuthScreen(
         Image(
             painter = logoPainter,
             contentDescription = null,
-            modifier = Modifier.forcePixelToDp(logoPainter)
+            modifier = Modifier
+                .size(width = 300.dp, height = 63.dp)
+                .forcePixelToDp(logoPainter)
         )
 
         Spacer(modifier = Modifier.weight(1f))
