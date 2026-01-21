@@ -31,12 +31,16 @@ class SseDataSourceImpl @Inject constructor(
         accessToken: String
     ): Flow<RawSseEvent> = callbackFlow {
         val request = Request.Builder()
-            .url("${BuildConfig.BASE_URL}/api/v1/subscribe")
+            .url("${BuildConfig.BASE_URL}api/v1/subscribe")
             .header("Accept", "text/event-stream")
             .header("Authorization", "Bearer $accessToken")
             .build()
 
-        val eventSource = EventSources.createFactory(okHttpClient)
+        val sseClient = okHttpClient.newBuilder()
+            .readTimeout(0, java.util.concurrent.TimeUnit.MILLISECONDS)
+            .build()
+
+        val eventSource = EventSources.createFactory(sseClient)
             .newEventSource(request, object : EventSourceListener() {
 
                 override fun onOpen(eventSource: EventSource, response: Response) {

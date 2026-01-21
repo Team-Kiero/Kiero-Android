@@ -1,12 +1,11 @@
 package com.kiero.data.sse.repositoryimpl
 
-import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.data.sse.remote.datasource.SseDataSource
 import com.kiero.data.sse.model.RawSseEvent
 import com.kiero.data.sse.model.SseEvent
 import com.kiero.data.sse.model.SseEventType
-import com.kiero.data.sse.remote.dto.event.FeedDataDto
-import com.kiero.data.sse.remote.dto.event.InviteDataDto
+import com.kiero.data.sse.remote.dto.response.FeedDataDto
+import com.kiero.data.sse.remote.dto.response.InviteDataDto
 import com.kiero.data.sse.remote.dto.event.MissionDataDto
 import com.kiero.data.sse.remote.dto.event.ScheduleDataDto
 import com.kiero.data.sse.repository.SseRepository
