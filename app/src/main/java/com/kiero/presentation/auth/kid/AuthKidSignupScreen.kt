@@ -59,6 +59,7 @@ fun AuthKidSignupRoute(
     AuthKidSignupScreen(
         paddingValues = paddingValues,
         state = state,
+        navigateUp = navigateUp,
         onSignupClick = viewmodel::onSignupClick,
         onDone = {
             focusManager.clearFocus()
@@ -73,6 +74,7 @@ fun AuthKidSignupRoute(
 fun AuthKidSignupScreen(
     paddingValues: PaddingValues,
     state: KidSignUpState,
+    navigateUp: () -> Unit,
     onSignupClick: () -> Unit,
     nextFocus: () -> Unit,
     onDone: () -> Unit,
@@ -93,7 +95,7 @@ fun AuthKidSignupScreen(
             KieroTopbar(
                 title = "자녀로 시작하기",
                 leftIconRes = R.drawable.ic_arrow_left,
-                leftIconClick = {},
+                leftIconClick = navigateUp,
             )
 
             Spacer(modifier = Modifier.height(21.dp))
@@ -155,6 +157,7 @@ private fun KidSignupScreenPreview() {
     KieroTheme {
         AuthKidSignupScreen(
             state = KidSignUpState(),
+            navigateUp = {},
             onSignupClick = {},
             paddingValues = PaddingValues(),
             nextFocus = {},
