@@ -25,27 +25,30 @@ fun ScheduleWeekTopbar(
     currentDate: LocalDate,
     modifier: Modifier = Modifier,
 ) {
-   val DAY_FORMATTER = DateTimeFormatter.ofPattern("d(E)", Locale.KOREAN)
+    val dayFormatter = remember { DateTimeFormatter.ofPattern("d(E)", Locale.KOREAN) }
+    val today = remember { LocalDate.now() }
 
     val weekDaysList = remember(currentDate) {
         val startOfWeek = currentDate.with(DayOfWeek.MONDAY)
         (0L..6L).map { offset ->
-            startOfWeek.plusDays(offset).format(DAY_FORMATTER)
+            startOfWeek.plusDays(offset)
         }
     }
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(color = Color.Unspecified)
+            .background(color = Color.Transparent)
             .padding(start = 28.dp, end = 7.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(3.dp)
     ) {
-        weekDaysList.forEachIndexed { index, day ->
+        weekDaysList.forEach { date ->
+            val isToday = date.isEqual(today)
+
             Text(
-                text = day,
-                color = if (index == 0) KieroTheme.colors.main else KieroTheme.colors.gray100,
+                text = date.format(dayFormatter),
+                color = if (isToday) KieroTheme.colors.main else KieroTheme.colors.gray100,
                 style = KieroTheme.typography.regular.body5,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.weight(1f)
