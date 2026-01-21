@@ -25,7 +25,7 @@ fun ParentSignUpInviteScreen(
         Spacer(modifier = Modifier.height(38.dp))
 
         KieroTextField(
-            state = TextFieldState(state.childInfo.childFirstName.text.toString()),
+            state = TextFieldState("${state.childInfo.childLastName.text}${state.childInfo.childFirstName.text}"),
             placeholder = "",
             isError = false,
             enabled = false,

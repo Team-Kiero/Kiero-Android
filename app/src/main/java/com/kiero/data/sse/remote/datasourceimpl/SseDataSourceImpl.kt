@@ -69,7 +69,7 @@ class SseDataSourceImpl @Inject constructor(
                     response: Response?
                 ) {
                     Timber.e(t, "SSE 연결 실패 - response: ${response?.code}")
-                    close(t)
+                    close()
                 }
             })
 

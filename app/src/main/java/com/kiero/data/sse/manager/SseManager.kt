@@ -9,6 +9,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -68,6 +69,14 @@ class SseManager @Inject constructor(
                             startTokenRefreshTimer()
 
                             sseRepository.subscribeEvents(accessToken)
+                                .catch {
+                                    Timber.e(it, "SSE 구독 실패")
+                                    isSubscribed = false
+                                    _connectionState.emit(false)
+
+                                    delay(3000L)
+                                    restartSubscription()
+                                }
                                 .collect { event ->
                                     handleParentEvent(event)
                                 }
@@ -101,6 +110,14 @@ class SseManager @Inject constructor(
                             startTokenRefreshTimer()
 
                             sseRepository.subscribeEvents(accessToken)
+                                .catch {
+                                    Timber.e(it, "SSE 구독 실패")
+                                    isSubscribed = false
+                                    _connectionState.emit(false)
+
+                                    delay(3000L)
+                                    restartSubscription()
+                                }
                                 .collect { event ->
                                     handleChildEvent(event)
                                 }
