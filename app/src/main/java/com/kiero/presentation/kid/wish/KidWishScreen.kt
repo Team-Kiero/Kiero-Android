@@ -176,7 +176,8 @@ private fun KidWishScreen(
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .background(color = KieroTheme.colors.black),
             verticalAlignment = Alignment.CenterVertically
         ) {
             KidProfileChip(

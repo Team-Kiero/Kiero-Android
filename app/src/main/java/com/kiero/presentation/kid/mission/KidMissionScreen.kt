@@ -106,7 +106,8 @@ private fun KidMissionScreen(
             stickyHeader {
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .background(color = KieroTheme.colors.black),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     KidProfileChip(
