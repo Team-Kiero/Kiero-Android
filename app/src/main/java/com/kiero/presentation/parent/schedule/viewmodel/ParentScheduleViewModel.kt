@@ -27,6 +27,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -47,10 +49,16 @@ class ParentScheduleViewModel @Inject constructor(
     private val _sideEffect = MutableSharedFlow<ParentSignUpSideEffect>()
     val sideEffect: SharedFlow<ParentSignUpSideEffect> = _sideEffect.asSharedFlow()
 
+    private val _selectedTabIndex = MutableStateFlow(0)
+    val selectedTabIndex: StateFlow<Int> = _selectedTabIndex.asStateFlow()
+
     init {
         initFetchParentInfo()
     }
 
+    fun updateTabIndex(index: Int) {
+        _selectedTabIndex.value = index
+    }
 
     fun fetchSchedule() {
         val currentState = (_state.value as? UiState.Success)?.data ?: ParentScheduleState()
@@ -71,6 +79,16 @@ class ParentScheduleViewModel @Inject constructor(
                     _state.value = UiState.Failure(it.message ?: "데이터 로드 실패")
                 }
         }
+    }
+
+    fun resetToday(){
+        val currentState = (_state.value as? UiState.Success)?.data ?: return
+        val today = LocalDate.now()
+
+        if (currentState.currentDate == today ) return
+
+        _state.value = UiState.Success(currentState.copy(currentDate = today))
+
     }
 
     fun initFetchParentInfo() {
@@ -114,10 +132,19 @@ class ParentScheduleViewModel @Inject constructor(
 
     fun onDateChange(isNext: Boolean) {
         val currentState = (_state.value as? UiState.Success)?.data ?: return
+        val today = LocalDate.now()
         val newDate =
             if (isNext) currentState.currentDate.plusWeeks(1) else currentState.currentDate.minusWeeks(
                 1
             )
+
+        val weeksDiff = ChronoUnit.WEEKS.between(today, newDate)
+        if (weeksDiff in -12..12) {
+            _state.value = UiState.Success(currentState.copy(currentDate = newDate))
+            fetchSchedule()
+        } else {
+            //Todo: Icon 색상 및 막기 처리
+        }
         _state.value = UiState.Success(currentState.copy(currentDate = newDate))
 
         viewModelScope.launch {
