@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.kiero.core.common.extension.updateSuccess
+import com.kiero.core.common.util.successData
 import com.kiero.core.model.UiState
 import com.kiero.data.kid.schedule.repository.ScheduleRepository
 import com.kiero.presentation.kid.journey.camera.navigation.Camera
@@ -59,7 +60,7 @@ class KidCameraViewModel @Inject constructor(
         contentType: String
     ) {
         viewModelScope.launch {
-            val currentState = (_state.value as? UiState.Success)?.data ?: return@launch
+            val currentState = _state.value.successData ?: return@launch
             _state.updateSuccess { it.copy(isLoading = true) }
 
             val timerJob = async {
