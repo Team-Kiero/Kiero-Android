@@ -8,6 +8,8 @@ import com.kiero.presentation.parent.schedule.model.ScheduleEvent
 import com.kiero.presentation.signup.parent.model.ParentInfoUiModel
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
+import java.time.temporal.TemporalAdjusters
 
 @Immutable
 data class ParentScheduleState(
@@ -15,14 +17,33 @@ data class ParentScheduleState(
     val parentInfo: ParentInfoUiModel = ParentInfoUiModel(),
     val currentDate: LocalDate = LocalDate.now(),
     val isFetching: Boolean = false,
-    val isLogoutDialogVisible : Boolean = false,
-    val isLoading: Boolean = false
+    val isFireLit : Boolean = false,
+    val isLogoutDialogVisible: Boolean = false,
+    val isRefreshing: Boolean = false,
+    val isLoading: Boolean = false,
 ) {
+    val canGoNext: Boolean
+        get() = ChronoUnit.WEEKS.between(LocalDate.now(), currentDate) < 12
+
+    val canGoPrevious: Boolean
+        get() = ChronoUnit.WEEKS.between(LocalDate.now(), currentDate) > -12
     val dateRangeText: String
         get() {
-            val monday = currentDate.with(DayOfWeek.MONDAY)
-            val sunday = currentDate.with(DayOfWeek.SUNDAY)
-            return "${monday.monthValue}월 ${((monday.dayOfMonth - 1) / 7) + 1}주차"
+            val thursday = currentDate.with(DayOfWeek.THURSDAY)
+            val monthValue = thursday.monthValue
+
+            val firstThursday = thursday.with(TemporalAdjusters.firstDayOfMonth())
+                .with(TemporalAdjusters.nextOrSame(DayOfWeek.THURSDAY))
+
+            val lastThursday = thursday.with(TemporalAdjusters.lastDayOfMonth())
+                .with(TemporalAdjusters.previousOrSame(DayOfWeek.THURSDAY))
+
+            val weekNum = ChronoUnit.WEEKS.between(firstThursday, thursday).toInt() + 1
+
+            return when {
+                thursday == lastThursday -> "${monthValue}월 마지막 주차"
+                else -> "${monthValue}월 ${weekNum}주차"
+            }
         }
 
     fun ScheduleEvent.getIndices(): List<Int> {

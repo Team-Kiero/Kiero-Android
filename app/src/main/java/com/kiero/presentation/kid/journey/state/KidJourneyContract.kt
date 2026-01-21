@@ -5,12 +5,9 @@ import com.kiero.R
 import com.kiero.presentation.kid.journey.model.KidJourneyButtonType
 import com.kiero.presentation.kid.journey.model.KidJourneyContentUiModel
 import com.kiero.presentation.kid.journey.model.KidJourneyHeaderUiModel
-import com.kiero.presentation.kid.journey.model.KidJourneyScheduleUiModel
-import java.time.LocalTime
 
 @Immutable
 data class KidJourneyState(
-    val isLoading: Boolean = false,
     val header: KidJourneyHeaderUiModel? = null,
     val content: KidJourneyContentUiModel = KidJourneyContentUiModel.NoSchedule
 ) {
@@ -18,9 +15,27 @@ data class KidJourneyState(
     // 버튼 타입
     val buttonType: KidJourneyButtonType
         get() = when (content) {
-            is KidJourneyContentUiModel.FirstSchedule,
-            is KidJourneyContentUiModel.NowSchedule,
-            is KidJourneyContentUiModel.NextSchedule -> KidJourneyButtonType.AUTH
+            is KidJourneyContentUiModel.FirstSchedule-> {
+                if (content.isNowScheduleVerified) {
+                    KidJourneyButtonType.NONE
+                } else {
+                    KidJourneyButtonType.AUTH
+                }
+            }
+            is KidJourneyContentUiModel.NextSchedule-> {
+                if (content.isNowScheduleVerified) {
+                    KidJourneyButtonType.NONE
+                } else {
+                    KidJourneyButtonType.AUTH
+                }
+            }
+            is KidJourneyContentUiModel.NowSchedule -> {
+                if (content.isNowScheduleVerified) {
+                    KidJourneyButtonType.NONE
+                } else {
+                    KidJourneyButtonType.AUTH
+                }
+            }
             is KidJourneyContentUiModel.FireNotLit -> KidJourneyButtonType.FIRE
             is KidJourneyContentUiModel.NoSchedule,
             is KidJourneyContentUiModel.FireLit -> KidJourneyButtonType.NONE
@@ -55,22 +70,26 @@ data class KidJourneyState(
     companion object {
         fun fake() = KidJourneyState(
             header = KidJourneyHeaderUiModel(
-                kidName = "주완",
-                currentDate = java.time.LocalDate.of(2024, 12, 5),
+                kidName = "민성",
+                currentDate = "1월 5일 목요일",
                 coinCount = 350,
-                earnedStones = 7,
+                earnedStones = 4,
                 totalScheduleCount = 7
             ),
-            content = KidJourneyContentUiModel.NextSchedule(
-                scheduleName = "피아노 학원 가기",
-                stoneType = "용기의 불조각",
-                scheduleInfo = KidJourneyScheduleUiModel(
-                    order = 1,
-                    startTime = LocalTime.of(14, 0),
-                    endTime = LocalTime.of(16, 0)
-                ),
-                isSkippable = true
+            content = KidJourneyContentUiModel.FireNotLit(
+                kidName = "주완"
             )
+//            content = KidJourneyContentUiModel.NowSchedule(
+//                scheduleDetailId = 1,
+//                scheduleName = "피아노 학원 가기",
+//                stoneType = StoneUiType.WISDOM,
+//                scheduleInfo = KidJourneyScheduleUiModel(
+//                    order = 1,
+//                    startTime = "14:00:00",
+//                    endTime = "16:00:00"
+//                ),
+//                isSkippable = true
+//            )
         )
     }
 }

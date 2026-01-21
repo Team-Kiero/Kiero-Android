@@ -8,13 +8,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.core.trigger.LocalRefreshState
+import com.kiero.presentation.main.navigation.ParentMainTab
 import com.kiero.presentation.parent.schedule.plan.component.plan.ScheduleDatebar
 import com.kiero.presentation.parent.schedule.plan.component.plan.ScheduleTimeTable
 import com.kiero.presentation.parent.schedule.plan.component.plan.ScheduleWeekTopbar
@@ -24,9 +28,22 @@ import com.kiero.presentation.parent.schedule.plan.state.toUiModel
 @Composable
 fun ParentPlanScreen(
     state: ParentScheduleState,
+    onResetToday: () -> Unit,
     onDateChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val refreshState = LocalRefreshState.current
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(Unit) {
+        refreshState.refreshEvent.collect { tab ->
+            if (tab == ParentMainTab.SCHEDULE) {
+                onResetToday()
+                listState.animateScrollToItem(0)
+            }
+        }
+
+    }
     val events = remember(state.planAllModel) {
         state.planAllModel?.let { model ->
             buildList {
@@ -49,11 +66,17 @@ fun ParentPlanScreen(
 
         ScheduleDatebar(
             date = state.dateRangeText,
-            onPreviousClick = { onDateChange(false) },
-            onNextClick = { onDateChange(true) }
+            onPreviousClick = { if (state.canGoPrevious) onDateChange(false) },
+            onNextClick = { if (state.canGoNext) onDateChange(true) },
+            isPreviousEnabled = state.canGoPrevious,
+            isNextEnabled = state.canGoNext,
+            modifier = Modifier.padding(horizontal = 20.dp),
         )
 
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.fillMaxSize()
+        ) {
             item {
                 ScheduleWeekTopbar(
                     currentDate = state.currentDate
@@ -77,6 +100,7 @@ private fun ParentPlanScreenPreview() {
     KieroTheme {
         ParentPlanScreen(
             state = ParentScheduleState(),
+            onResetToday = {},
             onDateChange = {}
         )
     }

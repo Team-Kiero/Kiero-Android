@@ -10,5 +10,7 @@ data class CoinResponseDto(
     @SerialName("firstName")
     val firstName: String,
     @SerialName("coinAmount")
-    val coinAmount: Int
+    val coinAmount: Int,
+    @SerialName("today")
+    val today: String
 )

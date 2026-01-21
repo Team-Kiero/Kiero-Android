@@ -48,7 +48,6 @@ import com.kiero.R
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
 import kotlinx.collections.immutable.ImmutableList
-import java.util.Calendar
 
 @Composable
 fun TimePicker(
@@ -106,21 +105,27 @@ fun TimePicker(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimePickerBottomSheet(
+    pickerTitle: String,
+    initialTime: String,
     onSelected: (String) -> Unit,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val sheetState = rememberModalBottomSheetState()
 
+    val initialValues = remember(initialTime) {
+        try {
+            val parts = initialTime.split(":", " ")
+            Triple(parts[0].toInt(), parts[1].toInt(), parts[2].uppercase())
+        } catch (e: Exception) {
+            Triple(12, 0, "PM")
+        }
+    }
 
-    val currentCalendar = Calendar.getInstance()
-    val currentHour12 = currentCalendar.get(Calendar.HOUR).let { if (it == 0) 12 else it }
-    val currentMinute = currentCalendar.get(Calendar.MINUTE)
-    val currentAmPm = if (currentCalendar.get(Calendar.AM_PM) == Calendar.AM) "AM" else "PM"
 
-    var chosenHour by remember { mutableIntStateOf(currentHour12) }
-    var chosenMinute by remember { mutableIntStateOf(currentMinute) }
-    var chosenAmPm by remember { mutableStateOf(currentAmPm) }
+    var chosenHour by remember { mutableIntStateOf(initialValues.first) }
+    var chosenMinute by remember { mutableIntStateOf(initialValues.second) }
+    var chosenAmPm by remember { mutableStateOf(initialValues.third) }
 
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -142,7 +147,7 @@ fun TimePickerBottomSheet(
                 .padding(vertical = 16.dp)
         ) {
             PickerTopbar(
-                title = "시간",
+                title = pickerTitle,
                 leftIconRes = R.drawable.ic_close_light,
                 leftIconClick = onDismissRequest,
                 rightIconRes = R.drawable.ic_check,
@@ -209,6 +214,23 @@ fun TimeSelectionSection(
     onMinuteChosen: (String) -> Unit,
     onAmPmChosen: (String) -> Unit,
 ) {
+    val hourIndex = remember(chosenHour) {
+        TimePickerConstants.hours.indexOf(
+            String.format(
+                "%02d",
+                chosenHour
+            )
+        )
+    }
+    val minuteIndex = remember(chosenMinute) {
+        TimePickerConstants.minutes.indexOf(
+            String.format(
+                "%02d",
+                chosenMinute
+            )
+        )
+    }
+    val amPmIndex = remember(chosenAmPm) { TimePickerConstants.amPmList.indexOf(chosenAmPm) }
     Box(
         modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
@@ -230,19 +252,19 @@ fun TimeSelectionSection(
         ) {
             TimeItemsPicker(
                 items = TimePickerConstants.hours,
-                firstIndex = chosenHour + 2 - 1,
+                firstIndex = if (hourIndex != -1) hourIndex - 2 else 0,
                 onItemSelected = onHourChosen,
             )
             Spacer(modifier = Modifier.width(16.dp))
             TimeItemsPicker(
                 items = TimePickerConstants.minutes,
-                firstIndex = chosenMinute + 2,
+                firstIndex = if (hourIndex != -1) hourIndex - 2 else 0,
                 onItemSelected = onMinuteChosen,
             )
             Spacer(modifier = Modifier.width(16.dp))
             TimeItemsPicker(
                 items = TimePickerConstants.amPmList,
-                firstIndex = if (chosenAmPm == "AM") 2 else 3,
+                firstIndex = if (hourIndex != -1) hourIndex - 2 else 0,
                 onItemSelected = onAmPmChosen,
             )
         }

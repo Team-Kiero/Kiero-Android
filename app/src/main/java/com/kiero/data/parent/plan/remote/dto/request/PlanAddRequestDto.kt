@@ -17,6 +17,6 @@ data class PlanAddRequestDto(
     val scheduleColor: String,
     @SerialName("dayOfWeek")
     val dayOfWeek: String?,
-    @SerialName("date")
-    val date: String?,
+    @SerialName("dates")
+    val dates: String?,
 )

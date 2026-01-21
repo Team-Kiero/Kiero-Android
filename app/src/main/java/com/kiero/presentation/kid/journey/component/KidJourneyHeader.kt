@@ -17,13 +17,12 @@ import com.kiero.core.designsystem.component.chip.action.KieroStoneAction
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.kid.component.KidProfileChip
 import com.kiero.presentation.kid.journey.model.KidJourneyHeaderUiModel
-import com.kiero.presentation.kid.journey.util.KidJourneyDateUtil
-import java.time.LocalDate
 
 @Composable
 fun KidJourneyHeader(
     header: KidJourneyHeaderUiModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isFireLit: Boolean = false
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -32,7 +31,7 @@ fun KidJourneyHeader(
         Column {
             KidProfileChip(kidName = header.kidName)
             Text(
-                text = KidJourneyDateUtil.formatDate(header.currentDate),
+                text = header.currentDate,
                 style = KieroTheme.typography.regular.body3,
                 color = KieroTheme.colors.gray500
             )
@@ -52,12 +51,13 @@ fun KidJourneyHeader(
 
             KieroChip(
                 action = KieroStoneAction(
-                    currentStoneCount = header.earnedStones,
-                    maxStoneCount = header.totalScheduleCount,
+                    currentStoneCount = header.earnedStones!!,
+                    maxStoneCount = header.totalScheduleCount!!,
+                    isFireLit = isFireLit,
                     onClick = {}
                 ),
                 isEnabled = true,
-                isCompleted = header.earnedStones == header.totalScheduleCount
+                isCompleted = !isFireLit && header.earnedStones == header.totalScheduleCount
                         && header.totalScheduleCount > 0
             )
         }
@@ -71,11 +71,12 @@ private fun KidJourneyHeaderPreview() {
         KidJourneyHeader(
             header = KidJourneyHeaderUiModel(
                 kidName = "주완",
-                currentDate = LocalDate.of(2024, 12, 5),
+                currentDate = "12월 5일 목요일",
                 coinCount = 350,
-                earnedStones = 5,
+                earnedStones = 7,
                 totalScheduleCount = 7
-            )
+            ),
+            isFireLit = true
         )
     }
 }

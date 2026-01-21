@@ -1,13 +1,18 @@
 package com.kiero.presentation.parent.schedule.plan.viewmodel
 
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.parent.plan.repository.PlanRepository
 import com.kiero.presentation.parent.schedule.plan.model.ColorType
+import com.kiero.presentation.parent.schedule.plan.navigation.ScheduleAdd
 import com.kiero.presentation.parent.schedule.plan.state.ParentPlanSideEffect
 import com.kiero.presentation.parent.schedule.plan.state.ParentPlanState
+import com.kiero.presentation.parent.schedule.plan.state.parseLocalTime
+import com.kiero.presentation.parent.schedule.plan.state.validateAndTimeAdjustment
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,17 +22,25 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.temporal.TemporalAdjusters
 import javax.inject.Inject
 
 @HiltViewModel
 class ParentPlanViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val planRepository: PlanRepository,
-    private val userInfoManager: UserInfoManager
+    private val userInfoManager: UserInfoManager,
 ) : ViewModel() {
-    private val _state = MutableStateFlow(ParentPlanState())
-    val state = _state.asStateFlow()
+    private val args = savedStateHandle.toRoute<ScheduleAdd>()
 
+    private val _state = MutableStateFlow(
+        ParentPlanState(
+            currentReferenceDate = LocalDate.parse(args.initialDate),
+            isFireLit = args.isFireLit
+        )
+    )
+    val state = _state.asStateFlow()
     private val _sideEffect = MutableSharedFlow<ParentPlanSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
 
@@ -38,9 +51,17 @@ class ParentPlanViewModel @Inject constructor(
     }
 
     fun onCreatePlanClick() {
+        if (_state.value.isLoading) return
+
         viewModelScope.launch {
             val name = textState.text.toString().trim()
             val currentState = _state.value
+            val today = LocalDate.now()
+            val currentTime = LocalTime.now()
+
+            if (name.isBlank() && currentState.selectedDays.isEmpty()) {
+                _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar("일정 저장에 실패했어요. 잠시 후 다시 시도해주세요"))
+            }
 
             if (name.isBlank()) {
                 _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar("일정 이름을 입력해주세요"))
@@ -70,11 +91,35 @@ class ParentPlanViewModel @Inject constructor(
                 _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar("종료 시간은 시작 시간보다 늦어야 합니다"))
                 return@launch
             }
+            if (!currentState.isRecurring) {
+                if (currentState.selectedDate.contains(today.toString())) {
+                    _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar("일정이 등록되었어요. (오늘일정은 마감되어 다음부터 적용돼요!)"))
+                    kotlinx.coroutines.delay(500)
+                    _sideEffect.emit(ParentPlanSideEffect.navigateUp)
+                    return@launch
+                }
+            }
+            if (!currentState.isRecurring && currentState.selectedDate.contains(today.toString())) {
+                val selectedStartTime = parseLocalTime(currentState.startTime)
 
-            val selectedColor = currentState.selectedColorType
-            val childId = userInfoManager.getChildIdInfo() ?: return@launch
+
+                if (selectedStartTime.isBefore(currentTime) || currentState.isFireLit) {
+                    _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar("일정이 등록되었어요. (오늘일정은 마감되어 다음부터 적용돼요!)"))
+                    kotlinx.coroutines.delay(500)
+                    _sideEffect.emit(ParentPlanSideEffect.navigateUp)
+                    return@launch
+                }
+            }
+
 
             _state.update { it.copy(isLoading = true) }
+
+            val selectedColor = currentState.selectedColorType
+            val childId = userInfoManager.getChildIdInfo() ?: run {
+                _state.update { it.copy(isLoading = false) }
+                return@launch
+            }
+
 
             planRepository.postPlan(
                 childId = childId,
@@ -83,11 +128,12 @@ class ParentPlanViewModel @Inject constructor(
                 startTime = currentState.formatTimeForServer(currentState.startTime),
                 endTime = currentState.formatTimeForServer(currentState.endTime),
                 scheduleColor = selectedColor.name,
-                dayOfWeek = if (currentState.isRecurring) currentState.formattedDays else null,
-                date = if (!currentState.isRecurring) currentState.selectedDate else null
+                dayOfWeek = currentState.formattedDays,
+                dates = if (!currentState.isRecurring) currentState.selectedDate else null
             ).onSuccess {
                 _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar("일정이 등록되었습니다"))
                 kotlinx.coroutines.delay(200)
+                _sideEffect.emit(ParentPlanSideEffect.navigateUp)
             }.onFailure { error ->
                 _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar("해당 시간에 이미 등록된 일정이 있습니다"))
                 _state.update { it.copy(isLoading = false) }
@@ -112,12 +158,30 @@ class ParentPlanViewModel @Inject constructor(
     fun onAllDaysSelect(isCurrentlyAllSelected: Boolean) {
         _state.update { currentState ->
             val newDays = if (isCurrentlyAllSelected) emptySet() else (0..6).toSet()
-            currentState.copy(selectedDays = newDays)
+
+            if (!currentState.isRecurring) {
+                val datesString = calculateSelectedDates(currentState.currentReferenceDate, newDays)
+                currentState.copy(selectedDays = newDays, selectedDate = datesString)
+            } else {
+                currentState.copy(selectedDays = newDays)
+            }
         }
+    }
+
+
+    private fun calculateSelectedDates(
+        currentReferenceDate: LocalDate,
+        selectedDays: Set<Int>,
+    ): String {
+        val monday = currentReferenceDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+        return selectedDays.sorted()
+            .map { dayIndex -> monday.plusDays(dayIndex.toLong()).toString() }
+            .joinToString(", ")
     }
 
     fun onDayClick(dayIndex: Int) {
         _state.update { currentState ->
+            // 1. 새로운 요일 Set 생성 (토글 로직)
             val newDays = if (currentState.selectedDays.contains(dayIndex)) {
                 currentState.selectedDays - dayIndex
             } else {
@@ -125,14 +189,11 @@ class ParentPlanViewModel @Inject constructor(
             }
 
             if (!currentState.isRecurring) {
-                val monday =
-                    currentState.currentReferenceDate.with(
-                        TemporalAdjusters.previousOrSame(
-                            DayOfWeek.MONDAY
-                        )
-                    )
-                val actualDate = monday.plusDays(dayIndex.toLong()).toString()
-                currentState.copy(selectedDays = newDays, selectedDate = actualDate)
+                val datesString = calculateSelectedDates(currentState.currentReferenceDate, newDays)
+                currentState.copy(
+                    selectedDays = newDays,
+                    selectedDate = datesString
+                )
             } else {
                 currentState.copy(selectedDays = newDays)
             }
@@ -194,7 +255,17 @@ class ParentPlanViewModel @Inject constructor(
     }
 
     fun onTimeSelected(isStart: Boolean, time: String) {
-        _state.update { if (isStart) it.copy(startTime = time) else it.copy(endTime = time) }
-    }
+        viewModelScope.launch {
+            val result = validateAndTimeAdjustment(time)
 
+            _state.update {
+                if (isStart) it.copy(startTime = result.adjustedTime)
+                else it.copy(endTime = result.adjustedTime)
+            }
+
+            if (!result.isValid) {
+                _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar(result.message ?: ""))
+            }
+        }
+    }
 }

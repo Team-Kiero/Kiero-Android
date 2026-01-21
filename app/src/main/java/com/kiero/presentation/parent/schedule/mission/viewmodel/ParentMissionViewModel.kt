@@ -27,8 +27,6 @@ class ParentMissionViewModel @Inject constructor(
 
     fun getMissions() {
         viewModelScope.launch {
-            _state.value = UiState.Loading
-
             missionRepository.getMissions()
                 .onSuccess { result ->
                     if (result.missionsByDate.isEmpty()) {

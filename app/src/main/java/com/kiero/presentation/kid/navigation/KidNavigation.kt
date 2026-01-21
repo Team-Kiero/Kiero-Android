@@ -6,6 +6,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.navigation
+import androidx.navigation.navOptions
 import com.kiero.core.navigation.Route
 import com.kiero.presentation.kid.journey.camera.navigation.kidJourneyCameraNavGraph
 import com.kiero.presentation.kid.journey.camera.navigation.navigateToCamera
@@ -14,6 +15,7 @@ import com.kiero.presentation.kid.journey.fire.navigation.kidJourneyFireResultNa
 import com.kiero.presentation.kid.journey.fire.navigation.navigateToFire
 import com.kiero.presentation.kid.journey.fire.navigation.navigateToFireResult
 import com.kiero.presentation.kid.journey.navigation.kidJourneyNavGraph
+import com.kiero.presentation.kid.journey.navigation.navigateToJourney
 import com.kiero.presentation.kid.mission.navigation.kidMissionNavGraph
 import com.kiero.presentation.kid.onboarding.navigation.kidOnboardingNavGraph
 import com.kiero.presentation.kid.wish.navigation.kidWishNavGraph
@@ -53,8 +55,12 @@ fun NavGraphBuilder.kidNavGraph(
         kidJourneyNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
-            navigateToCamera = navController::navigateToCamera,
-            navigateToFire = navController::navigateToFire
+            navigateToCamera = { scheduleDetailId, stoneType ->
+                navController.navigateToCamera(scheduleDetailId, stoneType)
+            },
+            navigateToFire = { date, stones->
+                navController.navigateToFire(date, stones)
+            }
         )
 
         kidMissionNavGraph(
@@ -87,6 +93,16 @@ fun NavGraphBuilder.kidNavGraph(
         kidJourneyFireResultNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
+            navigateToJourney = {
+                val clearStackNavOptions = navOptions {
+                    popUpTo(0) {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
+                }
+
+                navController.navigateToJourney(clearStackNavOptions)
+            }
         )
     }
 }

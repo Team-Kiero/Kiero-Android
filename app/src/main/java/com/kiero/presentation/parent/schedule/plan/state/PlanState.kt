@@ -2,6 +2,7 @@ package com.kiero.presentation.parent.schedule.plan.state
 
 import androidx.compose.runtime.Immutable
 import com.kiero.presentation.parent.schedule.plan.model.ColorType
+import com.kiero.presentation.parent.schedule.plan.model.TimeValidationResult
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -15,11 +16,12 @@ data class ParentPlanState(
     val isRecurring: Boolean = false,
     val selectedDays: Set<Int> = emptySet(),
     val startTime: String = "12:00 PM",
-    val endTime: String = "01:00 PM",
+    val endTime: String = "12:00 PM",
     val selectedDate: String = LocalDate.now().toString(),
     val currentReferenceDate: LocalDate = LocalDate.now(),
+    val isFireLit: Boolean = false,
     val isLoading: Boolean = false,
-    val isLogoutDialogVisible: Boolean = false
+    val isLogoutDialogVisible: Boolean = false,
 ) {
 
     val formattedDays: String?
@@ -59,6 +61,7 @@ data class ParentPlanState(
             "00:00:00"
         }
     }
+
 
     val dateRangeText: String
         get() {
@@ -119,4 +122,52 @@ data class ParentPlanState(
 sealed interface ParentPlanSideEffect {
     data class ShowSnackBar(val message: String) : ParentPlanSideEffect
     data object navigateUp : ParentPlanSideEffect
+}
+fun validateAndTimeAdjustment(timeStr: String): TimeValidationResult {
+    return try {
+        val regex = Regex("""(\d{1,2}):(\d{2})\s*(AM|PM)""", RegexOption.IGNORE_CASE)
+        val match = regex.find(timeStr) ?: return TimeValidationResult(false, "잘못된 형식", timeStr)
+
+        val (hStr, mStr, amPm) = match.destructured
+        var hour = hStr.toInt()
+        val minute = mStr.toInt()
+
+        if (amPm.uppercase() == "PM" && hour != 12) hour += 12
+        if (amPm.uppercase() == "AM" && hour == 12) hour = 0
+
+        val totalMinutes = hour * 60 + minute
+        val startLimit = 8 * 60
+        val endLimit = 22 * 60
+
+        when {
+            totalMinutes < startLimit -> {
+                TimeValidationResult(false, "시각은 08:00AM부터 설정가능합니다.", "08:00 AM")
+            }
+
+            totalMinutes > endLimit -> {
+                TimeValidationResult(false, "시각은 10:00PM까지 설정가능합니다.", "10:00 PM")
+            }
+
+            else -> {
+                TimeValidationResult(true, null, timeStr)
+            }
+        }
+    } catch (e: Exception) {
+        TimeValidationResult(false, "시간 확인 중 오류 발생", timeStr)
+    }
+}
+
+fun parseLocalTime(timeStr: String): java.time.LocalTime {
+    return try {
+        val regex = Regex("""(\d{1,2}):(\d{2})\s*(AM|PM)""", RegexOption.IGNORE_CASE)
+        val match = regex.find(timeStr) ?: return java.time.LocalTime.MIN
+        val (hStr, mStr, amPm) = match.destructured
+        var hour = hStr.toInt()
+        val minute = mStr.toInt()
+        if (amPm.uppercase() == "PM" && hour != 12) hour += 12
+        if (amPm.uppercase() == "AM" && hour == 12) hour = 0
+        java.time.LocalTime.of(hour, minute)
+    } catch (e: Exception) {
+        java.time.LocalTime.MIN
+    }
 }

@@ -3,9 +3,8 @@ package com.kiero.presentation.parent.schedule.plan.component.plan
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,15 +26,17 @@ fun ScheduleDatebar(
     onNextClick: () -> Unit,
     modifier: Modifier = Modifier,
     isPreviousEnabled: Boolean = true,
+    isNextEnabled: Boolean = true,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .background(
                 color = Color.Transparent
-            ),
+            )
+            .padding(horizontal = 50.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
+        horizontalArrangement = Arrangement.SpaceBetween
 
     ) {
         Icon(
@@ -48,20 +49,16 @@ fun ScheduleDatebar(
             )
         )
 
-        Spacer(modifier = Modifier.width(44.dp))
-
         Text(
             text = date,
             style = KieroTheme.typography.semiBold.title4,
             color = KieroTheme.colors.white,
         )
 
-        Spacer(modifier = Modifier.width(44.dp))
-
         Icon(
             imageVector = ImageVector.vectorResource(id = R.drawable.ic_arrow_right),
             contentDescription = null,
-            tint = Color.Unspecified,
+            tint = if (isNextEnabled) KieroTheme.colors.white else KieroTheme.colors.gray600,
             modifier = Modifier
                 .noRippleClickable(onClick = onNextClick)
         )

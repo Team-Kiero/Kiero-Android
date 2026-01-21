@@ -13,12 +13,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
 import com.kiero.core.common.extension.collectSideEffect
+import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.trigger.SnackbarState
@@ -54,7 +56,6 @@ fun ParentScheduleAddRoute(
             }
 
         }
-
     }
 
     ScheduleAddScreen(
@@ -111,12 +112,16 @@ fun ScheduleAddScreen(
     onCreatePlan: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val focusManager = LocalFocusManager.current
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(color = KieroTheme.colors.black)
-            .padding(paddingValues),
+            .padding(paddingValues)
+            .noRippleClickable {
+                focusManager.clearFocus()
+            },
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -139,7 +144,7 @@ fun ScheduleAddScreen(
 
         ScheduleTextField(
             state = textState,
-            placeholder = "이름을 입력해주세요",
+            placeholder = "일정 이름을 입력해주세요",
         )
 
         WeekSelectArea(
