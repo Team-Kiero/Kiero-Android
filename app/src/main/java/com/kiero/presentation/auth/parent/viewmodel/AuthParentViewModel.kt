@@ -47,11 +47,14 @@ class AuthParentViewModel @Inject constructor(
                 val childrenResult = childrenDeferred.await()
 
                 childrenResult.onSuccess { children ->
-                    // 먼저 체크, 그 다음 저장
                     if (children.isNotEmpty()) {
-                        userInfoManager.saveChildIdInfo(
-                            childId = children.first().childId
-                        )
+
+                        children.firstOrNull()?.let {
+                            userInfoManager.saveChildIdInfo(
+                                childId = it.childId
+                            )
+                        }
+
                         _sideEffect.emit(
                             AuthSideEffect.NavigateToParentGraph
                         )
