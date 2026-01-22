@@ -14,6 +14,7 @@ data class AlarmFeedState(
     val alarms: ImmutableList<ParentAlarmUiModel> = persistentListOf(),
     val errorMessage: String? = null,
     val isLoadingMore: Boolean = false,
+    val isRefreshing: Boolean = false,
     val hasMore: Boolean = true,
     val nextCursor: String? = null
 ) {

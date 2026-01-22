@@ -22,7 +22,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -30,7 +29,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
 import com.kiero.core.common.extension.collectSideEffect
@@ -38,6 +37,7 @@ import com.kiero.core.designsystem.component.dialog.KieroDialog
 import com.kiero.core.designsystem.component.dialog.action.KieroCancelAction
 import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
 import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
+import com.kiero.core.designsystem.component.pulltorefresh.KieroPullToRefresh
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.trigger.LocalRefreshState
 import com.kiero.presentation.main.navigation.ParentMainTab
@@ -49,7 +49,6 @@ import com.kiero.presentation.parent.alarm.viewmodel.ParentAlarmViewModel
 import com.kiero.presentation.parent.component.ParentUserSection
 import com.kiero.presentation.signup.parent.state.ParentSignUpSideEffect
 import com.kiero.presentation.signup.parent.state.ParentSignUpState
-import kotlinx.coroutines.launch
 
 
 @Composable
@@ -64,15 +63,12 @@ fun ParentAlarmRoute(
     val listState = rememberLazyListState()
 
     val refreshState = LocalRefreshState.current
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         refreshState.refreshEvent.collect { tab ->
             if (tab == ParentMainTab.ALARM) {
-                scope.launch {
-                    listState.animateScrollToItem(0)
-                }
-                viewModel.refresh()
+                listState.animateScrollToItem(0)
+                viewModel.refresh(isRefresh = true)
             }
         }
     }
@@ -84,7 +80,10 @@ fun ParentAlarmRoute(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    KieroPullToRefresh(
+        isRefreshing = state.isRefreshing,
+        onRefresh = {viewModel.refresh(isRefresh = true)},
+    ) {
         ParentAlarmScreen(
             state = state,
             authState = authState,
