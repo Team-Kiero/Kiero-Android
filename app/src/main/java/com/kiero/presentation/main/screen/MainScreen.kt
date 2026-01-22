@@ -181,7 +181,6 @@ fun MainScreen(
                     SnackbarHost(hostState = snackBarHostState) { data ->
                         KieroSnackbar(
                             message = data.visuals.message,
-                            // TODO: 디자인 확정 후 스낵바 높이 및 패딩 수정 필요
                             modifier = Modifier
                                 .padding(horizontal = 16.dp)
                                 .padding(bottom = 90.dp)

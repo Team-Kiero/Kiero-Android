@@ -14,10 +14,16 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -30,7 +36,10 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
 import com.kiero.R
 import com.kiero.core.common.extension.forcePixelToDp
 import com.kiero.core.designsystem.component.chip.KieroChip
@@ -42,10 +51,12 @@ import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.component.pulltorefresh.KieroPullToRefresh
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
+import com.kiero.core.trigger.LocalRefreshState
 import com.kiero.presentation.kid.component.KidProfileChip
 import com.kiero.presentation.kid.component.KidSpeechField
 import com.kiero.presentation.kid.mission.component.KidMissionItem
 import com.kiero.presentation.kid.mission.state.KidMissionState
+import com.kiero.presentation.main.navigation.KidMainTab
 
 @Composable
 fun KidMissionRoute(
@@ -54,10 +65,29 @@ fun KidMissionRoute(
     viewModel: KidMissionViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val refreshState = LocalRefreshState.current
+    val lifeCycleOwner = LocalLifecycleOwner.current
+    val listState = rememberLazyListState()
+    var isFirstEntry by remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        refreshState.refreshEvent.flowWithLifecycle(lifeCycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .collect {
+                if (it == KidMainTab.MISSION) {
+                    if (isFirstEntry) {
+                        isFirstEntry = false
+                        return@collect
+                    }
+                    listState.animateScrollToItem(0)
+                    viewModel.fetchMissions(isRefreshing = true)
+                }
+            }
+    }
 
     when (val state = state) {
         is UiState.Success -> {
             KidMissionScreen(
+                listState = listState,
                 paddingValues = paddingValues,
                 state = state.data,
                 navigateUp = navigateUp,
@@ -80,6 +110,7 @@ fun KidMissionRoute(
 @Composable
 private fun KidMissionScreen(
     paddingValues: PaddingValues,
+    listState: LazyListState,
     state: KidMissionState,
     navigateUp: () -> Unit,
     onRefresh: () -> Unit,
@@ -102,7 +133,8 @@ private fun KidMissionScreen(
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp, vertical = 25.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(11.dp)
+            verticalArrangement = Arrangement.spacedBy(11.dp),
+            state = listState
         ) {
             stickyHeader {
                 Row(
@@ -218,7 +250,7 @@ private fun KidMissionScreen(
         }
 
         if (state.isVisibleDialog) {
-            KieroDialog (
+            KieroDialog(
                 onDismiss = dismissDialog,
                 isDisabled = state.isCompletedMission,
                 title = if (!state.isCompletedMission) "[${state.selectedMissionItem!!.name}]" else null,
@@ -272,7 +304,8 @@ private fun KidWishScreenPreview() {
             state = KidMissionState(),
             onRefresh = {},
             dismissDialog = {},
-            onClickConfirm = {}
+            onClickConfirm = {},
+            listState = rememberLazyListState()
         )
     }
 }
