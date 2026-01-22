@@ -2,10 +2,11 @@ package com.kiero.presentation.parent.schedule.mission
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -21,10 +22,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
+import com.kiero.core.common.extension.formatWithDayOfWeek
+import com.kiero.core.common.extension.toRelativeDayFromDate
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
 import com.kiero.core.trigger.LocalRefreshState
 import com.kiero.presentation.main.navigation.ParentMainTab
+import com.kiero.presentation.parent.schedule.mission.component.missionmain.MissionInfo
+import com.kiero.presentation.parent.schedule.mission.component.missionmain.MissionListItem
 import com.kiero.presentation.parent.schedule.mission.state.ParentMissionState
 import com.kiero.presentation.parent.schedule.mission.viewmodel.ParentMissionViewModel
 
@@ -88,16 +93,34 @@ fun ParentMissionScreen(
         modifier = modifier
             .fillMaxSize()
             .background(color = KieroTheme.colors.black),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(16.dp)
     ) {
-        items(
-            items = state.kidMissionByDateList.missionsByDate,
-            key = { missionsByDate -> missionsByDate.dueAt }
-        ) { missionsByDate ->
-            MissionDateGroup(
-                missionsByDate = missionsByDate,
-            )
+        state.kidMissionByDateList.missionsByDate.forEach { missionsByDate ->
+
+            stickyHeader(key = missionsByDate.dueAt) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(color = KieroTheme.colors.black)
+                        .padding(vertical = 8.dp)
+                ) {
+                    MissionInfo(
+                        dayOfWeek = missionsByDate.dueAt.toRelativeDayFromDate,
+                        dueAt = missionsByDate.dueAt.formatWithDayOfWeek
+                    )
+                }
+            }
+
+            items(
+                items = missionsByDate.missions,
+            ) { mission ->
+                Box(modifier = Modifier.padding(vertical = 6.dp)) {
+                    MissionListItem(
+                        missionTitle = mission.name,
+                        reward = mission.reward,
+                    )
+                }
+            }
         }
     }
 }
