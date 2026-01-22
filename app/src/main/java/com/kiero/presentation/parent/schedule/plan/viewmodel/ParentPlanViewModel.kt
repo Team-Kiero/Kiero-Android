@@ -11,8 +11,6 @@ import com.kiero.presentation.parent.schedule.plan.model.ColorType
 import com.kiero.presentation.parent.schedule.plan.navigation.ScheduleAdd
 import com.kiero.presentation.parent.schedule.plan.state.ParentPlanSideEffect
 import com.kiero.presentation.parent.schedule.plan.state.ParentPlanState
-import com.kiero.presentation.parent.schedule.plan.state.parseLocalTime
-import com.kiero.presentation.parent.schedule.plan.state.validateAndTimeAdjustment
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -59,49 +57,41 @@ class ParentPlanViewModel @Inject constructor(
             val today = LocalDate.now()
             val currentTime = LocalTime.now()
 
-            if (name.isBlank() && currentState.selectedDays.isEmpty()) {
-                _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar("일정 저장에 실패했어요. 잠시 후 다시 시도해주세요"))
-            }
+            val isNameMissing = name.isBlank()
+            val isDaysMissing = currentState.selectedDays.isEmpty()
+            val isTimeMissing = currentState.startTime == null || currentState.endTime == null
 
-            if (name.isBlank()) {
-                _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar("일정 이름을 입력해주세요"))
-                return@launch
-            }
+            val missingCount = listOf(isNameMissing, isDaysMissing, isTimeMissing).count { it }
+
             when {
-                currentState.isRecurring -> {
-                    if (currentState.selectedDays.isEmpty()) {
-                        _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar("요일을 선택해주세요"))
-                        return@launch
-                    }
+                missingCount >= 2 -> {
+                    _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar("일정 저장에 실패했어요. 잠시 후 다시 시도해주세요"))
+                    return@launch
                 }
 
-                else -> {
-                    if (currentState.selectedDays.isEmpty()) {
-                        _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar("날짜를 선택해주세요"))
-                        return@launch
-                    }
-                    if (currentState.selectedDate.isBlank()) {
-                        _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar("날짜를 선택해주세요"))
-                        return@launch
-                    }
+                isNameMissing -> {
+                    _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar("일정 이름을 입력해주세요"))
+                    return@launch
                 }
-            }
 
-            if (!currentState.isTimeValid(currentState.startTime, currentState.endTime)) {
-                _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar("종료 시간은 시작 시간보다 늦어야 합니다"))
-                return@launch
-            }
-            if (!currentState.isRecurring) {
-                if (currentState.selectedDate.contains(today.toString())) {
-                    _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar("일정이 등록되었어요. (오늘일정은 마감되어 다음부터 적용돼요!)"))
-                    kotlinx.coroutines.delay(500)
-                    _sideEffect.emit(ParentPlanSideEffect.navigateUp)
+                isDaysMissing -> {
+                    _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar("요일을 선택해주세요"))
+                    return@launch
+                }
+
+                isTimeMissing -> {
+                    _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar("시간을 선택해주세요"))
                     return@launch
                 }
             }
-            if (!currentState.isRecurring && currentState.selectedDate.contains(today.toString())) {
-                val selectedStartTime = parseLocalTime(currentState.startTime)
 
+            if (!currentState.isTimeValid) {
+                _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar("종료 시간은 시작 시간보다 늦어야 합니다"))
+                return@launch
+            }
+
+            if (!currentState.isRecurring && currentState.selectedDate.contains(today.toString())) {
+                val selectedStartTime = currentState.parseLocalTime(currentState.displayStartTime)
 
                 if (selectedStartTime.isBefore(currentTime) || currentState.isFireLit) {
                     _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar("일정이 등록되었어요. (오늘일정은 마감되어 다음부터 적용돼요!)"))
@@ -110,8 +100,6 @@ class ParentPlanViewModel @Inject constructor(
                     return@launch
                 }
             }
-
-
             _state.update { it.copy(isLoading = true) }
 
             val selectedColor = currentState.selectedColorType
@@ -119,7 +107,6 @@ class ParentPlanViewModel @Inject constructor(
                 _state.update { it.copy(isLoading = false) }
                 return@launch
             }
-
 
             planRepository.postPlan(
                 childId = childId,
@@ -140,7 +127,6 @@ class ParentPlanViewModel @Inject constructor(
             }
         }
     }
-
 
     fun fetchDefaultColor() {
         viewModelScope.launch {
@@ -181,7 +167,6 @@ class ParentPlanViewModel @Inject constructor(
 
     fun onDayClick(dayIndex: Int) {
         _state.update { currentState ->
-            // 1. 새로운 요일 Set 생성 (토글 로직)
             val newDays = if (currentState.selectedDays.contains(dayIndex)) {
                 currentState.selectedDays - dayIndex
             } else {
@@ -235,28 +220,29 @@ class ParentPlanViewModel @Inject constructor(
     fun onRecurringToggle() {
         _state.update { currentState ->
             val newIsRecurring = !currentState.isRecurring
-            when {
-                newIsRecurring -> {
-                    currentState.copy(
-                        isRecurring = true,
-                        selectedDate = ""
-                    )
-                }
 
-                else -> {
-                    currentState.copy(
-                        isRecurring = false,
-                        selectedDays = emptySet(),
-                        selectedDate = ""
-                    )
-                }
+            if (newIsRecurring) {
+                currentState.copy(
+                    isRecurring = true,
+                    selectedDate = ""
+                )
+            } else {
+                val updatedDates = calculateSelectedDates(
+                    currentState.currentReferenceDate,
+                    currentState.selectedDays
+                )
+
+                currentState.copy(
+                    isRecurring = false,
+                    selectedDate = updatedDates
+                )
             }
         }
     }
 
     fun onTimeSelected(isStart: Boolean, time: String) {
         viewModelScope.launch {
-            val result = validateAndTimeAdjustment(time)
+            val result = _state.value.validateAndTimeAdjustment(time)
 
             _state.update {
                 if (isStart) it.copy(startTime = result.adjustedTime)
