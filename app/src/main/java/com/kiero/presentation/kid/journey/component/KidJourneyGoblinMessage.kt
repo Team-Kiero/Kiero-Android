@@ -48,7 +48,7 @@ fun KidJourneyGoblinMessage(
                     withStyle(SpanStyle(color = mainColor)) {
                         append(content.scheduleName)
                     }
-                    append(" 야!")
+                    append(" !")
                 },
                 color = defaultColor,
                 style = textStyle
@@ -151,7 +151,7 @@ private fun KidJourneyGoblinMessagePreview() {
             name = "꾸비"
         ) {
             KidJourneyGoblinMessage(
-                content = KidJourneyContentUiModel.NowSchedule(
+                content = KidJourneyContentUiModel.FirstSchedule(
                     scheduleDetailId = 1,
                     scheduleName = "피아노 학원 가기",
                     stoneType = StoneUiType.WISDOM,
