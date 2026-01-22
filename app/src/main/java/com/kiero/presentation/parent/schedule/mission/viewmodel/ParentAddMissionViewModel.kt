@@ -31,7 +31,7 @@ class ParentAddMissionViewModel @Inject constructor(
 ) : ViewModel() {
 
     val missionNameState = TextFieldState()
-    val awardTextFieldState = TextFieldState()
+    val awardTextFieldState = TextFieldState(MissionAwardDefaults.DEFAULT_AWARD.toString())
 
     private val _state = MutableStateFlow(ParentAddMissionState())
     val state = _state.asStateFlow()
@@ -57,7 +57,7 @@ class ParentAddMissionViewModel @Inject constructor(
         _state.update {
             it.copy(selectedDate = _selectedDate.value)
         }
-        observeAwardTextFieldChanges()
+        observeAwardInput()
         observeCurrentAwardValueChanges()
         observeMissionNameChanges()
     }
@@ -90,10 +90,36 @@ class ParentAddMissionViewModel @Inject constructor(
         }
     }
 
+    private fun observeAwardInput() {
+        viewModelScope.launch {
+            snapshotFlow { awardTextFieldState.text.toString() }
+                .collect { text ->
+                    val parsed = text.toIntOrNull()
+                    if (parsed != null) {
+                        if (parsed > MissionAwardDefaults.MAX_AWARD) {
+                            _sideEffect.emit(
+                                ParentAddMissionSideEffect.ShowSnackbar(
+                                    ParentMissionAddValid.MAX.message
+                                )
+                            )
+                        }
+                        _currentAwardValue.value = parsed
+                        _state.update { it.copy(reward = parsed) }
+                    } else if (text.isEmpty()) {
+                        _currentAwardValue.value = 0
+                        _state.update { it.copy(reward = 0) }
+                    }
+                }
+        }
+    }
+
     private fun observeCurrentAwardValueChanges() {
         viewModelScope.launch {
             _currentAwardValue.collect { value ->
-                if (awardTextFieldState.text.toString().toIntOrNull() != value) {
+                val currentText = awardTextFieldState.text.toString()
+                val currentInt = currentText.toIntOrNull()
+
+                if (value != 0 && currentInt != value) {
                     awardTextFieldState.setTextAndPlaceCursorAtEnd(value.toString())
                 }
             }
@@ -118,30 +144,19 @@ class ParentAddMissionViewModel @Inject constructor(
     }
 
     fun onAwardClick(change: Int) {
-        val currentReward = _currentAwardValue.value
-        val nextReward = currentReward + change
+        val current = _currentAwardValue.value
+        val nextReward = (current + change).coerceIn(
+            MissionAwardDefaults.MIN_AWARD,
+            MissionAwardDefaults.MAX_AWARD
+        )
 
-        viewModelScope.launch {
-            when {
-                nextReward < MissionAwardDefaults.MIN_AWARD -> {
-                    _sideEffect.emit(
-                        ParentAddMissionSideEffect.ShowSnackbar(
-                            "최소 보상은 ${MissionAwardDefaults.MIN_AWARD}개입니다."
-                        )
-                    )
-                }
-
-                nextReward > MissionAwardDefaults.MAX_AWARD -> {
-                    _sideEffect.emit(
-                        ParentAddMissionSideEffect.ShowSnackbar(
-                            "최대 보상은 ${MissionAwardDefaults.MAX_AWARD}개입니다."
-                        )
-                    )
-                }
-
-                else -> {
-                    _currentAwardValue.value = nextReward
-                }
+        if (nextReward != current) {
+            awardTextFieldState.setTextAndPlaceCursorAtEnd(nextReward.toString())
+        } else {
+            val message =
+                if (nextReward >= MissionAwardDefaults.MAX_AWARD) "최대 보상은 500개입니다." else "최소 보상은 1개입니다."
+            viewModelScope.launch {
+                _sideEffect.emit(ParentAddMissionSideEffect.ShowSnackbar(message))
             }
         }
     }
@@ -161,19 +176,25 @@ class ParentAddMissionViewModel @Inject constructor(
         onDismissBottomSheet()
     }
 
+    private var isProcessing = false
 
     fun createMission() {
+        if (isProcessing) return
+        isProcessing = true
+
         val currentState = _state.value
         val awardValue = _currentAwardValue.value
+        val name = missionNameState.text.toString().trim()
 
         val validationError = when {
-            currentState.missionName.isBlank() -> ParentMissionAddValid.MISSION
+            name.isBlank() -> ParentMissionAddValid.MISSION
             awardValue <= 0 -> ParentMissionAddValid.AWARD
             awardValue > 500 -> ParentMissionAddValid.MAX
             else -> null
         }
 
         if (validationError != null) {
+            isProcessing = false
             viewModelScope.launch {
                 _sideEffect.emit(ParentAddMissionSideEffect.ShowSnackbar(validationError.message))
             }
@@ -181,16 +202,15 @@ class ParentAddMissionViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val childId = currentState.childId ?: 1L
-            val name = currentState.missionName
-            val reward = currentState.reward
-            val dueAt = currentState.selectedDate ?: LocalDate.now().toString()
             _state.update { it.copy(isLoading = true) }
+
+            val childId = currentState.childId ?: 1L
+            val dueAt = currentState.selectedDate ?: LocalDate.now().toString()
 
             repository.postParentMission(
                 childId = childId,
                 name = name,
-                reward = reward,
+                reward = currentState.reward,
                 dueAt = dueAt
             ).onSuccess { mission ->
                 _state.update { it.copy(isLoading = false) }
@@ -198,6 +218,7 @@ class ParentAddMissionViewModel @Inject constructor(
                 _sideEffect.emit(ParentAddMissionSideEffect.NavigateToMissionList(mission))
             }.onFailure { error ->
                 _state.update { it.copy(isLoading = false) }
+                isProcessing = false
                 _sideEffect.emit(
                     ParentAddMissionSideEffect.ShowSnackbar(error.message ?: "미션 생성에 실패했습니다.")
                 )
