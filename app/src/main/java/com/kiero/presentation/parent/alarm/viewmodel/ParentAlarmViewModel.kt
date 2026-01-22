@@ -18,7 +18,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -146,7 +145,6 @@ class ParentAlarmViewModel @Inject constructor(
         viewModelScope.launch {
             sseManager.parentFeedEvents.collect { feedEvent ->
                 Timber.d("📢 새 알림 도착: ${feedEvent.data.eventType}")
-                delay(500)
                 refresh()
             }
         }
