@@ -50,7 +50,10 @@ fun KidOnboardingRoute(
 
     when (val uiState = state) {
         is UiState.Loading -> {
-            KieroLoadingIndicator()
+            KieroLoadingIndicator(
+                repeatCount = 0,
+                onSuccess = viewModel::startJourney
+            )
         }
         is UiState.Success -> {
             KidOnboardingScreen(
