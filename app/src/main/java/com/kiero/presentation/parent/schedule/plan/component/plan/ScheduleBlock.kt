@@ -26,6 +26,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -89,7 +91,8 @@ fun ScheduleEventBlock(
                                         val paint = Paint()
                                         val frameworkPaint = paint.asFrameworkPaint()
 
-                                        frameworkPaint.color = block.color.copy(alpha = 0.5f).toArgb()
+                                        frameworkPaint.color =
+                                            block.color.copy(alpha = 0.5f).toArgb()
                                         frameworkPaint.setShadowLayer(
                                             4.dp.toPx(),
                                             0.dp.toPx(),
@@ -113,7 +116,15 @@ fun ScheduleEventBlock(
                         Text(
                             text = textToDisplay,
                             color = KieroTheme.colors.white,
-                            style = KieroTheme.typography.regular.body5,
+                            style = KieroTheme.typography.regular.body5.copy(
+                                platformStyle = PlatformTextStyle(
+                                    includeFontPadding = false
+                                ),
+                                lineHeightStyle = LineHeightStyle(
+                                    alignment = LineHeightStyle.Alignment.Bottom,
+                                    trim = LineHeightStyle.Trim.None
+                                )
+                            ),
                             maxLines = maxLines,
                             overflow = TextOverflow.Ellipsis,
                         )

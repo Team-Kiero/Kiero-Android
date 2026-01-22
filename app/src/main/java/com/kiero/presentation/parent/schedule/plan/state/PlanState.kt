@@ -15,14 +15,16 @@ data class ParentPlanState(
     val showColorPicker: Boolean = false,
     val isRecurring: Boolean = false,
     val selectedDays: Set<Int> = emptySet(),
-    val startTime: String = "12:00 PM",
-    val endTime: String = "12:00 PM",
+    val startTime: String? = null,
+    val endTime: String ?= null,
     val selectedDate: String = LocalDate.now().toString(),
     val currentReferenceDate: LocalDate = LocalDate.now(),
     val isFireLit: Boolean = false,
     val isLoading: Boolean = false,
     val isLogoutDialogVisible: Boolean = false,
 ) {
+    val displayStartTime: String get() = startTime ?: "12:00 PM"
+    val displayEndTime: String get() = endTime ?: "12:00 PM"
 
     val formattedDays: String?
         get() = if (isRecurring && selectedDays.isNotEmpty()) {
@@ -40,25 +42,27 @@ data class ParentPlanState(
         } else null
 
     val isTimeValid: Boolean
-        get() = timeToMinutes(endTime) > timeToMinutes(startTime)
+        get() = timeToMinutes(displayEndTime) > timeToMinutes(displayStartTime)
 
-    fun formatTimeForServer(time: String): String {
+    fun formatTimeForServer(time: String?): String {
+        val targetTime = if (time.isNullOrEmpty()) "12:00 PM" else time
+
         return try {
-            if (time.isEmpty()) return "00:00:00"
-            val parts = time.split(" ", ":")
-            if (parts.size < 3) return "00:00:00"
+            val parts = targetTime.split(" ", ":")
+            if (parts.size < 3) return "12:00:00"
 
-            var hour = parts[0].toIntOrNull() ?: 0
+            var hour = parts[0].toIntOrNull() ?: 12
             val minute = parts[1]
-            val amPm = parts[2]
+            val amPm = parts[2].uppercase()
 
             when {
                 amPm == "PM" && hour < 12 -> hour += 12
                 amPm == "AM" && hour == 12 -> hour = 0
             }
+
             String.format("%02d:%s:00", hour, minute)
         } catch (e: Exception) {
-            "00:00:00"
+            "12:00:00"
         }
     }
 
@@ -117,57 +121,58 @@ data class ParentPlanState(
             0
         }
     }
+    fun validateAndTimeAdjustment(timeStr: String): TimeValidationResult {
+        return try {
+            val regex = Regex("""(\d{1,2}):(\d{2})\s*(AM|PM)""", RegexOption.IGNORE_CASE)
+            val match = regex.find(timeStr) ?: return TimeValidationResult(false, "잘못된 형식", timeStr)
+
+            val (hStr, mStr, amPm) = match.destructured
+            var hour = hStr.toInt()
+            val minute = mStr.toInt()
+
+            if (amPm.uppercase() == "PM" && hour != 12) hour += 12
+            if (amPm.uppercase() == "AM" && hour == 12) hour = 0
+
+            val totalMinutes = hour * 60 + minute
+            val startLimit = 8 * 60
+            val endLimit = 22 * 60
+
+            when {
+                totalMinutes < startLimit -> {
+                    TimeValidationResult(false, "시각은 08:00AM부터 설정가능합니다.", "08:00 AM")
+                }
+
+                totalMinutes > endLimit -> {
+                    TimeValidationResult(false, "시각은 10:00PM까지 설정가능합니다.", "10:00 PM")
+                }
+
+                else -> {
+                    TimeValidationResult(true, null, timeStr)
+                }
+            }
+        } catch (e: Exception) {
+            TimeValidationResult(false, "시간 확인 중 오류 발생", timeStr)
+        }
+    }
+
+    fun parseLocalTime(timeStr: String): java.time.LocalTime {
+        return try {
+            val regex = Regex("""(\d{1,2}):(\d{2})\s*(AM|PM)""", RegexOption.IGNORE_CASE)
+            val match = regex.find(timeStr) ?: return java.time.LocalTime.MIN
+            val (hStr, mStr, amPm) = match.destructured
+            var hour = hStr.toInt()
+            val minute = mStr.toInt()
+            if (amPm.uppercase() == "PM" && hour != 12) hour += 12
+            if (amPm.uppercase() == "AM" && hour == 12) hour = 0
+            java.time.LocalTime.of(hour, minute)
+        } catch (e: Exception) {
+            java.time.LocalTime.MIN
+        }
+    }
 }
 
 sealed interface ParentPlanSideEffect {
     data class ShowSnackBar(val message: String) : ParentPlanSideEffect
     data object navigateUp : ParentPlanSideEffect
 }
-fun validateAndTimeAdjustment(timeStr: String): TimeValidationResult {
-    return try {
-        val regex = Regex("""(\d{1,2}):(\d{2})\s*(AM|PM)""", RegexOption.IGNORE_CASE)
-        val match = regex.find(timeStr) ?: return TimeValidationResult(false, "잘못된 형식", timeStr)
 
-        val (hStr, mStr, amPm) = match.destructured
-        var hour = hStr.toInt()
-        val minute = mStr.toInt()
-
-        if (amPm.uppercase() == "PM" && hour != 12) hour += 12
-        if (amPm.uppercase() == "AM" && hour == 12) hour = 0
-
-        val totalMinutes = hour * 60 + minute
-        val startLimit = 8 * 60
-        val endLimit = 22 * 60
-
-        when {
-            totalMinutes < startLimit -> {
-                TimeValidationResult(false, "시각은 08:00AM부터 설정가능합니다.", "08:00 AM")
-            }
-
-            totalMinutes > endLimit -> {
-                TimeValidationResult(false, "시각은 10:00PM까지 설정가능합니다.", "10:00 PM")
-            }
-
-            else -> {
-                TimeValidationResult(true, null, timeStr)
-            }
-        }
-    } catch (e: Exception) {
-        TimeValidationResult(false, "시간 확인 중 오류 발생", timeStr)
-    }
-}
-
-fun parseLocalTime(timeStr: String): java.time.LocalTime {
-    return try {
-        val regex = Regex("""(\d{1,2}):(\d{2})\s*(AM|PM)""", RegexOption.IGNORE_CASE)
-        val match = regex.find(timeStr) ?: return java.time.LocalTime.MIN
-        val (hStr, mStr, amPm) = match.destructured
-        var hour = hStr.toInt()
-        val minute = mStr.toInt()
-        if (amPm.uppercase() == "PM" && hour != 12) hour += 12
-        if (amPm.uppercase() == "AM" && hour == 12) hour = 0
-        java.time.LocalTime.of(hour, minute)
-    } catch (e: Exception) {
-        java.time.LocalTime.MIN
-    }
-}

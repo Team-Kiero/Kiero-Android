@@ -33,6 +33,7 @@ import com.kiero.presentation.parent.schedule.mission.component.missionadd.Missi
 import com.kiero.presentation.parent.schedule.mission.component.missionadd.MissionAwardSelect
 import com.kiero.presentation.parent.schedule.mission.component.missionmain.MissionCalendar
 import com.kiero.presentation.parent.schedule.mission.state.ParentAddMissionSideEffect
+import com.kiero.presentation.parent.schedule.mission.state.ParentAddMissionState
 import com.kiero.presentation.parent.schedule.mission.viewmodel.ParentAddMissionViewModel
 import com.kiero.presentation.parent.schedule.plan.component.select.ScheduleTextField
 
@@ -87,6 +88,7 @@ fun ParentAddMissionRoute(
                 viewModel = viewModel,
                 showBottomSheet = showBottomSheet,
                 selectedDate = dateText,
+                state = state
             )
         }
     }
@@ -100,6 +102,7 @@ fun ParentAddMissionScreen(
     viewModel: ParentAddMissionViewModel,
     showBottomSheet: Boolean,
     selectedDate: String?,
+    state: ParentAddMissionState,
     modifier: Modifier = Modifier,
 ) {
     val focusManager = LocalFocusManager.current
@@ -122,7 +125,11 @@ fun ParentAddMissionScreen(
             leftIconRes = R.drawable.ic_close_light,
             rightIconRes = R.drawable.ic_check,
             leftIconClick = navigateUp,
-            rightIconClick = viewModel::createMission,
+            rightIconClick = {
+                if (!state.isLoading) {
+                    viewModel.createMission()
+                }
+            },
         )
 
         ScheduleTextField(

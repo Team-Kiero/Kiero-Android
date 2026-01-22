@@ -38,9 +38,7 @@ fun MissionAwardSelect(
             if (index == 2) {
                 MissionTextField(
                     state = textFieldState,
-                    placeholder = textFieldState.text.toString().ifEmpty {
-                        MissionAwardDefaults.DEFAULT_AWARD.toString()
-                    },
+                    placeholder = "0",
                     modifier = Modifier
                         .weight(1f)
                         .padding(horizontal = 7.dp)

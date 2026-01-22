@@ -40,7 +40,7 @@ class ParentScheduleViewModel @Inject constructor(
     private val userInfoManager: UserInfoManager,
     private val demoRepository: DemoRepository,
     private val tokenManager: TokenManager,
-    private val sseManager: SseManager
+    private val sseManager: SseManager,
 ) : ViewModel() {
     private val _state = MutableStateFlow<UiState<ParentScheduleState>>(UiState.Loading)
     val state = _state.asStateFlow()
@@ -58,6 +58,7 @@ class ParentScheduleViewModel @Inject constructor(
         initFetchParentInfo()
         ensureChildIdAndStartSse()
     }
+
     private fun ensureChildIdAndStartSse() {
         viewModelScope.launch {
             var childId = userInfoManager.getChildIdInfo()
@@ -88,6 +89,7 @@ class ParentScheduleViewModel @Inject constructor(
 
     fun fetchSchedule() {
         val currentState = (_state.value as? UiState.Success)?.data ?: ParentScheduleState()
+        val today = LocalDate.now()
         val monday = currentState.currentDate.with(DayOfWeek.MONDAY).toString()
         val sunday = currentState.currentDate.with(DayOfWeek.SUNDAY).toString()
 
@@ -97,8 +99,25 @@ class ParentScheduleViewModel @Inject constructor(
             _state.value = UiState.Success(currentState.copy(isFetching = true))
             planRepository.getPlanAll(childId, monday, sunday)
                 .onSuccess { model ->
+                    val todayDayOfWeek = today.dayOfWeek.name.take(3).uppercase()
+
+
+                    val finalRecurringSchedules =
+                        if (currentState.currentDate == today && model.isFireLit) {
+                            model.recurringSchedules.filterNot {
+                                it.dayOfWeek.contains(
+                                    todayDayOfWeek
+                                )
+                            }
+                        } else {
+                            model.recurringSchedules
+                        }
                     _state.value = UiState.Success(
-                        currentState.copy(planAllModel = model)
+                        currentState.copy(
+                            planAllModel = model.copy(recurringSchedules = finalRecurringSchedules),
+                            isFireLit = model.isFireLit,
+                            isFetching = false
+                        )
                     )
                 }
                 .onFailure {
@@ -107,11 +126,11 @@ class ParentScheduleViewModel @Inject constructor(
         }
     }
 
-    fun resetToday(){
+    fun resetToday() {
         val currentState = (_state.value as? UiState.Success)?.data ?: return
         val today = LocalDate.now()
 
-        if (currentState.currentDate == today ) return
+        if (currentState.currentDate == today) return
 
         _state.value = UiState.Success(currentState.copy(currentDate = today))
 
