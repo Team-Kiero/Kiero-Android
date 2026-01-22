@@ -92,7 +92,7 @@ fun ParentScheduleRoute(
                     onResetToToday = viewModel::resetToday,
                     navigateToScheduleAdd = {
                         navigateToScheduleAdd(
-                            state.data.currentDate.toString(),
+                            state.data.navInitialDate,
                             state.data.isFireLit
                         )
                     },
