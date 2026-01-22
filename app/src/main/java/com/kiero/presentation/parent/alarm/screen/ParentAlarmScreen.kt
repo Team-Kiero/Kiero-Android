@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -38,6 +39,8 @@ import com.kiero.core.designsystem.component.dialog.action.KieroCancelAction
 import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
 import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.core.trigger.LocalRefreshState
+import com.kiero.presentation.main.navigation.ParentMainTab
 import com.kiero.presentation.parent.alarm.component.ParentAlarmCard
 import com.kiero.presentation.parent.alarm.component.ParentAlarmDateHeader
 import com.kiero.presentation.parent.alarm.model.ParentAlarmUiModel
@@ -46,6 +49,7 @@ import com.kiero.presentation.parent.alarm.viewmodel.ParentAlarmViewModel
 import com.kiero.presentation.parent.component.ParentUserSection
 import com.kiero.presentation.signup.parent.state.ParentSignUpSideEffect
 import com.kiero.presentation.signup.parent.state.ParentSignUpState
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -54,16 +58,22 @@ fun ParentAlarmRoute(
     navigateUp: () -> Unit,
     navigateToSelection: () -> Unit,
     viewModel: ParentAlarmViewModel = hiltViewModel(),
-    isTabReselected: Boolean = false
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val authState by viewModel.authState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
 
-    LaunchedEffect(isTabReselected) {
-        if (isTabReselected) {
-            listState.animateScrollToItem(0)
-            viewModel.refresh()
+    val refreshState = LocalRefreshState.current
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        refreshState.refreshEvent.collect { tab ->
+            if (tab == ParentMainTab.ALARM) {
+                scope.launch {
+                    listState.animateScrollToItem(0)
+                }
+                viewModel.refresh()
+            }
         }
     }
 
