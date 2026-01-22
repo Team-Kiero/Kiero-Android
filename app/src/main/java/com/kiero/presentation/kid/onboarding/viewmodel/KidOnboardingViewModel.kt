@@ -8,7 +8,6 @@ import com.kiero.data.kid.coin.repository.CoinRepository
 import com.kiero.presentation.kid.onboarding.state.KidOnboardingSideEffect
 import com.kiero.presentation.kid.onboarding.state.KidOnboardingState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -37,9 +36,6 @@ class KidOnboardingViewModel @Inject constructor(
     fun startJourney() {
         viewModelScope.launch {
             _state.value = UiState.Loading
-
-            delay(2000)
-
             onboardingManager.saveIsSawOnboarding(isSaw = true)
             _sideEffect.emit(KidOnboardingSideEffect.NavigateToKid)
         }
