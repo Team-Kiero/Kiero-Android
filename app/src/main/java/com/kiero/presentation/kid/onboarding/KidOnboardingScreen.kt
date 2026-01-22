@@ -136,7 +136,7 @@ fun KidOnboardingScreen(
             }
 
             KieroButtonMedium(
-                text = "여정 시작하기",
+                text = "시작해보자!",
                 onClick = navigateToKid,
                 modifier = Modifier
                     .alpha(if (currentStep == OnboardingUiModel.STORY5) 1f else 0f)
