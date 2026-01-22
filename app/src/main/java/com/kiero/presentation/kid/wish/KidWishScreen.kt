@@ -149,7 +149,7 @@ fun KidWishRoute(
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    val coinImage = painterResource(R.drawable.img_kid_coin)
+                                    val coinImage = painterResource(R.drawable.img_coin)
 
                                     Image(
                                         painter = coinImage,
@@ -210,7 +210,8 @@ private fun KidWishScreen(
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .background(color = KieroTheme.colors.black),
             verticalAlignment = Alignment.CenterVertically
         ) {
             KidProfileChip(
@@ -224,7 +225,8 @@ private fun KidWishScreen(
                     coinCount = state.coinUiModel.coinAmount,
                     isEnabled = true,
                     onClick = {}
-                )
+                ),
+                isEnabled = true
             )
         }
 

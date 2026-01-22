@@ -3,6 +3,7 @@ package com.kiero.core.designsystem.component.chip.action
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,7 +31,7 @@ class KieroCoinAction(
 ) : ChipAction {
     @Composable
     override fun invoke(modifier: Modifier) {
-        val coin = painterResource(id = R.drawable.img_kid_coin)
+        val coin = painterResource(id = R.drawable.img_coin)
 
         val targetColor = when {
             !isEnabled -> KieroTheme.colors.gray500
@@ -58,6 +59,7 @@ class KieroCoinAction(
                 painter = coin,
                 contentDescription = null,
                 modifier = Modifier
+                    .size(20.dp)
                     .forcePixelToDp(coin)
             )
 
