@@ -21,6 +21,7 @@ data class ParentScheduleState(
     val isLogoutDialogVisible: Boolean = false,
     val isRefreshing: Boolean = false,
     val isLoading: Boolean = false,
+
 ) {
     val canGoNext: Boolean
         get() = ChronoUnit.WEEKS.between(LocalDate.now(), currentDate) < 12
@@ -29,21 +30,17 @@ data class ParentScheduleState(
         get() = ChronoUnit.WEEKS.between(LocalDate.now(), currentDate) > -12
     val dateRangeText: String
         get() {
-            val thursday = currentDate.with(DayOfWeek.THURSDAY)
-            val monthValue = thursday.monthValue
+            val targetMonth = currentDate.monthValue
 
-            val firstThursday = thursday.with(TemporalAdjusters.firstDayOfMonth())
-                .with(TemporalAdjusters.nextOrSame(DayOfWeek.THURSDAY))
+            val firstDayOfMonth = currentDate.with(TemporalAdjusters.firstDayOfMonth())
 
-            val lastThursday = thursday.with(TemporalAdjusters.lastDayOfMonth())
-                .with(TemporalAdjusters.previousOrSame(DayOfWeek.THURSDAY))
+            val firstMondayOfTargetMonthWeek = firstDayOfMonth.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
 
-            val weekNum = ChronoUnit.WEEKS.between(firstThursday, thursday).toInt() + 1
+            val currentMonday = currentDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
 
-            return when {
-                thursday == lastThursday -> "${monthValue}월 마지막 주차"
-                else -> "${monthValue}월 ${weekNum}주차"
-            }
+            val weekNum = ChronoUnit.WEEKS.between(firstMondayOfTargetMonthWeek, currentMonday).toInt() + 1
+
+            return "${targetMonth}월 ${weekNum}주차"
         }
 
     fun ScheduleEvent.getIndices(): List<Int> {

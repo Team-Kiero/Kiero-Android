@@ -44,12 +44,16 @@ fun ParentScheduleAddRoute(
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val globalTrigger = LocalGlobalUiEventTrigger.current
+    val focusManager = LocalFocusManager.current
 
     viewModel.sideEffect.collectSideEffect { effect ->
         when (effect) {
-            is ParentPlanSideEffect.ShowSnackBar -> globalTrigger.showSnackbar(
-                SnackbarState(effect.message)
-            )
+            is ParentPlanSideEffect.ShowSnackBar -> {
+                focusManager.clearFocus()
+                globalTrigger.showSnackbar(
+                    SnackbarState(effect.message)
+                )
+            }
 
             is ParentPlanSideEffect.navigateUp -> {
                 navigateUp()
@@ -69,8 +73,8 @@ fun ParentScheduleAddRoute(
         onRecurringToggle = viewModel::onRecurringToggle,
         selectedColorType = uiState.selectedColorType,
         dateRangeText = uiState.dateRangeText,
-        startTime = uiState.startTime,
-        endTime = uiState.endTime,
+        startTime = uiState.displayStartTime,
+        endTime = uiState.displayEndTime,
         onTimeSelected = viewModel::onTimeSelected,
         isPreviousEnabled = uiState.canGoToPrevious,
         onPreviousWeek = viewModel::onPreviousWeek,
