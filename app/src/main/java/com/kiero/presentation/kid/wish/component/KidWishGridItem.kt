@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.core.common.extension.noRippleClickable
@@ -60,7 +61,9 @@ fun KidWishGridItem(
             Text(
                 text = "소원빌기",
                 style = KieroTheme.typography.semiBold.title4,
-                color = KieroTheme.colors.black
+                color = KieroTheme.colors.black,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }
