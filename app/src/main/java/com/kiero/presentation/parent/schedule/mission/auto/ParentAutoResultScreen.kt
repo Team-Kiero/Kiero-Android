@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
@@ -228,58 +227,6 @@ private fun ParentAutoResultScreenPreview() {
                 ),
                 currentIndex = 0,
                 selectedDate = LocalDate.now().plusDays(1)
-            ),
-            onMissionNameChange = {},
-            onDateSelected = {},
-            onRewardClick = {},
-            onIndexChange = {},
-            onSaveClick = {},
-            onCancelClick = {},
-            onShowDatePicker = {},
-            onDismissDatePicker = {},
-            awardTextFieldState = awardTextFieldState,
-            paddingValues = PaddingValues(0.dp),
-            snackbarHostState = snackbarHostState
-        )
-    }
-}
-
-@Preview(
-    name = "Multiple Missions",
-    showBackground = true,
-    backgroundColor = 0xFF000000,
-    device = "spec:width=360dp,height=800dp,dpi=420"
-)
-@Composable
-private fun ParentAutoResultScreenMultipleMissionsPreview() {
-    val snackbarHostState = remember { SnackbarHostState() }
-    val awardTextFieldState = rememberTextFieldState("20")
-
-    KieroTheme {
-        ParentAutoResultScreen(
-            state = AutoMissionState(
-                missions = listOf(
-                    MissionUiModel(
-                        name = "수학 숙제하기",
-                        dueAt = LocalDate.now().plusDays(1),
-                        reward = 20,
-                        isCompleted = false
-                    ),
-                    MissionUiModel(
-                        name = "체육복 챙기기",
-                        dueAt = LocalDate.now().plusDays(2),
-                        reward = 30,
-                        isCompleted = false
-                    ),
-                    MissionUiModel(
-                        name = "일기 쓰기",
-                        dueAt = LocalDate.now().plusDays(1),
-                        reward = 50,
-                        isCompleted = false
-                    )
-                ),
-                currentIndex = 1,
-                selectedDate = LocalDate.now().plusDays(2)
             ),
             onMissionNameChange = {},
             onDateSelected = {},
