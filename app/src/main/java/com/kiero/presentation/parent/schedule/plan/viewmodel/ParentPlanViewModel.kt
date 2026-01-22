@@ -89,23 +89,38 @@ class ParentPlanViewModel @Inject constructor(
                 _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar("종료 시간은 시작 시간보다 늦어야 합니다"))
                 return@launch
             }
-
-            if (!currentState.isRecurring && currentState.selectedDate.contains(today.toString())) {
-                val selectedStartTime = currentState.parseLocalTime(currentState.displayStartTime)
-
-                if (selectedStartTime.isBefore(currentTime) || currentState.isFireLit) {
-                    _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar("일정이 등록되었어요. (오늘일정은 마감되어 다음부터 적용돼요!)"))
-                    kotlinx.coroutines.delay(500)
-                    _sideEffect.emit(ParentPlanSideEffect.navigateUp)
-                    return@launch
-                }
+            val isTodayIncluded = if (currentState.isRecurring) {
+                val todayDayOfWeekIndex = (today.dayOfWeek.value - 1)
+                currentState.selectedDays.contains(todayDayOfWeekIndex)
+            } else {
+                currentState.selectedDate.contains(today.toString())
             }
+
+            val isAlreadyClosedToday = if (isTodayIncluded) {
+                val selectedStartTime = currentState.parseLocalTime(currentState.displayStartTime)
+                selectedStartTime.isBefore(currentTime) || currentState.isFireLit
+            } else false
+
+
+
+            if (!currentState.isRecurring && isAlreadyClosedToday) {
+                _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar("일정이 등록되었어요. (오늘 일정은 마감되어 다음부터 적용돼요!)"))
+                kotlinx.coroutines.delay(500)
+                _sideEffect.emit(ParentPlanSideEffect.navigateUp)
+                return@launch
+            }
+
             _state.update { it.copy(isLoading = true) }
 
             val selectedColor = currentState.selectedColorType
             val childId = userInfoManager.getChildIdInfo() ?: run {
                 _state.update { it.copy(isLoading = false) }
                 return@launch
+            }
+            val finalDateParam = if (currentState.isRecurring) {
+                if (isAlreadyClosedToday) today.plusDays(1).toString() else today.toString()
+            } else {
+                currentState.selectedDate
             }
 
             planRepository.postPlan(
@@ -115,10 +130,14 @@ class ParentPlanViewModel @Inject constructor(
                 startTime = currentState.formatTimeForServer(currentState.startTime),
                 endTime = currentState.formatTimeForServer(currentState.endTime),
                 scheduleColor = selectedColor.name,
-                dayOfWeek = currentState.formattedDays,
-                dates = if (!currentState.isRecurring) currentState.selectedDate else null
+                dayOfWeek = if (currentState.isRecurring) currentState.formattedDays else null,
+                dates = if (currentState.isRecurring) null else currentState.selectedDate
             ).onSuccess {
-                _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar("일정이 등록되었습니다"))
+                if (isAlreadyClosedToday) {
+                    _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar("일정이 등록되었어요. (오늘 일정은 마감되어 다음부터 적용돼요!)"))
+                } else {
+                    _sideEffect.emit(ParentPlanSideEffect.ShowSnackBar("일정이 등록되었습니다"))
+                }
                 kotlinx.coroutines.delay(200)
                 _sideEffect.emit(ParentPlanSideEffect.navigateUp)
             }.onFailure { error ->
