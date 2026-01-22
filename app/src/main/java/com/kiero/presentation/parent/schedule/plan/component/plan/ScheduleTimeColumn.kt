@@ -36,7 +36,7 @@ fun ScheduleTimeColumn(
             modifier = Modifier
                 .padding(bottom = 27.dp)
         )
-        (9..22).forEach { hour ->
+        (9..21).forEach { hour ->
             Box(
                 modifier = Modifier
                     .height(38.dp)

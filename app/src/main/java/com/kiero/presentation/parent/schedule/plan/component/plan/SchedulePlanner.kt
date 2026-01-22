@@ -39,7 +39,9 @@ fun ScheduleTimeTable(
         verticalArrangement = Arrangement.spacedBy(11.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
         ) {
             ScheduleTimeColumn()
 
@@ -59,6 +61,10 @@ fun SchedulePlanner(
     val hourHeight = with(density) { 38.dp.roundToPx().toDp() }
     val slotHeight = hourHeight / 4
 
+    val innerPadding = 4.dp
+    val bottomBuffer = 4.dp
+    val totalHeight = (hourHeight * 14) + (innerPadding * 2) + bottomBuffer
+
     val allBlocks = events.flatMap { event ->
         val indices = state.run { event.getIndices() }
 
@@ -70,10 +76,10 @@ fun SchedulePlanner(
     BoxWithConstraints(
         modifier = modifier
             .fillMaxWidth()
-            .height(hourHeight * 15)
+            .height(totalHeight)
             .clip(RoundedCornerShape(10.dp))
             .border(0.3.dp, KieroTheme.colors.gray800, RoundedCornerShape(10.dp))
-            .padding(4.dp)
+            .padding(innerPadding)
     ) {
         val dayWidth = maxWidth / daysCount
         if (events.isEmpty()) {
@@ -115,8 +121,8 @@ fun SchedulePlanner(
                     ScheduleEventBlock(block = block)
                 }
             }
-
         }
+        Spacer(modifier = Modifier.height(14.dp))
     }
 }
 
