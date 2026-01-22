@@ -64,8 +64,7 @@ class ParentAlarmViewModel @Inject constructor(
         viewModelScope.launch {
             sseManager.parentFeedEvents.collect { feedEvent ->
                 Timber.d("📢 새 알림 도착: ${feedEvent.data.eventType}")
-                // ✅ 서버 DB 동기화를 위해 약간 지연
-                delay(500) // 0.5초 대기
+                delay(500)
                 refresh()
             }
         }
