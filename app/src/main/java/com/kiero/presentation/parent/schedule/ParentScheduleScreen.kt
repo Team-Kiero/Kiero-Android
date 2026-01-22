@@ -92,7 +92,7 @@ fun ParentScheduleRoute(
                     onResetToToday = viewModel::resetToday,
                     navigateToScheduleAdd = {
                         navigateToScheduleAdd(
-                            state.data.currentDate.toString(),
+                            state.data.navInitialDate,
                             state.data.isFireLit
                         )
                     },
@@ -182,7 +182,7 @@ private fun ParentScheduleScreen(
                 .padding(paddingValues)
         ) {
             ParentUserSection(
-                userName = state.parentInfo.parentName,
+                userName = state.parentInfo.formattedParentName,
                 profileImage = state.parentInfo.parentProfileImage,
                 onUserNameClick = onUserNameClick,
                 modifier = Modifier

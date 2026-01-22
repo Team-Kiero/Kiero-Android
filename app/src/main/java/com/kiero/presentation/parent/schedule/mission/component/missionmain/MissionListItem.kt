@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -68,6 +69,7 @@ fun MissionInfo(
     dueAt: String,
     modifier: Modifier = Modifier,
     dayOfWeek: String? = null,
+    isVisible: Boolean = true,
 ) {
     val annotateDate = remember(dueAt) {
         buildAnnotatedString {
@@ -86,16 +88,15 @@ fun MissionInfo(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(color = Color.Unspecified),
+            .background(color = Color.Unspecified)
+            .alpha(if (isVisible) 1f else 0f),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        dayOfWeek?.let {
-            Text(
-                text = dayOfWeek,
-                color = KieroTheme.colors.gray300,
-                style = KieroTheme.typography.semiBold.title4
-            )
-        }
+        Text(
+            text = dayOfWeek ?: " ",
+            color = KieroTheme.colors.gray300,
+            style = KieroTheme.typography.semiBold.title4
+        )
 
         Text(
             text = annotateDate,

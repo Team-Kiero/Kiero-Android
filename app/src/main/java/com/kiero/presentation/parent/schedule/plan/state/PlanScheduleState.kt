@@ -43,6 +43,18 @@ data class ParentScheduleState(
             return "${targetMonth}월 ${weekNum}주차"
         }
 
+    val navInitialDate: String
+        get() {
+            val today = LocalDate.now()
+            val currentMonday = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+            val viewedMonday = currentDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+
+            return if (viewedMonday.isBefore(currentMonday)) {
+                today.toString()
+            } else {
+                currentDate.toString()
+            }
+        }
     fun ScheduleEvent.getIndices(): List<Int> {
         return if (isRecurring) {
             this.dayOfWeek?.split(",")?.mapNotNull { day ->
