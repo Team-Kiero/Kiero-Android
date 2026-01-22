@@ -182,7 +182,7 @@ private fun ParentScheduleScreen(
                 .padding(paddingValues)
         ) {
             ParentUserSection(
-                userName = state.parentInfo.parentName,
+                userName = state.parentInfo.formattedParentName,
                 profileImage = state.parentInfo.parentProfileImage,
                 onUserNameClick = onUserNameClick,
                 modifier = Modifier
