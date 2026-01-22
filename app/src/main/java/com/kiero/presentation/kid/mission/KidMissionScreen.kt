@@ -106,7 +106,8 @@ private fun KidMissionScreen(
             stickyHeader {
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .background(color = KieroTheme.colors.black),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     KidProfileChip(
@@ -120,7 +121,8 @@ private fun KidMissionScreen(
                             coinCount = 150,
                             isEnabled = true,
                             onClick = {}
-                        )
+                        ),
+                        isEnabled = true
                     )
                 }
             }

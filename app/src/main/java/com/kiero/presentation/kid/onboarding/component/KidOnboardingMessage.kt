@@ -11,7 +11,8 @@ import com.kiero.presentation.kid.onboarding.model.OnboardingUiModel
 
 @Composable
 fun KidOnboardingMessage(
-    step: OnboardingUiModel
+    step: OnboardingUiModel,
+    kidName: String = ""
 ) {
     val mainColor = KieroTheme.colors.main
     val defaultColor = KieroTheme.colors.gray300
@@ -20,7 +21,7 @@ fun KidOnboardingMessage(
     when (step) {
         OnboardingUiModel.STORY1 -> {
             Text(
-                text = "드디어 만났다! 나의 짝궁 근영",
+                text = "드디어 만났다! 나의 짝궁 $kidName",
                 color = defaultColor,
                 style = textStyle
             )

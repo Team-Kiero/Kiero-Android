@@ -58,7 +58,7 @@ fun SplashRoute(
 
 @Composable
 fun SplashScreen() {
-    val logoPainter = painterResource(R.drawable.img_app_logo)
+    val logoPainter = painterResource(R.drawable.ic_logo)
     val goblinPainter = painterResource(R.drawable.img_splash_goblin)
     val configuration = LocalConfiguration.current.screenWidthDp.dp
 
