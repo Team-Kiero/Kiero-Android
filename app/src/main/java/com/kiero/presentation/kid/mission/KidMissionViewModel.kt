@@ -70,6 +70,7 @@ class KidMissionViewModel @Inject constructor(
     fun collectChildMissionEvents() {
         viewModelScope.launch {
             sseManager.childMissionEvents.collect { event ->
+                Timber.e("collectChildMissionEvents $event")
                 fetchMissions()
             }
         }

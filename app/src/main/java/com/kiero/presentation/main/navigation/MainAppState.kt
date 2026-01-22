@@ -148,7 +148,10 @@ class MainAppState(
 
     fun navigateToAuth() {
         navController.navigate(AuthGraph) {
-            popUpTo(0) { inclusive = true }
+            popUpTo<Splash> {
+                inclusive = true
+            }
+            launchSingleTop = true
         }
     }
 

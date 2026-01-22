@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -72,15 +73,15 @@ class SseManager @Inject constructor(
                 cachedAccessToken = null
 
                 sseJob = launch {
-                    subscriptionLoop(isActive, isParent)
+                    subscriptionLoop(isParent)
                 }
 
                 startTokenRefreshTimer()
             }
         }
     }
-    private suspend fun subscriptionLoop(isActive: Boolean, isParent: Boolean) {
-        while (isActive && isSubscribed) {
+    private suspend fun subscriptionLoop(isParent: Boolean) {
+        while (currentCoroutineContext().isActive && isSubscribed) {
             try {
                 // 실패 시 재발급으로 continue
                 val token = getValidToken() ?: continue
@@ -128,7 +129,7 @@ class SseManager @Inject constructor(
                         sseJob?.cancel()
 
                         sseJob = launch {
-                            subscriptionLoop(isActive, isParentMode)
+                            subscriptionLoop(isParentMode)
                         }
                     }
                 }

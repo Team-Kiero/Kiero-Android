@@ -186,7 +186,7 @@ private fun ParentSignInEntryScreen(
             .padding(horizontal = 16.dp, vertical = 25.dp)
     ) {
         ParentSignUpTopBar(
-            parentName = state.parentInfo.formattedParentName,
+            parentName = state.parentInfo.parentName,
             profileImage = state.parentInfo.parentProfileImage,
             onClickProfile = onLogOut
         )

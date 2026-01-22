@@ -85,6 +85,7 @@ class KidJourneyViewModel @Inject constructor(
     fun collectChildKidScheduleEvents() {
         viewModelScope.launch {
             sseManager.childScheduleEvents.collect { event ->
+                Timber.e("collectChildKidScheduleEvents")
                 fetchTodaySchedule()
             }
         }
