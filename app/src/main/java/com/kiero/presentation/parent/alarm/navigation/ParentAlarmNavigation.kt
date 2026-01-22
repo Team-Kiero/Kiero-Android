@@ -17,11 +17,13 @@ fun NavController.navigateToAlarm(
 fun NavGraphBuilder.parentAlarmNavGraph(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
+    navigateToSelection: () -> Unit,
 ) {
     composable<Alarm> {
         ParentAlarmRoute(
             paddingValues = paddingValues,
-            navigateUp = navigateUp
+            navigateUp = navigateUp,
+            navigateToSelection = navigateToSelection
         )
     }
 }

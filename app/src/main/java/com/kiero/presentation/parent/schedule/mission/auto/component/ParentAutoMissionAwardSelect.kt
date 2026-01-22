@@ -18,7 +18,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
-import com.kiero.presentation.parent.schedule.mission.component.missionadd.MissionTextField
 import com.kiero.presentation.parent.schedule.mission.component.model.MissionAwardDefaults
 
 @Composable
@@ -36,13 +35,10 @@ fun ParentAutoMissionAwardSelect(
     ) {
         MissionAwardDefaults.PRESET_VALUES.forEachIndexed { index, presetValue ->
             if (index == 2) {
-                MissionTextField(
+                ParentAutoMissionTextField(
                     state = textFieldState,
-                    placeholder = textFieldState.text.toString().ifEmpty {
-                        MissionAwardDefaults.DEFAULT_AWARD.toString()
-                    },
-                    modifier = Modifier
-                        .weight(0.5f)
+                    placeholder = "",
+                    modifier = Modifier.weight(0.5f)
                 )
             }
 

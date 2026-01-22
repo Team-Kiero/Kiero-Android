@@ -57,6 +57,7 @@ fun ParentScheduleRoute(
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val authState by viewModel.authstate.collectAsStateWithLifecycle()
     val selectedTabIndex by viewModel.selectedTabIndex.collectAsStateWithLifecycle()
+    val childId by viewModel.childId.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.fetchSchedule()
@@ -85,6 +86,7 @@ fun ParentScheduleRoute(
                     paddingValues = paddingValues,
                     state = authState,
                     scheduleState = state.data,
+                    childId = childId,
                     selectedTabIndex = selectedTabIndex,
                     onTabSelected = viewModel::updateTabIndex,
                     onDateChange = viewModel::onDateChange,
@@ -109,6 +111,7 @@ fun ParentScheduleRoute(
                 ParentScheduleScreen(
                     paddingValues = paddingValues,
                     state = authState,
+                    childId = childId,
                     scheduleState = ParentScheduleState(),
                     selectedTabIndex = selectedTabIndex,
                     onTabSelected = viewModel::updateTabIndex,
@@ -155,6 +158,7 @@ private fun ParentScheduleScreen(
     paddingValues: PaddingValues,
     state: ParentSignUpState,
     scheduleState: ParentScheduleState,
+    childId: Long?,
     navigateToAutoMissionAdd: (Long) -> Unit,
     selectedTabIndex: Int,
     modifier: Modifier = Modifier,
@@ -230,7 +234,7 @@ private fun ParentScheduleScreen(
                 onExpandedChange = { isMissionFabExpanded = it },
                 onMissionAdd = navigateToMissionAdd,
                 onMissionRecommend = {
-                    navigateToAutoMissionAdd(10) // 임시 ChildID
+                    childId?.let { navigateToAutoMissionAdd(it) }
                 },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)

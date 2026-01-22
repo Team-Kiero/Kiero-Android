@@ -34,13 +34,12 @@ fun ParentUserSection(
     profileImage: String,
     onUserNameClick: () -> Unit,
     modifier: Modifier = Modifier,
+    backgroundColor: Color = KieroTheme.colors.gray900
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(
-                color = KieroTheme.colors.gray900
-            )
+            .background(color = backgroundColor)
     ) {
         Spacer(modifier = Modifier.height(33.dp))
 

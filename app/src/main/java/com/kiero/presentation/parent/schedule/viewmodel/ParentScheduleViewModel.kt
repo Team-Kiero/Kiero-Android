@@ -54,6 +54,9 @@ class ParentScheduleViewModel @Inject constructor(
     private val _selectedTabIndex = MutableStateFlow(0)
     val selectedTabIndex: StateFlow<Int> = _selectedTabIndex.asStateFlow()
 
+    private val _childId = MutableStateFlow<Long?>(null)
+    val childId: StateFlow<Long?> = _childId.asStateFlow()
+
     init {
         initFetchParentInfo()
     }
@@ -75,6 +78,8 @@ class ParentScheduleViewModel @Inject constructor(
                         Timber.e(it, "📌 자녀 목록 조회 실패")
                     }
             }
+
+            _childId.value = childId
 
             Timber.d("📢 SSE 구독 시작")
             sseManager.startParentSubscription()

@@ -40,7 +40,7 @@ class AutoMissionViewModel @Inject constructor(
 
     val sideEffect: SharedFlow<AutoMissionSideEffect> = _sideEffect.asSharedFlow()
 
-    val awardTextFieldState = TextFieldState()
+    val awardTextFieldState = TextFieldState(initialText = "20")
 
     init {
         observeAwardTextFieldChanges()
@@ -236,6 +236,16 @@ class AutoMissionViewModel @Inject constructor(
         }
     }
 
+    fun backToInputScreen() {
+        _state.update {
+            it.copy(
+                missions = emptyList(),
+                currentIndex = 0,
+                hasViewedLastPage = false
+            )
+        }
+    }
+
     fun handleCancel() {
         viewModelScope.launch {
             _sideEffect.emit(AutoMissionSideEffect.NavigateBack)
@@ -258,21 +268,45 @@ class AutoMissionViewModel @Inject constructor(
         viewModelScope.launch {
             snapshotFlow { awardTextFieldState.text.toString() }
                 .collect { text ->
+                    if (text.isEmpty()) {
+                        return@collect
+                    }
                     val value = text.toIntOrNull() ?: return@collect
                     val currentState = _state.value
 
-                    if (value in 1..500 && value != currentState.currentReward) {
-                        _state.update { state ->
-                            val updatedMissions = state.missions.toMutableList().apply {
-                                val index = state.currentIndex
-                                if (index in indices) {
-                                    this[index] = this[index].copy(reward = value)
-                                }
+                    when {
+                        value > 500 -> {
+                            awardTextFieldState.edit {
+                                replace(0, length, "500")
                             }
-                            state.copy(missions = updatedMissions)
+                            _sideEffect.emit(
+                                AutoMissionSideEffect.ShowToast("최대 보상은 500개입니다.")
+                            )
+                            updateMissionReward(500)
+                        }
+                        value < 1 -> {
+                            awardTextFieldState.edit {
+                                replace(0, length, "1")
+                            }
+                            updateMissionReward(1)
+                        }
+                        value != currentState.currentReward -> {
+                            updateMissionReward(value)
                         }
                     }
                 }
+        }
+    }
+
+    private fun updateMissionReward(value: Int) {
+        _state.update { state ->
+            val updatedMissions = state.missions.toMutableList().apply {
+                val index = state.currentIndex
+                if (index in indices) {
+                    this[index] = this[index].copy(reward = value)
+                }
+            }
+            state.copy(missions = updatedMissions)
         }
     }
 
