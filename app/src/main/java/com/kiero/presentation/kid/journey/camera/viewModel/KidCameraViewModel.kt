@@ -7,6 +7,7 @@ import androidx.navigation.toRoute
 import com.kiero.core.common.extension.updateSuccess
 import com.kiero.core.common.util.successData
 import com.kiero.core.model.UiState
+import com.kiero.data.kid.schedule.repository.PresignedUrlRepository
 import com.kiero.data.kid.schedule.repository.ScheduleRepository
 import com.kiero.presentation.kid.journey.camera.navigation.Camera
 import com.kiero.presentation.kid.journey.camera.state.KidCameraSideEffect
@@ -26,7 +27,8 @@ import javax.inject.Inject
 @HiltViewModel
 class KidCameraViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val repository: ScheduleRepository
+    private val repository: ScheduleRepository,
+    private val presignedUrlRepository: PresignedUrlRepository
 ) : ViewModel() {
     private val camera = savedStateHandle.toRoute<Camera>()
 
@@ -56,6 +58,63 @@ class KidCameraViewModel @Inject constructor(
     }
 
     fun postImage(
+        fileName: String,
+        contentType: String
+    ) {
+        viewModelScope.launch {
+            val currentState = _state.value.successData ?: return@launch
+
+            if (currentState.imageUri?.isBlank() == true) {
+                Timber.e("이미지 URI가 없습니다.")
+                return@launch
+            }
+
+            _state.updateSuccess { it.copy(isLoading = true) }
+
+            val timerJob = async {
+                delay(4000L)
+            }
+
+            val apiJob = async {
+                repository.postPresignedUrl(
+                    fileName = fileName,
+                    contentType = contentType
+                ).mapCatching { presignedModel ->
+                    val isUploaded = presignedUrlRepository.uploadImage(
+                        presignedUrl = presignedModel.presignedUrl,
+                        uriString = currentState.imageUri.orEmpty()
+                    )
+
+                    if (!isUploaded) {
+                        throw Exception("S3 Upload Failed")
+                    }
+
+                    repository.patchScheduleComplete(
+                        scheduleDetailId = currentState.scheduleDetailId,
+                        imageUrl = presignedModel.presignedUrl.split("?").first()
+                    ).getOrThrow()
+                }
+            }
+
+            try {
+                timerJob.await()
+                val apiResult = apiJob.await()
+
+                apiResult
+                    .onSuccess {
+                        _sideEffect.emit(KidCameraSideEffect.NavigateUp)
+                        _state.updateSuccess { it.copy(isLoading = false) }
+                    }
+                    .onFailure { e ->
+                        _state.updateSuccess { it.copy(isLoading = false) }
+                    }
+            } catch (e: Exception) {
+                _state.updateSuccess { it.copy(isLoading = false) }
+            }
+        }
+    }
+
+    /*fun postImage(
         fileName: String,
         contentType: String
     ) {
@@ -93,5 +152,5 @@ class KidCameraViewModel @Inject constructor(
                     _state.updateSuccess { it.copy(isLoading = false) }
                 }
         }
-    }
+    }*/
 }

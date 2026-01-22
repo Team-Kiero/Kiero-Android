@@ -7,11 +7,12 @@ fun createDateTitle(dueAt: String, dayOfWeek: String): String {
     return try {
         val date = LocalDate.parse(dueAt, DateTimeFormatter.ISO_DATE)
         val today = LocalDate.now()
+        val tomorrow = today.plusDays(1)
 
-        if (date.isEqual(today)) {
-            "오늘까지"
-        } else {
-            "${date.monthValue}월 ${date.dayOfMonth}일 ${dayOfWeek}까지"
+        when {
+            date.isEqual(today) -> "오늘까지"
+            date.isEqual(tomorrow) -> "내일까지"
+            else -> "${date.monthValue}월 ${date.dayOfMonth}일 ${dayOfWeek}까지"
         }
     } catch (e: Exception) {
         "$dueAt ${dayOfWeek}까지"

@@ -87,7 +87,20 @@ fun KieroNavHost(
             paddingValues = paddingValues,
             navigateUp = appState::navigateUp,
             navigateToParentGraph = appState::navigateToParentGraph,
-            navigateToParentSignUp = appState::navigateToParentSignUp,
+            navigateToParentSignUp = { parentName, parentProfileImage ->
+                val clearStackNavOptions = navOptions {
+                    popUpTo(0) {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
+                }
+
+                appState.navigateToParentSignUp(
+                    parentName = parentName,
+                    parentProfileImage = parentProfileImage,
+                    navOptions = clearStackNavOptions
+                )
+            },
             onEasterEggClick = appState::navigateToKidOnboarding
         )
 

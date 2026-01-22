@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -21,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
@@ -87,13 +89,15 @@ fun KieroDialog(
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                Text(
-                    text = title.orEmpty(),
-                    color = KieroTheme.colors.white,
-                    style = KieroTheme.typography.semiBold.title2,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center
-                )
+                if (title != null) {
+                    Text(
+                        text = title.orEmpty(),
+                        color = KieroTheme.colors.white,
+                        style = KieroTheme.typography.semiBold.title2,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
+                }
 
                 if (content != null) {
                     content()
@@ -133,7 +137,7 @@ private fun KieroDialogPreview() {
     KieroTheme {
         KieroDialog(
             onDismiss = {},
-            title = "제목",
+            title = null,
             subDescription = "로그아웃 하시겠습니까?",
 
             cancelAction = KieroCancelAction(
@@ -144,25 +148,19 @@ private fun KieroDialogPreview() {
                 text = "확인",
                 onClick = {}
             ),
-
+            isDisabled = true,
             content = {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    val coinImage = painterResource(R.drawable.img_kid_coin)
+                val coinImage = painterResource(R.drawable.img_kid_camera_goblin)
 
-                    Image(
-                        painter = coinImage,
-                        contentDescription = null,
-                        modifier = Modifier.forcePixelToDp(coinImage)
+                Image(
+                    painter = coinImage,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.size(
+                        width = 62.dp,
+                        height = 70.dp
                     )
-
-                    Spacer(modifier = Modifier.width(10.dp))
-
-                    Text(
-                        text = "150 개",
-                        color = KieroTheme.colors.main,
-                        style = KieroTheme.typography.semiBold.title4,
-                    )
-                }
+                )
             }
         )
     }

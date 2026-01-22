@@ -109,7 +109,9 @@ class AuthParentViewModel @Inject constructor(
 
     fun navigateUp() {
         viewModelScope.launch {
+            Timber.e("navigateUp")
             _sideEffect.emit(AuthSideEffect.NavigateUp)
+            _state.update { it.copy(uiState = UiState.Empty) }
         }
     }
 }
