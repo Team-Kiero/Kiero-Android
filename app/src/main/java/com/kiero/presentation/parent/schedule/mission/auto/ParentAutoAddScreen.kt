@@ -56,11 +56,7 @@ fun ParentAutoAddRoute(
     viewModel.sideEffect.collectSideEffect { effect ->
         when (effect) {
             is AutoMissionSideEffect.ShowToast -> {
-                globalUiEventHolder.showSnackbar(
-                    SnackbarState(
-                        message = effect.message
-                    )
-                )
+                // ParentAutoResultRoute에서 처리
             }
 
             is AutoMissionSideEffect.NavigateBack -> {
@@ -159,7 +155,7 @@ fun ParentAutoAddScreen(
             KieroButtonMedium(
                 text = "분석하고 미션 추가하기",
                 onClick = onAnalyzeClick,
-                isEnabled = state.isAnalyzeEnabled,  // ✅ Computed property
+                isEnabled = state.isAnalyzeEnabled,
                 containerColor = KieroTheme.colors.main,
                 contentColor = KieroTheme.colors.black,
                 modifier = Modifier.padding(horizontal = 16.dp)

@@ -75,6 +75,7 @@ fun NavGraphBuilder.parentNavGraph(
         parentAlarmNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
+            navigateToSelection = navigateToSelection
         )
     }
 }
