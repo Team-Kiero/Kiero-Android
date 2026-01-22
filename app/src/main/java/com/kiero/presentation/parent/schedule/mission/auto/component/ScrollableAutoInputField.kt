@@ -101,7 +101,7 @@ fun ScrollableAutoInputField(
                     }
             )
 
-            Spacer(Modifier.height(65.dp))
+            Spacer(Modifier.height(60.dp))
         }
     }
 }

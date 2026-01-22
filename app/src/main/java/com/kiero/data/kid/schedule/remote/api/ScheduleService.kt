@@ -7,10 +7,14 @@ import com.kiero.data.kid.schedule.remote.dto.response.ScheduleFireResponseDto
 import com.kiero.data.kid.schedule.remote.dto.response.ScheduleImageUploadResponseDto
 import com.kiero.data.kid.schedule.remote.dto.response.ScheduleSkipResponseDto
 import com.kiero.data.kid.schedule.remote.dto.response.ScheduleTodayResponseDto
+import okhttp3.RequestBody
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Url
 
 interface ScheduleService {
     @PATCH("api/v1/schedules/today")
