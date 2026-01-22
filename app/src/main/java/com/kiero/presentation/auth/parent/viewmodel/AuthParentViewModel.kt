@@ -3,6 +3,8 @@ package com.kiero.presentation.auth.parent.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kakao.sdk.common.model.ClientError
+import com.kakao.sdk.common.model.ClientErrorCause
 import com.kiero.core.common.extension.toHandleErrorMessage
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.model.UiState
@@ -82,10 +84,21 @@ class AuthParentViewModel @Inject constructor(
 
             }.onFailure { throwable ->
                 Timber.e(throwable)
+                if (throwable is ClientError && throwable.reason == ClientErrorCause.Cancelled) {
+                    _state.update {
+                        it.copy(uiState = UiState.Failure("로그인이 취소되었습니다"))
+                    }
+                    _sideEffect.emit(
+                        AuthSideEffect.ShowSnackbar(
+                            message = "로그인이 취소되었습니다"
+                        )
+                    )
+                    return@onFailure
+                }
+
                 _state.update {
                     it.copy(uiState = UiState.Failure(throwable.toHandleErrorMessage()))
                 }
-
                 _sideEffect.emit(
                     AuthSideEffect.ShowSnackbar(
                         message = throwable.toHandleErrorMessage()

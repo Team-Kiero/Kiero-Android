@@ -21,6 +21,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
 import com.kiero.core.common.extension.collectSideEffect
+import com.kiero.core.common.util.MaxLengthInputTransformation
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.component.button.KieroButtonMedium
 import com.kiero.core.designsystem.theme.KieroTheme
@@ -117,7 +118,8 @@ fun AuthKidSignupScreen(
                 fieldState = lastName,
                 isError = state.kidSignUpUiModel.lastName.text.isNotEmpty() && !validateLastName,
                 onImeAction = nextFocus,
-                imeAction = ImeAction.Next
+                imeAction = ImeAction.Next,
+                inputTransformation = MaxLengthInputTransformation(5)
             )
 
             KidInputField(
@@ -126,7 +128,8 @@ fun AuthKidSignupScreen(
                 fieldState = firstName,
                 isError = state.kidSignUpUiModel.firstName.text.isNotEmpty() && !validateFirstName,
                 onImeAction = nextFocus,
-                imeAction = ImeAction.Next
+                imeAction = ImeAction.Next,
+                inputTransformation = MaxLengthInputTransformation(5)
             )
 
             Spacer(modifier = Modifier.height(31.dp))

@@ -32,8 +32,13 @@ class AuthDataSourceImpl @Inject constructor(
             val accountCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
                 when {
                     error != null -> {
-                        Timber.e(error, "❌ 카카오 계정 로그인 실패")
-                        continuation.resume(Result.failure(error))
+                        if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
+                            Timber.d("⚠️ 사용자 웹 로그인 취소")
+                            continuation.resume(Result.failure(error))
+                        } else {
+                            Timber.e(error, "❌ 카카오 계정 로그인 실패")
+                            continuation.resume(Result.failure(error))
+                        }
                     }
                     token != null -> {
                         Timber.i("✅ 카카오 계정 로그인 성공")
