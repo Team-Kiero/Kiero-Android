@@ -4,9 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
@@ -35,14 +37,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import com.kiero.R
 import com.kiero.core.common.extension.noRippleClickable
@@ -57,6 +54,7 @@ fun TimePicker(
     onClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+
     val isEmpty by remember(value) { derivedStateOf { value.isEmpty() } }
 
     val newModifier =
@@ -198,8 +196,8 @@ fun TimePickerUI(
             chosenHour = chosenHour,
             chosenMinute = chosenMinute,
             chosenAmPm = chosenAmPm,
-            onHourChosen = { onHourChosen(it.toInt()) },
-            onMinuteChosen = { onMinuteChosen(it.toInt()) },
+            onHourChosen = { it.toIntOrNull()?.let { hour -> onHourChosen(hour) } },
+            onMinuteChosen = { it.toIntOrNull()?.let { min -> onMinuteChosen(min) } },
             onAmPmChosen = { onAmPmChosen(it) },
         )
     }
@@ -215,22 +213,18 @@ fun TimeSelectionSection(
     onAmPmChosen: (String) -> Unit,
 ) {
     val hourIndex = remember(chosenHour) {
-        TimePickerConstants.hours.indexOf(
-            String.format(
-                "%02d",
-                chosenHour
-            )
-        )
+        val formatted = String.format("%02d", chosenHour)
+        val raw = chosenHour.toString()
+        val index = TimePickerConstants.hours.indexOf(formatted)
+        if (index != -1) index else TimePickerConstants.hours.indexOf(raw)
     }
     val minuteIndex = remember(chosenMinute) {
-        TimePickerConstants.minutes.indexOf(
-            String.format(
-                "%02d",
-                chosenMinute
-            )
-        )
+        TimePickerConstants.minutes.indexOf(String.format("%02d", chosenMinute))
     }
-    val amPmIndex = remember(chosenAmPm) { TimePickerConstants.amPmList.indexOf(chosenAmPm) }
+    val amPmIndex = remember(chosenAmPm) {
+        TimePickerConstants.amPmList.indexOf(chosenAmPm)
+    }
+
     Box(
         modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
@@ -252,19 +246,19 @@ fun TimeSelectionSection(
         ) {
             TimeItemsPicker(
                 items = TimePickerConstants.hours,
-                firstIndex = if (hourIndex != -1) hourIndex - 2 else 0,
+                firstIndex = (hourIndex).coerceAtLeast(0),
                 onItemSelected = onHourChosen,
             )
             Spacer(modifier = Modifier.width(16.dp))
             TimeItemsPicker(
                 items = TimePickerConstants.minutes,
-                firstIndex = if (hourIndex != -1) hourIndex - 2 else 0,
+                firstIndex = (minuteIndex).coerceAtLeast(0),
                 onItemSelected = onMinuteChosen,
             )
             Spacer(modifier = Modifier.width(16.dp))
             TimeItemsPicker(
                 items = TimePickerConstants.amPmList,
-                firstIndex = if (hourIndex != -1) hourIndex - 2 else 0,
+                firstIndex = (amPmIndex).coerceAtLeast(0),
                 onItemSelected = onAmPmChosen,
             )
         }
@@ -278,74 +272,55 @@ fun TimeItemsPicker(
     onItemSelected: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val listState = rememberLazyListState(firstIndex)
+    val listState = rememberLazyListState(initialFirstVisibleItemIndex = firstIndex)
 
-    val nestedScrollConnection = remember {
-        object : NestedScrollConnection {
-            override fun onPostScroll(
-                consumed: Offset,
-                available: Offset,
-                source: NestedScrollSource,
-            ): Offset {
-                return available
-            }
-
-            override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
-                return available
-            }
-        }
+    LaunchedEffect(firstIndex) {
+        listState.scrollToItem(firstIndex)
     }
 
     LaunchedEffect(listState) {
         snapshotFlow { listState.firstVisibleItemIndex }
             .collect { index ->
-                val selectedIndex = (index + 2) % items.size
-                if (items[selectedIndex].isNotEmpty()) {
-                    onItemSelected(items[selectedIndex])
+                if (index in items.indices) {
+                    onItemSelected(items[index])
                 }
             }
     }
 
     Box(
         modifier = modifier
-            .height(210.dp)
+            .height(180.dp)
             .width(70.dp),
         contentAlignment = Alignment.Center,
     ) {
         LazyColumn(
-            modifier = Modifier
-                .fillMaxHeight()
-                .nestedScroll(nestedScrollConnection),
+            modifier = Modifier.fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally,
             state = listState,
+            contentPadding = PaddingValues(vertical = 72.dp),
+            flingBehavior = rememberSnapFlingBehavior(lazyListState = listState)
         ) {
-            items(items.size) {
-                val index = it % items.size
-                val firstVisibleItemIndex by remember {
-                    derivedStateOf { listState.firstVisibleItemIndex }
-                }
+            items(items.size) { i ->
+                val isSelected = i == listState.firstVisibleItemIndex
 
-                val isSelected = it == firstVisibleItemIndex + 2
-
-                Spacer(modifier = Modifier.height(2.dp))
-
-                Text(
-                    text = items[index],
-                    color = KieroTheme.colors.gray200,
+                Box(
                     modifier = Modifier
-                        .alpha(if (isSelected) 1f else 0.5f)
                         .height(36.dp)
-                        .padding(vertical = 2.dp),
-                    style = KieroTheme.typography.semiBold.title2,
-                    textAlign = TextAlign.Center,
-                )
-
-                Spacer(modifier = Modifier.height(4.dp))
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = items[i],
+                        color = if (isSelected) KieroTheme.colors.white else KieroTheme.colors.gray600,
+                        modifier = Modifier.alpha(if (isSelected) 1f else 0.5f),
+                        style = KieroTheme.typography.semiBold.title2,
+                        textAlign = TextAlign.Center,
+                    )
+                }
             }
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable
