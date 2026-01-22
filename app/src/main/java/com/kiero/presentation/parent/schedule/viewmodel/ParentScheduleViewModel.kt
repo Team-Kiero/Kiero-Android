@@ -56,9 +56,8 @@ class ParentScheduleViewModel @Inject constructor(
 
     init {
         initFetchParentInfo()
-        ensureChildIdAndStartSse()
     }
-    private fun ensureChildIdAndStartSse() {
+    fun ensureChildIdAndStartSse() {
         viewModelScope.launch {
             var childId = userInfoManager.getChildIdInfo()
 

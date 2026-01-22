@@ -7,6 +7,7 @@ import com.kiero.core.common.util.successData
 import com.kiero.core.model.UiState
 import com.kiero.data.kid.coin.repository.CoinRepository
 import com.kiero.data.mission.repository.MissionRepository
+import com.kiero.data.sse.manager.SseManager
 import com.kiero.presentation.kid.mission.model.toUiModel
 import com.kiero.presentation.kid.mission.state.KidMissionSideEffect
 import com.kiero.presentation.kid.mission.state.KidMissionState
@@ -28,7 +29,8 @@ import javax.inject.Inject
 @HiltViewModel
 class KidMissionViewModel @Inject constructor(
     repository: CoinRepository,
-    private val missionRepository: MissionRepository
+    private val missionRepository: MissionRepository,
+    private val sseManager: SseManager
 ) : ViewModel() {
     private val _state = MutableStateFlow<UiState<KidMissionState>>(UiState.Loading)
     val state: StateFlow<UiState<KidMissionState>> = combine(
@@ -61,6 +63,16 @@ class KidMissionViewModel @Inject constructor(
 
     init {
         fetchMissions()
+        sseManager.startChildSubscription()
+        collectChildMissionEvents()
+    }
+
+    fun collectChildMissionEvents() {
+        viewModelScope.launch {
+            sseManager.childMissionEvents.collect { event ->
+                fetchMissions()
+            }
+        }
     }
 
     fun fetchMissions(isRefreshing: Boolean = false) {

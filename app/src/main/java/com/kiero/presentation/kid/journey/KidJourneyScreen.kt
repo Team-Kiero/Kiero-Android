@@ -76,6 +76,7 @@ fun KidJourneyRoute(
     val refreshState = LocalRefreshState.current
 
     LaunchedEffect(Unit) {
+
         refreshState.refreshEvent.collect { tab ->
             if (tab == KidMainTab.JOURNEY) {
                 viewModel.fetchData()

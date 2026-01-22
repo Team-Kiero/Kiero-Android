@@ -7,6 +7,7 @@ import com.kiero.core.model.UiState
 import com.kiero.data.kid.coin.repository.CoinRepository
 import com.kiero.data.kid.schedule.model.ScheduleStatus
 import com.kiero.data.kid.schedule.repository.ScheduleRepository
+import com.kiero.data.sse.manager.SseManager
 import com.kiero.presentation.kid.journey.model.KidJourneyContentUiModel
 import com.kiero.presentation.kid.journey.model.KidJourneyHeaderUiModel
 import com.kiero.presentation.kid.journey.model.KidJourneyScheduleUiModel
@@ -14,7 +15,6 @@ import com.kiero.presentation.kid.journey.model.StoneUiType
 import com.kiero.presentation.kid.journey.state.KidJourneySideEffect
 import com.kiero.presentation.kid.journey.state.KidJourneyState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -23,7 +23,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -31,7 +30,8 @@ import javax.inject.Inject
 @HiltViewModel
 class KidJourneyViewModel @Inject constructor(
     private val repository: ScheduleRepository,
-    private val coinRepository: CoinRepository
+    private val coinRepository: CoinRepository,
+    private val sseManager: SseManager
 ) : ViewModel() {
     private val coin = coinRepository.myCoin
 
@@ -73,7 +73,8 @@ class KidJourneyViewModel @Inject constructor(
     val sideEffect: SharedFlow<KidJourneySideEffect> = _sideEffect.asSharedFlow()
 
     init {
-        startAutoRefresh()
+        sseManager.startChildSubscription()
+        collectChildKidScheduleEvents()
     }
 
     fun fetchData() {
@@ -81,11 +82,10 @@ class KidJourneyViewModel @Inject constructor(
         fetchCoin()
     }
 
-    private fun startAutoRefresh() {
+    fun collectChildKidScheduleEvents() {
         viewModelScope.launch {
-            while (isActive) {
-                fetchData()
-                delay(10_000L)
+            sseManager.childScheduleEvents.collect { event ->
+                fetchTodaySchedule()
             }
         }
     }

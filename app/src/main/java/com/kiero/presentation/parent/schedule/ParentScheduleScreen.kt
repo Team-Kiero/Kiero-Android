@@ -60,6 +60,7 @@ fun ParentScheduleRoute(
 
     LaunchedEffect(Unit) {
         viewModel.fetchSchedule()
+        viewModel.ensureChildIdAndStartSse()
     }
 
     viewModel.sideEffect.collectSideEffect {

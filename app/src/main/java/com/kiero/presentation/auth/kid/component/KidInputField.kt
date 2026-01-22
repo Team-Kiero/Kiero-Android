@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -36,6 +37,7 @@ fun KidInputField(
     modifier: Modifier = Modifier,
     isError: Boolean = false,
     imeAction: ImeAction = ImeAction.Next,
+    inputTransformation : InputTransformation? = null,
 ) {
     Column(
         modifier = modifier
@@ -65,7 +67,7 @@ fun KidInputField(
             onKeyboardAction = { performDefaultAction ->
                 onImeAction()
             },
-            inputTransformation = MaxLengthInputTransformation(5)
+            inputTransformation = inputTransformation
         )
 
         Row(
@@ -103,7 +105,8 @@ private fun KieroInputField() {
             fieldInputText = "성을 입력해줘!",
             fieldState = TextFieldState(),
             isError = true,
-            onImeAction = {}
+            onImeAction = {},
+            inputTransformation = MaxLengthInputTransformation(10)
         )
     }
 }
