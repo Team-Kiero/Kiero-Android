@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -19,10 +20,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.component.button.KieroButtonMedium
+import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.core.model.UiState
 import com.kiero.presentation.kid.component.KidSpeechField
 import com.kiero.presentation.kid.onboarding.component.KidOnboardingMessage
 import com.kiero.presentation.kid.onboarding.model.OnboardingUiModel
@@ -36,23 +40,36 @@ fun KidOnboardingRoute(
     navigateToKid: () -> Unit,
     viewModel: KidOnboardingViewModel = hiltViewModel()
 ) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
     viewModel.sideEffect.collectSideEffect {
         when (it) {
             KidOnboardingSideEffect.NavigateToKid -> navigateToKid()
         }
     }
 
-    KidOnboardingScreen(
-        paddingValues = paddingValues,
-        navigateToKid = viewModel::startJourney,
-        onSkipClick = {},
-        onNextClick = {}
-    )
+    when (val uiState = state) {
+        is UiState.Loading -> {
+            KieroLoadingIndicator()
+        }
+        is UiState.Success -> {
+            KidOnboardingScreen(
+                paddingValues = paddingValues,
+                kidName = uiState.data.kidName,
+                navigateToKid = viewModel::startJourney,
+                onSkipClick = {},
+                onNextClick = {}
+            )
+        }
+        is UiState.Failure -> {}
+        UiState.Empty -> {}
+    }
 }
 
 @Composable
 fun KidOnboardingScreen(
     paddingValues: PaddingValues,
+    kidName: String,
     navigateToKid: () -> Unit,
     onNextClick: () -> Unit,
     onSkipClick: () -> Unit,
@@ -77,7 +94,6 @@ fun KidOnboardingScreen(
         modifier = modifier
             .fillMaxSize()
             .background(color = KieroTheme.colors.black)
-            .padding(paddingValues),
     ) {
         Image(
             painter = painterResource(id = currentStep.backImage),
@@ -89,8 +105,10 @@ fun KidOnboardingScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 527.dp)
+                .padding(paddingValues),
         ) {
+            Spacer(modifier = Modifier.weight(1f))
+
             if (currentStep == OnboardingUiModel.STORY5) {
                 KidSpeechField(
                     name = "꾸비",
@@ -111,8 +129,9 @@ fun KidOnboardingScreen(
                     buttonText = "다음",
                     isVisibleButton = true,
                     nextButtonColor = KieroTheme.colors.main,
+                    onClick = moveToNextStep
                 ) {
-                    KidOnboardingMessage(step = currentStep)
+                    KidOnboardingMessage(step = currentStep, kidName = kidName)
                 }
             }
 
@@ -128,13 +147,13 @@ fun KidOnboardingScreen(
     }
 }
 
-
 @Preview
 @Composable
 private fun KidOnboardingStoryScreenPreview() {
     KieroTheme {
         KidOnboardingScreen(
             paddingValues = PaddingValues(),
+            kidName = "",
             navigateToKid = {},
             onSkipClick = {},
             onNextClick = {}
