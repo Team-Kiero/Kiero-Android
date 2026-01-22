@@ -2,6 +2,7 @@ package com.kiero.presentation.kid.wish.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.common.extension.toHandleErrorMessage
 import com.kiero.core.common.extension.updateSuccess
 import com.kiero.core.common.util.successData
 import com.kiero.core.model.UiState
@@ -67,9 +68,15 @@ class KidWishViewModel @Inject constructor(
             repository.getCurrentCoin()
                 .onSuccess {
                     Timber.d("fetchCoin: $it")
+                    _state.updateSuccess { state ->
+                        state.copy(
+                            coinUiModel = it.toUiModel()
+                        )
+                    }
                 }
                 .onFailure {
                     Timber.e("fetchCoin fail: $it")
+                    _sideEffect.emit(KidWishSideEffect.ShowSnackBar(it.toHandleErrorMessage()))
                 }
         }
     }

@@ -28,7 +28,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class KidMissionViewModel @Inject constructor(
-    repository: CoinRepository,
+    private val repository: CoinRepository,
     private val missionRepository: MissionRepository,
     private val sseManager: SseManager
 ) : ViewModel() {
@@ -132,9 +132,22 @@ class KidMissionViewModel @Inject constructor(
                             isCompletedMission = true
                         )
                     }
+                    fetchCoin()
                 }
                 .onFailure { exception ->
                     _sideEffect.emit(KidMissionSideEffect.ShowSnackbar(exception.message.toString()))
+                }
+        }
+    }
+
+    fun fetchCoin() {
+        viewModelScope.launch {
+            repository.getCurrentCoin()
+                .onSuccess {
+                    Timber.d("fetchCoin: $it")
+                }
+                .onFailure {
+                    Timber.e("fetchCoin fail: $it")
                 }
         }
     }

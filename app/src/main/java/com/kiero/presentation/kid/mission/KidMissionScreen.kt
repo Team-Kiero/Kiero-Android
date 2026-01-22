@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -133,76 +134,79 @@ private fun KidMissionScreen(
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp, vertical = 25.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(11.dp),
             state = listState
         ) {
             stickyHeader {
-                Row(
+                Column (
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(color = KieroTheme.colors.black),
-                    verticalAlignment = Alignment.CenterVertically
+                        .background(color = KieroTheme.colors.black)
                 ) {
-                    KidProfileChip(
-                        kidName = state.kidName
-                    )
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    KieroChip(
-                        action = KieroCoinAction(
-                            coinCount = state.coinUiModel.coinAmount,
-                            isEnabled = true,
-                            onClick = {}
-                        ),
-                        isEnabled = true
-                    )
-                }
-            }
-
-            item {
-                Spacer(modifier = Modifier.height(5.dp))
-
-                Box(
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        painter = painterGoblin,
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
+                    Row(
                         modifier = Modifier
-                            .forcePixelToDp(painterGoblin)
-                            .offset(y = (-30).dp)
-                    )
-
-                    KidSpeechField(
-                        name = "꾸비",
-                        isVisibleButton = false,
-                        modifier = Modifier.padding(top = 40.dp)
+                            .fillMaxWidth()
+                            .background(color = KieroTheme.colors.black),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = buildAnnotatedString {
-                                append("우리 함께 ")
-                                withStyle(style = SpanStyle(color = KieroTheme.colors.main)) {
-                                    append("멋진 금화")
-                                }
-                                append(" 를 만들어볼까?")
-                            },
-                            color = KieroTheme.colors.gray300
+                        KidProfileChip(
+                            kidName = state.kidName
+                        )
+
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        KieroChip(
+                            action = KieroCoinAction(
+                                coinCount = state.coinUiModel.coinAmount,
+                                isEnabled = true,
+                                onClick = {}
+                            ),
+                            isEnabled = true
                         )
                     }
-                }
 
-                Text(
-                    text = "미션",
-                    style = KieroTheme.typography.semiBold.title4,
-                    color = KieroTheme.colors.gray200,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .alpha(alpha = if (state.kidMissionByDateList.missionsByDate.isEmpty()) 0f else 1f)
-                        .padding(top = 12.dp),
-                    textAlign = TextAlign.Start
-                )
+                    Spacer(modifier = Modifier.height(5.dp))
+
+                    Box(
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterGoblin,
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .forcePixelToDp(painterGoblin)
+                                .offset(y = (-30).dp)
+                        )
+
+                        KidSpeechField(
+                            name = "꾸비",
+                            isVisibleButton = false,
+                            modifier = Modifier.padding(top = 40.dp)
+                        ) {
+                            Text(
+                                text = buildAnnotatedString {
+                                    append("우리 함께 ")
+                                    withStyle(style = SpanStyle(color = KieroTheme.colors.main)) {
+                                        append("멋진 금화")
+                                    }
+                                    append(" 를 만들어볼까?")
+                                },
+                                color = KieroTheme.colors.gray300
+                            )
+                        }
+                    }
+
+                    Text(
+                        text = "미션",
+                        style = KieroTheme.typography.semiBold.title4,
+                        color = KieroTheme.colors.gray200,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .alpha(alpha = if (state.kidMissionByDateList.missionsByDate.isEmpty()) 0f else 1f)
+                            .padding(top = 12.dp, bottom = 8.dp),
+                        textAlign = TextAlign.Start
+                    )
+                }
             }
 
             if (state.kidMissionByDateList.missionsByDate.isEmpty()) {
@@ -229,7 +233,8 @@ private fun KidMissionScreen(
                             style = KieroTheme.typography.regular.body4,
                             color = KieroTheme.colors.gray200,
                             modifier = Modifier
-                                .fillMaxWidth(),
+                                .fillMaxWidth()
+                                .padding(bottom = 18.dp),
                             textAlign = TextAlign.Start
                         )
                     }
@@ -238,14 +243,16 @@ private fun KidMissionScreen(
                         items = section.missions,
                         key = { it.id },
                     ) { item ->
-                        KidMissionItem(
-                            missionTitle = item.name,
-                            missionReward = item.reward,
-                            isCompleted = item.isCompleted,
-                            onClickButton = {
-                                onMissionCompleted(item.id)
-                            }
-                        )
+                        Box(modifier = Modifier.padding(bottom = 11.dp)) {
+                            KidMissionItem(
+                                missionTitle = item.name,
+                                missionReward = item.reward,
+                                isCompleted = item.isCompleted,
+                                onClickButton = {
+                                    onMissionCompleted(item.id)
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -285,8 +292,8 @@ private fun KidMissionScreen(
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.size(
-                            width = 62.dp,
-                            height = 70.dp
+                            width = 67.dp,
+                            height = 75.dp
                         )
                     )
                 }

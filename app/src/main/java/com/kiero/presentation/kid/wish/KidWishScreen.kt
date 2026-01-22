@@ -94,7 +94,8 @@ fun KidWishRoute(
             is KidWishSideEffect.ShowSnackBar -> {
                 globalTrigger.showSnackbar(
                     SnackbarState(
-                        message = it.message
+                        message = it.message,
+                        bottomPadding = 60
                     )
                 )
             }
@@ -154,7 +155,7 @@ fun KidWishRoute(
                                     Image(
                                         painter = coinImage,
                                         contentDescription = null,
-                                        modifier = Modifier.forcePixelToDp(coinImage)
+                                        modifier = Modifier.size(20.dp)
                                     )
 
                                     Spacer(modifier = Modifier.width(10.dp))

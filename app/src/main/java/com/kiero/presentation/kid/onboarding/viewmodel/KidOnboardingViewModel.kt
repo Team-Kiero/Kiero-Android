@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.localstorage.onboarding.OnboardingManager
 import com.kiero.core.model.UiState
+import com.kiero.data.demo.repository.DemoRepository
 import com.kiero.data.kid.coin.repository.CoinRepository
 import com.kiero.presentation.kid.onboarding.state.KidOnboardingSideEffect
 import com.kiero.presentation.kid.onboarding.state.KidOnboardingState
@@ -49,7 +50,9 @@ class KidOnboardingViewModel @Inject constructor(
                 .onSuccess {
                     Timber.d("fetchCoin: $it")
                     _state.value = UiState.Success(
-                        KidOnboardingState(kidName = coin.value.firstName)
+                        KidOnboardingState(
+                            kidName = coin.value.firstName
+                        )
                     )
                 }
                 .onFailure {
