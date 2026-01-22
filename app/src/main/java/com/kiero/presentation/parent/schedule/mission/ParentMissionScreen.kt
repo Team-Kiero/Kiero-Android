@@ -30,6 +30,7 @@ import com.kiero.core.trigger.LocalRefreshState
 import com.kiero.presentation.main.navigation.ParentMainTab
 import com.kiero.presentation.parent.schedule.mission.component.missionmain.MissionInfo
 import com.kiero.presentation.parent.schedule.mission.component.missionmain.MissionListItem
+import com.kiero.presentation.parent.schedule.mission.component.missionmain.MissionInfo
 import com.kiero.presentation.parent.schedule.mission.state.ParentMissionState
 import com.kiero.presentation.parent.schedule.mission.viewmodel.ParentMissionViewModel
 
@@ -96,8 +97,7 @@ fun ParentMissionScreen(
         contentPadding = PaddingValues(16.dp)
     ) {
         state.kidMissionByDateList.missionsByDate.forEach { missionsByDate ->
-
-            stickyHeader(key = missionsByDate.dueAt) {
+            stickyHeader {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -110,14 +110,13 @@ fun ParentMissionScreen(
                     )
                 }
             }
-
             items(
                 items = missionsByDate.missions,
             ) { mission ->
                 Box(modifier = Modifier.padding(vertical = 6.dp)) {
                     MissionListItem(
                         missionTitle = mission.name,
-                        reward = mission.reward,
+                        reward = mission.reward
                     )
                 }
             }

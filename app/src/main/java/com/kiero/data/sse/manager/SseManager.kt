@@ -3,6 +3,7 @@ package com.kiero.data.sse.manager
 import com.kiero.data.sse.model.SseEvent
 import com.kiero.data.sse.repository.SseRepository
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancelAndJoin
@@ -25,7 +26,7 @@ import kotlin.coroutines.cancellation.CancellationException
 class SseManager @Inject constructor(
     private val sseRepository: SseRepository
 ) {
-    private val scope = CoroutineScope(SupervisorJob())
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private var sseJob: Job? = null
     private var tokenRefreshJob: Job? = null
@@ -33,17 +34,29 @@ class SseManager @Inject constructor(
     private val mutex = Mutex()
 
     // 부모 이벤트
-    private val _parentInviteEvents = MutableSharedFlow<SseEvent.Invite>(replay = 1)
+    private val _parentInviteEvents = MutableSharedFlow<SseEvent.Invite>(
+        replay = 0,
+        extraBufferCapacity = 1
+    )
     val parentInviteEvents: SharedFlow<SseEvent.Invite> = _parentInviteEvents.asSharedFlow()
 
-    private val _parentFeedEvents = MutableSharedFlow<SseEvent.Feed>(replay = 1)
+    private val _parentFeedEvents = MutableSharedFlow<SseEvent.Feed>(
+        replay = 0,
+        extraBufferCapacity = 1
+    )
     val parentFeedEvents: SharedFlow<SseEvent.Feed> = _parentFeedEvents.asSharedFlow()
 
     // 자녀 이벤트
-    private val _childMissionEvents = MutableSharedFlow<SseEvent.Mission>(replay = 1)
+    private val _childMissionEvents = MutableSharedFlow<SseEvent.Mission>(
+        replay = 0,
+        extraBufferCapacity = 1
+    )
     val childMissionEvents: SharedFlow<SseEvent.Mission> = _childMissionEvents.asSharedFlow()
 
-    private val _childScheduleEvents = MutableSharedFlow<SseEvent.Schedule>(replay = 1)
+    private val _childScheduleEvents = MutableSharedFlow<SseEvent.Schedule>(
+        replay = 0,
+        extraBufferCapacity = 1
+    )
     val childScheduleEvents: SharedFlow<SseEvent.Schedule> = _childScheduleEvents.asSharedFlow()
 
     // 연결 상태

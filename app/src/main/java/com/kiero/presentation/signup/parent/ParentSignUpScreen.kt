@@ -74,7 +74,8 @@ fun ParentSignUpRoute(
                 if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
                     globalTrigger.showSnackbar(
                         SnackbarState(
-                            message = it.message
+                            message = it.message,
+                            bottomPadding = 110
                         )
                     )
                 }

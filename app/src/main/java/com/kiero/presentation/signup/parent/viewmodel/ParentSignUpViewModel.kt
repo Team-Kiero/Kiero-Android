@@ -10,10 +10,12 @@ import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.core.common.viewmodel.throttleFirst
 import com.kiero.core.localstorage.TokenManager
 import com.kiero.core.localstorage.info.UserInfoManager
+import com.kiero.core.model.UiState
 import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.data.demo.repository.DemoRepository
 import com.kiero.data.parent.signup.repository.ParentSignUpRepository
 import com.kiero.data.sse.manager.SseManager
+import com.kiero.presentation.kid.onboarding.state.KidOnboardingSideEffect
 import com.kiero.presentation.signup.parent.model.ParentSignUpStep
 import com.kiero.presentation.signup.parent.model.toUiModel
 import com.kiero.presentation.signup.parent.navigation.ParentSignUp
@@ -55,7 +57,7 @@ class ParentSignUpViewModel @Inject constructor(
 
     private var timerJob: Job? = null
     private var copyJob: Job? = null
-    private val TIMER_DURATION_SECONDS = 10 * 1
+    private val TIMER_DURATION_SECONDS = 10 * 60
 
     init {
         initFetchParentInfo(
@@ -77,9 +79,6 @@ class ParentSignUpViewModel @Inject constructor(
             ParentSignUpStep.INVITE -> {
                 viewModelScope.launch {
                     _sideEffect.emit(ParentSignUpSideEffect.NavigateToParent)
-
-                    // Todo : 데모데이 부스용
-                    //demoRepository.postDemo()
                 }
             }
         }
@@ -174,17 +173,14 @@ class ParentSignUpViewModel @Inject constructor(
 
         Timber.e("로그아웃 되었습니다")
         viewModelScope.launch {
-            val logoutDeferred = async {
-                suspendRunCatching { authRepository.postLogout() }
-            }
-            /*val demoDeferred = async {
-                suspendRunCatching { demoRepository.deleteDemo() }
-            }*/
-            val tokenDeferred = async {
-                suspendRunCatching { tokenManager.clearTokens() }
-            }
+            val networkJobs = listOf(
+                async { suspendRunCatching { authRepository.postLogout() } },
+                async { suspendRunCatching { demoRepository.deleteDemo() } }
+            )
+            networkJobs.awaitAll()
+            sseManager.stopSubscription()
 
-            awaitAll(logoutDeferred, /*demoDeferred,*/ tokenDeferred)
+            suspendRunCatching { tokenManager.clearTokens() }
 
             _state.update {
                 it.copy(isLoading = false)
@@ -248,10 +244,17 @@ class ParentSignUpViewModel @Inject constructor(
     }
 
     fun onBackClick() {
-        _state.update {
-            it.copy(
-                currentStep = ParentSignUpStep.ADDCHILD
-            )
+        Timber.e("onBackClick")
+        if (_state.value.currentStep == ParentSignUpStep.INVITE) {
+            _state.update {
+                it.copy(
+                    currentStep = ParentSignUpStep.ADDCHILD
+                )
+            }
+        } else {
+            viewModelScope.launch {
+                _sideEffect.emit(ParentSignUpSideEffect.NavigateToSelection)
+            }
         }
     }
 
