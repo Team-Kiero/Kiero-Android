@@ -232,6 +232,11 @@ class AutoMissionViewModel @Inject constructor(
             autoMissionRepository.saveBatchMissions(childId, domainMissions)
                 .onSuccess {
                     Timber.e("message saveBatchMissions")
+                    _state.update {
+                        it.copy(
+                            hasViewedLastPage = false
+                        )
+                    }
                     _sideEffect.emit(
                         AutoMissionSideEffect.ShowToastAndNavigate("미션이 등록되었습니다."),
                     )

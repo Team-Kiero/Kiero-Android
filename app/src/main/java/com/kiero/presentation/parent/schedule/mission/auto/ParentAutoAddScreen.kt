@@ -37,6 +37,7 @@ import com.kiero.presentation.parent.schedule.mission.auto.component.ScrollableA
 import com.kiero.presentation.parent.schedule.mission.auto.state.AutoMissionSideEffect
 import com.kiero.presentation.parent.schedule.mission.auto.state.AutoMissionState
 import com.kiero.presentation.parent.schedule.mission.auto.viewmodel.AutoMissionViewModel
+import timber.log.Timber
 
 @Composable
 fun ParentAutoAddRoute(
@@ -63,6 +64,7 @@ fun ParentAutoAddRoute(
             }
 
             is AutoMissionSideEffect.ShowToastAndNavigate -> {
+                Timber.e("parent auto add")
                 snackbarHostState.showSnackbar(effect.message)
                 navigateUp()
             }
