@@ -43,6 +43,7 @@ import java.time.LocalDate
 fun ParentAutoResultRoute(
     paddingValues: PaddingValues,
     state: AutoMissionState,
+    navigateUp: () -> Unit,
     viewModel: AutoMissionViewModel = hiltViewModel(),
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
@@ -62,6 +63,13 @@ fun ParentAutoResultRoute(
                         snackbarHostState.currentSnackbarData?.dismiss()
                         snackbarHostState.showSnackbar(effect.message)
                     }
+                }
+                is AutoMissionSideEffect.ShowToastAndNavigate -> {
+                    scope.launch {
+                        snackbarHostState.currentSnackbarData?.dismiss()
+                        snackbarHostState.showSnackbar(effect.message)
+                    }
+                    navigateUp()
                 }
                 else -> {}
             }

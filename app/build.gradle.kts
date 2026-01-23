@@ -14,7 +14,6 @@ val properties = Properties().apply {
     load(project.rootProject.file("local.properties").inputStream())
 }
 
-
 android {
     namespace = "com.kiero"
     compileSdk = libs.versions.compileSdk.get().toInt()
@@ -46,7 +45,6 @@ android {
         // manifestPlaceholders["NATIVE_APP_KEY"] = properties["kakao.native.app.key"].toString().replace("\"", "")
 
     }
-
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -81,6 +79,15 @@ android {
             dimension = "version"
             applicationIdSuffix = ".child"
             resValue("string", "app_name", "Kiero_Kid")
+        }
+    }
+
+    signingConfigs {
+        getByName("debug") {
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+            storeFile = File("${project.rootDir.absolutePath}/keystore/debug.keystore")
+            storePassword = "android"
         }
     }
 }
