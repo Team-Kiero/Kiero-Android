@@ -26,7 +26,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.kiero.R
 import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.designsystem.component.KieroTopbar
@@ -52,6 +52,7 @@ fun ParentAutoAddRoute(
         when (effect) {
             is AutoMissionSideEffect.ShowToast -> {
                 // ParentAutoResultRoute에서 처리
+                snackbarHostState.showSnackbar(effect.message)
             }
 
             is AutoMissionSideEffect.NavigateBack -> {

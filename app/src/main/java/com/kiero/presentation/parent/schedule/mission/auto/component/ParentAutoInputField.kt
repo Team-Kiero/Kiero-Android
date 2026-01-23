@@ -8,14 +8,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
@@ -24,10 +19,9 @@ import com.kiero.core.designsystem.theme.KieroTheme
 
 @Composable
 fun ParentAutoInputField(
-    text: String,
-    onTextChange: (String) -> Unit,
+    value: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
     modifier: Modifier = Modifier,
-    onSelectionChange: ((TextRange) -> Unit)? = null,
     placeholder: String = "알림장 내용을 입력하세요.",
     maxLength: Int = 1000,
     maxLines: Int = Int.MAX_VALUE,
@@ -36,21 +30,13 @@ fun ParentAutoInputField(
     textColor: Color = KieroTheme.colors.gray400
 ) {
     val focusManager = LocalFocusManager.current
-    var selection by remember { mutableStateOf(TextRange(text.length)) }
 
-    val textFieldValue = TextFieldValue(
-        text = text,
-        selection = selection
-    )
     TextField(
-        value = textFieldValue, // String 대신 TextFieldValue 사용
+        value = value,
         onValueChange = { newTextFieldValue ->
             if (newTextFieldValue.text.length <= maxLength) {
-                if (text != newTextFieldValue.text) {
-                    onTextChange(newTextFieldValue.text)
-                }
-                selection = newTextFieldValue.selection
-                onSelectionChange?.invoke(newTextFieldValue.selection)
+                // 값 변경을 상위로 즉시 전달
+                onValueChange(newTextFieldValue)
             }
         },
         placeholder = {
