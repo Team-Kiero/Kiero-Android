@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.theme.KieroTheme
 import kotlinx.coroutines.delay
@@ -41,13 +42,20 @@ fun ScrollableAutoInputField(
     val scrollState = rememberScrollState()
     val isFocused = remember { mutableStateOf(false) }
     val isImeVisible = WindowInsets.isImeVisible
-    var currentSelection by remember { mutableStateOf(TextRange(text.length)) }
+    var textFieldValue by remember {
+        mutableStateOf(TextFieldValue(text = text, selection = TextRange(text.length)))
+    }
+
     val previousLength = remember { mutableIntStateOf(text.length) }
     val shouldScrollToBottom = remember { mutableStateOf(false) }
-
     LaunchedEffect(text) {
-        val lengthDiff = text.length - previousLength.intValue
-        previousLength.intValue = text.length
+        if (textFieldValue.text != text) {
+            textFieldValue = textFieldValue.copy(text = text)
+        }
+    }
+    LaunchedEffect(textFieldValue.text) {
+        val lengthDiff = textFieldValue.text.length - previousLength.intValue
+        previousLength.intValue = textFieldValue.text.length
         if (lengthDiff > 5) {
             shouldScrollToBottom.value = true
         }
@@ -64,7 +72,7 @@ fun ScrollableAutoInputField(
     LaunchedEffect(isImeVisible, isFocused.value) {
         if (isImeVisible && isFocused.value) {
             delay(350)
-            val isCursorAtBottom = currentSelection.start == text.length
+            val isCursorAtBottom = textFieldValue.selection.start == textFieldValue.text.length
 
             if (scrollState.value > 0 && isCursorAtBottom) {
                 scrollState.animateScrollTo(scrollState.maxValue)
@@ -82,10 +90,10 @@ fun ScrollableAutoInputField(
                 .verticalScroll(scrollState)
         ) {
             ParentAutoInputField(
-                text = text,
-                onTextChange = onTextChange,
-                onSelectionChange = { range ->
-                    currentSelection = range
+                value = textFieldValue,
+                onValueChange = { newValue ->
+                    textFieldValue = newValue
+                    onTextChange(newValue.text)
                 },
                 placeholder = placeholder,
                 maxLength = maxLength,

@@ -28,55 +28,61 @@ class SplashViewModel @Inject constructor(
     private val _sideEffect = Channel<SplashSideEffect>()
     val sideEffect = _sideEffect.receiveAsFlow()
 
-
     fun checkLoginState() {
         viewModelScope.launch {
             delay(2000)
 
             val accessToken = tokenManager.getAccessToken()
             val userRole = tokenManager.getUserRole()
+            val refreshToken = tokenManager.getRefreshToken()
 
-            if (!accessToken.isNullOrBlank() && userRole != null) {
-                when (userRole) {
-                    UserRole.PARENT -> {
-                        authRepository.getChildren()
-                            .onSuccess { children ->
-                                Timber.e("children $children")
-                                if (children.isEmpty()) {
-                                    _sideEffect.send(SplashSideEffect.NavigateToParentGraph)
-                                } else {
-                                    // Todo : 추후 스프린트 시 수정 지금은 first
-                                    Timber.e("children.first().childId ${children.first().childId}")
-                                    delay(1000L)
-                                    userInfoManager.saveChildIdInfo(children.first().childId)
-
-                                    _sideEffect.send(SplashSideEffect.NavigateToParentHome)
-                                }
-                            }
-                            .onFailure { t ->
-                                Timber.e(t, "자녀 목록 조회 실패")
-                                _sideEffect.send(SplashSideEffect.NavigateToAuth)
-                            }
+            if (!accessToken.isNullOrBlank() && userRole != null && !refreshToken.isNullOrBlank()) {
+                reIssueManager.refresh(
+                    refreshToken = refreshToken,
+                    role = userRole
+                ).onSuccess {
+                    when (userRole) {
+                        UserRole.PARENT -> handleParentLogin()
+                        UserRole.KID -> handleKidLogin()
                     }
-                    UserRole.KID -> {
-                        reIssueManager.refresh(
-                            refreshToken = tokenManager.getRefreshToken().orEmpty(),
-                            role = UserRole.KID
-                        ).onSuccess {
-                            if (onboardingManager.getIsSawOnboarding()) {
-                                _sideEffect.send(SplashSideEffect.NavigateToKidHome)
-                            } else {
-                                _sideEffect.send(SplashSideEffect.NavigateToKidOnboarding)
-                            }
-                        }.onFailure { t ->
-                            Timber.e(t, "refreshn조회 실패")
-                            _sideEffect.send(SplashSideEffect.NavigateToAuth)
-                        }
-                    }
+                }.onFailure { t ->
+                    Timber.e(t, "토큰 갱신 실패 - 재로그인 필요")
+                    _sideEffect.send(SplashSideEffect.NavigateToAuth)
                 }
             } else {
                 _sideEffect.send(SplashSideEffect.NavigateToAuth)
             }
+        }
+    }
+
+    private suspend fun handleParentLogin() {
+        authRepository.getChildren()
+            .onSuccess { children ->
+                Timber.e("children $children")
+                if (children.isEmpty()) {
+                    // 자녀가 없으면 카카오 로그인으로
+                    _sideEffect.send(SplashSideEffect.NavigateToParentGraph)
+                } else {
+                    // 자녀가 있으면 첫 번째 자녀 정보 저장 후 스케줄로
+                    Timber.e("children.first().childId ${children.first().childId}")
+                    userInfoManager.saveChildIdInfo(children.first().childId)
+
+                    _sideEffect.send(SplashSideEffect.NavigateToParentHome)
+                }
+            }
+            .onFailure { t ->
+                Timber.e(t, "자녀 목록 조회 실패")
+                _sideEffect.send(SplashSideEffect.NavigateToAuth)
+            }
+    }
+
+    // 아이 로그인 처리 분리
+    private suspend fun handleKidLogin() {
+        if (onboardingManager.getIsSawOnboarding()) {
+            // 온보딩을 봤다면
+            _sideEffect.send(SplashSideEffect.NavigateToKidHome)
+        } else {
+            _sideEffect.send(SplashSideEffect.NavigateToKidOnboarding)
         }
     }
 }

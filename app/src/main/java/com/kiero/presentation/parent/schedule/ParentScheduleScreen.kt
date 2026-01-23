@@ -146,10 +146,6 @@ fun ParentScheduleRoute(
                 content = {}
             )
         }
-
-        if (uiState.successData?.isLoading == true) {
-            KieroLoadingIndicator()
-        }
     }
 }
 
