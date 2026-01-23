@@ -58,38 +58,33 @@ Google Recommended App Architecture를 기반으로 설계되었습니다.
 
 ```mermaid
 graph TB
-    subgraph UI["UI Layer (Presentation)"]
-        P1[auth / kid / parent / main / splash / signup<br/>Compose UI + ViewModel + UiState]
-    end
-
-    subgraph Domain["Domain Layer"]
-        D1[auth / kid / parent / mission / sse<br/>Entity + Repository Interface + UseCase]
+    subgraph UI["Presentation (UI Layer)"]
+        P1[splash / auth / kid / parent / main / signup<br/>Compose UI + ViewModel + UiState]
     end
 
     subgraph Data["Data Layer"]
-        DA1[auth / kid / parent / mission / sse<br/>Repository Impl + DataSource + DTO]
+        DA1[alarm / auth / kid / mission / parent / sse<br/>Repository + DataSource + API + DTO + Model]
     end
 
-    subgraph Core["Core Modules"]
+    subgraph Core["Core (Infrastructure)"]
         direction LR
-        CC[Common / Util / Extension]
-        CD[DesignSystem]
-        CL[LocalStorage]
-        CN[Network]
-        CS[Security]
-        CNV[Navigation]
-        CT[Trigger & Event]
+        CC[common]
+        CD[designsystem]
+        CL[localstorage]
+        CN[network]
+        CS[security]
+        CT[trigger]
     end
 
-    UI --> Domain
-    Domain --> Data
+    %% 의존성 흐름
+    UI --> Data
     
+    %% Core에 대한 의존성
     UI -.-> Core
-    Domain -.-> Core
     Data -.-> Core
 
+    %% 스타일링
     style UI fill:#81C784,stroke:#2E7D32,color:#fff
-    style Domain fill:#64B5F6,stroke:#1565C0,color:#fff
     style Data fill:#455A64,stroke:#212121,color:#fff
     style Core fill:#FFE082,stroke:#F9A825,color:#333
 ```
@@ -163,6 +158,14 @@ app/
 
 ---
 
+## 📚 Notion
+
+- [컨벤션](https://www.notion.so/2d58ff4aed3f809397e7c940a41beafa?source=copy_link)
+- [담당화면](https://www.notion.so/2d58ff4aed3f8087a51cff4f620c53e2?source=copy_link)
+- [API 담당](https://www.notion.so/API-2d78ff4aed3f802fb2e4e6b266821a52?source=copy_link)
+
+---
+
 ## 👥 Contributors
 
 <table>
@@ -198,16 +201,16 @@ app/
   </tr>
   <tr>
     <td align="center">
-      <sub>`부모 스케쥴 관리`,`미션 직접 추가`</sub>
+      <sub>부모 스케쥴 관리, 미션 직접 추가</sub>
     </td>
     <td align="center">
-      <sub>`자녀 및 부모 회원가입 뷰`,`자녀 소원의 우물`</sub>
+      <sub>자녀 및 부모 회원가입 뷰, 자녀 소원의 우물</sub>
     </td>
     <td align="center">
-      <sub>`자녀 오늘의 여정 뷰`,`자녀 금화 미션`</sub>
+      <sub>자녀 오늘의 여정 뷰, 자녀 금화 미션</sub>
     </td>
     <td align="center">
-      <sub>`카카오 로그인`,`부모 실시간 알림 피드`,`AI 미션 자동추가`</sub>
+      <sub>카카오 로그인, 부모 실시간 알림 피드, AI 미션 자동추가</sub>
     </td>
   </tr>
 </table>
