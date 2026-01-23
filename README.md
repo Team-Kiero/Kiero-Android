@@ -1,86 +1,52 @@
 # Kiero-Android
+
 Kiero 안드로이드 레포지토리 👶
-
-
 
 <div align="center">
 
-![Kotlin](https://img.shields.io/badge/Kotlin-2.2.21-7F52FF?style=flat&logo=kotlin&logoColor=white
-)
+![Kotlin](https://img.shields.io/badge/Kotlin-2.2.21-7F52FF?style=flat&logo=kotlin&logoColor=white)
 ![Android](https://img.shields.io/badge/Android-34A853?style=flat&logo=android&logoColor=white)
 ![MinSDK](https://img.shields.io/badge/minSdk-28-3DDC84?style=flat&logo=android&logoColor=white)
 
 ### 아이의 하루가 모험이 되는 곳
 
-<img width="1024" height="500" alt="image" src="" />
+<img src="https://github.com/user-attachments/assets/44273ca9-44fa-4f54-8ec4-d936dad0ae95" alt="Kiero App" width="100%" />
 
-**초등학생 자녀의 일정 관리와 자기주도적 습관 형성을 돕는**  
-**게이미피케이션 기반 성장 플랫폼**
+세상의 모든 아이는 히어로입니다.
 
-[Download](#download) • [Features](#features) • [Architecture](#architecture)
+Kiero는 그 믿음에서 시작된 가족 성장 플랫폼입니다.
 
-</div>
+부모는 응원으로, 아이는 도전으로 하루를 채웁니다.
 
----
+그렇게 가족은 함께 성장하며,
+일상 속 작은 성취를 이야기로 남깁니다. ✨
 
-## 💡 About Kiero
-
-> "세상의 모든 아이는 '히어로'다"
-
-**Kiero**는 'Kid(아이)'와 'Hero(히어로)'의 합성어입니다.
-
-잔소리가 응원이 되고, 의무가 모험이 되는 곳.  
-부모와 아이가 함께 성장하는 가족 운영 플랫폼을 만듭니다.
-
-### For Parents 👑
-잔소리 → 응원 | 불안 → 안심  
-아이의 성취를 확인하고 칭찬하며, 흩어진 스케줄을 한곳에서 관리합니다.
-
-### For Kids 🦸
-의무 → 모험 | 통제 → 도전  
-시간표가 모험 지도로 변하고, 스스로 퀘스트를 시작하며 보상을 획득합니다.
-
-### For Family 👨‍👩‍👧‍👦
-통제 → 협력  
-함께 약속을 정하고 지켜나가며, 서로를 든든한 팀원으로 느낍니다.
+[Download](#-download) • [Features](#-features) • [Architecture](#-architecture)
 
 ---
 
-## ✨ Features
+## 🌟 Features
 
-### 🎯 서비스 플로우
+👇 이런 순간, Kiero가 함께합니다
 
-```
-부모의 설계 → 아이의 도전 → 가족의 보상 → 신뢰의 형성
-```
+- 해야 할 일마다 "하자!" 대신 "싫어…"로 대답할 때
+- 아이의 하루를 관리가 아닌 성장으로 기록하고 싶을 때
+- 가족이 함께 목표를 세우고 칭찬과 보상을 나누고 싶을 때
+- "오늘은 잘했다"는 말을 놀이처럼 전하고 싶을 때
 
-**STEP 1. 부모의 설계**
-- 일정 등록 → 아이 화면의 `오늘의 레시피`로 변환
-- 미션 등록 → 아이 화면의 `마을 의뢰서`로 변환
-- AI 알림장 입력기로 자동 미션 생성
-
-**STEP 2. 아이의 도전**
-- 퀘스트 수행 후 인증샷 제출
-- 보석(포인트) 즉시 획득
-- 현실의 성취가 게임 배경으로 반영
-
-**STEP 3. 가족의 보상**
-- 소원 상점에서 보석으로 쿠폰 교환
-- 게임 30분 연장, 치킨 먹기 등 실질적 보상
-- 노력의 가시화
-
-**STEP 4. 신뢰의 형성**
-- 부모는 피드로 아이의 성취 확인
-- 승인과 칭찬 메시지 전송
-- 선순환 구조 완성
+📱 Kiero와 함께라면
+하루의 미션이 도전으로, 도전이 성취로,
+그리고 가족의 일상이 이야기로 이어집니다. ✨
 
 ---
 
 ## 📥 Download
 
-<a href="https://play.google.com/store/apps/details?id=com.kiero">
-  <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" height="80"/>
-</a>
+추후 스프린트 이후 구글 플레이 스토어에 출시할 예정입니다.
+
+<!-- <a href="https://play.google.com/store/apps/details?id=com.kiero">
+  <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" height="80" alt="Get it on Google Play"/>
+</a> -->
 
 ---
 
@@ -93,24 +59,26 @@ Google Recommended App Architecture를 기반으로 설계되었습니다.
 ```mermaid
 graph TB
     subgraph UI["UI Layer (Presentation)"]
-        P1[auth / kid / parent / main<br/>Compose UI + ViewModel + UiState]
+        P1[auth / kid / parent / main / splash / signup<br/>Compose UI + ViewModel + UiState]
     end
 
     subgraph Domain["Domain Layer"]
-        D1[auth / kid / parent<br/>Repository Interface + Entity + UseCase]
+        D1[auth / kid / parent / mission / sse<br/>Entity + Repository Interface + UseCase]
     end
 
     subgraph Data["Data Layer"]
-        DA1[auth / kid / parent<br/>Repository Impl + DataSource + DTO]
+        DA1[auth / kid / parent / mission / sse<br/>Repository Impl + DataSource + DTO]
     end
 
     subgraph Core["Core Modules"]
         direction LR
-        CN[Network]
+        CC[Common / Util / Extension]
         CD[DesignSystem]
+        CL[LocalStorage]
+        CN[Network]
+        CS[Security]
         CNV[Navigation]
-        CC[Common]
-        CM[Model]
+        CT[Trigger & Event]
     end
 
     UI --> Domain
@@ -120,119 +88,131 @@ graph TB
     Domain -.-> Core
     Data -.-> Core
 
-    style UI fill:#81C784
-    style Domain fill:#64B5F6
-    style Data fill:#455A64
-    style Core fill:#FFE082
+    style UI fill:#81C784,stroke:#2E7D32,color:#fff
+    style Domain fill:#64B5F6,stroke:#1565C0,color:#fff
+    style Data fill:#455A64,stroke:#212121,color:#fff
+    style Core fill:#FFE082,stroke:#F9A825,color:#333
 ```
 
+### ⚙️ Tech Stack
 
-### Package Structure
+| Category                 | Stack                                                           |
+| ------------------------ | --------------------------------------------------------------- |
+| **Architecture**         | Google Recommended App Architecture (MVVM)                      |
+| **UI**                   | Jetpack Compose · Material3                                     |
+| **Asynchronous**         | Kotlin Coroutines · Flow                                        |
+| **Dependency Injection** | Hilt 2.57.2                                                     |
+| **Networking**           | Retrofit 3.0.0 · OkHttp 5.3.2 · Kotlin Serialization            |
+| **Local Storage**        | DataStore · Google Tink (Encrypted Storage)                     |
+| **Image Loading**        | Coil 2.7.0 (GIF Supported)                                      |
+| **Logging**              | Timber                                                          |
+| **Auth SDK**             | Kakao SDK 2.20.6                                                |
+| **Modularization**       | Android App Modularization                                      |
+| **Build Configuration**  | Gradle Version Catalog · Custom Convention Plugins              |
 
-```
-com.kiero
-├── core/
-│   ├── common
-│   │   ├── extension/ Kotlin 확장 함수
-│   │   └── util/ 공통 유틸 함수
-│   ├── designsystem
-│   │   ├── component/ 공통 UI 컴포넌트
-│   │   └── theme/ 디자인 시스템 (Color, Typography 등)
-│   ├── model/ 공통으로 사용하는 모델
-│   ├── navigation/ 앱 전역 Navigation 정의
-│   └── network
-│       ├── di/ 네트워크 관련 DI 모듈
-│       └── model/ 공통 네트워크 모델
-│
-├── data
-│   ├── auth
-│   │   ├── local
-│   │   │   ├── datasource
-│   │   │   └── datasourceimpl/ Local DataSource 구현체
-│   │   ├── mapper/ DTO ↔ Domain Entity 매핑
-│   │   ├── remote
-│   │   │   ├── api/ Retrofit Service
-│   │   │   ├── datasource
-│   │   │   ├── datasourceimpl/ Remote DataSource 구현체
-│   │   │   └── dto
-│   │   └── repositoryimpl/ Domain Repository 구현체
-│   │
-│   ├── kid/ auth와 동일한 구조
-│   ├── parent/ auth와 동일한 구조
-│   └── di/ Data Layer DI 모듈
-│
-├── domain
-│   ├── auth
-│   │   ├── model/ Domain Entity
-│   │   │   └── DummyEntity
-│   │   └── repository/ Repository Interface
-│   │       └── DummyRepository
-│   │
-│   ├── kid/ auth와 동일한 구조
-│   └── parent/ auth와 동일한 구조
-│
-└── presentation
-    ├── auth
-    │   ├── component/ Auth 전용 UI 컴포넌트
-    │   ├── model/ UiState, UiEvent, SideEffect
-    │   ├── navigation/ Auth 관련 Navigation
-    │   ├── viewmodel/ 상태 관리 (ViewModel)
-    │   └── AuthScreen.kt
-    │
-    ├── kid
-    ├── main
-    ├── parent
-    └── KieroApplication
+### 📦 Package Structure
+
+</div>
 
 ```
+app/
+ ┣━ ⚙️ build.gradle.kts
+ ┣━ 🛡 proguard-rules.pro
+ ┗━ 📂 src/
+     ┣━ 📂 main/
+     │   ┣━ 📜 AndroidManifest.xml
+     │   ┣━ 📂 java/com/kiero/
+     │   │   ┣━ 🧩 core/                # 공통 인프라 계층
+     │   │   │   ┣━ common/             # Base, 유틸, 확장함수
+     │   │   │   ┣━ designsystem/       # Compose 디자인 시스템 (버튼, 다이얼로그, 테마 등)
+     │   │   │   ┣━ localstorage/       # Token, Onboarding, DataStore
+     │   │   │   ┣━ network/            # Retrofit, Interceptor, DI 모듈
+     │   │   │   ┣━ security/           # 암호화 및 보안 관리
+     │   │   │   ┗━ trigger/            # 전역 이벤트 및 상태 트리거
+     │   │   │
+     │   │   ┣━ 📚 data/                # 데이터 계층 (API, Repository, Model)
+     │   │   │   ┣━ alarm/              # 알림 기능
+     │   │   │   ┣━ auth/               # 인증 / 로그인 / 회원가입
+     │   │   │   ┣━ kid/                # 아이 관련 데이터 (코인, 스케줄, 위시)
+     │   │   │   ┣━ mission/            # 미션 데이터 (자동미션 등)
+     │   │   │   ┣━ parent/             # 부모 관련 데이터 (계획, 미션관리)
+     │   │   │   ┗━ sse/                # 실시간 이벤트 (Server-Sent Events)
+     │   │   │
+     │   │   ┣━ 🎨 presentation/        # UI 계층 (Compose)
+     │   │   │   ┣━ splash/             # 스플래시 화면
+     │   │   │   ┣━ auth/               # 로그인 / 회원가입
+     │   │   │   ┣━ kid/                # 아이 앱 화면 (여정, 미션, 위시, 온보딩)
+     │   │   │   ┣━ parent/             # 부모 앱 화면 (알림, 일정, 플랜, 미션)
+     │   │   │   ┣━ main/               # 메인 액티비티, 네비게이션 구조
+     │   │   │   ┗━ signup/             # 부모 회원가입 플로우
+     │   │   │
+     │   │   ┗━ 🚀 KieroApplication.kt   # 앱 진입점 (Application 클래스)
+     │   │
+     │   ┗━ 📂 res/
+     │       ┣━ 🎨 drawable/            # 벡터/아이콘 리소스
+     │       ┣━ 📑 values/              # 색상, 문자열, 테마
+     │       ┗━ ⚙️ xml/                 # 환경 설정 (backup_rules 등)
+     │
+     ┣━ 🧪 test/
+     │   └── java/com/kiero/ExampleUnitTest.kt
+     ┗━ 🧩 androidTest/
+         └── java/com/kiero/ExampleInstrumentedTest.kt
+```
 
-------
+<div align="center">
+
+---
+
 ## 👥 Contributors
 
 <table>
   <tr>
-    <td align="center">
+    <td align="center" width="25%">
       <a href="https://github.com/vvan2">
+        <img src="https://github.com/user-attachments/assets/87194a65-9acf-49f9-857b-c03d43cca9e1" alt="SJW" width="120" />
         <br />
         <sub><b>손주완 (Lead)</b></sub>
       </a>
-      <br />
-      <sub></sub>
     </td>
-    <td align="center">
+    <td align="center" width="25%">
       <a href="https://github.com/sonms">
+        <img src="https://github.com/user-attachments/assets/ca1e1d4b-e99d-4c76-83ad-07b62e88ec08" alt="SMS" width="120" />
         <br />
         <sub><b>손민성</b></sub>
       </a>
-      <br />
-      <sub></sub>
     </td>
-    <td align="center">
+    <td align="center" width="25%">
       <a href="https://github.com/seungjae708">
+        <img src="https://github.com/user-attachments/assets/51ee36b7-c6a8-4ea2-baf9-28fa97167e04" alt="CHJ" width="120" />
         <br />
         <sub><b>최승재</b></sub>
       </a>
-      <br />
-      <sub></sub>
+    </td>
+    <td align="center" width="25%">
+      <a href="https://github.com/dmp100">
+        <img src="https://github.com/user-attachments/assets/43c8c7d3-b323-4168-ab3c-b3fca0bf1295" alt="SKH" width="120" />
+        <br />
+        <sub><b>성규현</b></sub>
+      </a>
     </td>
   </tr>
   <tr>
     <td align="center">
-      <a href="https://github.com/dmp100">
-        <br />
-        <sub><b>성규현</b></sub>
-      </a>
-      <br />
-      <sub></sub>
+      <sub>`부모 스케쥴 관리`,`미션 직접 추가`</sub>
     </td>
-    <td></td>
-    <td></td>
+    <td align="center">
+      <sub>`자녀 및 부모 회원가입 뷰`,`자녀 소원의 우물`</sub>
+    </td>
+    <td align="center">
+      <sub>`자녀 오늘의 여정 뷰`,`자녀 금화 미션`</sub>
+    </td>
+    <td align="center">
+      <sub>`카카오 로그인`,`부모 실시간 알림 피드`,`AI 미션 자동추가`</sub>
+    </td>
   </tr>
 </table>
 
 ---
-
-<div align="center">
 
 **Made with ❤️ by Kiero Team**
 
