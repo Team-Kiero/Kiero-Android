@@ -37,6 +37,7 @@ import com.kiero.presentation.parent.schedule.mission.auto.component.ScrollableA
 import com.kiero.presentation.parent.schedule.mission.auto.state.AutoMissionSideEffect
 import com.kiero.presentation.parent.schedule.mission.auto.state.AutoMissionState
 import com.kiero.presentation.parent.schedule.mission.auto.viewmodel.AutoMissionViewModel
+import timber.log.Timber
 
 @Composable
 fun ParentAutoAddRoute(
@@ -51,7 +52,6 @@ fun ParentAutoAddRoute(
     viewModel.sideEffect.collectSideEffect { effect ->
         when (effect) {
             is AutoMissionSideEffect.ShowToast -> {
-                // ParentAutoResultRoute에서 처리
                 snackbarHostState.showSnackbar(effect.message)
             }
 
@@ -61,6 +61,12 @@ fun ParentAutoAddRoute(
 
             is AutoMissionSideEffect.ScrollToPage -> {
                 // 처리 안 함
+            }
+
+            is AutoMissionSideEffect.ShowToastAndNavigate -> {
+                Timber.e("parent auto add")
+                snackbarHostState.showSnackbar(effect.message)
+                navigateUp()
             }
         }
     }
@@ -77,7 +83,8 @@ fun ParentAutoAddRoute(
             ParentAutoResultRoute(
                 paddingValues = paddingValues,
                 state = state,
-                viewModel = viewModel
+                viewModel = viewModel,
+                navigateUp = navigateUp
             )
         }
 

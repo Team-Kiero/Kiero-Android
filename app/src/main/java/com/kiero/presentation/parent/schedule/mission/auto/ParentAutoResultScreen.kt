@@ -36,6 +36,7 @@ import com.kiero.presentation.parent.schedule.mission.auto.state.AutoMissionStat
 import com.kiero.presentation.parent.schedule.mission.auto.viewmodel.AutoMissionViewModel
 import com.kiero.presentation.parent.schedule.mission.component.datepicker.component.CalendarBottomSheet
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.time.LocalDate
 
 
@@ -43,6 +44,7 @@ import java.time.LocalDate
 fun ParentAutoResultRoute(
     paddingValues: PaddingValues,
     state: AutoMissionState,
+    navigateUp: () -> Unit,
     viewModel: AutoMissionViewModel = hiltViewModel(),
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
@@ -58,10 +60,16 @@ fun ParentAutoResultRoute(
         viewModel.sideEffect.collect { effect ->
             when (effect) {
                 is AutoMissionSideEffect.ShowToast -> {
-                    scope.launch {
-                        snackbarHostState.currentSnackbarData?.dismiss()
-                        snackbarHostState.showSnackbar(effect.message)
-                    }
+                    snackbarHostState.currentSnackbarData?.dismiss()
+                    snackbarHostState.showSnackbar(effect.message)
+                }
+                is AutoMissionSideEffect.ShowToastAndNavigate -> {
+                    Timber.e("parent Auto result")
+
+                    snackbarHostState.currentSnackbarData?.dismiss()
+                    snackbarHostState.showSnackbar(effect.message)
+
+                    navigateUp()
                 }
                 else -> {}
             }

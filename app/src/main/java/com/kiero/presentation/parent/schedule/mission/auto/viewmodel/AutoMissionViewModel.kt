@@ -35,10 +35,7 @@ class AutoMissionViewModel @Inject constructor(
     private val _state = MutableStateFlow(AutoMissionState())
     val state: StateFlow<AutoMissionState> = _state.asStateFlow()
 
-    private val _sideEffect = MutableSharedFlow<AutoMissionSideEffect>(
-        extraBufferCapacity = 1
-    )
-
+    private val _sideEffect = MutableSharedFlow<AutoMissionSideEffect>()
     val sideEffect: SharedFlow<AutoMissionSideEffect> = _sideEffect.asSharedFlow()
 
     val awardTextFieldState = TextFieldState(initialText = "20")
@@ -234,11 +231,15 @@ class AutoMissionViewModel @Inject constructor(
 
             autoMissionRepository.saveBatchMissions(childId, domainMissions)
                 .onSuccess {
+                    Timber.e("message saveBatchMissions")
+                    _state.update {
+                        it.copy(
+                            hasViewedLastPage = false
+                        )
+                    }
                     _sideEffect.emit(
-                        AutoMissionSideEffect.ShowToast("미션이 등록되었습니다.")
+                        AutoMissionSideEffect.ShowToastAndNavigate("미션이 등록되었습니다."),
                     )
-                    delay(200)
-                    _sideEffect.emit(AutoMissionSideEffect.NavigateBack)
                 }
                 .onFailure { e ->
                     val message = when {
