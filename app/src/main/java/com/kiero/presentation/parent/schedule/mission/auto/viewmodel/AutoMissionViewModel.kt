@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -62,21 +63,35 @@ class AutoMissionViewModel @Inject constructor(
 
             autoMissionRepository.analyzeNotice(escapedText)
                 .onSuccess { domainData ->
-                    val uiMissions = domainData.suggestedMissions.map { suggested ->
-                        MissionUiModel(
-                            name = suggested.name,
-                            reward = suggested.reward,
-                            dueAt = LocalDate.parse(suggested.dueAt),
-                            isCompleted = false
-                        )
-                    }
-                    _state.update {
-                        it.copy(
-                            missions = uiMissions,
-                            currentIndex = 0,
-                            hasViewedLastPage = uiMissions.size == 1,
-                            isAnalyzing = false
-                        )
+                    if (domainData.suggestedMissions.isEmpty()) {
+                        Timber.e("message suggestedMissions")
+                        _sideEffect.emit(AutoMissionSideEffect.ShowToast("알림장 내용을 분석하지 못했어요."))
+                        delay(2000L)
+                        _state.update {
+                            it.copy(
+                                missions = emptyList(),
+                                currentIndex = 0,
+                                hasViewedLastPage = false,
+                                isAnalyzing = false
+                            )
+                        }
+                    } else {
+                        val uiMissions = domainData.suggestedMissions.map { suggested ->
+                            MissionUiModel(
+                                name = suggested.name,
+                                reward = suggested.reward,
+                                dueAt = LocalDate.parse(suggested.dueAt),
+                                isCompleted = false
+                            )
+                        }
+                        _state.update {
+                            it.copy(
+                                missions = uiMissions,
+                                currentIndex = 0,
+                                hasViewedLastPage = uiMissions.size == 1,
+                                isAnalyzing = false
+                            )
+                        }
                     }
                 }
                 .onFailure { e ->
@@ -84,6 +99,7 @@ class AutoMissionViewModel @Inject constructor(
                         is TimeoutCancellationException -> "잠시 후 다시 시도해주세요."
                         else -> "알림장 내용을 분석하지 못했어요."
                     }
+                    Timber.e("message $message")
                     _sideEffect.emit(AutoMissionSideEffect.ShowToast(message))
                     _state.update { it.copy(isAnalyzing = false) }
                 }
