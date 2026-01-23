@@ -1,6 +1,13 @@
 # Kiero-Android
 
-Kiero 안드로이드 레포지토리 👶
+# <img width="40" height="40" alt="로고" src="https://github.com/user-attachments/assets/2b10c798-e649-4275-9712-7f2b8659c0d9" />  Kiero 키어로
+
+> 프로젝트 기간 | 2025.12.20 ~ ing
+
+초등학생 자녀의 **일정 관리**와 **자기주도적 습관 형성**을 동시에 돕는  
+게이미피케이션 기반 성장 플랫폼입니다.
+<br>
+<br>
 
 <div align="center">
 
@@ -10,7 +17,7 @@ Kiero 안드로이드 레포지토리 👶
 
 ### 아이의 하루가 모험이 되는 곳
 
-<img src="https://github.com/user-attachments/assets/44273ca9-44fa-4f54-8ec4-d936dad0ae95" alt="Kiero App" width="100%" />
+<img width="1000" alt="웹페이지 소개" src="https://github.com/user-attachments/assets/6047df01-957f-408c-b9ea-ddfa4bdbb57c" />
 
 세상의 모든 아이는 히어로입니다.
 
@@ -21,11 +28,11 @@ Kiero는 그 믿음에서 시작된 가족 성장 플랫폼입니다.
 그렇게 가족은 함께 성장하며,
 일상 속 작은 성취를 이야기로 남깁니다. ✨
 
-[Download](#-download) • [Features](#-features) • [Architecture](#-architecture)
+
+[About](#-about) • [Download](#-download) • [Architecture](#-architecture)
 
 ---
-
-## 🌟 Features
+## 🌟 About
 
 👇 이런 순간, Kiero가 함께합니다
 
@@ -37,6 +44,69 @@ Kiero는 그 믿음에서 시작된 가족 성장 플랫폼입니다.
 📱 Kiero와 함께라면
 하루의 미션이 도전으로, 도전이 성취로,
 그리고 가족의 일상이 이야기로 이어집니다. ✨
+
+---
+<img width="1920" height="1080" alt="16" src="https://github.com/user-attachments/assets/c1f581be-5fc5-4de9-9130-232c82c5d945" />
+<img width="1920" height="1080" alt="17" src="https://github.com/user-attachments/assets/70fa7be7-0f83-4fc9-b6a2-954ab786636c" />
+<img width="1920" height="1080" alt="18" src="https://github.com/user-attachments/assets/dca0842e-6341-4018-9033-dc0e2c8d5048" />
+<img width="1920" height="1080" alt="19" src="https://github.com/user-attachments/assets/b997759b-855e-455e-822d-0ae7ef4fdd2f" />
+<img width="1920" height="1080" alt="20" src="https://github.com/user-attachments/assets/b0a2d9c9-e28d-4eb4-a6c5-8205365ca125" />
+<img width="1920" height="1080" alt="21" src="https://github.com/user-attachments/assets/3051ab5f-7776-4660-9ecf-5a1c6d94d76c" />
+<img width="1920" height="1080" alt="22" src="https://github.com/user-attachments/assets/8ba524fc-964f-4219-946d-7a4c1f913c9b" />
+<img width="1920" height="1080" alt="23" src="https://github.com/user-attachments/assets/8ee83aa2-4fc7-49a4-8b97-5fd5e31fb259" />
+<img width="1920" height="1080" alt="24" src="https://github.com/user-attachments/assets/87cdb273-1f1f-46b2-b6ee-7becd3ed1cf2" />
+<img width="1920" height="1080" alt="30" src="https://github.com/user-attachments/assets/24e6bc5e-fc7a-4078-a0e7-d69113c7fee0" />
+<br>
+<br>
+
+## 👥 Contributors
+
+<table>
+  <tr>
+    <td align="center" width="25%">
+      <a href="https://github.com/vvan2">
+        <img src="https://github.com/user-attachments/assets/87194a65-9acf-49f9-857b-c03d43cca9e1" alt="SJW" width="120" />
+        <br />
+        <sub><b>손주완 (Lead)</b></sub>
+      </a>
+    </td>
+    <td align="center" width="25%">
+      <a href="https://github.com/sonms">
+        <img src="https://github.com/user-attachments/assets/ca1e1d4b-e99d-4c76-83ad-07b62e88ec08" alt="SMS" width="120" />
+        <br />
+        <sub><b>손민성</b></sub>
+      </a>
+    </td>
+    <td align="center" width="25%">
+      <a href="https://github.com/seungjae708">
+        <img src="https://github.com/user-attachments/assets/51ee36b7-c6a8-4ea2-baf9-28fa97167e04" alt="CHJ" width="120" />
+        <br />
+        <sub><b>최승재</b></sub>
+      </a>
+    </td>
+    <td align="center" width="25%">
+      <a href="https://github.com/dmp100">
+        <img src="https://github.com/user-attachments/assets/43c8c7d3-b323-4168-ab3c-b3fca0bf1295" alt="SKH" width="120" />
+        <br />
+        <sub><b>성규현</b></sub>
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <sub>부모 스케쥴 관리, 미션 직접 추가</sub>
+    </td>
+    <td align="center">
+      <sub>자녀 및 부모 회원가입 뷰, 자녀 소원의 우물</sub>
+    </td>
+    <td align="center">
+      <sub>자녀 오늘의 여정 뷰, 자녀 금화 미션</sub>
+    </td>
+    <td align="center">
+      <sub>카카오 로그인, 부모 실시간 알림 피드, AI 미션 자동추가</sub>
+    </td>
+  </tr>
+</table>
 
 ---
 
@@ -163,57 +233,6 @@ app/
 - [컨벤션](https://ruddy-adapter-e98.notion.site/2d58ff4aed3f809397e7c940a41beafa?source=copy_link)
 - [담당화면](https://ruddy-adapter-e98.notion.site/2d58ff4aed3f8087a51cff4f620c53e2?source=copy_link)
 - [API 담당](https://ruddy-adapter-e98.notion.site/API-2f18ff4aed3f8014afb7cea46529ff9e?source=copy_link)
-
----
-
-## 👥 Contributors
-
-<table>
-  <tr>
-    <td align="center" width="25%">
-      <a href="https://github.com/vvan2">
-        <img src="https://github.com/user-attachments/assets/87194a65-9acf-49f9-857b-c03d43cca9e1" alt="SJW" width="120" />
-        <br />
-        <sub><b>손주완 (Lead)</b></sub>
-      </a>
-    </td>
-    <td align="center" width="25%">
-      <a href="https://github.com/sonms">
-        <img src="https://github.com/user-attachments/assets/ca1e1d4b-e99d-4c76-83ad-07b62e88ec08" alt="SMS" width="120" />
-        <br />
-        <sub><b>손민성</b></sub>
-      </a>
-    </td>
-    <td align="center" width="25%">
-      <a href="https://github.com/seungjae708">
-        <img src="https://github.com/user-attachments/assets/51ee36b7-c6a8-4ea2-baf9-28fa97167e04" alt="CHJ" width="120" />
-        <br />
-        <sub><b>최승재</b></sub>
-      </a>
-    </td>
-    <td align="center" width="25%">
-      <a href="https://github.com/dmp100">
-        <img src="https://github.com/user-attachments/assets/43c8c7d3-b323-4168-ab3c-b3fca0bf1295" alt="SKH" width="120" />
-        <br />
-        <sub><b>성규현</b></sub>
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <sub>부모 스케쥴 관리, 미션 직접 추가</sub>
-    </td>
-    <td align="center">
-      <sub>자녀 및 부모 회원가입 뷰, 자녀 소원의 우물</sub>
-    </td>
-    <td align="center">
-      <sub>자녀 오늘의 여정 뷰, 자녀 금화 미션</sub>
-    </td>
-    <td align="center">
-      <sub>카카오 로그인, 부모 실시간 알림 피드, AI 미션 자동추가</sub>
-    </td>
-  </tr>
-</table>
 
 ---
 
