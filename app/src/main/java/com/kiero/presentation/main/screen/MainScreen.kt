@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -87,6 +88,10 @@ fun MainScreen(
         mutableStateOf<Shape>(RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp))
     }
 
+    var bottomPadding by remember {
+        mutableIntStateOf(90)
+    }
+
     if (showParentBottomBar) {
         cachedTabs = ParentMainTab.entries.toImmutableList()
         cachedShape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp)
@@ -113,6 +118,7 @@ fun MainScreen(
     val onShowSnackbar: (SnackbarState) -> Unit = remember(scope, snackBarHostState) {
         { state ->
             currentSnackbarState = state
+            bottomPadding = state.bottomPadding
             scope.launch {
                 snackBarHostState.currentSnackbarData?.dismiss()
 
@@ -181,10 +187,9 @@ fun MainScreen(
                     SnackbarHost(hostState = snackBarHostState) { data ->
                         KieroSnackbar(
                             message = data.visuals.message,
-                            // TODO: 디자인 확정 후 스낵바 높이 및 패딩 수정 필요
                             modifier = Modifier
                                 .padding(horizontal = 16.dp)
-                                .padding(bottom = 90.dp)
+                                .padding(bottom = bottomPadding.dp)
                         )
                     }
                 },
@@ -213,6 +218,7 @@ fun MainScreen(
                 if (dialogState.dialogState.isVisible) {
                     KieroDialog(
                         title = "인터넷 연결을 확인해주세요!",
+                        isDisabled = true,
                         confirmAction = KieroConfirmAction(
                             text = "재시도",
                             onClick = {

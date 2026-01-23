@@ -36,7 +36,7 @@ fun ParentAutoMissionAwardInfo(
         horizontalArrangement = Arrangement.Start
     ) {
         Image(
-            painter = painterResource(id = R.drawable.img_kid_coin),
+            painter = painterResource(id = R.drawable.img_coin),
             contentDescription = null,
             modifier = Modifier
                 .size(24.dp)

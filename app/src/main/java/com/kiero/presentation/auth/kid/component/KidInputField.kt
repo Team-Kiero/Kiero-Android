@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -19,9 +20,11 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
+import com.kiero.core.common.util.MaxLengthInputTransformation
 import com.kiero.core.designsystem.component.KieroTextField
 import com.kiero.core.designsystem.theme.KieroTheme
 
@@ -34,6 +37,7 @@ fun KidInputField(
     modifier: Modifier = Modifier,
     isError: Boolean = false,
     imeAction: ImeAction = ImeAction.Next,
+    inputTransformation : InputTransformation? = null,
 ) {
     Column(
         modifier = modifier
@@ -55,10 +59,15 @@ fun KidInputField(
             placeholder = fieldInputText,
             containerColor = KieroTheme.colors.gray900,
             isError = isError,
-            keyboardOptions = KeyboardOptions(imeAction = imeAction),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Uri,
+                autoCorrectEnabled = false,
+                imeAction = imeAction
+            ),
             onKeyboardAction = { performDefaultAction ->
                 onImeAction()
-            }
+            },
+            inputTransformation = inputTransformation
         )
 
         Row(
@@ -96,7 +105,8 @@ private fun KieroInputField() {
             fieldInputText = "성을 입력해줘!",
             fieldState = TextFieldState(),
             isError = true,
-            onImeAction = {}
+            onImeAction = {},
+            inputTransformation = MaxLengthInputTransformation(10)
         )
     }
 }

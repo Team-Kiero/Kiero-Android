@@ -4,6 +4,7 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.navOptions
@@ -23,6 +24,15 @@ fun KieroNavHost(
     modifier: Modifier = Modifier,
     startDestination: Route = AuthGraph,
 ) {
+    val clearStackNavOptions = remember {
+        navOptions {
+            popUpTo(0) {
+                inclusive = true
+            }
+            launchSingleTop = true
+        }
+    }
+
     NavHost(
         navController = appState.navController,
         startDestination = startDestination,
@@ -35,49 +45,20 @@ fun KieroNavHost(
         splashNavGraph(
             navigateToAuth = appState::navigateToAuth,
             navigateToParentHome = {
-                Timber.e("navigateToParentHome")
-                val clearStackNavOptions = navOptions {
-                    popUpTo(0) {
-                        inclusive = true
-                    }
-                    launchSingleTop = true
-                }
-
-                appState.navigateToSchedule(
-                    navOptions = clearStackNavOptions
-                )
+                Timber.d("Navigate to Parent Home (Clear Stack)")
+                appState.navigateToSchedule(clearStackNavOptions)
             },
             navigateToKidHome = {
-                Timber.e("navigateToKidHome")
-                val clearStackNavOptions = navOptions {
-                    popUpTo(0) {
-                        inclusive = true
-                    }
-                    launchSingleTop = true
-                }
-
+                Timber.d("Navigate to Kid Home (Clear Stack)")
                 appState.navigateToJourney(clearStackNavOptions)
             },
             navigateToParentGraph = {
-                Timber.e("navigateToAuthParent")
-                val clearStackNavOptions = navOptions {
-                    popUpTo(0) {
-                        inclusive = true
-                    }
-                    launchSingleTop = true
-                }
-
+                // 부모 카카오 로그인
+                Timber.d("Navigate to Parent Graph (Clear Stack)")
                 appState.navigateToAuthParent(clearStackNavOptions)
             },
             navigateToKidOnboarding = {
-                Timber.e("navigateToKidOnboarding")
-                val clearStackNavOptions = navOptions {
-                    popUpTo(0) {
-                        inclusive = true
-                    }
-                    launchSingleTop = true
-                }
-
+                Timber.d("Navigate to Kid Onboarding (Clear Stack)")
                 appState.navigateToKidOnboarding(clearStackNavOptions)
             }
         )
@@ -87,7 +68,13 @@ fun KieroNavHost(
             paddingValues = paddingValues,
             navigateUp = appState::navigateUp,
             navigateToParentGraph = appState::navigateToParentGraph,
-            navigateToParentSignUp = appState::navigateToParentSignUp,
+            navigateToParentSignUp = { parentName, parentProfileImage ->
+                appState.navigateToParentSignUp(
+                    parentName = parentName,
+                    parentProfileImage = parentProfileImage,
+                    navOptions = clearStackNavOptions
+                )
+            },
             onEasterEggClick = appState::navigateToKidOnboarding
         )
 

@@ -10,11 +10,12 @@ import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.core.common.viewmodel.throttleFirst
 import com.kiero.core.localstorage.TokenManager
 import com.kiero.core.localstorage.info.UserInfoManager
+import com.kiero.core.model.UiState
 import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.data.demo.repository.DemoRepository
 import com.kiero.data.parent.signup.repository.ParentSignUpRepository
 import com.kiero.data.sse.manager.SseManager
-import com.kiero.data.sse.repository.SseRepository
+import com.kiero.presentation.kid.onboarding.state.KidOnboardingSideEffect
 import com.kiero.presentation.signup.parent.model.ParentSignUpStep
 import com.kiero.presentation.signup.parent.model.toUiModel
 import com.kiero.presentation.signup.parent.navigation.ParentSignUp
@@ -31,9 +32,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -58,14 +57,13 @@ class ParentSignUpViewModel @Inject constructor(
 
     private var timerJob: Job? = null
     private var copyJob: Job? = null
-    private val TIMER_DURATION_SECONDS = 10 * 1
+    private val TIMER_DURATION_SECONDS = 10 * 60
 
     init {
         initFetchParentInfo(
             parentName = parentInfo.parentName,
             parentProfileImage = parentInfo.parentProfileImage
         )
-        checkExistingChild()
         sseManager.startParentSubscription()
         collectInviteEvents()
     }
@@ -81,8 +79,6 @@ class ParentSignUpViewModel @Inject constructor(
             ParentSignUpStep.INVITE -> {
                 viewModelScope.launch {
                     _sideEffect.emit(ParentSignUpSideEffect.NavigateToParent)
-
-                    demoRepository.postDemo()
                 }
             }
         }
@@ -177,17 +173,14 @@ class ParentSignUpViewModel @Inject constructor(
 
         Timber.e("로그아웃 되었습니다")
         viewModelScope.launch {
-            val logoutDeferred = async {
-                suspendRunCatching { authRepository.postLogout() }
-            }
-            val demoDeferred = async {
-                suspendRunCatching { demoRepository.deleteDemo() }
-            }
-            val tokenDeferred = async {
-                suspendRunCatching { tokenManager.clearTokens() }
-            }
+            val networkJobs = listOf(
+                async { suspendRunCatching { authRepository.postLogout() } },
+                async { suspendRunCatching { demoRepository.deleteDemo() } }
+            )
+            networkJobs.awaitAll()
+            sseManager.stopSubscription()
 
-            awaitAll(logoutDeferred, demoDeferred, tokenDeferred)
+            suspendRunCatching { tokenManager.clearTokens() }
 
             _state.update {
                 it.copy(isLoading = false)
@@ -251,54 +244,16 @@ class ParentSignUpViewModel @Inject constructor(
     }
 
     fun onBackClick() {
-        _state.update {
-            it.copy(
-                currentStep = ParentSignUpStep.ADDCHILD
-            )
-        }
-    }
-
-    private fun checkExistingChild() {
-        viewModelScope.launch {
-            val existingChildId = userInfoManager.getChildIdInfo()
-
-            if (existingChildId != null) {
-                _state.update {
-                    it.copy(isChildJoined = true)
-                }
-                Timber.d("기존 childId 존재: $existingChildId")
-            } else {
-                checkChildRegistration()
+        Timber.e("onBackClick")
+        if (_state.value.currentStep == ParentSignUpStep.INVITE) {
+            _state.update {
+                it.copy(
+                    currentStep = ParentSignUpStep.ADDCHILD
+                )
             }
-        }
-    }
-
-    private fun checkChildRegistration() {
-        viewModelScope.launch {
-            val lastName = _state.value.childInfo.childLastName.text.toString()
-            val firstName = _state.value.childInfo.childFirstName.text.toString()
-
-            if (lastName.isEmpty() || firstName.isEmpty()) {
-                Timber.d("자녀 이름 미입력 - 연동 체크 건너뜀")
-                return@launch
-            }
-
-            repository.getLinkageKid(
-                childLastName = lastName,
-                childFirstName = firstName
-            ).onSuccess { result ->
-                if (result.isRegistered && result.childId != null) {
-
-                    userInfoManager.saveChildIdInfo(result.childId)
-                    _state.update {
-                        it.copy(isChildJoined = true)
-                    }
-                    Timber.d("자녀 연동 확인됨: ${result.childId}")
-                } else {
-                    Timber.d("자녀 연동 대기 중")
-                }
-            }.onFailure {
-                Timber.e(it, "자녀 연동 여부 조회 실패")
+        } else {
+            viewModelScope.launch {
+                _sideEffect.emit(ParentSignUpSideEffect.NavigateToSelection)
             }
         }
     }
@@ -306,7 +261,9 @@ class ParentSignUpViewModel @Inject constructor(
     private suspend fun handleChildJoined(childId: Long) {
         userInfoManager.saveChildIdInfo(childId)
         _state.update {
-            it.copy(isChildJoined = true)
+            it.copy(
+                isChildJoined = true
+            )
         }
         _sideEffect.emit(ParentSignUpSideEffect.OnChildJoined(childId))
     }

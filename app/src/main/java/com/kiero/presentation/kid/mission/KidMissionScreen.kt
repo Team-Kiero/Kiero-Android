@@ -4,19 +4,27 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -29,7 +37,10 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
 import com.kiero.R
 import com.kiero.core.common.extension.forcePixelToDp
 import com.kiero.core.designsystem.component.chip.KieroChip
@@ -41,10 +52,12 @@ import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.component.pulltorefresh.KieroPullToRefresh
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
+import com.kiero.core.trigger.LocalRefreshState
 import com.kiero.presentation.kid.component.KidProfileChip
 import com.kiero.presentation.kid.component.KidSpeechField
 import com.kiero.presentation.kid.mission.component.KidMissionItem
 import com.kiero.presentation.kid.mission.state.KidMissionState
+import com.kiero.presentation.main.navigation.KidMainTab
 
 @Composable
 fun KidMissionRoute(
@@ -53,10 +66,29 @@ fun KidMissionRoute(
     viewModel: KidMissionViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val refreshState = LocalRefreshState.current
+    val lifeCycleOwner = LocalLifecycleOwner.current
+    val listState = rememberLazyListState()
+    var isFirstEntry by remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        refreshState.refreshEvent.flowWithLifecycle(lifeCycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .collect {
+                if (it == KidMainTab.MISSION) {
+                    if (isFirstEntry) {
+                        isFirstEntry = false
+                        return@collect
+                    }
+                    listState.animateScrollToItem(0)
+                    viewModel.fetchMissions(isRefreshing = true)
+                }
+            }
+    }
 
     when (val state = state) {
         is UiState.Success -> {
             KidMissionScreen(
+                listState = listState,
                 paddingValues = paddingValues,
                 state = state.data,
                 navigateUp = navigateUp,
@@ -79,6 +111,7 @@ fun KidMissionRoute(
 @Composable
 private fun KidMissionScreen(
     paddingValues: PaddingValues,
+    listState: LazyListState,
     state: KidMissionState,
     navigateUp: () -> Unit,
     onRefresh: () -> Unit,
@@ -101,74 +134,79 @@ private fun KidMissionScreen(
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp, vertical = 25.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(11.dp)
+            state = listState
         ) {
             stickyHeader {
-                Row(
+                Column (
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(color = KieroTheme.colors.black),
-                    verticalAlignment = Alignment.CenterVertically
+                        .background(color = KieroTheme.colors.black)
                 ) {
-                    KidProfileChip(
-                        kidName = state.kidName
-                    )
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    KieroChip(
-                        action = KieroCoinAction(
-                            coinCount = 150,
-                            isEnabled = true,
-                            onClick = {}
-                        ),
-                        isEnabled = true
-                    )
-                }
-            }
-
-            item {
-                Spacer(modifier = Modifier.height(5.dp))
-
-                Box(
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        painter = painterGoblin,
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
+                    Row(
                         modifier = Modifier
-                            .forcePixelToDp(painterGoblin)
-                    )
-
-                    KidSpeechField(
-                        name = "꾸비",
-                        isVisibleButton = false,
-                        modifier = Modifier.padding(top = 100.dp)
+                            .fillMaxWidth()
+                            .background(color = KieroTheme.colors.black),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = buildAnnotatedString {
-                                append("우리 함께 ")
-                                withStyle(style = SpanStyle(color = KieroTheme.colors.main)) {
-                                    append("멋진 금화")
-                                }
-                                append(" 를 만들어볼까?")
-                            },
-                            color = KieroTheme.colors.gray300
+                        KidProfileChip(
+                            kidName = state.kidName
+                        )
+
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        KieroChip(
+                            action = KieroCoinAction(
+                                coinCount = state.coinUiModel.coinAmount,
+                                isEnabled = true,
+                                onClick = {}
+                            ),
+                            isEnabled = true
                         )
                     }
-                }
 
-                Text(
-                    text = "미션",
-                    style = KieroTheme.typography.semiBold.title4,
-                    color = KieroTheme.colors.gray200,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .alpha(alpha = if (state.kidMissionByDateList.missionsByDate.isEmpty()) 0f else 1f)
-                        .padding(top = 12.dp),
-                    textAlign = TextAlign.Start
-                )
+                    Spacer(modifier = Modifier.height(5.dp))
+
+                    Box(
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterGoblin,
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .forcePixelToDp(painterGoblin)
+                                .offset(y = (-30).dp)
+                        )
+
+                        KidSpeechField(
+                            name = "꾸비",
+                            isVisibleButton = false,
+                            modifier = Modifier.padding(top = 40.dp)
+                        ) {
+                            Text(
+                                text = buildAnnotatedString {
+                                    append("우리 함께 ")
+                                    withStyle(style = SpanStyle(color = KieroTheme.colors.main)) {
+                                        append("멋진 금화")
+                                    }
+                                    append(" 를 만들어볼까?")
+                                },
+                                color = KieroTheme.colors.gray300
+                            )
+                        }
+                    }
+
+                    Text(
+                        text = "미션",
+                        style = KieroTheme.typography.semiBold.title4,
+                        color = KieroTheme.colors.gray200,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .alpha(alpha = if (state.kidMissionByDateList.missionsByDate.isEmpty()) 0f else 1f)
+                            .padding(top = 12.dp, bottom = 8.dp),
+                        textAlign = TextAlign.Start
+                    )
+                }
             }
 
             if (state.kidMissionByDateList.missionsByDate.isEmpty()) {
@@ -195,7 +233,8 @@ private fun KidMissionScreen(
                             style = KieroTheme.typography.regular.body4,
                             color = KieroTheme.colors.gray200,
                             modifier = Modifier
-                                .fillMaxWidth(),
+                                .fillMaxWidth()
+                                .padding(bottom = 18.dp),
                             textAlign = TextAlign.Start
                         )
                     }
@@ -204,14 +243,16 @@ private fun KidMissionScreen(
                         items = section.missions,
                         key = { it.id },
                     ) { item ->
-                        KidMissionItem(
-                            missionTitle = item.name,
-                            missionReward = item.reward,
-                            isCompleted = item.isCompleted,
-                            onClickButton = {
-                                onMissionCompleted(item.id)
-                            }
-                        )
+                        Box(modifier = Modifier.padding(bottom = 11.dp)) {
+                            KidMissionItem(
+                                missionTitle = item.name,
+                                missionReward = item.reward,
+                                isCompleted = item.isCompleted,
+                                onClickButton = {
+                                    onMissionCompleted(item.id)
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -220,10 +261,11 @@ private fun KidMissionScreen(
         if (state.isVisibleDialog) {
             KieroDialog(
                 onDismiss = dismissDialog,
+                isDisabled = state.isCompletedMission,
                 title = if (!state.isCompletedMission) "[${state.selectedMissionItem!!.name}]" else null,
                 subDescription = if (!state.isCompletedMission) "미션을 완료했다면\n" +
                         "아래 버튼을 눌러줘!" else "금 나와라 뚝딱!\n" +
-                        "금화 50개를 만들었어!",
+                        "금화 ${state.selectedMissionItem?.reward}를 만들었어!",
                 cancelAction = if (state.isCompletedMission) {
                     null
                 } else {
@@ -233,10 +275,12 @@ private fun KidMissionScreen(
                 },
                 confirmAction = KieroConfirmAction(
                     text = "확인",
-                    onClick = if (state.isCompletedMission) {
-                        onClickConfirm
-                    } else {
-                        dismissDialog
+                    onClick = {
+                        if (state.isCompletedMission) {
+                            dismissDialog()
+                        } else {
+                            onClickConfirm()
+                        }
                     }
                 )
             ) {
@@ -246,9 +290,10 @@ private fun KidMissionScreen(
                     Image(
                         painter = coinImage,
                         contentDescription = null,
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier.size(
-                            width = 62.dp,
-                            height = 70.dp
+                            width = 67.dp,
+                            height = 75.dp
                         )
                     )
                 }
@@ -268,7 +313,8 @@ private fun KidWishScreenPreview() {
             state = KidMissionState(),
             onRefresh = {},
             dismissDialog = {},
-            onClickConfirm = {}
+            onClickConfirm = {},
+            listState = rememberLazyListState()
         )
     }
 }

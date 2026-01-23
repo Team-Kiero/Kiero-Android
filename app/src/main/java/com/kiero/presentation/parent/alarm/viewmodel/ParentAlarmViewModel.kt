@@ -3,6 +3,7 @@ package com.kiero.presentation.parent.alarm.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.common.extension.toHandleErrorMessage
+import com.kiero.core.common.extension.updateSuccess
 import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.core.localstorage.TokenManager
 import com.kiero.core.localstorage.info.UserInfoManager
@@ -18,6 +19,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -65,6 +67,7 @@ class ParentAlarmViewModel @Inject constructor(
             }.toPersistentList(),
             errorMessage = localState.errorMessage,
             isLoadingMore = localState.isLoadingMore,
+            isRefreshing = localState.isRefreshing,
             hasMore = cursor != null,
             nextCursor = cursor
         )
@@ -119,19 +122,18 @@ class ParentAlarmViewModel @Inject constructor(
     }
 
     fun logOut() {
+        sseManager.stopSubscription()
+
         Timber.e("로그아웃 되었습니다")
         viewModelScope.launch {
-            val logoutDeferred = async {
-                suspendRunCatching { authRepository.postLogout() }
-            }
-            val demoDeferred = async {
-                suspendRunCatching { demoRepository.deleteDemo() }
-            }
-            val tokenDeferred = async {
-                suspendRunCatching { tokenManager.clearTokens() }
-            }
+            val networkJobs = listOf(
+                async { suspendRunCatching { authRepository.postLogout() } },
+                async { suspendRunCatching { demoRepository.deleteDemo() } }
+            )
+            networkJobs.awaitAll()
+            sseManager.stopSubscription()
 
-            awaitAll(logoutDeferred, demoDeferred, tokenDeferred)
+            suspendRunCatching { tokenManager.clearTokens() }
 
             _authState.update {
                 it.copy(isLoading = false)
@@ -168,7 +170,12 @@ class ParentAlarmViewModel @Inject constructor(
         val id = childId ?: return
 
         viewModelScope.launch {
-            _localState.update { it.copy(isLoading = true, errorMessage = null) }
+            _localState.update {
+                it.copy(
+                    isLoading = !refresh,
+                    errorMessage = null
+                )
+            }
             repository.loadAlarms(id, refresh = refresh)
                 .onSuccess { _localState.update { it.copy(isLoading = false) } }
                 .onFailure { error ->
@@ -195,7 +202,25 @@ class ParentAlarmViewModel @Inject constructor(
         }
     }
 
-    fun refresh() = loadAlarms(refresh = true)
+    fun refresh(isRefresh: Boolean = false) {
+        viewModelScope.launch {
+            if (isRefresh) {
+                _localState.update { it.copy(isRefreshing = true) }
+            }
+
+            val minLoadingTime = async {
+                if (isRefresh) delay(1000)
+            }
+
+            loadAlarms(refresh = isRefresh)
+
+            minLoadingTime.await()
+
+            if (isRefresh) {
+                _localState.update { it.copy(isRefreshing = false) }
+            }
+        }
+    }
 
     fun toggleExpand(alarmId: String) {
         _localState.update { currentState ->
@@ -211,6 +236,7 @@ class ParentAlarmViewModel @Inject constructor(
     private data class LocalState(
         val isLoading: Boolean = false,
         val isLoadingMore: Boolean = false,
+        val isRefreshing: Boolean = false,
         val errorMessage: String? = null,
         val expandedIds: Set<String> = emptySet()
     )

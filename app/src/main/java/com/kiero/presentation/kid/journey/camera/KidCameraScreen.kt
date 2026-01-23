@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
@@ -45,7 +46,9 @@ import com.kiero.presentation.kid.journey.camera.component.StoneFloating
 import com.kiero.presentation.kid.journey.camera.state.KidCameraSideEffect
 import com.kiero.presentation.kid.journey.camera.viewModel.KidCameraViewModel
 import com.kiero.presentation.kid.journey.model.StoneUiType
+import timber.log.Timber
 import java.io.File
+import java.io.IOException
 
 @Composable
 fun KidCameraRoute(
@@ -58,10 +61,22 @@ fun KidCameraRoute(
     LaunchedEffect(Unit) {
         if (state.successData?.tempUri == null) {
             val directory = File(context.cacheDir, "images")
-            directory.mkdirs()
+            if (!directory.exists()) {
+                directory.mkdirs()
+            }
             val file = File(directory, "${System.currentTimeMillis()}.jpg")
-            val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
-            viewModel.updateTempUri(uri.toString())
+            try {
+                file.createNewFile()
+
+                val uri = FileProvider.getUriForFile(
+                    context,
+                    "${context.packageName}.fileprovider",
+                    file
+                )
+                viewModel.updateTempUri(uri.toString())
+            } catch (e: IOException) {
+                Timber.e(e, "파일 생성 실패")
+            }
         }
     }
 
@@ -72,7 +87,7 @@ fun KidCameraRoute(
             viewModel.updateImageUri()
 
             viewModel.postImage(
-                fileName = "schedule/${System.currentTimeMillis()}.jpg",
+                fileName = "${System.currentTimeMillis()}.jpg",
                 contentType = "image/jpeg"
             )
         }

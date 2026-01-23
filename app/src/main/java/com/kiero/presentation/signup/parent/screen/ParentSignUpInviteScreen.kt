@@ -25,7 +25,7 @@ fun ParentSignUpInviteScreen(
         Spacer(modifier = Modifier.height(38.dp))
 
         KieroTextField(
-            state = TextFieldState(state.childInfo.childFirstName.text.toString()),
+            state = TextFieldState("${state.childInfo.childLastName.text}${state.childInfo.childFirstName.text}"),
             placeholder = "",
             isError = false,
             enabled = false,
@@ -48,8 +48,8 @@ fun ParentSignUpInviteScreen(
             text = "시작하기",
             onClick = onStartClick,
             isEnabled = state.isChildJoined,
-            containerColor = KieroTheme.colors.gray900,
-            contentColor = KieroTheme.colors.white
+            containerColor = KieroTheme.colors.main,
+            contentColor = KieroTheme.colors.black
         )
     }
 }

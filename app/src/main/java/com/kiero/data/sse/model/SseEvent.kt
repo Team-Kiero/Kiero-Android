@@ -1,9 +1,9 @@
 package com.kiero.data.sse.model
 
-import com.kiero.data.sse.remote.dto.event.FeedDataDto
-import com.kiero.data.sse.remote.dto.event.InviteDataDto
-import com.kiero.data.sse.remote.dto.event.MissionDataDto
-import com.kiero.data.sse.remote.dto.event.ScheduleDataDto
+import com.kiero.data.sse.remote.dto.response.FeedDataDto
+import com.kiero.data.sse.remote.dto.response.InviteDataDto
+import com.kiero.data.sse.remote.dto.response.MissionDataDto
+import com.kiero.data.sse.remote.dto.response.ScheduleDataDto
 
 sealed interface SseEvent {
     // 공통

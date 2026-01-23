@@ -1,4 +1,4 @@
-package com.kiero.data.sse.remote.dto.event
+package com.kiero.data.sse.remote.dto.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

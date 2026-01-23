@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalFocusManager
@@ -72,7 +74,8 @@ fun ParentSignUpRoute(
                 if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
                     globalTrigger.showSnackbar(
                         SnackbarState(
-                            message = it.message
+                            message = it.message,
+                            bottomPadding = 110
                         )
                     )
                 }
@@ -167,17 +170,24 @@ private fun ParentSignInEntryScreen(
     onLogOut: () -> Unit,
     content: @Composable () -> Unit
 ) {
+    val focusManager = LocalFocusManager.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(
                 color = KieroTheme.colors.black
             )
+            .pointerInput(Unit) {
+                detectTapGestures(onTap = {
+                    focusManager.clearFocus()
+                })
+            }
             .padding(paddingValues)
             .padding(horizontal = 16.dp, vertical = 25.dp)
     ) {
         ParentSignUpTopBar(
-            parentName = state.parentInfo.formattedParentName,
+            parentName = state.parentInfo.parentName,
             profileImage = state.parentInfo.parentProfileImage,
             onClickProfile = onLogOut
         )

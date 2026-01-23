@@ -6,7 +6,4 @@ import androidx.compose.runtime.Immutable
 data class ParentInfoUiModel(
     val parentName: String = "",
     val parentProfileImage: String = "",
-) {
-    val formattedParentName: String
-        get() = parentName.drop(1) + "맘"
-}
+)

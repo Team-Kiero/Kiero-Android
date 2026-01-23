@@ -61,6 +61,7 @@ fun ParentScheduleRoute(
 
     LaunchedEffect(Unit) {
         viewModel.fetchSchedule()
+        viewModel.ensureChildIdAndStartSse()
     }
 
     viewModel.sideEffect.collectSideEffect {
@@ -77,7 +78,7 @@ fun ParentScheduleRoute(
     ) {
         when (val state = uiState) {
             is UiState.Loading -> {
-
+                KieroLoadingIndicator()
             }
 
             is UiState.Success -> {
@@ -145,10 +146,6 @@ fun ParentScheduleRoute(
                 content = {}
             )
         }
-
-        if (uiState.successData?.isLoading == true) {
-            KieroLoadingIndicator()
-        }
     }
 }
 
@@ -182,7 +179,7 @@ private fun ParentScheduleScreen(
                 .padding(paddingValues)
         ) {
             ParentUserSection(
-                userName = state.parentInfo.formattedParentName,
+                userName = state.parentInfo.parentName,
                 profileImage = state.parentInfo.parentProfileImage,
                 onUserNameClick = onUserNameClick,
                 modifier = Modifier

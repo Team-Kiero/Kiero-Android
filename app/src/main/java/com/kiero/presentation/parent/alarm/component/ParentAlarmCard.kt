@@ -1,14 +1,11 @@
 package com.kiero.presentation.parent.alarm.component
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -20,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -60,13 +58,14 @@ fun ParentAlarmCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(15.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
                 text = time,
                 style = KieroTheme.typography.regular.body4,
                 color = KieroTheme.colors.gray400
             )
+
+            Spacer(modifier = Modifier.height(10.dp))
 
             Row(
                 modifier = Modifier
@@ -100,42 +99,35 @@ fun ParentAlarmCard(
                 }
             }
 
-
             if (!hasImage && coinUsed != null) {
-                Spacer(
-                    modifier = Modifier
-                        .height(6.dp)
-                )
                 KieroChip(
-                    modifier = Modifier.align(Alignment.Start),
+                    modifier = Modifier
+                        .align(Alignment.Start)
+                        .padding(top = 12.dp),
                     isEnabled = false, isCompleted = true, action = KieroCoinAction(
                         coinCount = coinUsed,
                         isCompleted = true,
                         isEnabled = false,
                         viewType = DisplayType.PARENT,
-                        onClick = { })
+                        onClick = { }
+                    )
                 )
             }
 
             if (hasImage && isExpanded) {
                 Spacer(
                     modifier = Modifier
-                        .height(7.dp)
+                        .height(15.dp)
                 )
-                Box(
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(3f / 4f)
-                        .animateContentSize()
-                        .background(KieroTheme.colors.black)
-                ) {
-                    AsyncImage(
-                        model = imageUrl,
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Fit
-                    )
-                }
+                        .clip(RoundedCornerShape(8.dp)),
+                    contentScale = ContentScale.Crop
+                )
             }
         }
     }

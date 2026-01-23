@@ -1,6 +1,5 @@
 package com.kiero.presentation.parent.schedule.viewmodel
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.common.extension.updateSuccess
@@ -34,7 +33,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ParentScheduleViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
     private val planRepository: PlanRepository,
     private val authRepository: AuthRepository,
     private val userInfoManager: UserInfoManager,
@@ -59,10 +57,9 @@ class ParentScheduleViewModel @Inject constructor(
 
     init {
         initFetchParentInfo()
-        ensureChildIdAndStartSse()
+        sseManager.startParentSubscription()
     }
-
-    private fun ensureChildIdAndStartSse() {
+    fun ensureChildIdAndStartSse() {
         viewModelScope.launch {
             var childId = userInfoManager.getChildIdInfo()
 
@@ -157,19 +154,18 @@ class ParentScheduleViewModel @Inject constructor(
     }
 
     fun logOut() {
+        sseManager.stopSubscription()
+
         Timber.e("로그아웃 되었습니다")
         viewModelScope.launch {
-            val logoutDeferred = async {
-                suspendRunCatching { authRepository.postLogout() }
-            }
-            val demoDeferred = async {
-                suspendRunCatching { demoRepository.deleteDemo() }
-            }
-            val tokenDeferred = async {
-                suspendRunCatching { tokenManager.clearTokens() }
-            }
+            val networkJobs = listOf(
+                async { suspendRunCatching { authRepository.postLogout() } },
+                async { suspendRunCatching { demoRepository.deleteDemo() } }
+            )
+            networkJobs.awaitAll()
+            sseManager.stopSubscription()
 
-            awaitAll(logoutDeferred, demoDeferred, tokenDeferred)
+            suspendRunCatching { tokenManager.clearTokens() }
 
             _state.updateSuccess {
                 it.copy(isLoading = false)

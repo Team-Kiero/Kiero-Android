@@ -83,11 +83,27 @@ fun KidMissionItem(
                 )
             }
         } else {
-            Text(
-                text = "성공!",
-                color = KieroTheme.colors.gray500,
-                style = KieroTheme.typography.semiBold.title4
-            )
+            Box(
+                modifier = Modifier
+                    .background(
+                        color = KieroTheme.colors.white.copy(alpha = 0f),
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                    .padding(
+                        horizontal = 22.dp,
+                        vertical = 10.dp
+                    )
+                    .noRippleClickable(
+                        onClick = onClickButton
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "성공!",
+                    color = KieroTheme.colors.gray500,
+                    style = KieroTheme.typography.semiBold.title4
+                )
+            }
         }
     }
 }

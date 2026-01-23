@@ -23,11 +23,6 @@ fun MissionDateGroup(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        MissionInfo(
-            dayOfWeek = missionsByDate.dueAt.toRelativeDayFromDate,
-            dueAt = missionsByDate.dueAt.formatWithDayOfWeek
-        )
-
         missionsByDate.missions.forEach { mission ->
             MissionListItem(
                 missionTitle = mission.name,

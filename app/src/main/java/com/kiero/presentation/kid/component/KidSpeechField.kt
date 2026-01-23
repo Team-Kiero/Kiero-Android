@@ -114,6 +114,7 @@ private fun SpeechFieldPreview() {
     KidSpeechField(
         name = "주완",
         isVisibleButton = true,
+
     ) {
         Text("첫번째 줄 입니다", color = KieroTheme.colors.gray300)
         Text("두번째 줄 입니다", color = KieroTheme.colors.gray300)

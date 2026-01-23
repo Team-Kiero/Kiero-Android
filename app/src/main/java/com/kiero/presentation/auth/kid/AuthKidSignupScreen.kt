@@ -24,6 +24,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
 import com.kiero.core.common.extension.collectSideEffect
+import com.kiero.core.common.util.MaxLengthInputTransformation
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.component.button.KieroButtonMedium
 import com.kiero.core.designsystem.theme.KieroTheme
@@ -62,14 +63,14 @@ fun AuthKidSignupRoute(
     AuthKidSignupScreen(
         paddingValues = paddingValues,
         state = state,
-        navigateUp = navigateUp,
         onSignupClick = viewmodel::onSignupClick,
         onDone = {
             focusManager.clearFocus()
         },
         nextFocus = {
             focusManager.moveFocus(FocusDirection.Down)
-        }
+        },
+        navigateUp = navigateUp
     )
 }
 
@@ -77,10 +78,10 @@ fun AuthKidSignupRoute(
 fun AuthKidSignupScreen(
     paddingValues: PaddingValues,
     state: KidSignUpState,
-    navigateUp: () -> Unit,
     onSignupClick: () -> Unit,
     nextFocus: () -> Unit,
     onDone: () -> Unit,
+    navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val focusManager = LocalFocusManager.current
@@ -128,7 +129,9 @@ fun AuthKidSignupScreen(
                 fieldInputText = "성을 입력해줘!",
                 fieldState = lastName,
                 isError = state.kidSignUpUiModel.lastName.text.isNotEmpty() && !validateLastName,
-                onImeAction = nextFocus
+                onImeAction = nextFocus,
+                imeAction = ImeAction.Next,
+                inputTransformation = MaxLengthInputTransformation(5)
             )
 
             KidInputField(
@@ -136,7 +139,9 @@ fun AuthKidSignupScreen(
                 fieldInputText = "이름을 입력해줘!",
                 fieldState = firstName,
                 isError = state.kidSignUpUiModel.firstName.text.isNotEmpty() && !validateFirstName,
-                onImeAction = nextFocus
+                onImeAction = nextFocus,
+                imeAction = ImeAction.Next,
+                inputTransformation = MaxLengthInputTransformation(5)
             )
 
             Spacer(modifier = Modifier.height(31.dp))
@@ -169,11 +174,11 @@ private fun KidSignupScreenPreview() {
     KieroTheme {
         AuthKidSignupScreen(
             state = KidSignUpState(),
-            navigateUp = {},
             onSignupClick = {},
             paddingValues = PaddingValues(),
             nextFocus = {},
-            onDone = {}
+            onDone = {},
+            navigateUp = {}
         )
     }
 }

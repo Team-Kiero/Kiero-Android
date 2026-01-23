@@ -1,5 +1,6 @@
 package com.kiero.presentation.auth.parent
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -70,6 +71,11 @@ fun AuthParentRoute(
         }
     }
 
+    BackHandler(
+        enabled = true,
+        onBack = viewModel::navigateUp
+    )
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -138,7 +144,7 @@ fun AuthParentScreen(
                     message = "반가워요!",
                     modifier = Modifier
                         .align(BiasAlignment(
-                            horizontalBias = -0.5f,
+                            horizontalBias = -0.4f,
                             verticalBias = -0.5f
                         ))
                 )

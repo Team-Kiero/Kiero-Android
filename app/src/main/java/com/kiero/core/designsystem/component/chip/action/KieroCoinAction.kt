@@ -60,7 +60,6 @@ class KieroCoinAction(
                 contentDescription = null,
                 modifier = Modifier
                     .size(20.dp)
-                    .forcePixelToDp(coin)
             )
 
             Text(

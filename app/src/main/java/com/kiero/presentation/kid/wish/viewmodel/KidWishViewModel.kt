@@ -2,6 +2,7 @@ package com.kiero.presentation.kid.wish.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.common.extension.toHandleErrorMessage
 import com.kiero.core.common.extension.updateSuccess
 import com.kiero.core.common.util.successData
 import com.kiero.core.model.UiState
@@ -37,6 +38,7 @@ class KidWishViewModel @Inject constructor(
     ) { uiState, coinData ->
         when (uiState) {
             is UiState.Success -> {
+                Timber.e("combine $coinData")
                 UiState.Success(
                     uiState.data.copy(
                         coinUiModel = coinData.toUiModel()
@@ -66,9 +68,15 @@ class KidWishViewModel @Inject constructor(
             repository.getCurrentCoin()
                 .onSuccess {
                     Timber.d("fetchCoin: $it")
+                    _state.updateSuccess { state ->
+                        state.copy(
+                            coinUiModel = it.toUiModel()
+                        )
+                    }
                 }
                 .onFailure {
                     Timber.e("fetchCoin fail: $it")
+                    _sideEffect.emit(KidWishSideEffect.ShowSnackBar(it.toHandleErrorMessage()))
                 }
         }
     }
@@ -110,34 +118,37 @@ class KidWishViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             wishRepository.patchCoupon(couponId)
-                .onSuccess {
-                    _state.updateSuccess {
-                        it.copy(
-                            isVisibleDialog = false,
+                .onSuccess { result ->
+                    _state.updateSuccess { state ->
+                        state.copy(
                             isCompletedWish = true
                         )
                     }
-
                     fetchCoin()
                 }
                 .onFailure {
                     _sideEffect.emit(KidWishSideEffect.ShowSnackBar(it.message.toString()))
+                    dismissDialog()
                 }
         }
     }
 
     fun openDialogWithItem(targetId: Long) {
-        val currentState = _state.value.successData ?: return
+        val currentState = state.value.successData ?: return
 
         val selectedItem = currentState.kidWishList.find { it.couponId == targetId } ?: return
 
         val myCoin = currentState.coinUiModel.coinAmount
         val itemPrice = selectedItem.price
 
+        Timber.e("myCoin: $myCoin, itemPrice: $itemPrice")
+
         if (myCoin >= itemPrice) {
+            Timber.e("openDialogWithItem $selectedItem")
             _state.updateSuccess { state ->
                 state.copy(
                     isVisibleDialog = true,
+                    isCompletedWish = false,
                     selectedWishItem = selectedItem
                 )
             }

@@ -13,9 +13,15 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.schedule.mission.auto.model.MissionUiModel
@@ -39,6 +45,24 @@ fun ParentAutoMissionEditForm(
         targetDate.format(DateTimeFormatter.ofPattern("yyyy.MM.dd.(E)", Locale.KOREA))
     }
 
+    var nameTextFieldValue by remember {
+        mutableStateOf(
+            TextFieldValue(
+                text = mission.name,
+                selection = TextRange(mission.name.length)
+            )
+        )
+    }
+
+    LaunchedEffect(mission.name) {
+        if (nameTextFieldValue.text != mission.name) {
+            nameTextFieldValue = nameTextFieldValue.copy(
+                text = mission.name,
+                selection = TextRange(mission.name.length)
+            )
+        }
+    }
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -56,8 +80,11 @@ fun ParentAutoMissionEditForm(
             )
         ) {
             ParentAutoInputField(
-                text = mission.name,
-                onTextChange = onMissionNameChange,
+                value = nameTextFieldValue,
+                onValueChange = { newValue ->
+                    nameTextFieldValue = newValue
+                    onMissionNameChange(newValue.text)
+                },
                 placeholder = "미션 이름을 입력해주세요.",
                 maxLength = 15,
                 singleLine = true

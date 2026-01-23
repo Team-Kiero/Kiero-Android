@@ -194,6 +194,7 @@ fun ParentAutoResultScreen(
         }
     }
 }
+
 @Preview(
     showBackground = true,
     backgroundColor = 0xFF000000,

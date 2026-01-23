@@ -4,12 +4,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.core.common.extension.noRippleClickable
@@ -48,6 +50,7 @@ fun KidWishGridItem(
 
         Box(
             modifier = Modifier
+                .fillMaxWidth()
                 .background(
                     color = KieroTheme.colors.white,
                     shape = RoundedCornerShape(8.dp)
@@ -58,7 +61,9 @@ fun KidWishGridItem(
             Text(
                 text = "소원빌기",
                 style = KieroTheme.typography.semiBold.title4,
-                color = KieroTheme.colors.black
+                color = KieroTheme.colors.black,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }

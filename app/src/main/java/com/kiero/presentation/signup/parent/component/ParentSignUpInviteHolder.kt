@@ -138,8 +138,12 @@ fun ParentSignUpInviteHolder(
         Spacer(modifier = Modifier.height(9.dp))
 
         Text(
-            text = "이 코드를 아이에게 알려주시고, \n" +
-                    "회원가입 시 입력하도록 안내해주세요.",
+            text = if (!isExpired) {
+                "이 코드를 아이에게 알려주시고, \n" +
+                        "회원가입 시 입력하도록 안내해주세요."
+            } else {
+                "코드가 만료되었습니다"
+            },
             style = KieroTheme.typography.regular.body4,
             color = KieroTheme.colors.gray200,
             textAlign = TextAlign.Center

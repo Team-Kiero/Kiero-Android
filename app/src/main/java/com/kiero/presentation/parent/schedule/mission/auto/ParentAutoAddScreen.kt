@@ -14,34 +14,29 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.kiero.R
 import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.component.button.KieroButtonMedium
 import com.kiero.core.designsystem.theme.KieroTheme
-import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
 import com.kiero.presentation.parent.schedule.mission.auto.component.ScrollableAutoInputField
 import com.kiero.presentation.parent.schedule.mission.auto.state.AutoMissionSideEffect
 import com.kiero.presentation.parent.schedule.mission.auto.state.AutoMissionState
 import com.kiero.presentation.parent.schedule.mission.auto.viewmodel.AutoMissionViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun ParentAutoAddRoute(
@@ -57,6 +52,7 @@ fun ParentAutoAddRoute(
         when (effect) {
             is AutoMissionSideEffect.ShowToast -> {
                 // ParentAutoResultRoute에서 처리
+                snackbarHostState.showSnackbar(effect.message)
             }
 
             is AutoMissionSideEffect.NavigateBack -> {
@@ -114,8 +110,8 @@ fun ParentAutoAddScreen(
         modifier = modifier
             .fillMaxSize()
             .background(KieroTheme.colors.black)
-            .imePadding()
             .padding(paddingValues)
+            .imePadding()
             .pointerInput(Unit) {
                 detectTapGestures(onTap = {
                     focusManager.clearFocus()
@@ -150,7 +146,6 @@ fun ParentAutoAddScreen(
         )
 
         if (!isImeVisible) {
-            Spacer(Modifier.height(48.dp))
 
             KieroButtonMedium(
                 text = "분석하고 미션 추가하기",

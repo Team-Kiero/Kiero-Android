@@ -7,6 +7,7 @@ import com.kiero.core.common.util.successData
 import com.kiero.core.model.UiState
 import com.kiero.data.kid.coin.repository.CoinRepository
 import com.kiero.data.mission.repository.MissionRepository
+import com.kiero.data.sse.manager.SseManager
 import com.kiero.presentation.kid.mission.model.toUiModel
 import com.kiero.presentation.kid.mission.state.KidMissionSideEffect
 import com.kiero.presentation.kid.mission.state.KidMissionState
@@ -27,8 +28,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class KidMissionViewModel @Inject constructor(
-    repository: CoinRepository,
-    private val missionRepository: MissionRepository
+    private val repository: CoinRepository,
+    private val missionRepository: MissionRepository,
+    private val sseManager: SseManager
 ) : ViewModel() {
     private val _state = MutableStateFlow<UiState<KidMissionState>>(UiState.Loading)
     val state: StateFlow<UiState<KidMissionState>> = combine(
@@ -37,6 +39,7 @@ class KidMissionViewModel @Inject constructor(
     ) { uiState, coinData ->
         when (uiState) {
             is UiState.Success -> {
+                Timber.e("combine $coinData")
                 UiState.Success(
                     uiState.data.copy(
                         coinUiModel = coinData.toUiModel()
@@ -60,6 +63,17 @@ class KidMissionViewModel @Inject constructor(
 
     init {
         fetchMissions()
+        sseManager.startChildSubscription()
+        collectChildMissionEvents()
+    }
+
+    fun collectChildMissionEvents() {
+        viewModelScope.launch {
+            sseManager.childMissionEvents.collect { event ->
+                Timber.e("collectChildMissionEvents $event")
+                fetchMissions()
+            }
+        }
     }
 
     fun fetchMissions(isRefreshing: Boolean = false) {
@@ -118,6 +132,7 @@ class KidMissionViewModel @Inject constructor(
                             isCompletedMission = true
                         )
                     }
+                    fetchCoin()
                 }
                 .onFailure { exception ->
                     _sideEffect.emit(KidMissionSideEffect.ShowSnackbar(exception.message.toString()))
@@ -125,8 +140,20 @@ class KidMissionViewModel @Inject constructor(
         }
     }
 
+    fun fetchCoin() {
+        viewModelScope.launch {
+            repository.getCurrentCoin()
+                .onSuccess {
+                    Timber.d("fetchCoin: $it")
+                }
+                .onFailure {
+                    Timber.e("fetchCoin fail: $it")
+                }
+        }
+    }
+
     fun openMissionDialog(targetId: Long) {
-        val currentState = _state.value.successData ?: return
+        val currentState = state.value.successData ?: return
 
         val selectedMission = currentState.kidMissionByDateList.missionsByDate
             .flatMap { it.missions }
@@ -136,6 +163,7 @@ class KidMissionViewModel @Inject constructor(
         _state.updateSuccess { state ->
             state.copy(
                 isVisibleDialog = true,
+                isCompletedMission = false,
                 selectedMissionItem = selectedMission
             )
         }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -18,6 +19,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
@@ -32,7 +34,7 @@ fun ParentSignUpForm(
     textState: TextFieldState,
     modifier: Modifier = Modifier,
     isError: Boolean = false,
-    imeAction: ImeAction = ImeAction.Next,
+    imeAction: ImeAction,
     onImeAction: () -> Unit = {}
 ) {
     Column (
@@ -51,10 +53,14 @@ fun ParentSignUpForm(
             placeholder = placeholder,
             isError = isError,
             containerColor = KieroTheme.colors.gray900,
-            keyboardOptions = KeyboardOptions(imeAction = imeAction),
-            onKeyboardAction = { performDefaultAction ->
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Uri,
+                imeAction = imeAction,
+                autoCorrectEnabled = false,
+            ),
+            lineLimits = TextFieldLineLimits.SingleLine,
+            onKeyboardAction = {
                 onImeAction()
-                performDefaultAction()
             },
             inputTransformation = MaxLengthInputTransformation(5)
         )
@@ -92,6 +98,7 @@ private fun ParentSignUpFormPreview() {
         title = "아이의 성을 입력해주세요.",
         placeholder = "성",
         textState = TextFieldState(),
-        isError = true
+        isError = true,
+        imeAction = ImeAction.Next
     )
 }

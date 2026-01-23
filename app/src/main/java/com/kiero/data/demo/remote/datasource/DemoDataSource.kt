@@ -1,9 +1,9 @@
 package com.kiero.data.demo.remote.datasource
 
-import com.kiero.core.network.model.BaseResponse
+import retrofit2.Response
 
 interface DemoDataSource {
-    suspend fun deleteDemo(): BaseResponse<Unit>
+    suspend fun deleteDemo(): Response<Unit>
 
-    suspend fun postDemo(): BaseResponse<Unit>
+    suspend fun postDemo(): Response<Unit>
 }

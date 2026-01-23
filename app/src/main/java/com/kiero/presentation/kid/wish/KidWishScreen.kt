@@ -1,6 +1,7 @@
 package com.kiero.presentation.kid.wish
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,15 +18,23 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
 import com.kiero.R
 import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.common.extension.forcePixelToDp
@@ -40,6 +49,7 @@ import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
 import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
+import com.kiero.core.trigger.LocalRefreshState
 import com.kiero.presentation.kid.component.KidProfileChip
 import com.kiero.presentation.kid.wish.component.KidWishDescription
 import com.kiero.presentation.kid.wish.component.KidWishGridList
@@ -48,6 +58,7 @@ import com.kiero.presentation.kid.wish.preview.KidWishPreviewProvider
 import com.kiero.presentation.kid.wish.state.KidWishSideEffect
 import com.kiero.presentation.kid.wish.state.KidWishState
 import com.kiero.presentation.kid.wish.viewmodel.KidWishViewModel
+import com.kiero.presentation.main.navigation.KidMainTab
 import kotlinx.collections.immutable.ImmutableList
 
 @Composable
@@ -56,15 +67,35 @@ fun KidWishRoute(
     navigateUp: () -> Unit,
     viewModel: KidWishViewModel = hiltViewModel()
 ) {
-    val globalTrigger = LocalGlobalUiEventTrigger.current
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val globalTrigger = LocalGlobalUiEventTrigger.current
+    val refreshState = LocalRefreshState.current
+    val lifeCycleOwner = LocalLifecycleOwner.current
+    val scrollState = rememberScrollState()
+
+    var isFirstEntry by remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        refreshState.refreshEvent.flowWithLifecycle(lifeCycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .collect {
+                if (it == KidMainTab.WISH) {
+                    if (isFirstEntry) {
+                        isFirstEntry = false
+                        return@collect
+                    }
+                    scrollState.animateScrollTo(0)
+                    viewModel.fetchWish(isRefresh = true)
+                }
+            }
+    }
 
     viewModel.sideEffect.collectSideEffect {
         when(it) {
             is KidWishSideEffect.ShowSnackBar -> {
                 globalTrigger.showSnackbar(
                     SnackbarState(
-                        message = it.message
+                        message = it.message,
+                        bottomPadding = 60
                     )
                 )
             }
@@ -82,6 +113,7 @@ fun KidWishRoute(
                     onRefresh = { viewModel.fetchWish(isRefresh = true) }
                 ) {
                     KidWishScreen(
+                        scrollState = scrollState,
                         paddingValues = paddingValues,
                         state = data,
                         navigateUp = navigateUp,
@@ -106,12 +138,13 @@ fun KidWishRoute(
                                 text = "확인",
                                 onClick = {
                                     if (data.isCompletedWish) {
-                                        viewModel.prayWish(data.selectedWishItem?.couponId ?: -1)
-                                    } else {
                                         viewModel.dismissDialog()
+                                    } else {
+                                        viewModel.prayWish(data.selectedWishItem?.couponId ?: -1)
                                     }
                                 }
-                            )
+                            ),
+                            isDisabled = data.isCompletedWish
                         ) {
                             if (!data.isCompletedWish) {
                                 Row(
@@ -122,7 +155,7 @@ fun KidWishRoute(
                                     Image(
                                         painter = coinImage,
                                         contentDescription = null,
-                                        modifier = Modifier.forcePixelToDp(coinImage)
+                                        modifier = Modifier.size(20.dp)
                                     )
 
                                     Spacer(modifier = Modifier.width(10.dp))
@@ -139,6 +172,7 @@ fun KidWishRoute(
                                 Image(
                                     painter = coinImage,
                                     contentDescription = null,
+                                    contentScale = ContentScale.Crop,
                                     modifier = Modifier.size(
                                         width = 62.dp,
                                         height = 70.dp
@@ -159,6 +193,7 @@ fun KidWishRoute(
 @Composable
 private fun KidWishScreen(
     paddingValues: PaddingValues,
+    scrollState: ScrollState,
     state: KidWishState,
     navigateUp: () -> Unit,
     onClickWish : (Long) -> Unit,
@@ -167,7 +202,7 @@ private fun KidWishScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(scrollState)
             .background(
                 color = KieroTheme.colors.black
             )
@@ -212,7 +247,7 @@ private fun KidWishScreen(
         Spacer(modifier = Modifier.height(17.dp))
 
         KidWishGridList(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxSize(),
             wishList = state.kidWishList,
             onClickWish = onClickWish
         )
@@ -235,7 +270,8 @@ private fun KidWishScreenPreview(
             paddingValues = PaddingValues(),
             state = state,
             navigateUp = {},
-            onClickWish = {}
+            onClickWish = {},
+            scrollState = rememberScrollState()
         )
     }
 }
