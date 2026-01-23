@@ -12,6 +12,7 @@ import coil.drawable.MovieDrawable
 import coil.request.ImageRequest
 import coil.request.onAnimationEnd
 import coil.request.repeatCount
+import coil.size.Precision
 
 @Composable
 fun KieroGifImage(
@@ -24,6 +25,7 @@ fun KieroGifImage(
     val imageRequest = remember(drawableId) {
         ImageRequest.Builder(context)
             .data(drawableId)
+            .precision(Precision.INEXACT)
             .bitmapConfig(Bitmap.Config.ARGB_8888)
             .allowHardware(false)
             .repeatCount(repeatCount)

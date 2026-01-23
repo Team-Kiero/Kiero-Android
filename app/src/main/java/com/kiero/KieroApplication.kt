@@ -8,6 +8,9 @@ import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
+import coil.disk.DiskCache
+import coil.memory.MemoryCache
+import coil.util.DebugLogger
 import com.kakao.sdk.common.KakaoSdk
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
@@ -30,6 +33,7 @@ class KieroApplication : Application(), ImageLoaderFactory {
     private fun setDayMode() {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
     }
+
     private fun initKakaoSdk() {
         try {
             KakaoSdk.init(this, BuildConfig.KAKAO_NATIVE_APP_KEY)
@@ -49,8 +53,25 @@ class KieroApplication : Application(), ImageLoaderFactory {
                     add(GifDecoder.Factory())
                 }
             }
+            .memoryCache {
+                MemoryCache.Builder(this)
+                    .maxSizePercent(0.25)
+                    .build()
+            }
+            .diskCache {
+                DiskCache.Builder()
+                    .directory(cacheDir.resolve("image_cache"))
+                    .maxSizeBytes(50L * 1024 * 1024)
+                    .build()
+            }
             .crossfade(false)
             .bitmapConfig(Bitmap.Config.HARDWARE)
+            .respectCacheHeaders(false)
+            .apply {
+                if (BuildConfig.DEBUG) {
+                    logger(DebugLogger())
+                }
+            }
             .build()
     }
 }
