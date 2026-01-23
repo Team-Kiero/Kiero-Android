@@ -160,9 +160,9 @@ app/
 
 ## 📚 Notion
 
-- [컨벤션](https://www.notion.so/2d58ff4aed3f809397e7c940a41beafa?source=copy_link)
-- [담당화면](https://www.notion.so/2d58ff4aed3f8087a51cff4f620c53e2?source=copy_link)
-- [API 담당](https://www.notion.so/API-2d78ff4aed3f802fb2e4e6b266821a52?source=copy_link)
+- [컨벤션](https://ruddy-adapter-e98.notion.site/2d58ff4aed3f809397e7c940a41beafa?source=copy_link)
+- [담당화면](https://ruddy-adapter-e98.notion.site/2d58ff4aed3f8087a51cff4f620c53e2?source=copy_link)
+- [API 담당](https://ruddy-adapter-e98.notion.site/API-2f18ff4aed3f8014afb7cea46529ff9e?source=copy_link)
 
 ---
 
