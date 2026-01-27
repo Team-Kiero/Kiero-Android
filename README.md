@@ -94,13 +94,13 @@ Kiero는 그 믿음에서 시작된 가족 성장 플랫폼입니다.
   </tr>
   <tr>
     <td align="center">
-      <sub>부모 스케쥴 관리, 미션 직접 추가</sub>
+      <sub>Team Leader, 부모 스케쥴 관리, 미션 직접 추가</sub>
     </td>
     <td align="center">
-      <sub>자녀 및 부모 회원가입 뷰, 자녀 소원의 우물</sub>
+      <sub>자녀 및 부모 회원가입 뷰,자녀 금화 미션, 자녀 소원의 우물, QA, 메인테이너</sub>
     </td>
     <td align="center">
-      <sub>자녀 오늘의 여정 뷰, 자녀 금화 미션</sub>
+      <sub>자녀 오늘의 여정 뷰</sub>
     </td>
     <td align="center">
       <sub>카카오 로그인, 부모 실시간 알림 피드, AI 미션 자동추가</sub>
