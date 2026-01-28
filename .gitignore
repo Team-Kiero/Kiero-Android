@@ -25,6 +25,7 @@ output.json
 !.idea/icon.svg
 misc.xml
 deploymentTargetDropDown.xml
+deploymentTargetSelector.xml
 render.experimental.xml
 
 # Keystore files
