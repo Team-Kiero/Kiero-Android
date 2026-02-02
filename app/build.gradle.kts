@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.dagger.hilt)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.devtools.ksp)
+    alias(libs.plugins.baselineprofile)
 }
 
 val properties = Properties().apply {
@@ -17,6 +18,23 @@ val properties = Properties().apply {
 android {
     namespace = "com.kiero"
     compileSdk = libs.versions.compileSdk.get().toInt()
+
+    signingConfigs {
+        getByName("debug") {
+            val debugKeystorePath = System.getProperty("user.home") + "/.android/debug.keystore"
+            storeFile = file(debugKeystorePath)
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+
+        create("benchmark") {
+            storeFile = file(System.getProperty("user.home") + "/.android/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
 
     defaultConfig {
         applicationId = "com.Kiero"
@@ -53,6 +71,15 @@ android {
                 "proguard-rules.pro"
             )
         }
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("debug")
+
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -82,20 +109,14 @@ android {
         }
     }
 
-    signingConfigs {
-        getByName("debug") {
-            keyAlias = "androiddebugkey"
-            keyPassword = "android"
-            storeFile = File("${project.rootDir.absolutePath}/keystore/debug.keystore")
-            storePassword = "android"
-        }
-    }
 }
 
 dependencies {
+    implementation(libs.androidx.profileinstaller)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.bundles.test)
+    "baselineProfile"(project(":baselineprofile"))
 
     debugImplementation(libs.bundles.debug)
 
