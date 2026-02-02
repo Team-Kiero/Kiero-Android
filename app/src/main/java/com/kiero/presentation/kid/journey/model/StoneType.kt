@@ -1,7 +1,12 @@
 package com.kiero.presentation.kid.journey.model
 
 import androidx.annotation.DrawableRes
+import androidx.annotation.Keep
 import com.kiero.R
+import kotlinx.serialization.Serializable
+
+@Keep
+@Serializable
 
 enum class StoneUiType(
     val serverKey: String,
