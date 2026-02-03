@@ -40,7 +40,7 @@ class StartupBenchmarks {
     val rule = MacrobenchmarkRule()
 
     private val targetPackageName = InstrumentationRegistry.getArguments().getString("targetAppId")
-        ?: "com.Kiero.parent"
+        ?: "com.kiero.parent"
 
     @Test
     fun startupCompilationNone() =
@@ -52,7 +52,7 @@ class StartupBenchmarks {
 
     @Test
     fun startupWithBaselineProfile() = rule.measureRepeated(
-        packageName = "com.Kiero.parent",
+        packageName = targetPackageName,
         metrics = listOf(StartupTimingMetric()),
         iterations = 5,
         startupMode = StartupMode.COLD,
