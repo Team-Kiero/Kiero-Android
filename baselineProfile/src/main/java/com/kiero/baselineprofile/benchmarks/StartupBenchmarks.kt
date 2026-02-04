@@ -1,4 +1,4 @@
-package com.kiero.baselineprofile
+package com.kiero.baselineprofile.benchmarks
 
 import androidx.benchmark.macro.BaselineProfileMode
 import androidx.benchmark.macro.CompilationMode
@@ -15,8 +15,8 @@ import org.junit.runner.RunWith
 /**
  * This test class benchmarks the speed of app startup.
  * Run this benchmark to verify how effective a Baseline Profile is.
- * It does this by comparing [CompilationMode.None], which represents the app with no Baseline
- * Profiles optimizations, and [CompilationMode.Partial], which uses Baseline Profiles.
+ * It does this by comparing [androidx.benchmark.macro.CompilationMode.None], which represents the app with no Baseline
+ * Profiles optimizations, and [androidx.benchmark.macro.CompilationMode.Partial], which uses Baseline Profiles.
  *
  * Run this benchmark to see startup measurements and captured system traces for verifying
  * the effectiveness of your Baseline Profiles. You can run it directly from Android
