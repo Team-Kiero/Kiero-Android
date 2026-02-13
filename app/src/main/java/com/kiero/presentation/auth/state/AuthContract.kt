@@ -25,4 +25,6 @@ sealed interface AuthSideEffect {
     data object NavigateToParentGraph : AuthSideEffect
     data object NavigateToParent : AuthSideEffect
     data object NavigateToKid : AuthSideEffect
+
+    data object NavigateToSelection : AuthSideEffect
 }

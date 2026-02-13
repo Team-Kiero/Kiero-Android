@@ -9,6 +9,7 @@ import com.kiero.core.common.extension.toHandleErrorMessage
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.model.UiState
 import com.kiero.data.auth.repository.AuthRepository
+import com.kiero.data.sse.manager.SseManager
 import com.kiero.presentation.auth.state.AuthSideEffect
 import com.kiero.presentation.auth.state.AuthState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,6 +28,7 @@ import javax.inject.Inject
 class AuthParentViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val userInfoManager: UserInfoManager,
+    private val sseManager: SseManager
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AuthState())
@@ -110,7 +112,8 @@ class AuthParentViewModel @Inject constructor(
     fun navigateUp() {
         viewModelScope.launch {
             Timber.e("navigateUp")
-            _sideEffect.emit(AuthSideEffect.NavigateUp)
+            sseManager.stopSubscription()
+            _sideEffect.emit(AuthSideEffect.NavigateToSelection)
             _state.update { it.copy(uiState = UiState.Empty) }
         }
     }

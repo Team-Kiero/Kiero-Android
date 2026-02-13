@@ -40,6 +40,7 @@ import com.kiero.presentation.auth.state.AuthSideEffect
 fun AuthParentRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
+    navigateToSelection: () -> Unit,
     navigateToParentSignUp: (String, String) -> Unit,
     navigateToParentGraph: () -> Unit,
     viewModel: AuthParentViewModel = hiltViewModel(),
@@ -66,15 +67,14 @@ fun AuthParentRoute(
             }
 
             AuthSideEffect.NavigateToParentGraph -> navigateToParentGraph()
-
+            AuthSideEffect.NavigateToSelection -> navigateToSelection()
             else -> {}
         }
     }
 
-    BackHandler(
-        enabled = true,
-        onBack = viewModel::navigateUp
-    )
+    BackHandler {
+        viewModel.navigateUp()
+    }
 
     Box(
         modifier = Modifier
