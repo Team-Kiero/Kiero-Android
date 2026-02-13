@@ -44,7 +44,7 @@ fun SplashRoute(
             SplashSideEffect.NavigateToAuth -> navigateToAuth()
             SplashSideEffect.NavigateToKidHome -> navigateToKidHome()
             SplashSideEffect.NavigateToParentHome -> navigateToParentHome()
-            SplashSideEffect.NavigateToParentGraph -> navigateToParentGraph()
+            SplashSideEffect.NavigateToParentGraph -> navigateToParentGraph() // 카카오 로그인
             SplashSideEffect.NavigateToKidOnboarding -> navigateToKidOnboarding()
         }
     }
