@@ -120,6 +120,8 @@ class MainAppState(
         popUpTo(AuthGraph) { inclusive = true }
     }
 
+    fun navigateToClearParentGraph() = navController.navigate(ParentGraph, clearStackNavOptions)
+
     fun navigateToAuthParent(
         navOptions: NavOptions? = null,
     ) = navController.navigateToAuthParent(
@@ -146,9 +148,11 @@ class MainAppState(
         }
     }
 
-    fun navigateToAuth() {
+    fun navigateToAuth(
+        navOptions: NavOptions? = null
+    ) {
         navController.navigate(AuthGraph) {
-            popUpTo<Splash> {
+            popUpTo(0) {
                 inclusive = true
             }
             launchSingleTop = true

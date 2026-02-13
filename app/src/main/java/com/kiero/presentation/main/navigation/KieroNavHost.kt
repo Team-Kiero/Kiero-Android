@@ -43,22 +43,20 @@ fun KieroNavHost(
         modifier = modifier
     ) {
         splashNavGraph(
-            navigateToAuth = appState::navigateToAuth,
+            navigateToAuth = {
+                appState.navigateToAuth(clearStackNavOptions)
+            },
             navigateToParentHome = {
-                Timber.d("Navigate to Parent Home (Clear Stack)")
                 appState.navigateToSchedule(clearStackNavOptions)
             },
             navigateToKidHome = {
-                Timber.d("Navigate to Kid Home (Clear Stack)")
                 appState.navigateToJourney(clearStackNavOptions)
             },
             navigateToParentGraph = {
                 // 부모 카카오 로그인
-                Timber.d("Navigate to Parent Graph (Clear Stack)")
                 appState.navigateToAuthParent(clearStackNavOptions)
             },
             navigateToKidOnboarding = {
-                Timber.d("Navigate to Kid Onboarding (Clear Stack)")
                 appState.navigateToKidOnboarding(clearStackNavOptions)
             }
         )
@@ -75,16 +73,17 @@ fun KieroNavHost(
                     navOptions = clearStackNavOptions
                 )
             },
+            navigateToSelection = appState::navigateToSelection,
             onEasterEggClick = appState::navigateToKidOnboarding
         )
 
         parentSignUpNavGraph(
             paddingValues = paddingValues,
-            navigateToParent = appState::navigateToParentGraph,
+            navigateToParent = {
+                appState.navigateToClearParentGraph()
+            },
             navigateToSelection = appState::navigateToSelection
         )
-
-
 
         parentNavGraph(
             navController = appState.navController,
