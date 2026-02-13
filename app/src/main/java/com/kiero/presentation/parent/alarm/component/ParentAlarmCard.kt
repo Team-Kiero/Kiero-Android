@@ -24,10 +24,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import com.kiero.R
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.common.extension.toHighlightedText
+import com.kiero.core.designsystem.component.UrlImage
 import com.kiero.core.designsystem.component.chip.KieroChip
 import com.kiero.core.designsystem.component.chip.action.KieroCoinAction
 import com.kiero.core.designsystem.theme.KieroTheme
@@ -40,7 +40,7 @@ fun ParentAlarmCard(
     highlightTexts: List<String>,
     highlightColor: Color,
     coinUsed: Int?,
-    imageUrl: Any?,
+    imageUrl: String?,
     isExpanded: Boolean,
     onExpandClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -119,8 +119,8 @@ fun ParentAlarmCard(
                     modifier = Modifier
                         .height(15.dp)
                 )
-                AsyncImage(
-                    model = imageUrl,
+                UrlImage(
+                    url = imageUrl,
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -150,7 +150,7 @@ private fun ParentAlarmCardPreview() {
                 highlightTexts = listOf("과자먹기"),
                 highlightColor = Color(0xFF00FFE1),
                 coinUsed = null,
-                imageUrl = R.drawable.img_kid_journey_piano_background,
+                imageUrl = "",
                 isExpanded = true,
                 onExpandClick = {}
             )

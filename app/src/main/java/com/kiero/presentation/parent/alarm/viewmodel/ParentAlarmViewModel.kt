@@ -133,7 +133,10 @@ class ParentAlarmViewModel @Inject constructor(
             networkJobs.awaitAll()
             sseManager.stopSubscription()
 
-            suspendRunCatching { tokenManager.clearTokens() }
+            suspendRunCatching {
+                tokenManager.clearTokens()
+                userInfoManager.clearParentInfo()
+            }
 
             _authState.update {
                 it.copy(isLoading = false)

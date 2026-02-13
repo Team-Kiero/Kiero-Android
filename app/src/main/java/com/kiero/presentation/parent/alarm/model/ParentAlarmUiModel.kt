@@ -24,7 +24,7 @@ data class ParentAlarmUiModel(
     val highlightText: String,
     val highlightColor: Color,
     val coinUsed: Int?,
-    val imageUrl: Any?,
+    val imageUrl: String?,
     val isExpanded: Boolean = false
 )
 
