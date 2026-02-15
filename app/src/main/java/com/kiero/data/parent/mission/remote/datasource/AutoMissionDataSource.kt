@@ -1,9 +1,10 @@
-package com.kiero.data.mission.remote.datasource
+package com.kiero.data.parent.mission.remote.datasource
 
 import com.kiero.core.network.model.BaseResponse
-import com.kiero.data.mission.remote.dto.request.MissionCreateDto
-import com.kiero.data.mission.remote.dto.response.MissionBulkCreateResponseDto
-import com.kiero.data.mission.remote.dto.response.MissionSuggestionResponseDto
+import com.kiero.data.parent.mission.remote.dto.request.MissionCreateDto
+import com.kiero.data.parent.mission.remote.dto.response.MissionBulkCreateResponseDto
+import com.kiero.data.parent.mission.remote.dto.response.MissionSuggestionResponseDto
+
 
 interface AutoMissionDataSource {
     suspend fun analyzeNotice(
