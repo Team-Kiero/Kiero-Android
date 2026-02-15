@@ -3,13 +3,11 @@ package com.kiero.presentation.parent.alarm.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.common.extension.toHandleErrorMessage
-import com.kiero.core.common.extension.updateSuccess
 import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.core.localstorage.TokenManager
 import com.kiero.core.localstorage.info.UserInfoManager
-import com.kiero.data.alarm.repository.AlarmRepository
-import com.kiero.data.auth.repository.AuthRepository
-import com.kiero.data.demo.repository.DemoRepository
+import com.kiero.domain.repository.parent.alarm.AlarmRepository
+import com.kiero.domain.repository.auth.AuthRepository
 import com.kiero.data.sse.manager.SseManager
 import com.kiero.presentation.parent.alarm.model.toUiModel
 import com.kiero.presentation.parent.alarm.state.AlarmFeedState
@@ -41,7 +39,6 @@ class ParentAlarmViewModel @Inject constructor(
     private val sseManager: SseManager,
     private val authRepository: AuthRepository,
     private val tokenManager: TokenManager,
-    private val demoRepository: DemoRepository
 ) : ViewModel() {
 
     private val _localState = MutableStateFlow(LocalState())
@@ -128,7 +125,6 @@ class ParentAlarmViewModel @Inject constructor(
         viewModelScope.launch {
             val networkJobs = listOf(
                 async { suspendRunCatching { authRepository.postLogout() } },
-                async { suspendRunCatching { demoRepository.deleteDemo() } }
             )
             networkJobs.awaitAll()
             sseManager.stopSubscription()

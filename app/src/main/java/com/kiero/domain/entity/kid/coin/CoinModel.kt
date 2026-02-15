@@ -1,4 +1,4 @@
-package com.kiero.data.kid.coin.model
+package com.kiero.domain.entity.kid.coin
 
 import com.kiero.data.kid.coin.remote.dto.response.CoinResponseDto
 

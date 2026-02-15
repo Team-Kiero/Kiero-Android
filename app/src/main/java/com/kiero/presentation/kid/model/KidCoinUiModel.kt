@@ -1,7 +1,7 @@
 package com.kiero.presentation.kid.model
 
 import androidx.compose.runtime.Immutable
-import com.kiero.data.kid.coin.model.CoinModel
+import com.kiero.domain.entity.kid.coin.CoinModel
 
 @Immutable
 data class KidCoinUiModel(

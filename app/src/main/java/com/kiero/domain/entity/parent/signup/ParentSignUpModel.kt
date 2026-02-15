@@ -1,4 +1,4 @@
-package com.kiero.data.parent.signup.model
+package com.kiero.domain.entity.parent.signup
 
 import com.kiero.data.parent.signup.remote.dto.response.ParentSignUpResponseDto
 

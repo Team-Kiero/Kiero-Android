@@ -1,7 +1,7 @@
 package com.kiero.presentation.parent.schedule.mission.state
 
 import androidx.compose.runtime.Immutable
-import com.kiero.data.parent.model.ParentMissionAddModel
+import com.kiero.domain.entity.parent.mission.ParentMissionAddModel
 
 @Immutable
 data class ParentAddMissionState(

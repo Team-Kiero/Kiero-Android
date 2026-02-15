@@ -1,7 +1,8 @@
-package com.kiero.data.mission.model
+package com.kiero.domain.entity.parent.mission
 
-import com.kiero.data.mission.remote.dto.response.MissionSuggestionResponseDto
-import com.kiero.data.mission.remote.dto.response.SuggestedMissionDto
+import com.kiero.data.parent.mission.remote.dto.response.MissionSuggestionResponseDto
+import com.kiero.data.parent.mission.remote.dto.response.SuggestedMissionDto
+
 
 data class MissionSuggestionModel(
     val suggestedMissions: List<SuggestedMissionModel>

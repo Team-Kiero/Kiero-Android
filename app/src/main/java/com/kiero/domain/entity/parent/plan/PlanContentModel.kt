@@ -1,4 +1,4 @@
-package com.kiero.data.parent.plan.model
+package com.kiero.domain.entity.parent.plan
 
 import NormalScheduleDto
 import PlanAllResponseDto

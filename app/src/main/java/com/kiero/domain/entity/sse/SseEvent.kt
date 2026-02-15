@@ -1,4 +1,4 @@
-package com.kiero.data.sse.model
+package com.kiero.domain.entity.sse
 
 import com.kiero.data.sse.remote.dto.response.FeedDataDto
 import com.kiero.data.sse.remote.dto.response.InviteDataDto

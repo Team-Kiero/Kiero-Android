@@ -1,4 +1,4 @@
-package com.kiero.data.auth.model
+package com.kiero.domain.entity.auth
 
 import com.kiero.data.auth.remote.dto.response.ChildrenResponseDto
 

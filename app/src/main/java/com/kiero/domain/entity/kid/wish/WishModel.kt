@@ -1,4 +1,4 @@
-package com.kiero.data.kid.wish.model
+package com.kiero.domain.entity.kid.wish
 
 import com.kiero.data.kid.wish.remote.dto.response.WishResponseDto
 

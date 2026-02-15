@@ -1,4 +1,4 @@
-package com.kiero.core.designsystem.component
+package com.kiero.core.designsystem.component.textfield
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

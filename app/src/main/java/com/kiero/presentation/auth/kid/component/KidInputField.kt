@@ -25,7 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
 import com.kiero.core.common.util.MaxLengthInputTransformation
-import com.kiero.core.designsystem.component.KieroTextField
+import com.kiero.core.designsystem.component.textfield.KieroTextField
 import com.kiero.core.designsystem.theme.KieroTheme
 
 @Composable

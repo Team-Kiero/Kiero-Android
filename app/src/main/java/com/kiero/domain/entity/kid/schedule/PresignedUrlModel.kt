@@ -1,4 +1,4 @@
-package com.kiero.data.kid.schedule.model
+package com.kiero.domain.entity.kid.schedule
 
 import com.kiero.data.kid.schedule.remote.dto.response.PresignedUrlResponse
 

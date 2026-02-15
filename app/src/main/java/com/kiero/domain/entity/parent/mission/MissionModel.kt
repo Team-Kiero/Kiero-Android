@@ -1,9 +1,10 @@
-package com.kiero.data.mission.model
+package com.kiero.domain.entity.parent.mission
 
-import com.kiero.data.mission.remote.dto.response.CreatedMissionDto
-import com.kiero.data.mission.remote.dto.response.MissionByDateResponseDto
-import com.kiero.data.mission.remote.dto.response.MissionListResponseDto
-import com.kiero.data.mission.remote.dto.response.MissionResponseDto
+import com.kiero.data.parent.mission.remote.dto.response.CreatedMissionDto
+import com.kiero.data.parent.mission.remote.dto.response.MissionByDateResponseDto
+import com.kiero.data.parent.mission.remote.dto.response.MissionListResponseDto
+import com.kiero.data.parent.mission.remote.dto.response.MissionResponseDto
+
 
 data class MissionByDateModel(
     val missionsByDate: List<MissionListModel>

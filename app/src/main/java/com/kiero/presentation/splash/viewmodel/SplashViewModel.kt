@@ -7,7 +7,7 @@ import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.localstorage.onboarding.OnboardingManager
 import com.kiero.core.model.auth.UserRole
 import com.kiero.core.network.auth.TokenRefreshService
-import com.kiero.data.auth.repository.AuthRepository
+import com.kiero.domain.repository.auth.AuthRepository
 import com.kiero.presentation.splash.state.SplashSideEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel

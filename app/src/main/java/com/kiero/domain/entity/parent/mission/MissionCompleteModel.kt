@@ -1,6 +1,7 @@
-package com.kiero.data.mission.model
+package com.kiero.domain.entity.parent.mission
 
-import com.kiero.data.mission.remote.dto.response.MissionCompleteResponseDto
+import com.kiero.data.parent.mission.remote.dto.response.MissionCompleteResponseDto
+
 
 data class MissionCompleteModel(
     val id : Long,
