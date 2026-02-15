@@ -7,8 +7,8 @@ import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.core.localstorage.TokenManager
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.model.UiState
-import com.kiero.domain.repository.auth.AuthRepository
-import com.kiero.domain.repository.parent.plan.PlanRepository
+import com.kiero.data.auth.repository.AuthRepository
+import com.kiero.data.parent.plan.repository.PlanRepository
 import com.kiero.data.sse.manager.SseManager
 import com.kiero.presentation.parent.schedule.plan.state.ParentScheduleState
 import com.kiero.presentation.signup.parent.state.ParentSignUpSideEffect

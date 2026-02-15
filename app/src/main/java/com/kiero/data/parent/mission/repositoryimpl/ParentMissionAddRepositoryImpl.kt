@@ -3,9 +3,9 @@ package com.kiero.data.parent.mission.repositoryimpl
 import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.data.parent.mission.remote.datasource.ParentMissionAddDataSource
 import com.kiero.data.parent.mission.remote.dto.request.ParentMissionAddRequestDto
-import com.kiero.domain.entity.parent.mission.ParentMissionAddModel
-import com.kiero.domain.entity.parent.mission.toModel
-import com.kiero.domain.repository.parent.mission.ParentMissionAddRepository
+import com.kiero.data.parent.mission.model.ParentMissionAddModel
+import com.kiero.data.parent.mission.model.toModel
+import com.kiero.data.parent.mission.repository.ParentMissionAddRepository
 import javax.inject.Inject
 
 class ParentMissionAddRepositoryImpl @Inject constructor(

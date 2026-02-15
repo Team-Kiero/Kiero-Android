@@ -1,8 +1,8 @@
 package com.kiero.data.parent.alarm.di
 
 
-import com.kiero.data.parent.alarm.datasource.AlarmDataSource
-import com.kiero.data.parent.alarm.datasourceimpl.AlarmDataSourceImpl
+import com.kiero.data.parent.alarm.remote.datasource.AlarmDataSource
+import com.kiero.data.parent.alarm.remote.datasourceimpl.AlarmDataSourceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

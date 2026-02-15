@@ -1,9 +1,9 @@
 package com.kiero.presentation.parent.schedule.mission.component.model
 
 import androidx.compose.runtime.Immutable
-import com.kiero.domain.entity.parent.mission.MissionByDateModel
-import com.kiero.domain.entity.parent.mission.MissionListModel
-import com.kiero.domain.entity.parent.mission.MissionModel
+import com.kiero.data.parent.mission.model.MissionByDateModel
+import com.kiero.data.parent.mission.model.MissionListModel
+import com.kiero.data.parent.mission.model.MissionModel
 import com.kiero.presentation.kid.mission.util.createDateTitle
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf

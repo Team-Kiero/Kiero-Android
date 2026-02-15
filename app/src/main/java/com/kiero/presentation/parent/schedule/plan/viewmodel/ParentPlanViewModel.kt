@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.kiero.core.localstorage.info.UserInfoManager
-import com.kiero.domain.repository.parent.plan.PlanRepository
+import com.kiero.data.parent.plan.repository.PlanRepository
 import com.kiero.presentation.parent.schedule.plan.model.ColorType
 import com.kiero.presentation.parent.schedule.plan.navigation.ScheduleAdd
 import com.kiero.presentation.parent.schedule.plan.state.ParentPlanSideEffect

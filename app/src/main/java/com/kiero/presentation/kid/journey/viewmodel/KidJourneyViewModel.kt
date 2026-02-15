@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.common.util.successData
 import com.kiero.core.model.UiState
-import com.kiero.domain.repository.kid.coin.CoinRepository
-import com.kiero.domain.entity.kid.schedule.ScheduleStatus
-import com.kiero.domain.repository.kid.schedule.ScheduleRepository
+import com.kiero.data.kid.coin.repository.CoinRepository
+import com.kiero.data.kid.schedule.model.ScheduleStatus
+import com.kiero.data.kid.schedule.repository.ScheduleRepository
 import com.kiero.data.sse.manager.SseManager
 import com.kiero.presentation.kid.journey.model.KidJourneyContentUiModel
 import com.kiero.presentation.kid.journey.model.KidJourneyHeaderUiModel

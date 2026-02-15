@@ -1,12 +1,12 @@
 package com.kiero.data.kid.schedule.repositoryimpl
 
 import com.kiero.core.common.util.suspendRunCatching
-import com.kiero.domain.entity.kid.schedule.ScheduleFireModel
-import com.kiero.domain.entity.kid.schedule.ScheduleImageUploadModel
-import com.kiero.domain.entity.kid.schedule.ScheduleTodayModel
-import com.kiero.domain.entity.kid.schedule.toModel
+import com.kiero.data.kid.schedule.model.ScheduleFireModel
+import com.kiero.data.kid.schedule.model.ScheduleImageUploadModel
+import com.kiero.data.kid.schedule.model.ScheduleTodayModel
+import com.kiero.data.kid.schedule.model.toModel
 import com.kiero.data.kid.schedule.remote.datasource.ScheduleDataSource
-import com.kiero.domain.repository.kid.schedule.ScheduleRepository
+import com.kiero.data.kid.schedule.repository.ScheduleRepository
 import javax.inject.Inject
 
 class ScheduleRepositoryImpl @Inject constructor(

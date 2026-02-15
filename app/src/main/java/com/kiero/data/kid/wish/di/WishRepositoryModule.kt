@@ -1,6 +1,6 @@
 package com.kiero.data.kid.wish.di
 
-import com.kiero.domain.repository.kid.wish.WishRepository
+import com.kiero.data.kid.wish.repository.WishRepository
 import com.kiero.data.kid.wish.repositoryimpl.WishRepositoryImpl
 import dagger.Binds
 import dagger.Module

@@ -1,12 +1,12 @@
 package com.kiero.data.parent.plan.repositoryimpl
 
 import com.kiero.core.common.util.suspendRunCatching
-import com.kiero.domain.entity.parent.plan.PlanAllModel
-import com.kiero.domain.entity.parent.plan.PlanColorModel
-import com.kiero.domain.entity.parent.plan.toModel
+import com.kiero.data.parent.plan.model.PlanAllModel
+import com.kiero.data.parent.plan.model.PlanColorModel
+import com.kiero.data.parent.plan.model.toModel
 import com.kiero.data.parent.plan.remote.datasource.PlanDataSource
 import com.kiero.data.parent.plan.remote.dto.request.PlanAddRequestDto
-import com.kiero.domain.repository.parent.plan.PlanRepository
+import com.kiero.data.parent.plan.repository.PlanRepository
 import javax.inject.Inject
 
 class PlanRepositoryImpl @Inject constructor(

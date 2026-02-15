@@ -1,10 +1,10 @@
 package com.kiero.data.kid.wish.repositoryimpl
 
 import com.kiero.core.common.util.suspendRunCatching
-import com.kiero.domain.entity.kid.wish.WishModel
-import com.kiero.domain.entity.kid.wish.toModel
+import com.kiero.data.kid.wish.model.WishModel
+import com.kiero.data.kid.wish.model.toModel
 import com.kiero.data.kid.wish.remote.datasource.WishDataSource
-import com.kiero.domain.repository.kid.wish.WishRepository
+import com.kiero.data.kid.wish.repository.WishRepository
 import javax.inject.Inject
 
 class WishRepositoryImpl @Inject constructor(

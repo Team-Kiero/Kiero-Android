@@ -2,9 +2,9 @@ package com.kiero.data.parent.mission.di
 
 import com.kiero.data.parent.mission.repositoryimpl.AutoMissionRepositoryImpl
 import com.kiero.data.parent.mission.repositoryimpl.MissionRepositoryImpl
-import com.kiero.domain.repository.parent.mission.AutoMissionRepository
-import com.kiero.domain.repository.parent.mission.MissionRepository
-import com.kiero.domain.repository.parent.mission.ParentMissionAddRepository
+import com.kiero.data.parent.mission.repository.AutoMissionRepository
+import com.kiero.data.parent.mission.repository.MissionRepository
+import com.kiero.data.parent.mission.repository.ParentMissionAddRepository
 import com.kiero.data.parent.mission.repositoryimpl.ParentMissionAddRepositoryImpl
 import dagger.Binds
 import dagger.Module

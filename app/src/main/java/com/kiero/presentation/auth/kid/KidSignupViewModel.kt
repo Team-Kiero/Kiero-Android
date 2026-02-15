@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.common.extension.toHandleErrorMessage
 import com.kiero.core.localstorage.TokenManager
-import com.kiero.domain.repository.auth.AuthRepository
+import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.presentation.auth.kid.model.toModel
 import com.kiero.presentation.auth.kid.state.KidSignUpState
 import com.kiero.presentation.auth.kid.state.KidSignupSideEffect

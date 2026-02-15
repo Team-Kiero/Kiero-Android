@@ -7,8 +7,8 @@ import androidx.navigation.toRoute
 import com.kiero.core.common.extension.updateSuccess
 import com.kiero.core.common.util.successData
 import com.kiero.core.model.UiState
-import com.kiero.domain.repository.kid.schedule.PresignedUrlRepository
-import com.kiero.domain.repository.kid.schedule.ScheduleRepository
+import com.kiero.data.kid.schedule.repository.PresignedUrlRepository
+import com.kiero.data.kid.schedule.repository.ScheduleRepository
 import com.kiero.presentation.kid.journey.camera.navigation.Camera
 import com.kiero.presentation.kid.journey.camera.state.KidCameraSideEffect
 import com.kiero.presentation.kid.journey.camera.state.KidCameraState

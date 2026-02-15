@@ -1,7 +1,7 @@
 package com.kiero.presentation.kid.wish.model
 
 import androidx.compose.runtime.Immutable
-import com.kiero.domain.entity.kid.wish.WishModel
+import com.kiero.data.kid.wish.model.WishModel
 
 @Immutable
 data class KidWishUiModel(

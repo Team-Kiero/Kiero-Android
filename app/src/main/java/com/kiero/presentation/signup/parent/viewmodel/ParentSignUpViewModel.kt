@@ -11,8 +11,8 @@ import com.kiero.core.common.viewmodel.throttleFirst
 import com.kiero.core.localstorage.TokenManager
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.sse.manager.SseManager
-import com.kiero.domain.repository.auth.AuthRepository
-import com.kiero.domain.repository.parent.signup.ParentSignUpRepository
+import com.kiero.data.auth.repository.AuthRepository
+import com.kiero.data.parent.signup.repository.ParentSignUpRepository
 import com.kiero.presentation.signup.parent.model.ParentSignUpStep
 import com.kiero.presentation.signup.parent.model.toUiModel
 import com.kiero.presentation.signup.parent.navigation.ParentSignUp

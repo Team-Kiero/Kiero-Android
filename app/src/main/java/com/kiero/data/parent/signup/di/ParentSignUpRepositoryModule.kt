@@ -1,6 +1,6 @@
 package com.kiero.data.parent.signup.di
 
-import com.kiero.domain.repository.parent.signup.ParentSignUpRepository
+import com.kiero.data.parent.signup.repository.ParentSignUpRepository
 import com.kiero.data.parent.signup.repositoryimpl.ParentSignUpRepositoryImpl
 import dagger.Binds
 import dagger.Module

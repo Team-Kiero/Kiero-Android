@@ -1,7 +1,7 @@
 package com.kiero.data.sse.manager
 
-import com.kiero.domain.entity.sse.SseEvent
-import com.kiero.domain.repository.sse.SseRepository
+import com.kiero.data.sse.model.SseEvent
+import com.kiero.data.sse.repository.SseRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

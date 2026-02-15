@@ -1,6 +1,6 @@
 package com.kiero.presentation.kid.journey.fire.model
 
-import com.kiero.domain.entity.kid.schedule.ScheduleFireModel
+import com.kiero.data.kid.schedule.model.ScheduleFireModel
 import com.kiero.presentation.kid.journey.model.StoneUiType
 
 data class KidFireUiModel(

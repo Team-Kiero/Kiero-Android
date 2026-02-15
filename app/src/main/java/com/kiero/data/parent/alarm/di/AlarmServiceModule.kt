@@ -1,7 +1,7 @@
 package com.kiero.data.parent.alarm.di
 
 import com.kiero.core.network.di.AuthNetwork
-import com.kiero.data.parent.alarm.api.AlarmService
+import com.kiero.data.parent.alarm.remote.api.AlarmService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

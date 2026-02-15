@@ -6,8 +6,8 @@ import com.kiero.core.common.extension.toHandleErrorMessage
 import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.core.localstorage.TokenManager
 import com.kiero.core.localstorage.info.UserInfoManager
-import com.kiero.domain.repository.parent.alarm.AlarmRepository
-import com.kiero.domain.repository.auth.AuthRepository
+import com.kiero.data.parent.alarm.repository.AlarmRepository
+import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.data.sse.manager.SseManager
 import com.kiero.presentation.parent.alarm.model.toUiModel
 import com.kiero.presentation.parent.alarm.state.AlarmFeedState

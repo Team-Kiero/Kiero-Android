@@ -1,9 +1,9 @@
 package com.kiero.presentation.parent.schedule.plan.state
 
 import androidx.compose.runtime.Immutable
-import com.kiero.domain.entity.parent.plan.NormalScheduleModel
-import com.kiero.domain.entity.parent.plan.PlanAllModel
-import com.kiero.domain.entity.parent.plan.RecurringScheduleModel
+import com.kiero.data.parent.plan.model.NormalScheduleModel
+import com.kiero.data.parent.plan.model.PlanAllModel
+import com.kiero.data.parent.plan.model.RecurringScheduleModel
 import com.kiero.presentation.parent.schedule.model.ScheduleEvent
 import com.kiero.presentation.signup.parent.model.ParentInfoUiModel
 import java.time.DayOfWeek

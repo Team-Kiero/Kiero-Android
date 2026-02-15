@@ -3,7 +3,7 @@ package com.kiero.presentation.parent.schedule.mission.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.model.UiState
-import com.kiero.domain.repository.parent.mission.MissionRepository
+import com.kiero.data.parent.mission.repository.MissionRepository
 import com.kiero.presentation.kid.mission.model.toUiModel
 import com.kiero.presentation.parent.schedule.mission.state.ParentMissionSideEffect
 import com.kiero.presentation.parent.schedule.mission.state.ParentMissionState
