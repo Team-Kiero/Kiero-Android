@@ -1,7 +1,7 @@
-package com.kiero.data.alarm.datasource
+package com.kiero.data.parent.alarm.datasource
 
 import com.kiero.core.network.model.BaseResponse
-import com.kiero.data.alarm.dto.response.AlarmFeedResponseDto
+import com.kiero.data.parent.alarm.dto.response.AlarmFeedResponseDto
 
 interface AlarmDataSource {
     suspend fun getAlarmFeed(

@@ -1,4 +1,4 @@
-package com.kiero.data.alarm.dto.response
+package com.kiero.data.parent.alarm.dto.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

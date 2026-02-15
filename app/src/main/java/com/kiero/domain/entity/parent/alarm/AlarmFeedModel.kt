@@ -1,7 +1,8 @@
-package com.kiero.data.alarm.model
+package com.kiero.domain.entity.parent.alarm
 
-import com.kiero.data.alarm.dto.response.AlarmFeedResponseDto
-import com.kiero.data.alarm.dto.response.FeedItemDto
+
+import com.kiero.data.parent.alarm.dto.response.AlarmFeedResponseDto
+import com.kiero.data.parent.alarm.dto.response.FeedItemDto
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import timber.log.Timber

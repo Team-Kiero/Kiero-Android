@@ -1,9 +1,10 @@
-package com.kiero.data.alarm.datasourceimpl
+package com.kiero.data.parent.alarm.datasourceimpl
 
 import com.kiero.core.network.model.BaseResponse
-import com.kiero.data.alarm.api.AlarmService
-import com.kiero.data.alarm.datasource.AlarmDataSource
-import com.kiero.data.alarm.dto.response.AlarmFeedResponseDto
+import com.kiero.data.parent.alarm.api.AlarmService
+import com.kiero.data.parent.alarm.datasource.AlarmDataSource
+import com.kiero.data.parent.alarm.dto.response.AlarmFeedResponseDto
+
 import javax.inject.Inject
 
 class AlarmDataSourceImpl @Inject constructor(

@@ -1,7 +1,7 @@
-package com.kiero.data.alarm.di
+package com.kiero.data.parent.alarm.di
 
-import com.kiero.data.alarm.repository.AlarmRepository
-import com.kiero.data.alarm.repositoryimpl.AlarmRepositoryImpl
+import com.kiero.data.parent.alarm.repositoryimpl.AlarmRepositoryImpl
+import com.kiero.domain.repository.parent.alarm.AlarmRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
