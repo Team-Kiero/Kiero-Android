@@ -22,4 +22,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Kiero"
 include(":app")
- 
+include(":baselineprofile")
