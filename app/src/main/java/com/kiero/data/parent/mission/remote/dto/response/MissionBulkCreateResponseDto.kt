@@ -1,12 +1,14 @@
-package com.kiero.data.mission.remote.dto.response
+package com.kiero.data.parent.mission.remote.dto.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+typealias MissionBulkCreateResponseDto = List<CreatedMissionDto>
+
 @Serializable
-data class MissionCompleteResponseDto(
+data class CreatedMissionDto(
     @SerialName("id")
-    val id : Long,
+    val id: Long,
     @SerialName("name")
     val name: String,
     @SerialName("reward")

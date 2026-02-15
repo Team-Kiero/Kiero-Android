@@ -1,8 +1,8 @@
-package com.kiero.data.mission.di
+package com.kiero.data.parent.mission.di
 
 import com.kiero.core.network.di.AuthNetwork
-import com.kiero.data.mission.remote.api.MissionService
-import com.kiero.data.parent.remote.api.ParentMissionService
+import com.kiero.data.parent.mission.remote.api.MissionService
+import com.kiero.data.parent.mission.remote.api.ParentMissionService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

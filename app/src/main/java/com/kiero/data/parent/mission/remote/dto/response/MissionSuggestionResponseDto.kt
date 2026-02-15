@@ -1,4 +1,4 @@
-package com.kiero.data.mission.remote.dto.response
+package com.kiero.data.parent.mission.remote.dto.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

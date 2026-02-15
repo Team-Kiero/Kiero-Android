@@ -1,11 +1,12 @@
-package com.kiero.data.mission.di
+package com.kiero.data.parent.mission.di
 
-import com.kiero.data.mission.remote.datasource.AutoMissionDataSource
-import com.kiero.data.mission.remote.datasource.MissionDataSource
-import com.kiero.data.mission.remote.datasourceimpl.AutoMissionDataSourceImpl
-import com.kiero.data.mission.remote.datasourceimpl.MissionDataSourceImpl
-import com.kiero.data.parent.remote.datasource.ParentMissionAddDataSource
-import com.kiero.data.parent.remote.datasourcimpl.ParentMissionAddDataSourceImpl
+
+import com.kiero.data.parent.mission.remote.datasource.AutoMissionDataSource
+import com.kiero.data.parent.mission.remote.datasource.MissionDataSource
+import com.kiero.data.parent.mission.remote.datasource.ParentMissionAddDataSource
+import com.kiero.data.parent.mission.remote.datasourceimpl.AutoMissionDataSourceImpl
+import com.kiero.data.parent.mission.remote.datasourceimpl.MissionDataSourceImpl
+import com.kiero.data.parent.mission.remote.datasourceimpl.ParentMissionAddDataSourceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
