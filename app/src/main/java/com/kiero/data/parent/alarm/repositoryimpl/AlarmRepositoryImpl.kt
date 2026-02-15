@@ -1,11 +1,11 @@
-package com.kiero.data.alarm.repositoryimpl
+package com.kiero.data.parent.alarm.repositoryimpl
 
 import com.kiero.core.common.util.suspendRunCatching
-import com.kiero.data.alarm.datasource.AlarmDataSource
-import com.kiero.data.alarm.model.AlarmFeedModel
-import com.kiero.data.alarm.model.AlarmItemModel
-import com.kiero.data.alarm.model.toModel
-import com.kiero.data.alarm.repository.AlarmRepository
+import com.kiero.data.parent.alarm.datasource.AlarmDataSource
+import com.kiero.domain.entity.parent.alarm.AlarmFeedModel
+import com.kiero.domain.entity.parent.alarm.AlarmItemModel
+import com.kiero.domain.entity.parent.alarm.toModel
+import com.kiero.domain.repository.parent.alarm.AlarmRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

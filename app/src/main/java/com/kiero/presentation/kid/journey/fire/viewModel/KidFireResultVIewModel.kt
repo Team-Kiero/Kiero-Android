@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.kiero.core.model.UiState
-import com.kiero.data.kid.schedule.repository.ScheduleRepository
+import com.kiero.domain.repository.kid.schedule.ScheduleRepository
 import com.kiero.presentation.kid.journey.fire.model.toUiModel
 import com.kiero.presentation.kid.journey.fire.navigation.FireResult
 import com.kiero.presentation.kid.journey.fire.state.KidFireResultState

@@ -1,14 +1,14 @@
 package com.kiero.data.sse.repositoryimpl
 
 import com.kiero.data.sse.remote.datasource.SseDataSource
-import com.kiero.data.sse.model.RawSseEvent
-import com.kiero.data.sse.model.SseEvent
-import com.kiero.data.sse.model.SseEventType
+import com.kiero.domain.entity.sse.RawSseEvent
+import com.kiero.domain.entity.sse.SseEvent
+import com.kiero.domain.entity.sse.SseEventType
 import com.kiero.data.sse.remote.dto.response.FeedDataDto
 import com.kiero.data.sse.remote.dto.response.InviteDataDto
 import com.kiero.data.sse.remote.dto.response.MissionDataDto
 import com.kiero.data.sse.remote.dto.response.ScheduleDataDto
-import com.kiero.data.sse.repository.SseRepository
+import com.kiero.domain.repository.sse.SseRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.serialization.json.Json

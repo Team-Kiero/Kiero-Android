@@ -1,11 +1,11 @@
 package com.kiero.data.parent.signup.repositoryimpl
 
 import com.kiero.core.common.util.suspendRunCatching
-import com.kiero.data.parent.signup.model.LinkageKidModel
-import com.kiero.data.parent.signup.model.ParentSignUpModel
-import com.kiero.data.parent.signup.model.toModel
+import com.kiero.domain.entity.parent.signup.LinkageKidModel
+import com.kiero.domain.entity.parent.signup.ParentSignUpModel
+import com.kiero.domain.entity.parent.signup.toModel
 import com.kiero.data.parent.signup.remote.datasource.ParentSignUpDataSource
-import com.kiero.data.parent.signup.repository.ParentSignUpRepository
+import com.kiero.domain.repository.parent.signup.ParentSignUpRepository
 import javax.inject.Inject
 
 class ParentSignUpRepositoryImpl @Inject constructor(

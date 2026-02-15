@@ -8,7 +8,7 @@ import com.kakao.sdk.common.model.ClientErrorCause
 import com.kiero.core.common.extension.toHandleErrorMessage
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.model.UiState
-import com.kiero.data.auth.repository.AuthRepository
+import com.kiero.domain.repository.auth.AuthRepository
 import com.kiero.presentation.auth.state.AuthSideEffect
 import com.kiero.presentation.auth.state.AuthState
 import dagger.hilt.android.lifecycle.HiltViewModel

@@ -1,7 +1,7 @@
 package com.kiero.data.sse.remote.datasource
 
 import com.kiero.core.network.model.BaseResponse
-import com.kiero.data.sse.model.RawSseEvent
+import com.kiero.domain.entity.sse.RawSseEvent
 import com.kiero.data.sse.remote.dto.response.SseTokenResponseDto
 import kotlinx.coroutines.flow.Flow
 

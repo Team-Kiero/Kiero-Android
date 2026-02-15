@@ -6,8 +6,8 @@ import com.kiero.core.common.extension.toHandleErrorMessage
 import com.kiero.core.common.extension.updateSuccess
 import com.kiero.core.common.util.successData
 import com.kiero.core.model.UiState
-import com.kiero.data.kid.coin.repository.CoinRepository
-import com.kiero.data.kid.wish.repository.WishRepository
+import com.kiero.domain.repository.kid.coin.CoinRepository
+import com.kiero.domain.repository.kid.wish.WishRepository
 import com.kiero.presentation.kid.model.toUiModel
 import com.kiero.presentation.kid.wish.model.toUiModel
 import com.kiero.presentation.kid.wish.state.KidWishSideEffect

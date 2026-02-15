@@ -3,7 +3,7 @@ package com.kiero.data.sse.remote.datasourceimpl
 import com.kiero.core.network.model.BaseResponse
 import com.kiero.data.sse.remote.api.SseService
 import com.kiero.data.sse.remote.datasource.SseDataSource
-import com.kiero.data.sse.model.RawSseEvent
+import com.kiero.domain.entity.sse.RawSseEvent
 import com.kiero.data.sse.remote.dto.response.SseTokenResponseDto
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow

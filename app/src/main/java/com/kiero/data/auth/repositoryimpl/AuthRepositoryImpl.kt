@@ -3,14 +3,14 @@ package com.kiero.data.auth.repositoryimpl
 import android.content.Context
 import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.core.localstorage.TokenManager
-import com.kiero.data.auth.model.AuthKidModel
-import com.kiero.data.auth.model.AuthKidResponseModel
-import com.kiero.data.auth.model.ChildrenModel
-import com.kiero.data.auth.model.toDto
-import com.kiero.data.auth.model.toModel
+import com.kiero.domain.entity.auth.AuthKidModel
+import com.kiero.domain.entity.auth.AuthKidResponseModel
+import com.kiero.domain.entity.auth.ChildrenModel
+import com.kiero.domain.entity.auth.toDto
+import com.kiero.domain.entity.auth.toModel
 import com.kiero.data.auth.remote.datasource.AuthDataSource
 import com.kiero.data.auth.remote.dto.response.AuthLoginResponseDto
-import com.kiero.data.auth.repository.AuthRepository
+import com.kiero.domain.repository.auth.AuthRepository
 import timber.log.Timber
 import javax.inject.Inject
 

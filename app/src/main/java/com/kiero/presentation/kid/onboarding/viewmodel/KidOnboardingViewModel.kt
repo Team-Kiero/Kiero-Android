@@ -4,8 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.localstorage.onboarding.OnboardingManager
 import com.kiero.core.model.UiState
-import com.kiero.data.demo.repository.DemoRepository
-import com.kiero.data.kid.coin.repository.CoinRepository
+import com.kiero.domain.repository.kid.coin.CoinRepository
 import com.kiero.presentation.kid.onboarding.state.KidOnboardingSideEffect
 import com.kiero.presentation.kid.onboarding.state.KidOnboardingState
 import dagger.hilt.android.lifecycle.HiltViewModel

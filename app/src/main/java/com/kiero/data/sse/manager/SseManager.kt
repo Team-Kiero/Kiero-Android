@@ -1,7 +1,7 @@
 package com.kiero.data.sse.manager
 
-import com.kiero.data.sse.model.SseEvent
-import com.kiero.data.sse.repository.SseRepository
+import com.kiero.domain.entity.sse.SseEvent
+import com.kiero.domain.repository.sse.SseRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -12,7 +12,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex

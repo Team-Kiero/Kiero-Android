@@ -1,6 +1,6 @@
 package com.kiero.data.auth.di
 
-import com.kiero.data.auth.repository.AuthRepository
+import com.kiero.domain.repository.auth.AuthRepository
 import com.kiero.data.auth.repositoryimpl.AuthRepositoryImpl
 import dagger.Binds
 import dagger.Module
