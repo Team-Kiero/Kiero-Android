@@ -1,8 +1,8 @@
-package com.kiero.data.mission.repository
+package com.kiero.domain.repository.parent.mission
 
-import com.kiero.data.mission.model.MissionCompleteModel
-import com.kiero.data.mission.model.MissionSuggestionModel
-import com.kiero.data.mission.model.SuggestedMissionModel
+import com.kiero.domain.entity.parent.mission.MissionCompleteModel
+import com.kiero.domain.entity.parent.mission.MissionSuggestionModel
+import com.kiero.domain.entity.parent.mission.SuggestedMissionModel
 
 interface AutoMissionRepository {
 

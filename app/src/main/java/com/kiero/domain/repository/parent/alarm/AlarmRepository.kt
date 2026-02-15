@@ -1,7 +1,7 @@
-package com.kiero.data.alarm.repository
+package com.kiero.domain.repository.parent.alarm
 
-import com.kiero.data.alarm.model.AlarmFeedModel
-import com.kiero.data.alarm.model.AlarmItemModel
+import com.kiero.domain.entity.parent.alarm.AlarmFeedModel
+import com.kiero.domain.entity.parent.alarm.AlarmItemModel
 import kotlinx.coroutines.flow.StateFlow
 
 interface AlarmRepository {

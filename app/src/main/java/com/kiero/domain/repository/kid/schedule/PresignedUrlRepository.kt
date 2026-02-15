@@ -1,4 +1,4 @@
-package com.kiero.data.kid.schedule.repository
+package com.kiero.domain.repository.kid.schedule
 
 import android.content.Context
 import androidx.core.net.toUri

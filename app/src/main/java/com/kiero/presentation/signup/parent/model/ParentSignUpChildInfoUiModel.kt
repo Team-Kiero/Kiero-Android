@@ -3,7 +3,7 @@ package com.kiero.presentation.signup.parent.model
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Immutable
 import com.kiero.core.common.util.InputValidator
-import com.kiero.data.parent.signup.model.ParentSignUpModel
+import com.kiero.domain.entity.parent.signup.ParentSignUpModel
 
 @Immutable
 data class ParentSignUpChildInfoUiModel(

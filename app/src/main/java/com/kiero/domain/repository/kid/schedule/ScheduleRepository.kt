@@ -1,8 +1,8 @@
-package com.kiero.data.kid.schedule.repository
+package com.kiero.domain.repository.kid.schedule
 
-import com.kiero.data.kid.schedule.model.ScheduleFireModel
-import com.kiero.data.kid.schedule.model.ScheduleImageUploadModel
-import com.kiero.data.kid.schedule.model.ScheduleTodayModel
+import com.kiero.domain.entity.kid.schedule.ScheduleFireModel
+import com.kiero.domain.entity.kid.schedule.ScheduleImageUploadModel
+import com.kiero.domain.entity.kid.schedule.ScheduleTodayModel
 
 interface ScheduleRepository {
     suspend fun patchScheduleToday(): Result<ScheduleTodayModel>

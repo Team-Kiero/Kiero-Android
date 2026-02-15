@@ -1,4 +1,4 @@
-package com.kiero.data.parent.di
+package com.kiero.data.parent.plan.di
 
 import com.kiero.data.parent.plan.remote.datasource.PlanDataSource
 import com.kiero.data.parent.plan.remote.datasourceimpl.PlanDataSourceImpl
