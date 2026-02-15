@@ -1,6 +1,6 @@
-package com.kiero.data.parent.di
+package com.kiero.data.parent.plan.di
 
-import com.kiero.data.parent.plan.repository.PlanRepository
+import com.kiero.domain.repository.parent.plan.PlanRepository
 import com.kiero.data.parent.plan.repositoryimpl.PlanRepositoryImpl
 import dagger.Binds
 import dagger.Module

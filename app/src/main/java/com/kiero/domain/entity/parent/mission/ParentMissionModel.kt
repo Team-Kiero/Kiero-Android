@@ -1,6 +1,6 @@
-package com.kiero.data.parent.model
+package com.kiero.domain.entity.parent.mission
 
-import com.kiero.data.parent.remote.dto.response.ParentMissionAddResponseDto
+import com.kiero.data.parent.mission.remote.dto.response.ParentMissionAddResponseDto
 
 data class ParentMissionAddModel(
     val id: Long,
