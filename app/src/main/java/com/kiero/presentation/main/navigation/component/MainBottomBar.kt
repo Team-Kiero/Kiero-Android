@@ -57,7 +57,7 @@ fun MainBottomBar(
                             .dropShadow(
                                 shape = RoundedCornerShape(12.dp),
                                 shadow = Shadow(
-                                    radius = 10f.dp,
+                                    radius = 10.dp,
                                     color = KieroTheme.colors.gray800,
                                 )
                             )
