@@ -7,7 +7,7 @@ import androidx.navigation.toRoute
 import com.kiero.core.common.extension.updateSuccess
 import com.kiero.core.common.util.successData
 import com.kiero.core.model.UiState
-import com.kiero.data.kid.schedule.repository.PresignedUrlRepository
+import com.kiero.data.kid.schedule.repository.ImageUploadRepository
 import com.kiero.data.kid.schedule.repository.ScheduleRepository
 import com.kiero.presentation.kid.journey.camera.navigation.Camera
 import com.kiero.presentation.kid.journey.camera.state.KidCameraSideEffect
@@ -27,8 +27,8 @@ import javax.inject.Inject
 @HiltViewModel
 class KidCameraViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val repository: ScheduleRepository,
-    private val presignedUrlRepository: PresignedUrlRepository
+    private val scheduleRepository: ScheduleRepository,
+    private val imageUploadRepository: ImageUploadRepository
 ) : ViewModel() {
     private val camera = savedStateHandle.toRoute<Camera>()
 
@@ -76,22 +76,14 @@ class KidCameraViewModel @Inject constructor(
             }
 
             val apiJob = async {
-                repository.postPresignedUrl(
+                imageUploadRepository.uploadImage(
+                    uriString = currentState.imageUri.orEmpty(),
                     fileName = fileName,
                     contentType = contentType
-                ).mapCatching { presignedModel ->
-                    val isUploaded = presignedUrlRepository.uploadImage(
-                        presignedUrl = presignedModel.presignedUrl,
-                        uriString = currentState.imageUri.orEmpty()
-                    )
-
-                    if (!isUploaded) {
-                        throw Exception("S3 Upload Failed")
-                    }
-
-                    repository.patchScheduleComplete(
+                ).mapCatching { imageUrl ->
+                    scheduleRepository.patchScheduleComplete(
                         scheduleDetailId = currentState.scheduleDetailId,
-                        imageUrl = presignedModel.presignedUrl.split("?").first()
+                        imageUrl = imageUrl
                     ).getOrThrow()
                 }
             }
@@ -102,55 +94,18 @@ class KidCameraViewModel @Inject constructor(
 
                 apiResult
                     .onSuccess {
+                        Timber.d("이미지 업로드 및 일정 완료 성공")
                         _sideEffect.emit(KidCameraSideEffect.NavigateUp)
                         _state.updateSuccess { it.copy(isLoading = false) }
                     }
                     .onFailure { e ->
+                        Timber.e(e, "이미지 업로드 또는 일정 완료 실패")
                         _state.updateSuccess { it.copy(isLoading = false) }
                     }
             } catch (e: Exception) {
+                Timber.e(e, "예외 발생")
                 _state.updateSuccess { it.copy(isLoading = false) }
             }
         }
     }
-
-    /*fun postImage(
-        fileName: String,
-        contentType: String
-    ) {
-        viewModelScope.launch {
-            val currentState = _state.value.successData ?: return@launch
-            _state.updateSuccess { it.copy(isLoading = true) }
-
-            val timerJob = async {
-                delay(4000L)
-            }
-
-            val apiJob = async {
-                repository.postPresignedUrl(
-                    fileName = fileName,
-                    contentType = contentType
-                ).mapCatching { result ->
-                    repository.patchScheduleComplete(
-                        scheduleDetailId = currentState.scheduleDetailId,
-                        imageUrl = result.presignedUrl.split("?").first()
-                    ).getOrThrow()
-                }
-            }
-
-            val apiResult = apiJob.await()
-            timerJob.await()
-
-            apiResult
-                .onSuccess {
-                    Timber.d("scheduleComplete success")
-                    _sideEffect.emit(KidCameraSideEffect.NavigateUp)
-                    _state.updateSuccess { it.copy(isLoading = false) }
-                }
-                .onFailure {
-                    Timber.e("postImage or scheduleComplete fail: $it")
-                    _state.updateSuccess { it.copy(isLoading = false) }
-                }
-        }
-    }*/
 }
