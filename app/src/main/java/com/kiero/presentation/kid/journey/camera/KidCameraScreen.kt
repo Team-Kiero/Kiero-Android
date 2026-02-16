@@ -18,19 +18,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -46,9 +43,6 @@ import com.kiero.presentation.kid.journey.camera.component.StoneFloating
 import com.kiero.presentation.kid.journey.camera.state.KidCameraSideEffect
 import com.kiero.presentation.kid.journey.camera.viewModel.KidCameraViewModel
 import com.kiero.presentation.kid.journey.model.StoneUiType
-import timber.log.Timber
-import java.io.File
-import java.io.IOException
 
 @Composable
 fun KidCameraRoute(
@@ -56,28 +50,9 @@ fun KidCameraRoute(
     viewModel: KidCameraViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        if (state.successData?.tempUri == null) {
-            val directory = File(context.cacheDir, "images")
-            if (!directory.exists()) {
-                directory.mkdirs()
-            }
-            val file = File(directory, "${System.currentTimeMillis()}.jpg")
-            try {
-                file.createNewFile()
-
-                val uri = FileProvider.getUriForFile(
-                    context,
-                    "${context.packageName}.fileprovider",
-                    file
-                )
-                viewModel.updateTempUri(uri.toString())
-            } catch (e: IOException) {
-                Timber.e(e, "파일 생성 실패")
-            }
-        }
+        viewModel.createTempFile()
     }
 
     val systemCameraLauncher = rememberLauncherForActivityResult(

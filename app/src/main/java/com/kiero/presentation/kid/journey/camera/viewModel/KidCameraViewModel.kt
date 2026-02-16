@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.kiero.core.common.extension.updateSuccess
+import com.kiero.core.common.util.ImageUriManager
 import com.kiero.core.common.util.successData
 import com.kiero.core.model.UiState
 import com.kiero.data.kid.schedule.repository.ImageUploadRepository
@@ -13,6 +14,7 @@ import com.kiero.presentation.kid.journey.camera.navigation.Camera
 import com.kiero.presentation.kid.journey.camera.state.KidCameraSideEffect
 import com.kiero.presentation.kid.journey.camera.state.KidCameraState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -21,6 +23,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -28,7 +31,8 @@ import javax.inject.Inject
 class KidCameraViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val scheduleRepository: ScheduleRepository,
-    private val imageUploadRepository: ImageUploadRepository
+    private val imageUploadRepository: ImageUploadRepository,
+    private val imageUriManager: ImageUriManager
 ) : ViewModel() {
     private val camera = savedStateHandle.toRoute<Camera>()
 
@@ -44,6 +48,20 @@ class KidCameraViewModel @Inject constructor(
 
     private val _sideEffect = MutableSharedFlow<KidCameraSideEffect>()
     val sideEffect: SharedFlow<KidCameraSideEffect> = _sideEffect.asSharedFlow()
+
+    fun createTempFile() {
+        if (_state.value.successData?.tempUri != null) return
+
+        viewModelScope.launch {
+            val uriString = withContext(Dispatchers.IO) {
+                imageUriManager.createTempImageUri()
+            }
+
+            if (uriString != null) {
+                updateTempUri(uriString)
+            }
+        }
+    }
 
     fun updateTempUri(uri: String) {
         _state.updateSuccess {
