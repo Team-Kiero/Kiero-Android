@@ -44,6 +44,17 @@ class UserInfoManagerImpl @Inject constructor(
         }.getOrNull()
     }
 
+    override suspend fun clearParentInfo() {
+        suspendRunCatching {
+            dataStore.edit { preferences ->
+                preferences.remove(KEY_PARENT_NAME)
+                preferences.remove(KEY_PARENT_PROFILE_IMAGE)
+            }
+        }.onFailure {
+            Timber.e(it, "Failed to clear parent info")
+        }
+    }
+
     override suspend fun saveChildIdInfo(childId: Long) {
         suspendRunCatching {
             dataStore.edit { preferences ->

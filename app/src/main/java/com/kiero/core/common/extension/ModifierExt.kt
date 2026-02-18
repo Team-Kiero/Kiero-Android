@@ -45,50 +45,6 @@ fun Modifier.forcePixelToDp(painter: Painter): Modifier {
     )
 }
 
-@Composable
-fun Modifier.dropShadow(
-    shape: Shape,
-    color: Color = Color.Black.copy(0.25f),
-    blur: Dp = 1.dp,
-    offsetY: Dp = 1.dp,
-    offsetX: Dp = 1.dp,
-    spread: Dp = 1.dp
-) = composed {
-    val density = LocalDensity.current
-
-    val paint = remember(color, blur) {
-        Paint().apply {
-            this.color = color
-            val blurPx = with(density) { blur.toPx() }
-            if (blurPx > 0f) {
-                this.asFrameworkPaint().maskFilter =
-                    BlurMaskFilter(blurPx, BlurMaskFilter.Blur.NORMAL)
-            }
-        }
-    }
-
-    drawBehind {
-        val spreadPx = spread.toPx()
-        val offsetXPx = offsetX.toPx()
-        val offsetYPx = offsetY.toPx()
-
-        val shadowWidth = size.width + spreadPx
-        val shadowHeight = size.height + spreadPx
-
-        if (shadowWidth <= 0f || shadowHeight <= 0f) return@drawBehind
-
-        val shadowSize = Size(shadowWidth, shadowHeight)
-        val shadowOutline = shape.createOutline(shadowSize, layoutDirection, this)
-
-        drawIntoCanvas { canvas ->
-            canvas.save()
-            canvas.translate(offsetXPx, offsetYPx)
-            canvas.drawOutline(shadowOutline, paint)
-            canvas.restore()
-        }
-    }
-}
-
 fun Modifier.systemBarColor(color: Color): Modifier = composed {
     val activity = LocalActivity.current
 

@@ -21,13 +21,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.kiero.core.common.extension.dropShadow
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
 import kotlinx.collections.immutable.ImmutableList
@@ -52,14 +53,14 @@ fun MainBottomBar(
             modifier = Modifier
                 .then(
                     if (isVisible && isParentMode) {
-                        Modifier.dropShadow(
-                            shape = RoundedCornerShape(12.dp),
-                            color = KieroTheme.colors.gray800,
-                            offsetX = 0.dp,
-                            offsetY = 4.dp,
-                            blur = 10.dp,
-                            spread = 0.dp
-                        )
+                        Modifier
+                            .dropShadow(
+                                shape = RoundedCornerShape(12.dp),
+                                shadow = Shadow(
+                                    radius = 10.dp,
+                                    color = KieroTheme.colors.gray800,
+                                )
+                            )
                     } else {
                         Modifier
                     }
