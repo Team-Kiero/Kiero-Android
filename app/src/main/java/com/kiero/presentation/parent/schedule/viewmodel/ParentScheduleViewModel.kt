@@ -8,7 +8,6 @@ import com.kiero.core.localstorage.TokenManager
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.model.UiState
 import com.kiero.data.auth.repository.AuthRepository
-import com.kiero.data.demo.repository.DemoRepository
 import com.kiero.data.parent.plan.repository.PlanRepository
 import com.kiero.data.sse.manager.SseManager
 import com.kiero.presentation.parent.schedule.plan.state.ParentScheduleState
@@ -36,7 +35,6 @@ class ParentScheduleViewModel @Inject constructor(
     private val planRepository: PlanRepository,
     private val authRepository: AuthRepository,
     private val userInfoManager: UserInfoManager,
-    private val demoRepository: DemoRepository,
     private val tokenManager: TokenManager,
     private val sseManager: SseManager,
 ) : ViewModel() {
@@ -160,7 +158,6 @@ class ParentScheduleViewModel @Inject constructor(
         viewModelScope.launch {
             val networkJobs = listOf(
                 async { suspendRunCatching { authRepository.postLogout() } },
-                async { suspendRunCatching { demoRepository.deleteDemo() } }
             )
             networkJobs.awaitAll()
             sseManager.stopSubscription()

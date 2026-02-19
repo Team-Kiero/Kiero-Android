@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.kiero.core.designsystem.component.KieroTextField
+import com.kiero.core.designsystem.component.textfield.KieroTextField
 import com.kiero.core.designsystem.component.button.KieroButtonMedium
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.signup.parent.component.ParentSignUpInviteHolder

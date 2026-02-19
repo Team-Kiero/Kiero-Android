@@ -5,8 +5,8 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.localstorage.info.UserInfoManager
-import com.kiero.data.mission.model.SuggestedMissionModel
-import com.kiero.data.mission.repository.AutoMissionRepository
+import com.kiero.data.parent.mission.model.SuggestedMissionModel
+import com.kiero.data.parent.mission.repository.AutoMissionRepository
 import com.kiero.presentation.parent.schedule.mission.auto.model.MissionUiModel
 import com.kiero.presentation.parent.schedule.mission.auto.state.AutoMissionSideEffect
 import com.kiero.presentation.parent.schedule.mission.auto.state.AutoMissionState

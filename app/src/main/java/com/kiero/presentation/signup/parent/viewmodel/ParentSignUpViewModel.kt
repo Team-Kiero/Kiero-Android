@@ -10,12 +10,9 @@ import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.core.common.viewmodel.throttleFirst
 import com.kiero.core.localstorage.TokenManager
 import com.kiero.core.localstorage.info.UserInfoManager
-import com.kiero.core.model.UiState
-import com.kiero.data.auth.repository.AuthRepository
-import com.kiero.data.demo.repository.DemoRepository
-import com.kiero.data.parent.signup.repository.ParentSignUpRepository
 import com.kiero.data.sse.manager.SseManager
-import com.kiero.presentation.kid.onboarding.state.KidOnboardingSideEffect
+import com.kiero.data.auth.repository.AuthRepository
+import com.kiero.data.parent.signup.repository.ParentSignUpRepository
 import com.kiero.presentation.signup.parent.model.ParentSignUpStep
 import com.kiero.presentation.signup.parent.model.toUiModel
 import com.kiero.presentation.signup.parent.navigation.ParentSignUp
@@ -42,10 +39,9 @@ class ParentSignUpViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: ParentSignUpRepository,
     private val authRepository: AuthRepository,
-    private val demoRepository: DemoRepository,
     private val userInfoManager: UserInfoManager,
     private val tokenManager: TokenManager,
-    private val sseManager: SseManager
+    private val sseManager: SseManager,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ParentSignUpState())
     val state: StateFlow<ParentSignUpState> = _state.asStateFlow()
@@ -100,7 +96,7 @@ class ParentSignUpViewModel @Inject constructor(
 
     fun initFetchParentInfo(
         parentName: String,
-        parentProfileImage: String
+        parentProfileImage: String,
     ) {
         viewModelScope.launch {
             _state.update {
@@ -175,7 +171,6 @@ class ParentSignUpViewModel @Inject constructor(
         viewModelScope.launch {
             val networkJobs = listOf(
                 async { suspendRunCatching { authRepository.postLogout() } },
-                async { suspendRunCatching { demoRepository.deleteDemo() } }
             )
             networkJobs.awaitAll()
             sseManager.stopSubscription()

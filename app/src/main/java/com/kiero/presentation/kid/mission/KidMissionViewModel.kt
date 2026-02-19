@@ -6,7 +6,7 @@ import com.kiero.core.common.extension.updateSuccess
 import com.kiero.core.common.util.successData
 import com.kiero.core.model.UiState
 import com.kiero.data.kid.coin.repository.CoinRepository
-import com.kiero.data.mission.repository.MissionRepository
+import com.kiero.data.parent.mission.repository.MissionRepository
 import com.kiero.data.sse.manager.SseManager
 import com.kiero.presentation.kid.mission.model.toUiModel
 import com.kiero.presentation.kid.mission.state.KidMissionSideEffect

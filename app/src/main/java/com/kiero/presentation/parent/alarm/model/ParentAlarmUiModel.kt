@@ -5,7 +5,7 @@ import androidx.compose.ui.graphics.Color
 import com.kiero.core.common.extension.formattedAlarmDate
 import com.kiero.core.common.extension.formattedAlarmTime
 import com.kiero.core.common.extension.withJosa
-import com.kiero.data.alarm.model.AlarmItemModel
+import com.kiero.data.parent.alarm.model.AlarmItemModel
 
 private object AlarmUiConstant {
     val HIGHLIGHT_MAIN = Color(0xFF00FFE1)
