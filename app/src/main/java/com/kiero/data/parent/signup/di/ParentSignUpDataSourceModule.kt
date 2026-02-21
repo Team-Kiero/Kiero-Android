@@ -1,7 +1,7 @@
 package com.kiero.data.parent.signup.di
 
 import com.kiero.data.parent.signup.remote.datasource.ParentSignUpDataSource
-import com.kiero.data.parent.signup.remote.datasourcimpl.ParentSignUpDataSourceImpl
+import com.kiero.data.parent.signup.remote.datasourceimpl.ParentSignUpDataSourceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

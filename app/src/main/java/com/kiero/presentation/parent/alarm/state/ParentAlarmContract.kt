@@ -29,7 +29,7 @@ data class AlarmFeedState(
                     highlightText = "피아노 학원",
                     highlightColor = Color(0xFF00FFE1),
                     coinUsed = null,
-                    imageUrl = R.drawable.img_kid_journey_piano_background,
+                    imageUrl = null,
                     isExpanded = false
                 ), ParentAlarmUiModel(
                     id = "2",

@@ -20,6 +20,7 @@ android {
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     signingConfigs {
+        // Todo: local properties로 키 옮기기
         getByName("debug") {
             val debugKeystorePath = System.getProperty("user.home") + "/.android/debug.keystore"
             storeFile = file(debugKeystorePath)
@@ -64,6 +65,7 @@ android {
 
     }
     buildTypes {
+        // Todo: 이거도 하나로 합치기 및 난독화 적용 후 테스트도 해보기
         release {
             isMinifyEnabled = false
             proguardFiles(

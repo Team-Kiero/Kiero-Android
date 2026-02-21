@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.common.extension.formatWithDayOfWeek
 import com.kiero.core.localstorage.info.UserInfoManager
-import com.kiero.data.parent.repository.ParentMissionAddRepository
+import com.kiero.data.parent.mission.repository.ParentMissionAddRepository
 import com.kiero.presentation.parent.schedule.mission.component.model.MissionAwardDefaults
 import com.kiero.presentation.parent.schedule.mission.component.model.ParentMissionAddValid
 import com.kiero.presentation.parent.schedule.mission.state.ParentAddMissionSideEffect
