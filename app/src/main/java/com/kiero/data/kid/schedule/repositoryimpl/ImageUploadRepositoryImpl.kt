@@ -45,7 +45,9 @@ class ImageUploadRepositoryImpl @Inject constructor(
         )
 
         if (!response.isSuccessful) {
-            Timber.d("S3 업로드 실패: ${response.code()} - ${response.errorBody()?.string()}")
+            val errorMsg = "S3 업로드 실패: ${response.code()} - ${response.errorBody()?.string()}"
+            Timber.e(errorMsg)
+            error(errorMsg)
         }
 
         Timber.d("S3 업로드 성공: ${presignedResponse.fileName}")
