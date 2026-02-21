@@ -108,20 +108,17 @@ class KidCameraViewModel @Inject constructor(
 
             try {
                 timerJob.await()
-                val apiResult = apiJob.await()
-
-                apiResult
+                apiJob.await()
                     .onSuccess {
                         Timber.d("이미지 업로드 및 일정 완료 성공")
                         _sideEffect.emit(KidCameraSideEffect.NavigateUp)
-                        _state.updateSuccess { it.copy(isLoading = false) }
                     }
                     .onFailure { e ->
                         Timber.e(e, "이미지 업로드 또는 일정 완료 실패")
-                        _state.updateSuccess { it.copy(isLoading = false) }
                     }
             } catch (e: Exception) {
                 Timber.e(e, "예외 발생")
+            } finally {
                 _state.updateSuccess { it.copy(isLoading = false) }
             }
         }
