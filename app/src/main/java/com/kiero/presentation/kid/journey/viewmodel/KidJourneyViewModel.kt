@@ -59,6 +59,7 @@ class KidJourneyViewModel @Inject constructor(
                     )
                 )
             }
+
             is UiState.Loading -> UiState.Loading
             is UiState.Failure -> UiState.Failure(uiState.message)
             is UiState.Empty -> UiState.Empty
@@ -164,12 +165,9 @@ class KidJourneyViewModel @Inject constructor(
 
     fun onNextClick() {
         val content = _state.value.successData?.content
-        val scheduleDetailId = when (content) {
-            is KidJourneyContentUiModel.FirstSchedule -> content.scheduleDetailId
-            is KidJourneyContentUiModel.NowSchedule -> content.scheduleDetailId
-            is KidJourneyContentUiModel.NextSchedule -> content.scheduleDetailId
-            else -> null
-        }
+
+        val scheduleDetailId =
+            (content as? KidJourneyContentUiModel.ScheduledContent)?.scheduleDetailId
 
         if (scheduleDetailId != null) {
             viewModelScope.launch {
