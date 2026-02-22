@@ -53,7 +53,7 @@ fun MissionCalendar(
             )
 
             Icon(
-                imageVector = ImageVector.vectorResource(id = R.drawable.ic_parent_tab_schedule),
+                imageVector = ImageVector.vectorResource(id = R.drawable.ic_parent_mission_date),
                 contentDescription = null,
                 tint = Color.Unspecified
             )
