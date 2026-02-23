@@ -28,10 +28,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.presentation.main.navigation.KidMainTab
+import com.kiero.presentation.main.navigation.ParentMainTab
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun MainBottomBar(
@@ -83,7 +87,8 @@ fun MainBottomBar(
                         MainNavigationBarItem(
                             selected = tab == currentTab,
                             tab = tab,
-                            onClick = { onTabSelected(tab) }
+                            onClick = { onTabSelected(tab) },
+                            modifier = Modifier.weight(1f)
                         )
                     }
                 }
@@ -108,7 +113,7 @@ private fun MainNavigationBarItem(
     Column(
         modifier = modifier
             .noRippleClickable(onClick)
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+            .padding(vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -125,6 +130,36 @@ private fun MainNavigationBarItem(
             color = textColor,
             style = KieroTheme.typography.regular.body5,
             textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Preview(name = "Parent Mode")
+@Composable
+private fun PreviewMainBottomBarParent() {
+    KieroTheme {
+        MainBottomBar(
+            isVisible = true,
+            isParentMode = true,
+            containerShape = RoundedCornerShape(12.dp),
+            tabs = persistentListOf(*ParentMainTab.entries.toTypedArray()),
+            currentTab = ParentMainTab.SCHEDULE,
+            onTabSelected = {}
+        )
+    }
+}
+
+@Preview(name = "Kid Mode")
+@Composable
+private fun PreviewMainBottomBarKid() {
+    KieroTheme {
+        MainBottomBar(
+            isVisible = true,
+            isParentMode = false,
+            containerShape = RoundedCornerShape(12.dp),
+            tabs = persistentListOf(*KidMainTab.entries.toTypedArray()),
+            currentTab = KidMainTab.MISSION,
+            onTabSelected = {}
         )
     }
 }
