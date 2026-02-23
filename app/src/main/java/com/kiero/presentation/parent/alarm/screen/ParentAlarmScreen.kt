@@ -40,7 +40,6 @@ import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.component.pulltorefresh.KieroPullToRefresh
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.trigger.LocalRefreshState
-import com.kiero.presentation.main.navigation.ParentMainTab
 import com.kiero.presentation.parent.alarm.component.ParentAlarmCard
 import com.kiero.presentation.parent.alarm.component.ParentAlarmDateHeader
 import com.kiero.presentation.parent.alarm.model.ParentAlarmUiModel
@@ -65,11 +64,9 @@ fun ParentAlarmRoute(
     val refreshState = LocalRefreshState.current
 
     LaunchedEffect(Unit) {
-        refreshState.refreshEvent.collect { tab ->
-            if (tab == ParentMainTab.ALARM) {
-                listState.animateScrollToItem(0)
-                viewModel.refresh(isRefresh = true)
-            }
+        refreshState.refreshEvent.collect {
+            listState.animateScrollToItem(0)
+            viewModel.refresh(isRefresh = true)
         }
     }
 
@@ -82,7 +79,7 @@ fun ParentAlarmRoute(
 
     KieroPullToRefresh(
         isRefreshing = state.isRefreshing,
-        onRefresh = {viewModel.refresh(isRefresh = true)},
+        onRefresh = { viewModel.refresh(isRefresh = true) },
     ) {
         ParentAlarmScreen(
             state = state,
@@ -150,9 +147,11 @@ private fun ParentAlarmScreen(
                     CircularProgressIndicator(color = KieroTheme.colors.main)
                 }
             }
+
             state.alarms.isEmpty() -> {
                 EmptyAlarmView()
             }
+
             else -> {
                 LazyColumn(
                     state = listState,
