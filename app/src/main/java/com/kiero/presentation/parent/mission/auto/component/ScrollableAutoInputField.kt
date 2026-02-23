@@ -1,4 +1,4 @@
-package com.kiero.presentation.parent.schedule.mission.auto.component
+package com.kiero.presentation.parent.mission.auto.component
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.BoxWithConstraints
