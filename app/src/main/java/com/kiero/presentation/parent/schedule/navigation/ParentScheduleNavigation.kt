@@ -18,18 +18,16 @@ fun NavGraphBuilder.parentScheduleNavGraph(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
     navigateToScheduleAdd: (String, Boolean) -> Unit,
-    navigateToMissionAdd: () -> Unit,
-    navigateToAutoMissionAdd: (Long) -> Unit,
-    navigateToSelection: () -> Unit
+    navigateToSelection: () -> Unit,
+    navigateToAlarm: () -> Unit,
 ) {
     composable<Schedule> {
         ParentScheduleRoute(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
             navigateToScheduleAdd = navigateToScheduleAdd,
-            navigateToMissionAdd = navigateToMissionAdd,
-            navigateToAutoMissionAdd = navigateToAutoMissionAdd,
-            navigateToSelection = navigateToSelection
+            navigateToSelection = navigateToSelection,
+            navigateToAlarm = navigateToAlarm,
         )
     }
 }

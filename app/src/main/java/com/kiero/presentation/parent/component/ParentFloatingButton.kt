@@ -30,7 +30,7 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import com.kiero.R
 import com.kiero.core.designsystem.theme.KieroTheme
-import com.kiero.presentation.parent.schedule.mission.component.missionmain.MissionFabContent
+import com.kiero.presentation.parent.mission.component.missionmain.MissionFabContent
 
 @Composable
 fun ParentFloatingButton(

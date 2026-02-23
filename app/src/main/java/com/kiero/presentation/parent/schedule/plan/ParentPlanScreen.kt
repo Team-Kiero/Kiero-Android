@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -17,13 +18,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.core.model.trigger.RefreshState
 import com.kiero.core.trigger.LocalRefreshState
+import com.kiero.data.parent.plan.model.toUiModel
 import com.kiero.presentation.main.navigation.ParentMainTab
 import com.kiero.presentation.parent.schedule.plan.component.plan.ScheduleDatebar
 import com.kiero.presentation.parent.schedule.plan.component.plan.ScheduleTimeTable
 import com.kiero.presentation.parent.schedule.plan.component.plan.ScheduleWeekTopbar
 import com.kiero.presentation.parent.schedule.plan.state.ParentScheduleState
-import com.kiero.presentation.parent.schedule.plan.state.toUiModel
 
 @Composable
 fun ParentPlanScreen(
@@ -62,8 +64,6 @@ fun ParentPlanScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Spacer(modifier = Modifier.height(15.dp))
-
         ScheduleDatebar(
             date = state.dateRangeText,
             onPreviousClick = { if (state.canGoPrevious) onDateChange(false) },
@@ -98,10 +98,14 @@ fun ParentPlanScreen(
 @Composable
 private fun ParentPlanScreenPreview() {
     KieroTheme {
-        ParentPlanScreen(
-            state = ParentScheduleState(),
-            onResetToday = {},
-            onDateChange = {}
-        )
+        CompositionLocalProvider(
+            LocalRefreshState provides RefreshState()
+        ) {
+            ParentPlanScreen(
+                state = ParentScheduleState(),
+                onResetToday = {},
+                onDateChange = {}
+            )
+        }
     }
 }

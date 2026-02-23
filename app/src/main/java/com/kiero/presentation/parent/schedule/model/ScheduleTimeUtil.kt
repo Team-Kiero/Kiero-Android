@@ -73,19 +73,6 @@ fun ScheduleEvent.toScheduleBlocks(dayIndex: Int): List<ScheduleBlock> {
     return blocks
 }
 
-fun String.toDayIndex(): Int {
-    return when (this) {
-        "MON" -> 0
-        "TUE" -> 1
-        "WED" -> 2
-        "THU" -> 3
-        "FRI" -> 4
-        "SAT" -> 5
-        "SUN" -> 6
-        else -> 0
-    }
-}
-
 fun parseTime(timeString: String): Pair<Int, Int> {
     val parts = timeString.split(":")
     return Pair(parts[0].toInt(), parts[1].toInt())

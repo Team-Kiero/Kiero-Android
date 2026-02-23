@@ -82,27 +82,4 @@ data class ParentScheduleState(
             else -> 0
         }
     }
-
 }
-
-fun RecurringScheduleModel.toUiModel() = ScheduleEvent(
-    id = "recurring_${name}_${startTime}",
-    name = name,
-    isRecurring = true,
-    startTime = startTime,
-    endTime = endTime,
-    scheduleColor = colorCode,
-    dayOfWeek = dayOfWeek,
-    date = null
-)
-
-fun NormalScheduleModel.toUiModel() = ScheduleEvent(
-    id = "normal_${name}_${date}",
-    name = name,
-    isRecurring = false,
-    startTime = startTime,
-    endTime = endTime,
-    scheduleColor = colorCode,
-    dayOfWeek = null,
-    date = date
-)
