@@ -8,10 +8,11 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.navigation
 import com.kiero.core.navigation.Route
 import com.kiero.presentation.parent.alarm.navigation.parentAlarmNavGraph
-import com.kiero.presentation.parent.schedule.mission.auto.navigation.navigateToAutoMissionAdd
-import com.kiero.presentation.parent.schedule.mission.auto.navigation.parentAutoMissionAddNavGraph
-import com.kiero.presentation.parent.schedule.mission.navigation.navigateToMissionAdd
-import com.kiero.presentation.parent.schedule.mission.navigation.parentMissionAddNavGraph
+import com.kiero.presentation.parent.journey.navigation.parentJourneyNavGraph
+import com.kiero.presentation.parent.mission.auto.navigation.parentAutoMissionAddNavGraph
+import com.kiero.presentation.parent.mission.navigation.parentMissionAddNavGraph
+import com.kiero.presentation.parent.mypage.navigation.parentMypageNavGraph
+import com.kiero.presentation.parent.reward.navigation.parentRewardNavGraph
 import com.kiero.presentation.parent.schedule.navigation.parentScheduleNavGraph
 import com.kiero.presentation.parent.schedule.plan.navigation.navigateToScheduleAdd
 import com.kiero.presentation.parent.schedule.plan.navigation.parentScheduleAddNavGraph
@@ -28,6 +29,19 @@ data object Schedule : ParentTab
 @Serializable
 data object Alarm : ParentTab
 
+@Serializable
+data object ParentJourney : ParentTab
+
+@Serializable
+data object ParentMission : ParentTab
+
+@Serializable
+data object Reward : ParentTab
+
+@Serializable
+data object Mypage : ParentTab
+
+
 fun NavController.navigateToParent(
     navOptions: NavOptions? = null,
 ) {
@@ -39,6 +53,7 @@ fun NavGraphBuilder.parentNavGraph(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
     navigateToSelection: () -> Unit,
+    navigateToAlarm: () -> Unit,
 ) {
     navigation<ParentGraph>(
         startDestination = Schedule
@@ -52,9 +67,8 @@ fun NavGraphBuilder.parentNavGraph(
                     isFireLit = fireLit
                 )
             },
-            navigateToMissionAdd = navController::navigateToMissionAdd,
-            navigateToAutoMissionAdd = navController::navigateToAutoMissionAdd,
-            navigateToSelection = navigateToSelection
+            navigateToSelection = navigateToSelection,
+            navigateToAlarm = navigateToAlarm
         )
 
         parentScheduleAddNavGraph(
@@ -76,6 +90,21 @@ fun NavGraphBuilder.parentNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
             navigateToSelection = navigateToSelection
+        )
+
+        parentJourneyNavGraph(
+            paddingValues = paddingValues,
+            navigateUp = navigateUp,
+        )
+
+        parentRewardNavGraph(
+            paddingValues = paddingValues,
+            navigateUp = navigateUp,
+        )
+
+        parentMypageNavGraph(
+            paddingValues = paddingValues,
+            navigateUp = navigateUp,
         )
     }
 }
