@@ -1,4 +1,4 @@
-package com.kiero.presentation.parent.schedule.mission.component.datepicker.model
+package com.kiero.presentation.parent.mission.component.datepicker.model
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color

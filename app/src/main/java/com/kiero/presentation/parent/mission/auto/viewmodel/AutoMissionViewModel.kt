@@ -1,4 +1,4 @@
-package com.kiero.presentation.parent.schedule.mission.auto.viewmodel
+package com.kiero.presentation.parent.mission.auto.viewmodel
 
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.snapshotFlow
@@ -7,10 +7,10 @@ import androidx.lifecycle.viewModelScope
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.parent.mission.model.SuggestedMissionModel
 import com.kiero.data.parent.mission.repository.AutoMissionRepository
-import com.kiero.presentation.parent.schedule.mission.auto.model.MissionUiModel
-import com.kiero.presentation.parent.schedule.mission.auto.state.AutoMissionSideEffect
-import com.kiero.presentation.parent.schedule.mission.auto.state.AutoMissionState
-import com.kiero.presentation.parent.schedule.mission.component.model.MissionAwardDefaults
+import com.kiero.presentation.parent.mission.auto.model.MissionUiModel
+import com.kiero.presentation.parent.mission.auto.state.AutoMissionSideEffect
+import com.kiero.presentation.parent.mission.auto.state.AutoMissionState
+import com.kiero.presentation.parent.mission.component.model.MissionAwardDefaults
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
@@ -301,12 +301,14 @@ class AutoMissionViewModel @Inject constructor(
                             )
                             updateMissionReward(500)
                         }
+
                         value < 1 -> {
                             awardTextFieldState.edit {
                                 replace(0, length, "1")
                             }
                             updateMissionReward(1)
                         }
+
                         value != currentState.currentReward -> {
                             updateMissionReward(value)
                         }

@@ -1,7 +1,7 @@
-package com.kiero.presentation.parent.schedule.mission.auto.state
+package com.kiero.presentation.parent.mission.auto.state
 
 import androidx.compose.runtime.Immutable
-import com.kiero.presentation.parent.schedule.mission.auto.model.MissionUiModel
+import com.kiero.presentation.parent.mission.auto.model.MissionUiModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -18,7 +18,7 @@ data class AutoMissionState(
 
     val selectedDate: LocalDate? = null,
     val showBottomSheet: Boolean = false,
-    val hasViewedLastPage: Boolean = false
+    val hasViewedLastPage: Boolean = false,
 ) {
     val currentScreen: Screen
         get() = when {

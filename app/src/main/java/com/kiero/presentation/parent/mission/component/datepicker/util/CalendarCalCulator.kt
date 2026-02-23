@@ -1,4 +1,4 @@
-package com.kiero.presentation.parent.schedule.mission.component.datepicker.util
+package com.kiero.presentation.parent.mission.component.datepicker.util
 
 import java.time.DayOfWeek
 

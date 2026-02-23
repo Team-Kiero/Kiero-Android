@@ -1,4 +1,4 @@
-package com.kiero.presentation.parent.schedule.mission.auto.state
+package com.kiero.presentation.parent.mission.auto.state
 
 sealed interface AutoMissionSideEffect {
     data class ShowToast(val message: String) : AutoMissionSideEffect

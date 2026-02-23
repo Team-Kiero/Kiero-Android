@@ -1,4 +1,4 @@
-package com.kiero.presentation.parent.schedule.mission.component.datepicker.model
+package com.kiero.presentation.parent.mission.component.datepicker.model
 
 import java.time.LocalDate
 
