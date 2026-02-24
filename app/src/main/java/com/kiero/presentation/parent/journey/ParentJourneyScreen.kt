@@ -3,6 +3,7 @@ package com.kiero.presentation.parent.journey
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.kiero.core.designsystem.theme.KieroTheme
 
 @Composable
 fun ParentJourneyRoute(
@@ -25,8 +26,10 @@ private fun ParentJourneyScreen(
 @Preview
 @Composable
 private fun ParentJourneyScreenPreview() {
-    ParentJourneyScreen(
-        paddingValues = PaddingValues(),
-        navigateUp = {}
-    )
+    KieroTheme {
+        ParentJourneyScreen(
+            paddingValues = PaddingValues(),
+            navigateUp = {}
+        )
+    }
 }

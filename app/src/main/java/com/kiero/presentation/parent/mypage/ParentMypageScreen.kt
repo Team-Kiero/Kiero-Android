@@ -3,6 +3,7 @@ package com.kiero.presentation.parent.mypage
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.kiero.core.designsystem.theme.KieroTheme
 
 @Composable
 fun ParentMypageRoute(
@@ -25,8 +26,10 @@ private fun ParentMypageScreen(
 @Preview
 @Composable
 private fun ParentMypageScreenPreview() {
-    ParentMypageScreen(
-        paddingValues = PaddingValues(),
-        navigateUp = {}
-    )
+    KieroTheme {
+        ParentMypageScreen(
+            paddingValues = PaddingValues(),
+            navigateUp = {}
+        )
+    }
 }

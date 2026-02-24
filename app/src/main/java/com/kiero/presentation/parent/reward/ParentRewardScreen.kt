@@ -3,6 +3,7 @@ package com.kiero.presentation.parent.reward
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.kiero.core.designsystem.theme.KieroTheme
 
 
 @Composable
@@ -26,8 +27,10 @@ private fun ParentRewardScreen(
 @Preview
 @Composable
 private fun ParentRewardScreenPreview() {
-    ParentRewardScreen(
-        paddingValues = PaddingValues(),
-        navigateUp = {}
-    )
+    KieroTheme{
+        ParentRewardScreen(
+            paddingValues = PaddingValues(),
+            navigateUp = {}
+        )
+    }
 }
