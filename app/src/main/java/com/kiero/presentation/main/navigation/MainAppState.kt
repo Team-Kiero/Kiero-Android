@@ -34,7 +34,7 @@ import com.kiero.presentation.parent.navigation.ParentJourney
 import com.kiero.presentation.parent.navigation.ParentMission
 import com.kiero.presentation.parent.navigation.Reward
 import com.kiero.presentation.parent.navigation.Schedule
-import com.kiero.presentation.parent.screen.mission.navigation.navigateToMissionAdd
+import com.kiero.presentation.parent.screen.mission.directadd.navigation.navigateToMissionAdd
 import com.kiero.presentation.parent.screen.mission.navigation.navigateToParentMission
 import com.kiero.presentation.parent.screen.reward.navigation.navigateToReward
 import com.kiero.presentation.parent.screen.schedule.navigation.navigateToSchedule
