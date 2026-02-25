@@ -7,15 +7,15 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.navigation
 import com.kiero.core.navigation.Route
-import com.kiero.presentation.parent.alarm.navigation.parentAlarmNavGraph
-import com.kiero.presentation.parent.journey.navigation.parentJourneyNavGraph
-import com.kiero.presentation.parent.mission.auto.navigation.parentAutoMissionAddNavGraph
-import com.kiero.presentation.parent.mission.navigation.parentMissionAddNavGraph
-import com.kiero.presentation.parent.mypage.navigation.parentMypageNavGraph
-import com.kiero.presentation.parent.reward.navigation.parentRewardNavGraph
-import com.kiero.presentation.parent.schedule.navigation.parentScheduleNavGraph
-import com.kiero.presentation.parent.schedule.plan.navigation.navigateToScheduleAdd
-import com.kiero.presentation.parent.schedule.plan.navigation.parentScheduleAddNavGraph
+import com.kiero.presentation.parent.screen.alarm.navigation.parentAlarmNavGraph
+import com.kiero.presentation.parent.screen.journey.navigation.parentJourneyNavGraph
+import com.kiero.presentation.parent.screen.mission.auto.navigation.parentAutoMissionAddNavGraph
+import com.kiero.presentation.parent.screen.mission.navigation.parentMissionAddNavGraph
+import com.kiero.presentation.parent.screen.mypage.navigation.parentMypageNavGraph
+import com.kiero.presentation.parent.screen.reward.navigation.parentRewardNavGraph
+import com.kiero.presentation.parent.screen.schedule.navigation.parentScheduleNavGraph
+import com.kiero.presentation.parent.screen.schedule.plan.navigation.navigateToScheduleAdd
+import com.kiero.presentation.parent.screen.schedule.plan.navigation.parentScheduleAddNavGraph
 import kotlinx.serialization.Serializable
 
 sealed interface ParentTab : Route

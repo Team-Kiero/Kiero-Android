@@ -4,7 +4,7 @@ import NormalScheduleDto
 import PlanAllResponseDto
 import RecurringScheduleDto
 import com.kiero.data.parent.plan.remote.dto.response.PlanColorResponseDto
-import com.kiero.presentation.parent.schedule.model.ScheduleEvent
+import com.kiero.presentation.parent.screen.schedule.model.ScheduleEvent
 
 data class PlanColorModel(
     val scheduleColor : String,
