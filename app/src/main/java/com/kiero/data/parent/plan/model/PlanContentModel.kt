@@ -4,6 +4,7 @@ import NormalScheduleDto
 import PlanAllResponseDto
 import RecurringScheduleDto
 import com.kiero.data.parent.plan.remote.dto.response.PlanColorResponseDto
+import com.kiero.presentation.parent.screen.schedule.model.ScheduleEvent
 
 data class PlanColorModel(
     val scheduleColor : String,
@@ -59,4 +60,26 @@ fun NormalScheduleDto.toModel(): NormalScheduleModel = NormalScheduleModel(
     name = this.name,
     colorCode = this.colorCode,
     date = this.date
+)
+
+fun RecurringScheduleModel.toUiModel() = ScheduleEvent(
+    id = "recurring_${name}_${startTime}",
+    name = name,
+    isRecurring = true,
+    startTime = startTime,
+    endTime = endTime,
+    scheduleColor = colorCode,
+    dayOfWeek = dayOfWeek,
+    date = null
+)
+
+fun NormalScheduleModel.toUiModel() = ScheduleEvent(
+    id = "normal_${name}_${date}",
+    name = name,
+    isRecurring = false,
+    startTime = startTime,
+    endTime = endTime,
+    scheduleColor = colorCode,
+    dayOfWeek = null,
+    date = date
 )

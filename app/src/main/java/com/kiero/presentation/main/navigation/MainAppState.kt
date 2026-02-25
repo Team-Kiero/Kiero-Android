@@ -25,13 +25,20 @@ import com.kiero.presentation.kid.navigation.Mission
 import com.kiero.presentation.kid.navigation.Wish
 import com.kiero.presentation.kid.onboarding.navigation.navigateToKidOnboarding
 import com.kiero.presentation.kid.wish.navigation.navigateToWish
-import com.kiero.presentation.parent.alarm.navigation.navigateToAlarm
-import com.kiero.presentation.parent.navigation.Alarm
+import com.kiero.presentation.parent.screen.alarm.navigation.navigateToAlarm
+import com.kiero.presentation.parent.screen.journey.navigation.navigateToParentJourney
+import com.kiero.presentation.parent.screen.mypage.navigation.navigateToMypage
+import com.kiero.presentation.parent.navigation.Mypage
 import com.kiero.presentation.parent.navigation.ParentGraph
+import com.kiero.presentation.parent.navigation.ParentJourney
+import com.kiero.presentation.parent.navigation.ParentMission
+import com.kiero.presentation.parent.navigation.Reward
 import com.kiero.presentation.parent.navigation.Schedule
-import com.kiero.presentation.parent.schedule.mission.navigation.navigateToMissionAdd
-import com.kiero.presentation.parent.schedule.navigation.navigateToSchedule
-import com.kiero.presentation.parent.schedule.plan.navigation.navigateToScheduleAdd
+import com.kiero.presentation.parent.screen.mission.navigation.navigateToMissionAdd
+import com.kiero.presentation.parent.screen.mission.navigation.navigateToParentMission
+import com.kiero.presentation.parent.screen.reward.navigation.navigateToReward
+import com.kiero.presentation.parent.screen.schedule.navigation.navigateToSchedule
+import com.kiero.presentation.parent.screen.schedule.plan.navigation.navigateToScheduleAdd
 import com.kiero.presentation.signup.parent.navigation.navigateToParentSignUp
 import com.kiero.presentation.splash.navigation.Splash
 import kotlinx.coroutines.CoroutineScope
@@ -149,7 +156,7 @@ class MainAppState(
     }
 
     fun navigateToAuth(
-        navOptions: NavOptions? = null
+        navOptions: NavOptions? = null,
     ) {
         navController.navigate(AuthGraph) {
             popUpTo(0) {
@@ -166,8 +173,11 @@ class MainAppState(
             restoreState = true
         }
         when (tab) {
+            ParentMainTab.JOURNEY -> navController.navigate(ParentJourney, navOptions)
             ParentMainTab.SCHEDULE -> navController.navigate(Schedule, navOptions)
-            ParentMainTab.ALARM -> navController.navigate(Alarm, navOptions)
+            ParentMainTab.MISSION -> navController.navigate(ParentMission, navOptions)
+            ParentMainTab.REWARD -> navController.navigate(Reward, navOptions)
+            ParentMainTab.MYPAGE -> navController.navigate(Mypage, navOptions)
         }
     }
 
@@ -199,6 +209,12 @@ class MainAppState(
     fun navigateToWish(navOptions: NavOptions? = null) =
         navController.navigateToWish(navOptions)
 
+    fun navigateToMypage(navOptions: NavOptions? = null) =
+        navController.navigateToMypage(navOptions)
+
+    fun navigateToReward(navOptions: NavOptions? = null) =
+        navController.navigateToReward(navOptions)
+
     fun navigateToScheduleAdd(
         initialDate: String,
         isFireLit: Boolean,
@@ -211,7 +227,7 @@ class MainAppState(
     fun navigateToCamera(
         scheduleDetailId: Long,
         stoneType: StoneUiType,
-        navOptions: NavOptions? = null
+        navOptions: NavOptions? = null,
     ) = navController.navigateToCamera(
         scheduleDetailId = scheduleDetailId,
         stoneType = stoneType,
@@ -221,7 +237,7 @@ class MainAppState(
     fun navigateToFire(
         date: String,
         stones: Int,
-        navOptions: NavOptions? = null
+        navOptions: NavOptions? = null,
     ) = navController.navigateToFire(
         date = date,
         stones = stones,
@@ -230,11 +246,17 @@ class MainAppState(
 
     fun navigateToFireResult(
         date: String,
-        navOptions: NavOptions? = null
+        navOptions: NavOptions? = null,
     ) = navController.navigateToFireResult(
         date = date,
         navOptions = navOptions
     )
+
+    fun navigateToParentMission(navOptions: NavOptions? = null) =
+        navController.navigateToParentMission(navOptions)
+
+    fun navigateToParentJourney(navOptions: NavOptions? = null) =
+        navController.navigateToParentJourney(navOptions)
 
     fun navigateToMissionAdd(navOptions: NavOptions? = null) =
         navController.navigateToMissionAdd(navOptions)
