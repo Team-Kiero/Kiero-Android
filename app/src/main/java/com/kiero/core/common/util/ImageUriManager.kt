@@ -13,12 +13,10 @@ class ImageUriManager @Inject constructor(
 ) {
     fun createTempImageUri(): String? {
         return try {
-            val directory = File(context.cacheDir, "images")
-            if (!directory.exists()) {
-                directory.mkdirs()
+            val directory = File(context.cacheDir, "images").apply {
+                if (!exists()) mkdirs()
             }
-            val file = File(directory, "${System.currentTimeMillis()}.jpg")
-            file.createNewFile()
+            val file = File.createTempFile("IMG_", ".jpg", directory)
 
             FileProvider.getUriForFile(
                 context,
