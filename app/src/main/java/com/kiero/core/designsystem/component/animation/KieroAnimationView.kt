@@ -64,7 +64,7 @@ fun KieroAnimationView(
                 model = imageRequest,
                 contentDescription = null,
                 modifier = modifier,
-                contentScale = ContentScale.Crop
+                contentScale = contentScale
             )
         }
     }
