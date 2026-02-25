@@ -53,15 +53,12 @@ android {
         buildConfigField(
             "String",
             "KAKAO_NATIVE_APP_KEY",
-            "\"${properties["kakao.native.app.key"]}\"" // 명시적으로 따옴표 추가
+            "\"${properties["kakao.native.app.key"]}\""
         )
 
         // manifestPlaceholders for AndroidManifest
         manifestPlaceholders["NATIVE_APP_KEY"] = properties["kakao.native.app.key"].toString()
 
-        // Todo : (Issue) LocalProperties의 "" 유무 및 일관성
-        //buildConfigField("String", "KAKAO_NATIVE_KEY", properties["kakao.native.app.key"].toString())
-        // manifestPlaceholders["NATIVE_APP_KEY"] = properties["kakao.native.app.key"].toString().replace("\"", "")
 
     }
     buildTypes {

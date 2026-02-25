@@ -53,7 +53,7 @@ timber = "5.0.1"
 #Kakao SDK
 kakao = "2.20.6"
 
-# DataStore & Tink (여기 추가!)
+# DataStore & Tink
 datastore = "1.0.0"
 tink = "1.15.0"
 uiautomator = "2.2.0"
