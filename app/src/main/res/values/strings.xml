@@ -1,10 +1,16 @@
 <resources>
     <string name="app_name">Kiero</string>
     <!--Bottom Navigation -->
-    <string name="schedule_tab_content_description">스케쥴 관리</string>
+    <!--Parent-->
+    <string name="schedule_tab_content_description">일정</string>
     <string name="alarm_tab_content_description">알람 피드</string>
-    <string name="journey_tab_content_description">오늘의 여정</string>
-    <string name="mission_tab_content_description">금화 미션</string>
+    <string name="parent_journey_tab_content_description">오늘의 현황</string>
+    <string name="parent_mission_tab_content_description">미션</string>
+    <string name="reward_tab_content_description">보상</string>
+    <string name="mypage_tab_content_description">마이페이지</string>
+    <!--Kid-->
+    <string name="kid_journey_tab_content_description">오늘의 여정</string>
+    <string name="kid_mission_tab_content_description">금화 미션</string>
     <string name="wish_tab_content_description">소원의 우물</string>
 
     <!--Today Journey Text -->

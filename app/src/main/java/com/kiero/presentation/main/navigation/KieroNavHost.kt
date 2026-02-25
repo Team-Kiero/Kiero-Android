@@ -15,7 +15,6 @@ import com.kiero.presentation.kid.navigation.kidNavGraph
 import com.kiero.presentation.parent.navigation.parentNavGraph
 import com.kiero.presentation.signup.parent.navigation.parentSignUpNavGraph
 import com.kiero.presentation.splash.navigation.splashNavGraph
-import timber.log.Timber
 
 @Composable
 fun KieroNavHost(
@@ -89,7 +88,8 @@ fun KieroNavHost(
             navController = appState.navController,
             paddingValues = paddingValues,
             navigateUp = appState::navigateUp,
-            navigateToSelection = appState::navigateToSelection
+            navigateToSelection = appState::navigateToSelection,
+            navigateToAlarm = appState::navigateToAlarm
         )
 
         kidNavGraph(
