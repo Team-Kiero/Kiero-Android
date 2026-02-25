@@ -20,8 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
-import com.kiero.core.designsystem.component.KieroGifImage
 import com.kiero.core.designsystem.component.KieroSnackbar
+import com.kiero.core.designsystem.component.animation.KieroAnimationType
+import com.kiero.core.designsystem.component.animation.KieroAnimationView
 import com.kiero.core.designsystem.theme.KieroTheme
 
 @Composable
@@ -43,8 +44,8 @@ fun ParentAutoLoadingScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            KieroGifImage(
-                drawableId = R.drawable.gif_parent_analyze
+            KieroAnimationView(
+                type = KieroAnimationType.Image(R.drawable.webp_parent)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
