@@ -123,7 +123,7 @@ fun AuthScreen(
 
 @Preview
 @Composable
-private fun DummyScreenPreview() {
+private fun AuthScreenPreview() {
     KieroTheme {
         AuthScreen(
             paddingValues = PaddingValues(),

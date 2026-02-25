@@ -4,14 +4,14 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 
 val White = Color(0xFFFFFFFF)
-val Gray100 = Color(0xFFF5F5F5)
-val Gray200 = Color(0xFFD6D6D6)
-val Gray300 = Color(0xFFC2C2C2)
-val Gray400 = Color(0xFFADADAD)
-val Gray500 = Color(0xFF999999)
-val Gray600 = Color(0xFF848484)
-val Gray700 = Color(0xFF707070)
-val Gray800 = Color(0xFF5C5C5C)
+val Gray100 = Color(0xFFEDEEEF)
+val Gray200 = Color(0xFFD5D8DB)
+val Gray300 = Color(0xFFC4C9CE)
+val Gray400 = Color(0xFFA0A3A7)
+val Gray500 = Color(0xFF8E9094)
+val Gray600 = Color(0xFF7B7D80)
+val Gray700 = Color(0xFF616266)
+val Gray800 = Color(0xFF4A4B4E)
 val Gray900 = Color(0xFF2D2F34)
 val Black = Color(0xFF232428)
 

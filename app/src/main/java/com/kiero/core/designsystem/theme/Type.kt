@@ -38,6 +38,7 @@ sealed interface TypographyTokens {
         val body3: TextStyle,
         val body4: TextStyle,
         val body5: TextStyle,
+        val body6: TextStyle,
     )
 
     @Immutable
@@ -95,6 +96,13 @@ val defaultKieroTypography = KieroTypography(
             platformStyle = TypographyDefaults.PlatformStyle
         ),
         body5 = TextStyle(
+            fontFamily = NotoSansFont.regular,
+            fontSize = 11.sp,
+            letterSpacing = TypographyDefaults.RegularLetterSpacing,
+            lineHeight = TypographyDefaults.RegularLineHeight,
+            platformStyle = TypographyDefaults.PlatformStyle
+        ),
+        body6 = TextStyle(
             fontFamily = NotoSansFont.regular,
             fontSize = 10.sp,
             letterSpacing = TypographyDefaults.RegularLetterSpacing,
