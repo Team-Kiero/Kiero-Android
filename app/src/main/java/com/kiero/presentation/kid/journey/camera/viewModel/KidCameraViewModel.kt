@@ -8,8 +8,7 @@ import com.kiero.core.common.extension.updateSuccess
 import com.kiero.core.common.util.ImageUriManager
 import com.kiero.core.common.util.successData
 import com.kiero.core.model.UiState
-import com.kiero.data.kid.schedule.repository.ImageUploadRepository
-import com.kiero.data.kid.schedule.repository.ScheduleRepository
+import com.kiero.domain.kid.schedule.usecase.CompleteScheduleWithImageUseCase
 import com.kiero.presentation.kid.journey.camera.navigation.Camera
 import com.kiero.presentation.kid.journey.camera.state.KidCameraSideEffect
 import com.kiero.presentation.kid.journey.camera.state.KidCameraState
@@ -30,8 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class KidCameraViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val scheduleRepository: ScheduleRepository,
-    private val imageUploadRepository: ImageUploadRepository,
+    private val completeScheduleWithImageUseCase: CompleteScheduleWithImageUseCase,
     private val imageUriManager: ImageUriManager
 ) : ViewModel() {
     private val camera = savedStateHandle.toRoute<Camera>()
@@ -94,16 +92,12 @@ class KidCameraViewModel @Inject constructor(
             }
 
             val apiJob = async {
-                imageUploadRepository.uploadImage(
+                completeScheduleWithImageUseCase(
                     uriString = currentState.imageUri.orEmpty(),
                     fileName = fileName,
-                    contentType = contentType
-                ).mapCatching { imageUrl ->
-                    scheduleRepository.patchScheduleComplete(
-                        scheduleDetailId = currentState.scheduleDetailId,
-                        imageUrl = imageUrl
-                    ).getOrThrow()
-                }
+                    contentType = contentType,
+                    scheduleDetailId = currentState.scheduleDetailId
+                )
             }
 
             try {
