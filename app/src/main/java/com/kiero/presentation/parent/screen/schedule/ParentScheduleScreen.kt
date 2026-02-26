@@ -138,11 +138,6 @@ private fun ParentScheduleScreen(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
-            ParentTopbar(
-                title = "일정",
-                onAlarmClick = {}
-            )
-
             ParentPlanScreen(
                 state = scheduleState,
                 onDateChange = onDateChange,
