@@ -5,6 +5,7 @@ import com.kiero.data.auth.model.ChildrenModel
 data class KidInfo(
     val kidId: String = "",
     val kidName: String = "",
+    val currentDate: String = ""
 )
 
 fun ChildrenModel.toUiModel() = KidInfo(

@@ -4,7 +4,6 @@ import com.kiero.presentation.parent.screen.journey.model.KidInfo
 
 data class ParentJourneyState (
     val kidInfo: KidInfo = KidInfo(),
-    val currentDate: String = "",
 
     val completedMission: Int = 0,
     val unCompletedMission: Int = 0
