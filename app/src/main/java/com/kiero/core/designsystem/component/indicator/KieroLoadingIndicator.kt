@@ -34,7 +34,7 @@ fun KieroLoadingIndicator(
 
 @Preview
 @Composable
-fun KieroLoadingIndicatorPreview() {
+private fun KieroLoadingIndicatorPreview() {
     KieroTheme {
         KieroLoadingIndicator()
     }

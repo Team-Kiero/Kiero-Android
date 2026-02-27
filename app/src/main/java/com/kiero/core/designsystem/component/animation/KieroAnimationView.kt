@@ -52,7 +52,7 @@ fun KieroAnimationView(
                     .data(type.resId)
                     .precision(Precision.INEXACT)
                     .bitmapConfig(Bitmap.Config.ARGB_8888)
-                    .allowHardware(false)
+                    .allowHardware(true)
                     .repeatCount(repeatCount)
                     .onAnimationEnd {
                         onSuccess()
