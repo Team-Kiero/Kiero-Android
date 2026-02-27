@@ -11,6 +11,7 @@ import com.kiero.presentation.parent.screen.alarm.navigation.parentAlarmNavGraph
 import com.kiero.presentation.parent.screen.journey.navigation.parentJourneyNavGraph
 import com.kiero.presentation.parent.screen.mission.auto.navigation.parentAutoMissionAddNavGraph
 import com.kiero.presentation.parent.screen.mission.navigation.parentMissionAddNavGraph
+import com.kiero.presentation.parent.screen.mission.navigation.parentMissionNavGraph
 import com.kiero.presentation.parent.screen.mypage.navigation.parentMypageNavGraph
 import com.kiero.presentation.parent.screen.reward.navigation.parentRewardNavGraph
 import com.kiero.presentation.parent.screen.schedule.navigation.parentScheduleNavGraph
@@ -77,6 +78,11 @@ fun NavGraphBuilder.parentNavGraph(
         )
 
         parentMissionAddNavGraph(
+            paddingValues = paddingValues,
+            navigateUp = navigateUp,
+        )
+
+        parentMissionNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
         )
