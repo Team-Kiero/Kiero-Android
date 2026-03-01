@@ -2,20 +2,15 @@ package com.kiero.presentation.parent.screen.schedule.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kiero.core.common.extension.updateSuccess
-import com.kiero.core.common.util.suspendRunCatching
-import com.kiero.core.localstorage.TokenManager
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.model.UiState
 import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.data.parent.plan.repository.PlanRepository
 import com.kiero.data.sse.manager.SseManager
+import com.kiero.presentation.parent.screen.schedule.plan.state.ParentScheduleSideEffect
 import com.kiero.presentation.parent.screen.schedule.plan.state.ParentScheduleState
-import com.kiero.presentation.signup.parent.state.ParentSignUpSideEffect
 import com.kiero.presentation.signup.parent.state.ParentSignUpState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -35,7 +30,6 @@ class ParentScheduleViewModel @Inject constructor(
     private val planRepository: PlanRepository,
     private val authRepository: AuthRepository,
     private val userInfoManager: UserInfoManager,
-    private val tokenManager: TokenManager,
     private val sseManager: SseManager,
 ) : ViewModel() {
     private val _state = MutableStateFlow<UiState<ParentScheduleState>>(UiState.Loading)
@@ -44,8 +38,8 @@ class ParentScheduleViewModel @Inject constructor(
     private val _authstate = MutableStateFlow(ParentSignUpState())
     val authstate: StateFlow<ParentSignUpState> = _authstate.asStateFlow()
 
-    private val _sideEffect = MutableSharedFlow<ParentSignUpSideEffect>()
-    val sideEffect: SharedFlow<ParentSignUpSideEffect> = _sideEffect.asSharedFlow()
+    private val _sideEffect = MutableSharedFlow<ParentScheduleSideEffect>()
+    val sideEffect: SharedFlow<ParentScheduleSideEffect> = _sideEffect.asSharedFlow()
 
     private val _selectedTabIndex = MutableStateFlow(0)
     val selectedTabIndex: StateFlow<Int> = _selectedTabIndex.asStateFlow()
@@ -57,6 +51,7 @@ class ParentScheduleViewModel @Inject constructor(
         initFetchParentInfo()
         sseManager.startParentSubscription()
     }
+
     fun ensureChildIdAndStartSse() {
         viewModelScope.launch {
             var childId = userInfoManager.getChildIdInfo()
@@ -78,13 +73,15 @@ class ParentScheduleViewModel @Inject constructor(
 
             _childId.value = childId
 
+            if (childId != null) {
+                fetchSchedule()
+            } else {
+                _state.value = UiState.Empty  // childId 없으면 Empty로
+            }
+
             Timber.d("📢 SSE 구독 시작")
             sseManager.startParentSubscription()
         }
-    }
-
-    fun updateTabIndex(index: Int) {
-        _selectedTabIndex.value = index
     }
 
     fun fetchSchedule() {
@@ -138,8 +135,7 @@ class ParentScheduleViewModel @Inject constructor(
 
     fun initFetchParentInfo() {
         viewModelScope.launch {
-            val parentInfo = userInfoManager.getParentInfo()!!
-
+            val parentInfo = userInfoManager.getParentInfo() ?: return@launch  // ← !! 제거
             _authstate.update { currentState ->
                 currentState.copy(
                     parentInfo = currentState.parentInfo.copy(
@@ -150,28 +146,6 @@ class ParentScheduleViewModel @Inject constructor(
             }
         }
     }
-
-    fun logOut() {
-        sseManager.stopSubscription()
-
-        Timber.e("로그아웃 되었습니다")
-        viewModelScope.launch {
-            val networkJobs = listOf(
-                async { suspendRunCatching { authRepository.postLogout() } },
-            )
-            networkJobs.awaitAll()
-            sseManager.stopSubscription()
-
-            suspendRunCatching { tokenManager.clearTokens() }
-
-            _state.updateSuccess {
-                it.copy(isLoading = false)
-            }
-
-            _sideEffect.emit(ParentSignUpSideEffect.NavigateToSelection)
-        }
-    }
-
 
     fun onDateChange(isNext: Boolean) {
         val currentState = (_state.value as? UiState.Success)?.data ?: return
@@ -195,29 +169,6 @@ class ParentScheduleViewModel @Inject constructor(
                 fetchSchedule()
             }
         }
-    }
-
-    fun onProfileClick() {
-        _state.updateSuccess {
-            it.copy(isLogoutDialogVisible = true)
-        }
-    }
-
-    fun onLogoutCancel() {
-        _state.updateSuccess {
-            it.copy(isLogoutDialogVisible = false)
-        }
-    }
-
-    fun onLogoutConfirm() {
-        _state.updateSuccess {
-            it.copy(
-                isLogoutDialogVisible = false,
-                isLoading = true
-            )
-        }
-
-        logOut()
     }
 }
 

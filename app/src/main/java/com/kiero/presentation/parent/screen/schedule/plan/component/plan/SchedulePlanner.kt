@@ -27,6 +27,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
+import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.screen.schedule.model.ScheduleEvent
 import com.kiero.presentation.parent.screen.schedule.model.toScheduleBlocks
@@ -36,6 +37,7 @@ import com.kiero.presentation.parent.screen.schedule.plan.state.ParentScheduleSt
 fun ScheduleTimeTable(
     state: ParentScheduleState,
     events: List<ScheduleEvent>,
+    onContentClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -50,7 +52,11 @@ fun ScheduleTimeTable(
         ) {
             ScheduleTimeColumn()
 
-            SchedulePlanner(events = events, state = state)
+            SchedulePlanner(
+                events = events,
+                state = state,
+                onContentClick = onContentClick,
+            )
         }
     }
 }
@@ -59,6 +65,7 @@ fun ScheduleTimeTable(
 fun SchedulePlanner(
     events: List<ScheduleEvent>,
     state: ParentScheduleState,
+    onContentClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     daysCount: Int = 7,
 ) {
@@ -129,6 +136,7 @@ fun SchedulePlanner(
                         .offset(x = dayWidth * block.dayIndex, y = topOffset)
                         .width(dayWidth)
                         .height(blockHeight)
+                        .noRippleClickable(onClick = { onContentClick(block.id) })
                         .padding(horizontal = 3.dp)
                 ) {
                     ScheduleEventBlock(block = block)
@@ -148,7 +156,8 @@ private fun ScheduleTimeTablePreview() {
         Box(modifier = Modifier.padding(16.dp)) {
             ScheduleTimeTable(
                 state = ParentScheduleState(),
-                events = mockEvents
+                events = mockEvents,
+                onContentClick = {}
             )
         }
     }

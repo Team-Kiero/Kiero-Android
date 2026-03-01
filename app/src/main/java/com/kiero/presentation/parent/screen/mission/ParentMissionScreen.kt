@@ -22,8 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
-import com.kiero.core.common.extension.formatWithDayOfWeek
 import com.kiero.core.common.extension.toRelativeDayFromDate
+import com.kiero.core.common.util.ParentFormatters
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
 import com.kiero.core.trigger.LocalRefreshState
@@ -110,7 +110,7 @@ fun ParentMissionScreen(
                 ) {
                     MissionInfo(
                         dayOfWeek = missionsByDate.dueAt.toRelativeDayFromDate,
-                        dueAt = missionsByDate.dueAt.formatWithDayOfWeek
+                        dueAt = ParentFormatters.formatDateWithDayOfWeek(missionsByDate.dueAt)
                     )
                 }
             }
