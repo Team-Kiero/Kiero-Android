@@ -13,6 +13,8 @@ data class PlanAllResponseDto(
 
 @Serializable
 data class RecurringScheduleDto(
+    @SerialName("scheduleId")
+    val scheduleId: Long= 0L,
     @SerialName("startTime")
     val startTime: String,
     @SerialName("endTime")
@@ -22,11 +24,17 @@ data class RecurringScheduleDto(
     @SerialName("colorCode")
     val colorCode: String,
     @SerialName("dayOfWeek")
-    val dayOfWeek: String
+    val dayOfWeek: String,
+    @SerialName("repeatStartDate")
+    val repeatStartDate: String,
+    @SerialName("repeatEndDate")
+    val repeatEndDate: String? = null,
 )
 
 @Serializable
 data class NormalScheduleDto(
+    @SerialName("scheduleId")
+    val scheduleId: Long= 0L,
     @SerialName("startTime")
     val startTime: String,
     @SerialName("endTime")

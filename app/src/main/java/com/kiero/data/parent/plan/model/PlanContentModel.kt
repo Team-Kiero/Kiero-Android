@@ -22,22 +22,32 @@ data class PlanAllModel(
     val recurringSchedules: List<RecurringScheduleModel>,
     val normalSchedules: List<NormalScheduleModel>
 )
-
+interface ScheduleModel {
+    val scheduleId: Long
+    val name: String
+    val startTime: String
+    val endTime: String
+    val colorCode: String
+}
 data class RecurringScheduleModel(
-    val startTime: String,
-    val endTime: String,
-    val name: String,
-    val colorCode: String,
-    val dayOfWeek: String
-)
+    override val scheduleId: Long,
+    override val startTime: String,
+    override val endTime: String,
+    override val name: String,
+    override val colorCode: String,
+    val dayOfWeek: String,
+    val repeatStartDate: String,
+    val repeatEndDate: String? = null,
+) : ScheduleModel
 
 data class NormalScheduleModel(
-    val startTime: String,
-    val endTime: String,
-    val name: String,
-    val colorCode: String,
+    override val scheduleId: Long,
+    override val startTime: String,
+    override val endTime: String,
+    override val name: String,
+    override val colorCode: String,
     val date: String
-)
+) : ScheduleModel
 
 
 fun PlanAllResponseDto.toModel(): PlanAllModel = PlanAllModel(
@@ -47,14 +57,18 @@ fun PlanAllResponseDto.toModel(): PlanAllModel = PlanAllModel(
 )
 
 fun RecurringScheduleDto.toModel(): RecurringScheduleModel = RecurringScheduleModel(
+    scheduleId = this.scheduleId,
     startTime = this.startTime,
     endTime = this.endTime,
     name = this.name,
     colorCode = this.colorCode,
-    dayOfWeek = this.dayOfWeek
+    dayOfWeek = this.dayOfWeek,
+    repeatStartDate = this.repeatStartDate,
+    repeatEndDate = this.repeatEndDate,
 )
 
 fun NormalScheduleDto.toModel(): NormalScheduleModel = NormalScheduleModel(
+    scheduleId = this.scheduleId,
     startTime = this.startTime,
     endTime = this.endTime,
     name = this.name,
@@ -63,7 +77,7 @@ fun NormalScheduleDto.toModel(): NormalScheduleModel = NormalScheduleModel(
 )
 
 fun RecurringScheduleModel.toUiModel() = ScheduleEvent(
-    id = "recurring_${name}_${startTime}",
+    id = scheduleId.toString(),
     name = name,
     isRecurring = true,
     startTime = startTime,
@@ -74,7 +88,7 @@ fun RecurringScheduleModel.toUiModel() = ScheduleEvent(
 )
 
 fun NormalScheduleModel.toUiModel() = ScheduleEvent(
-    id = "normal_${name}_${date}",
+    id = scheduleId.toString(),
     name = name,
     isRecurring = false,
     startTime = startTime,
