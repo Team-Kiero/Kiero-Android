@@ -32,9 +32,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
-import com.kiero.core.designsystem.component.KieroGifImage
 import com.kiero.core.designsystem.component.KieroToolTip
 import com.kiero.core.designsystem.component.KieroTopbar
+import com.kiero.core.designsystem.component.animation.KieroAnimationType
+import com.kiero.core.designsystem.component.animation.KieroAnimationView
 import com.kiero.core.designsystem.component.chip.KieroChip
 import com.kiero.core.designsystem.component.chip.action.KieroTextAction
 import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
@@ -65,9 +66,11 @@ fun KidFireResultRoute(
                 navigateToJourney = navigateToJourney
             )
         }
+
         is UiState.Loading -> {
             KieroLoadingIndicator()
         }
+
         is UiState.Failure -> {}
         else -> {}
     }
@@ -154,8 +157,8 @@ private fun KidFIreResultScreen(
                     .padding(top = 4.dp)
             ) {
                 if (isFinished) {
-                    KieroGifImage(
-                        drawableId = R.drawable.gif_kid_fire,
+                    KieroAnimationView(
+                        type = KieroAnimationType.Image(R.drawable.webp_kid_fire),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 12.dp)
@@ -226,8 +229,7 @@ private fun KidFIreResultScreen(
                         },
                         color = KieroTheme.colors.gray300
                     )
-                }
-                else {
+                } else {
                     Text(
                         text = buildAnnotatedString {
                             append("오늘도 도와줘서 고마워.")

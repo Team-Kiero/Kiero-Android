@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -17,11 +16,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
-import com.kiero.core.designsystem.component.KieroGifImage
 import com.kiero.core.designsystem.component.KieroSnackbar
+import com.kiero.core.designsystem.component.animation.KieroAnimationType
+import com.kiero.core.designsystem.component.animation.KieroAnimationView
 import com.kiero.core.designsystem.theme.KieroTheme
 
 @Composable
@@ -38,13 +39,14 @@ fun ParentAutoLoadingScreen(
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .offset(y = (-40).dp),
+                .fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            KieroGifImage(
-                drawableId = R.drawable.gif_parent_analyze
+            KieroAnimationView(
+                type = KieroAnimationType.Image(R.drawable.webp_parent),
+                modifier = Modifier.padding(horizontal = 90.dp),
+                contentScale = ContentScale.Fit
             )
 
             Spacer(modifier = Modifier.height(16.dp))
