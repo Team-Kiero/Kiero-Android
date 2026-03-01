@@ -27,13 +27,13 @@ sealed interface KidTab : Route
 data object KidGraph : Route
 
 @Serializable
-data object Journey : KidTab
+data object KidJourney : KidTab
 
 @Serializable
-data object Mission : KidTab
+data object KidMission : KidTab
 
 @Serializable
-data object Wish : KidTab
+data object KidWish : KidTab
 
 @Serializable
 data object Onboarding : KidTab
@@ -50,7 +50,7 @@ fun NavGraphBuilder.kidNavGraph(
     navigateUp: () -> Unit,
 ) {
     navigation<KidGraph>(
-        startDestination = Journey
+        startDestination = KidJourney
     ) {
         kidJourneyNavGraph(
             paddingValues = paddingValues,
