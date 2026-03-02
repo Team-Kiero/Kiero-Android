@@ -1,4 +1,4 @@
-package com.kiero.presentation.parent.screen.mission.directadd.component.missionadd
+package com.kiero.presentation.parent.screen.mission.directadd.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
