@@ -133,6 +133,7 @@ dependencies {
     ksp(libs.hilt.compiler)
 
     implementation(libs.bundles.coil)
+    implementation(libs.lottie.compose)
 
     implementation(libs.timber)
 

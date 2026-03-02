@@ -9,6 +9,7 @@ import androidx.navigation.compose.navigation
 import com.kiero.core.navigation.Route
 import com.kiero.presentation.parent.screen.alarm.navigation.parentAlarmNavGraph
 import com.kiero.presentation.parent.screen.journey.navigation.parentJourneyNavGraph
+import com.kiero.presentation.parent.screen.mission.navigation.parentMissionNavGraph
 import com.kiero.presentation.parent.screen.mission.autoadd.navigation.parentAutoMissionAddNavGraph
 import com.kiero.presentation.parent.screen.mission.directadd.navigation.parentMissionAddNavGraph
 import com.kiero.presentation.parent.screen.mypage.navigation.parentMypageNavGraph
@@ -77,6 +78,11 @@ fun NavGraphBuilder.parentNavGraph(
         )
 
         parentMissionAddNavGraph(
+            paddingValues = paddingValues,
+            navigateUp = navigateUp,
+        )
+
+        parentMissionNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
         )
