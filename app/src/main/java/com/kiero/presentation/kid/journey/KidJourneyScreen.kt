@@ -6,7 +6,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -44,6 +43,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
 import com.kiero.core.common.extension.collectSideEffect
+import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.component.animation.KieroAnimationType
 import com.kiero.core.designsystem.component.animation.KieroAnimationView
 import com.kiero.core.designsystem.component.dialog.KieroDialog
@@ -76,6 +76,7 @@ fun KidJourneyRoute(
     navigateUp: () -> Unit,
     navigateToCamera: (Long, StoneUiType) -> Unit,
     navigateToFire: (String, Int) -> Unit,
+    navigateToMap: () -> Unit,
     viewModel: KidJourneyViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -84,7 +85,6 @@ fun KidJourneyRoute(
     val refreshState = LocalRefreshState.current
 
     LaunchedEffect(Unit) {
-
         refreshState.refreshEvent.collect { tab ->
             if (tab == KidMainTab.JOURNEY) {
                 viewModel.fetchData()
@@ -153,6 +153,7 @@ fun KidJourneyRoute(
                     }
                 },
                 onNextClick = viewModel::onNextClick,
+                onMapClick = navigateToMap,
                 navigateUp = navigateUp,
             )
         }
@@ -173,6 +174,7 @@ private fun KidJourneyScreen(
     state: KidJourneyState,
     onButtonClick: () -> Unit,
     onNextClick: () -> Unit,
+    onMapClick: () -> Unit,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -241,8 +243,8 @@ private fun KidJourneyScreen(
                         color = KieroTheme.colors.gray800,
                         shape = CircleShape
                     )
-                    .clickable {
-                        // TODO: 지도 화면으로 이동하는 액션 추가
+                    .noRippleClickable {
+                        onMapClick()
                     },
                 contentAlignment = Alignment.Center
             ) {
@@ -338,7 +340,8 @@ private fun KidJourneyScreenPreview() {
                 )
             ),
             onButtonClick = {},
-            onNextClick = {}
+            onNextClick = {},
+            onMapClick = {}
         )
     }
 }
