@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -18,6 +20,7 @@ import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.screen.journey.component.ParentJourneyTodayKidInfo
 import com.kiero.presentation.parent.screen.journey.component.ParentJourneyTodayMissionStatus
+import com.kiero.presentation.parent.screen.journey.component.ParentJourneyTodayStatusItem
 import com.kiero.presentation.parent.screen.journey.model.KidInfo
 
 @Composable
@@ -79,7 +82,20 @@ private fun ParentJourneyScreen(
             }
         }
 
-
+        // Todo: 서버 내용으로 수정
+        LazyColumn (
+            modifier = Modifier
+                .weight(1f)
+                .padding(vertical = 16.dp, horizontal = 24.dp),
+        ) {
+            itemsIndexed(
+                items = ParentJourneyState.FAKE
+            ) { index, item ->
+                ParentJourneyTodayStatusItem(
+                    item = item,
+                )
+            }
+        }
     }
 }
 
