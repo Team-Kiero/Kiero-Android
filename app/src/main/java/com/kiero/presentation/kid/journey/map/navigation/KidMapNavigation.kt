@@ -10,9 +10,10 @@ import com.kiero.presentation.kid.journey.map.KidMapRoute
 import kotlinx.serialization.Serializable
 
 fun NavController.navigateToMap(
+    date: String,
     navOptions: NavOptions? = null
 ) {
-    navigate(Map, navOptions)
+    navigate(Map(date = date), navOptions)
 }
 
 fun NavGraphBuilder.kidJourneyMapNavGraph(
@@ -28,4 +29,6 @@ fun NavGraphBuilder.kidJourneyMapNavGraph(
 }
 
 @Serializable
-data object Map: Route
+data class Map(
+    val date: String
+) : Route

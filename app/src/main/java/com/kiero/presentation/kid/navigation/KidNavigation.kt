@@ -63,8 +63,8 @@ fun NavGraphBuilder.kidNavGraph(
             navigateToFire = { date, stones->
                 navController.navigateToFire(date, stones)
             },
-            navigateToMap = {
-                navController.navigateToMap()
+            navigateToMap = { date ->
+                navController.navigateToMap(date)
             }
         )
 

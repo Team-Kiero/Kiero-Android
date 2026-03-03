@@ -77,7 +77,7 @@ fun KidJourneyRoute(
     navigateUp: () -> Unit,
     navigateToCamera: (Long, StoneUiType) -> Unit,
     navigateToFire: (String, Int) -> Unit,
-    navigateToMap: () -> Unit,
+    navigateToMap: (String) -> Unit,
     viewModel: KidJourneyViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -168,7 +168,7 @@ fun KidJourneyRoute(
                     }
                 },
                 onNextClick = viewModel::onNextClick,
-                onMapClick = navigateToMap,
+                onMapClick = { navigateToMap(state.data.header!!.currentDate) },
                 navigateUp = navigateUp,
             )
         }
