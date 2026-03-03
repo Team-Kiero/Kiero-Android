@@ -36,7 +36,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
 import com.kiero.core.common.extension.collectSideEffect
-import com.kiero.core.designsystem.component.KieroGifImage
+import com.kiero.core.designsystem.component.animation.KieroAnimationType
+import com.kiero.core.designsystem.component.animation.KieroAnimationView
 import com.kiero.core.designsystem.component.dialog.KieroDialog
 import com.kiero.core.designsystem.component.dialog.action.KieroCancelAction
 import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
@@ -75,6 +76,7 @@ fun KidJourneyRoute(
     val refreshState = LocalRefreshState.current
 
     LaunchedEffect(Unit) {
+
         refreshState.refreshEvent.collect { tab ->
             if (tab == KidMainTab.JOURNEY) {
                 viewModel.fetchData()
@@ -92,7 +94,6 @@ fun KidJourneyRoute(
             is KidJourneySideEffect.ShowSnackbar -> globalTrigger.showSnackbar(
                 SnackbarState(message = sideEffect.message)
             )
-
             KidJourneySideEffect.ShowDialog -> globalTrigger.dialogTrigger.show {}
         }
     }
@@ -244,8 +245,8 @@ private fun KidJourneyScreen(
         }
 
         // 꾸비 gif
-        KieroGifImage(
-            drawableId = R.drawable.gif_kid_intro,
+        KieroAnimationView(
+            type = KieroAnimationType.Image(R.drawable.webp_kid_intro),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 250.dp, start = 8.dp, end = 8.dp, bottom = 150.dp)
