@@ -28,21 +28,21 @@ fun KieroSnackbar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(KieroTheme.colors.schedule1)
+            .clip(RoundedCornerShape(999.dp))
+            .background(KieroTheme.colors.gray800)
             .padding(contentPadding),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = message,
             style = KieroTheme.typography.regular.body4,
-            color = KieroTheme.colors.gray900,
+            color = KieroTheme.colors.schedule1,
             textAlign = TextAlign.Center
         )
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun KieroSnackbarPreview() {
     KieroTheme {
