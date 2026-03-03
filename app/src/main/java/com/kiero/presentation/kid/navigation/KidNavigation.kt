@@ -77,7 +77,7 @@ fun NavGraphBuilder.kidNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
         )
-        
+
         kidOnboardingNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
