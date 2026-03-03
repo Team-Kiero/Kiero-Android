@@ -31,119 +31,150 @@ import androidx.compose.ui.unit.dp
 import com.kiero.R
 import com.kiero.core.designsystem.component.divider.KieroDashedVerticalDivider
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.presentation.parent.screen.journey.model.TodayJourneyModel
 import com.kiero.presentation.parent.screen.journey.model.TodayStatus
 
-// Todo: 서버 기준으로 변경하기
 @Composable
 fun ParentJourneyTodayStatusItem(
-    status: TodayStatus,
-    modifier: Modifier = Modifier
+    item: TodayJourneyModel,
+    modifier: Modifier = Modifier,
+    onItemClick: () -> Unit = {}
 ) {
-    Row (
+    Row(
         modifier = modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min),
         verticalAlignment = Alignment.Top
     ) {
         ParentJourneyLightDivider(
-            status = status,
-            modifier = Modifier.fillMaxHeight()
+            status = item.todayStatus,
+            modifier = Modifier.then(
+                if (item.todayStatus == TodayStatus.TODAY_COMPLETED) Modifier.fillMaxHeight()
+                else Modifier
+            )
         )
 
         Spacer(modifier = Modifier.width(5.dp))
 
         ParentJourneyToday(
-            status = status,
-            modifier = Modifier
-                .padding(bottom = 12.dp, end = 10.dp)
+            item = item,
+            modifier = Modifier.padding(bottom = 12.dp, end = 10.dp),
+            onItemClick = onItemClick
         )
     }
 }
 
 @Composable
 private fun ParentJourneyToday(
-    status: TodayStatus,
-    modifier: Modifier = Modifier
+    item: TodayJourneyModel,
+    modifier: Modifier = Modifier,
+    onItemClick: () -> Unit = {}
 ) {
-    val statusIcon = when(status) {
+    val isUpcoming = item.todayStatus == TodayStatus.UPCOMING
+
+    val statusIcon = when (item.todayStatus) {
         TodayStatus.PAST_COMPLETED -> R.drawable.ic_check_circle_complete_outline
         TodayStatus.PAST_MISSED -> R.drawable.ic_miss_circle_outline
-        TodayStatus.CURRENT_COMPLETED -> R.drawable.ic_parent_addschedule_check_on
+        TodayStatus.CURRENT_COMPLETED -> {
+            if (item.isAuthenticated) R.drawable.ic_parent_addschedule_check_on
+            else R.drawable.ic_parent_addschedule_check_off
+        }
         TodayStatus.UPCOMING -> R.drawable.ic_parent_addschedule_check_off
+        TodayStatus.TODAY_COMPLETED -> null
     }
 
-    val statusTextColor = when(status) {
-        TodayStatus.CURRENT_COMPLETED -> KieroTheme.colors.white
-        TodayStatus.UPCOMING -> KieroTheme.colors.gray800
+    val statusTextColor = when {
+        item.todayStatus == TodayStatus.CURRENT_COMPLETED -> KieroTheme.colors.white
+        isUpcoming -> KieroTheme.colors.gray800
         else -> KieroTheme.colors.gray400
     }
 
-    val statusDateColor = when(status) {
-        TodayStatus.CURRENT_COMPLETED -> KieroTheme.colors.main
-        TodayStatus.UPCOMING -> KieroTheme.colors.gray800
+    val statusDateColor = when {
+        item.todayStatus == TodayStatus.CURRENT_COMPLETED -> KieroTheme.colors.main
+        isUpcoming -> KieroTheme.colors.gray800
         else -> KieroTheme.colors.gray400
     }
 
-    val hasImageStatus = when(status) {
-        TodayStatus.PAST_COMPLETED, TodayStatus.CURRENT_COMPLETED -> true
+    val cardBackground = when {
+        item.todayStatus == TodayStatus.CURRENT_COMPLETED && item.isAuthenticated ->
+            KieroTheme.colors.schedule1.copy(alpha = 0.1f)
+        else -> KieroTheme.colors.black
+    }
+
+    val showImageIcon = when (item.todayStatus) {
+        TodayStatus.PAST_COMPLETED -> true
+        TodayStatus.CURRENT_COMPLETED -> item.isAuthenticated
         else -> false
     }
 
-    Column (
-        modifier = modifier
-    ) {
-        Text(
-            text = "09:00 ~ 12:00",
-            style = KieroTheme.typography.regular.body4,
-            color = statusDateColor
-        )
+    val imageIconTint = if (item.todayStatus == TodayStatus.CURRENT_COMPLETED && item.isAuthenticated)
+        KieroTheme.colors.white
+    else
+        KieroTheme.colors.gray800
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row (
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    color = if (status == TodayStatus.CURRENT_COMPLETED) KieroTheme.colors.schedule1.copy(0.1f) else KieroTheme.colors.black,
-                    shape = RoundedCornerShape(10.dp)
-                )
-                .border(
-                    width = 1.dp,
-                    color = status.getColor(KieroTheme.colors),
-                    shape = RoundedCornerShape(10.dp)
-                )
-                .padding(horizontal = 10.dp, vertical = 14.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = ImageVector.vectorResource(statusIcon),
-                contentDescription = null,
-                tint = Color.Unspecified
+    Column(modifier = modifier) {
+        if (item.todayStatus != TodayStatus.TODAY_COMPLETED) {
+            Text(
+                text = item.date,
+                style = KieroTheme.typography.regular.body4,
+                color = statusDateColor
             )
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = cardBackground, shape = RoundedCornerShape(10.dp))
+                    .border(
+                        width = 1.dp,
+                        color = item.todayStatus.getColor(KieroTheme.colors),
+                        shape = RoundedCornerShape(10.dp)
+                    )
+                    .padding(horizontal = 10.dp, vertical = 14.dp)
+                    .then(
+                        if (isUpcoming) Modifier.blur(2.dp, edgeTreatment = BlurredEdgeTreatment.Rectangle)
+                        else Modifier
+                    ),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (statusIcon != null) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(statusIcon),
+                        contentDescription = null,
+                        tint = Color.Unspecified
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Text(
+                    text = item.todayMission,
+                    style = KieroTheme.typography.regular.body4,
+                    color = statusTextColor
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                if (showImageIcon) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_image),
+                        tint = imageIconTint,
+                        contentDescription = null
+                    )
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_right),
+                        tint = imageIconTint,
+                        contentDescription = null
+                    )
+                }
+            }
+        } else {
             Text(
-                text = "키어로짱",
+                text = "오늘 일정이 모두 완료되었어요.",
                 style = KieroTheme.typography.regular.body4,
                 color = statusTextColor
             )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            if (hasImageStatus) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_image),
-                    tint = if (status == TodayStatus.CURRENT_COMPLETED) KieroTheme.colors.white else KieroTheme.colors.gray800,
-                    contentDescription = null
-                )
-
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_right),
-                    tint = if (status == TodayStatus.CURRENT_COMPLETED) KieroTheme.colors.white else KieroTheme.colors.gray800,
-                    contentDescription = null
-                )
-            }
         }
 
         Spacer(modifier = Modifier.height(14.dp))
@@ -152,7 +183,7 @@ private fun ParentJourneyToday(
 
 @Composable
 private fun ParentJourneyLightDivider(
-    status : TodayStatus,
+    status: TodayStatus,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -164,10 +195,19 @@ private fun ParentJourneyLightDivider(
             glowColor = status.getDotColor(KieroTheme.colors)
         )
 
-        KieroDashedVerticalDivider(
-            modifier = Modifier
-                .weight(1f)
-        )
+        when (status) {
+            TodayStatus.UPCOMING -> {
+                KieroDashedVerticalDivider(
+                    modifier = Modifier.weight(1f),
+                    color = KieroTheme.colors.gray800,
+                    endColor = KieroTheme.colors.black
+                )
+            }
+            TodayStatus.TODAY_COMPLETED -> { /* 라인 없음 */ }
+            else -> {
+                KieroDashedVerticalDivider(modifier = Modifier.weight(1f))
+            }
+        }
     }
 }
 
@@ -188,13 +228,9 @@ fun GlowingDot(
         Box(
             modifier = Modifier
                 .size(dotSize + blurRadius)
-                .blur(
-                    radius = blurRadius,
-                    edgeTreatment = BlurredEdgeTreatment.Unbounded
-                )
+                .blur(radius = blurRadius, edgeTreatment = BlurredEdgeTreatment.Unbounded)
                 .background(color = glowColor, shape = CircleShape)
         )
-
         Box(
             modifier = Modifier
                 .size(dotSize)
@@ -208,20 +244,57 @@ fun GlowingDot(
 private fun ParentJourneyTodayStatusItemPreview() {
     KieroTheme {
         Column {
+            // Case2: 지난 일정 + 인증완료
             ParentJourneyTodayStatusItem(
-                status = TodayStatus.PAST_COMPLETED
+                item = TodayJourneyModel(
+                    date = "09:00-14:00",
+                    todayStatus = TodayStatus.PAST_COMPLETED,
+                    todayMission = "학교 수업",
+                    isAuthenticated = true
+                )
             )
-
+            // Case3: 지난 일정 + 미인증
             ParentJourneyTodayStatusItem(
-                status = TodayStatus.PAST_MISSED
+                item = TodayJourneyModel(
+                    date = "09:00-14:00",
+                    todayStatus = TodayStatus.PAST_MISSED,
+                    todayMission = "학교 수업",
+                    isAuthenticated = false
+                )
             )
-
+            // Case1-c: 현재 일정 + 미인증
             ParentJourneyTodayStatusItem(
-                status = TodayStatus.CURRENT_COMPLETED
+                item = TodayJourneyModel(
+                    date = "13:00-14:00",
+                    todayStatus = TodayStatus.CURRENT_COMPLETED,
+                    todayMission = "학교 수업",
+                    isAuthenticated = false
+                )
             )
-
+            // Case1-d: 현재 일정 + 인증함
             ParentJourneyTodayStatusItem(
-                status = TodayStatus.UPCOMING
+                item = TodayJourneyModel(
+                    date = "13:00-14:00",
+                    todayStatus = TodayStatus.CURRENT_COMPLETED,
+                    todayMission = "학교 수업",
+                    isAuthenticated = true
+                )
+            )
+            // Case4: 대기 상태
+            ParentJourneyTodayStatusItem(
+                item = TodayJourneyModel(
+                    date = "09:00-14:00",
+                    todayStatus = TodayStatus.UPCOMING,
+                    todayMission = "학교 수업",
+                    isAuthenticated = false
+                )
+            )
+            // Case5: 하루 마무리
+            ParentJourneyTodayStatusItem(
+                item = TodayJourneyModel(
+                    todayStatus = TodayStatus.TODAY_COMPLETED,
+                    todayMission = ""
+                )
             )
         }
     }
