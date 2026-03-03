@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -16,7 +17,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,11 +29,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.dropShadow
+import androidx.compose.ui.graphics.shadow.Shadow
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -221,17 +229,44 @@ private fun KidJourneyScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(22.dp))
+            if (state.shouldShowSchedule) {
+                Spacer(modifier = Modifier.height(21.dp))
 
-            // 스케줄 정보 (특정 상태에서만 표시)
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .alpha(if (state.shouldShowSchedule) 1f else 0f)
-            ) {
                 KidJourneyContentUtil.getScheduleInfo(state.content)?.let { schedule ->
                     KidJourneyScheduleItem(item = schedule)
                 }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .align(Alignment.End)
+                    .dropShadow(
+                        shape = CircleShape,
+                        shadow = Shadow(
+                            radius = 10.dp,
+                            spread = 0.dp,
+                            color = KieroTheme.colors.gray800,
+                            offset = DpOffset(x = 0.dp, y = 0.dp)
+                        )
+                    )
+                    .background(
+                        color = KieroTheme.colors.gray800,
+                        shape = CircleShape
+                    )
+                    .clickable {
+                        // TODO: 지도 화면으로 이동하는 액션 추가
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_kid_tab_journey),
+                    contentDescription = null,
+                    tint = KieroTheme.colors.white,
+                    modifier = Modifier.size(16.dp)
+                )
             }
 
             Spacer(modifier = Modifier.weight(1f))
@@ -316,6 +351,9 @@ private fun KidJourneyScreenPreview() {
                     isSkippable = true,
                     isNowScheduleVerified = true
                 )
+//                content = KidJourneyContentUiModel.FireNotLit(
+//                    kidName = "주완"
+//                )
             ),
             onButtonClick = {},
             onNextClick = {}
