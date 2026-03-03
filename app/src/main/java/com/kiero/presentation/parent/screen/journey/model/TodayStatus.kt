@@ -17,11 +17,14 @@ enum class TodayStatus(
     ),
     UPCOMING(
         description = "다음 일정",
+    ),
+    TODAY_COMPLETED(
+        description = "오늘 완료",
     );
 
     fun getColor(themeColors: KieroColors): Color {
         return when (this) {
-            PAST_COMPLETED,UPCOMING -> themeColors.gray800
+            PAST_COMPLETED,UPCOMING,TODAY_COMPLETED -> themeColors.gray800
             PAST_MISSED -> themeColors.point
             CURRENT_COMPLETED -> themeColors.main
         }
@@ -29,7 +32,7 @@ enum class TodayStatus(
 
     fun getDotColor(themeColors: KieroColors) : Color {
         return when (this) {
-            PAST_COMPLETED, PAST_MISSED -> themeColors.schedule1
+            PAST_COMPLETED, PAST_MISSED,TODAY_COMPLETED -> themeColors.schedule1
             CURRENT_COMPLETED -> themeColors.main
             UPCOMING -> themeColors.gray800
         }
