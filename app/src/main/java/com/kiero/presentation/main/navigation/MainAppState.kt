@@ -253,9 +253,9 @@ class MainAppState(
         date: String,
         navOptions: NavOptions? = null
     ) = navController.navigateToMap(
-            date = date,
-            navOptions = navOptions
-        )
+        date = date,
+        navOptions = navOptions
+    )
 
     fun navigateToParentMission(navOptions: NavOptions? = null) =
         navController.navigateToParentMission(navOptions)
