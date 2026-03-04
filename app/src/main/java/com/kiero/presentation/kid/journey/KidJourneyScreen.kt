@@ -64,7 +64,7 @@ import com.kiero.presentation.kid.journey.model.KidJourneyButtonType
 import com.kiero.presentation.kid.journey.model.KidJourneyContentUiModel
 import com.kiero.presentation.kid.journey.model.KidJourneyHeaderUiModel
 import com.kiero.presentation.kid.journey.model.KidJourneyScheduleUiModel
-import com.kiero.presentation.kid.journey.model.StoneUiType
+import com.kiero.presentation.kid.journey.model.KidJourneyStoneType
 import com.kiero.presentation.kid.journey.state.KidJourneySideEffect
 import com.kiero.presentation.kid.journey.state.KidJourneyState
 import com.kiero.presentation.kid.journey.viewmodel.KidJourneyViewModel
@@ -74,7 +74,7 @@ import com.kiero.presentation.main.navigation.KidMainTab
 fun KidJourneyRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
-    navigateToCamera: (Long, StoneUiType) -> Unit,
+    navigateToCamera: (Long, KidJourneyStoneType) -> Unit,
     navigateToFire: (String, Int) -> Unit,
     navigateToMap: (String) -> Unit,
     viewModel: KidJourneyViewModel = hiltViewModel()
@@ -329,7 +329,7 @@ private fun KidJourneyScreenPreview() {
                 content = KidJourneyContentUiModel.NowSchedule(
                     scheduleDetailId = 1,
                     scheduleName = "피아노 학원 가기",
-                    stoneType = StoneUiType.WISDOM,
+                    stoneType = KidJourneyStoneType.WISDOM,
                     scheduleInfo = KidJourneyScheduleUiModel(
                         order = 4,
                         startTime = "14:00:00",
