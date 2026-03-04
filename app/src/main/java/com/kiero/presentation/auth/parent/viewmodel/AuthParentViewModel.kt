@@ -6,14 +6,13 @@ import androidx.lifecycle.viewModelScope
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kiero.core.common.extension.toHandleErrorMessage
-import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.model.UiState
 import com.kiero.data.auth.repository.AuthRepository
-import com.kiero.data.sse.manager.SseManager
+import com.kiero.domain.login.HandleKakaoLoginResultUseCase
+import com.kiero.presentation.auth.parent.model.KakaoLoginResult
+import com.kiero.presentation.auth.parent.state.AuthParentState
 import com.kiero.presentation.auth.state.AuthSideEffect
-import com.kiero.presentation.auth.state.AuthState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,12 +26,10 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthParentViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val userInfoManager: UserInfoManager,
-    private val sseManager: SseManager
+    private val handleKakaoLoginResultUseCase: HandleKakaoLoginResultUseCase,
 ) : ViewModel() {
-
-    private val _state = MutableStateFlow(AuthState())
-    val state: StateFlow<AuthState> = _state.asStateFlow()
+    private val _state = MutableStateFlow(AuthParentState())
+    val state: StateFlow<AuthParentState> = _state.asStateFlow()
 
     private val _sideEffect = MutableSharedFlow<AuthSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
@@ -42,79 +39,48 @@ class AuthParentViewModel @Inject constructor(
 
         authRepository.loginWithKakao(context)
             .onSuccess { result ->
-                userInfoManager.saveParentInfo(
-                    parentName = result.name,
-                    parentProfileImage = result.image
-                )
-
-                val childrenDeferred = async { authRepository.getChildren() }
-                val childrenResult = childrenDeferred.await()
-
-                childrenResult.onSuccess { children ->
-                    if (children.isNotEmpty()) {
-
-                        children.firstOrNull()?.let {
-                            userInfoManager.saveChildIdInfo(
-                                childId = it.childId
+                handleKakaoLoginResultUseCase(
+                    name = result.name,
+                    image = result.image
+                ).onSuccess { kakaoLoginResult ->
+                    when (kakaoLoginResult) {
+                        is KakaoLoginResult.HasChildren ->
+                            _sideEffect.emit(AuthSideEffect.NavigateToParentGraph)
+                        is KakaoLoginResult.NoChildren ->
+                            _sideEffect.emit(
+                                AuthSideEffect.NavigateToParentSignUp(
+                                    parentName = kakaoLoginResult.parentName,
+                                    parentProfileImage = kakaoLoginResult.parentProfileImage
+                                )
                             )
-                        }
-
-                        _sideEffect.emit(
-                            AuthSideEffect.NavigateToParentGraph
-                        )
-                    } else {
-                        _sideEffect.emit(
-                            AuthSideEffect.NavigateToParentSignUp(
-                                parentName = result.name,
-                                parentProfileImage = result.image
-                            )
-                        )
                     }
                 }.onFailure { throwable ->
                     Timber.e(throwable)
-                    _sideEffect.emit(
-                        AuthSideEffect.ShowSnackbar(
-                            message = throwable.toHandleErrorMessage()
-                        )
-                    )
-                    _state.update { currentState ->
-                        currentState.copy(
-                            uiState = UiState.Failure(throwable.toHandleErrorMessage())
-                        )
-                    }
+                    handleError(throwable)
                 }
-
-            }.onFailure { throwable ->
+            }
+            .onFailure { throwable ->
                 Timber.e(throwable)
                 if (throwable is ClientError && throwable.reason == ClientErrorCause.Cancelled) {
-                    _state.update {
-                        it.copy(uiState = UiState.Failure("로그인이 취소되었습니다"))
-                    }
-                    _sideEffect.emit(
-                        AuthSideEffect.ShowSnackbar(
-                            message = "로그인이 취소되었습니다"
-                        )
-                    )
+                    handleError(message = "로그인이 취소되었습니다")
                     return@onFailure
                 }
-
-                _state.update {
-                    it.copy(uiState = UiState.Failure(throwable.toHandleErrorMessage()))
-                }
-                _sideEffect.emit(
-                    AuthSideEffect.ShowSnackbar(
-                        message = throwable.toHandleErrorMessage()
-                    )
-                )
+                handleError(throwable)
             }
     }
 
     fun navigateUp() {
         viewModelScope.launch {
-            Timber.e("navigateUp")
-            sseManager.stopSubscription()
             _sideEffect.emit(AuthSideEffect.NavigateToSelection)
             _state.update { it.copy(uiState = UiState.Empty) }
         }
+    }
+
+    private suspend fun handleError(
+        throwable: Throwable? = null,
+        message: String = throwable?.toHandleErrorMessage().orEmpty()
+    ) {
+        _state.update { it.copy(uiState = UiState.Failure(message)) }
+        _sideEffect.emit(AuthSideEffect.ShowSnackbar(message = message))
     }
 }
