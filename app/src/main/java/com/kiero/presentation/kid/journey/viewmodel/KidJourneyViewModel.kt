@@ -11,7 +11,7 @@ import com.kiero.data.sse.manager.SseManager
 import com.kiero.presentation.kid.journey.model.KidJourneyContentUiModel
 import com.kiero.presentation.kid.journey.model.KidJourneyHeaderUiModel
 import com.kiero.presentation.kid.journey.model.KidJourneyScheduleUiModel
-import com.kiero.presentation.kid.journey.model.StoneUiType
+import com.kiero.presentation.kid.journey.model.KidJourneyStoneType
 import com.kiero.presentation.kid.journey.state.KidJourneySideEffect
 import com.kiero.presentation.kid.journey.state.KidJourneyState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -59,7 +59,6 @@ class KidJourneyViewModel @Inject constructor(
                     )
                 )
             }
-
             is UiState.Loading -> UiState.Loading
             is UiState.Failure -> UiState.Failure(uiState.message)
             is UiState.Empty -> UiState.Empty
@@ -96,7 +95,7 @@ class KidJourneyViewModel @Inject constructor(
         viewModelScope.launch {
             repository.patchScheduleToday()
                 .onSuccess { scheduleData ->
-                    val stoneType = scheduleData.stoneType?.let { StoneUiType.from(it) }
+                    val stoneType = scheduleData.stoneType?.let { KidJourneyStoneType.from(it) }
                     val scheduleInfo = KidJourneyScheduleUiModel(
                         order = scheduleData.scheduleOrder,
                         startTime = scheduleData.startTime,

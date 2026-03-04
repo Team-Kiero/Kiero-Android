@@ -2,7 +2,7 @@ package com.kiero.presentation.kid.journey.fire.state
 
 import androidx.compose.runtime.Immutable
 import com.kiero.presentation.kid.journey.fire.model.KidFireUiModel
-import com.kiero.presentation.kid.journey.model.StoneUiType
+import com.kiero.presentation.kid.journey.model.KidJourneyStoneType
 
 @Immutable
 data class KidFireResultState(
@@ -13,9 +13,9 @@ data class KidFireResultState(
         fun fake() = KidFireResultState(
             content = KidFireUiModel(
                 earnedStones = listOf(
-                    StoneUiType.WISDOM,
-                    StoneUiType.COURAGE,
-                    StoneUiType.GRIT
+                    KidJourneyStoneType.WISDOM,
+                    KidJourneyStoneType.COURAGE,
+                    KidJourneyStoneType.GRIT
                 ),
                 earnedCoin = 10
             )

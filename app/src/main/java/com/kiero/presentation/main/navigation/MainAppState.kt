@@ -16,7 +16,7 @@ import com.kiero.presentation.auth.parent.navigation.navigateToAuthParent
 import com.kiero.presentation.kid.journey.camera.navigation.navigateToCamera
 import com.kiero.presentation.kid.journey.fire.navigation.navigateToFire
 import com.kiero.presentation.kid.journey.fire.navigation.navigateToFireResult
-import com.kiero.presentation.kid.journey.model.StoneUiType
+import com.kiero.presentation.kid.journey.model.KidJourneyStoneType
 import com.kiero.presentation.kid.journey.navigation.navigateToJourney
 import com.kiero.presentation.kid.mission.navigation.navigateToMission
 import com.kiero.presentation.kid.navigation.Journey
@@ -25,17 +25,17 @@ import com.kiero.presentation.kid.navigation.Mission
 import com.kiero.presentation.kid.navigation.Wish
 import com.kiero.presentation.kid.onboarding.navigation.navigateToKidOnboarding
 import com.kiero.presentation.kid.wish.navigation.navigateToWish
-import com.kiero.presentation.parent.screen.alarm.navigation.navigateToAlarm
-import com.kiero.presentation.parent.screen.journey.navigation.navigateToParentJourney
-import com.kiero.presentation.parent.screen.mypage.navigation.navigateToMypage
 import com.kiero.presentation.parent.navigation.Mypage
 import com.kiero.presentation.parent.navigation.ParentGraph
 import com.kiero.presentation.parent.navigation.ParentJourney
 import com.kiero.presentation.parent.navigation.ParentMission
 import com.kiero.presentation.parent.navigation.Reward
 import com.kiero.presentation.parent.navigation.Schedule
+import com.kiero.presentation.parent.screen.alarm.navigation.navigateToAlarm
+import com.kiero.presentation.parent.screen.journey.navigation.navigateToParentJourney
 import com.kiero.presentation.parent.screen.mission.navigation.navigateToMissionAdd
 import com.kiero.presentation.parent.screen.mission.navigation.navigateToParentMission
+import com.kiero.presentation.parent.screen.mypage.navigation.navigateToMypage
 import com.kiero.presentation.parent.screen.reward.navigation.navigateToReward
 import com.kiero.presentation.parent.screen.schedule.navigation.navigateToSchedule
 import com.kiero.presentation.parent.screen.schedule.plan.navigation.navigateToScheduleAdd
@@ -222,7 +222,7 @@ class MainAppState(
 
     fun navigateToCamera(
         scheduleDetailId: Long,
-        stoneType: StoneUiType,
+        stoneType: KidJourneyStoneType,
         navOptions: NavOptions? = null,
     ) = navController.navigateToCamera(
         scheduleDetailId = scheduleDetailId,
