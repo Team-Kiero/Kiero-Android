@@ -37,7 +37,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import com.kiero.R
 import com.kiero.core.common.extension.collectSideEffect
-import com.kiero.core.common.extension.forcePixelToDp
 import com.kiero.core.designsystem.component.chip.KieroChip
 import com.kiero.core.designsystem.component.chip.action.KieroCoinAction
 import com.kiero.core.designsystem.component.dialog.KieroDialog
