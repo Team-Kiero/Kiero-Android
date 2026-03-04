@@ -18,24 +18,24 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.kiero.R
 import com.kiero.core.designsystem.theme.KieroTheme
-import com.kiero.presentation.kid.journey.map.model.MapScheduleStatus
+import com.kiero.presentation.kid.journey.map.model.KidMapScheduleStatus
 
 @Composable
 fun KidMapTimelineNode(
     isOngoing: Boolean,
-    status: MapScheduleStatus,
+    status: KidMapScheduleStatus,
     modifier: Modifier = Modifier
 ) {
-    val showConnectorLine = isOngoing || status == MapScheduleStatus.PENDING
+    val showLine = isOngoing || status == KidMapScheduleStatus.PENDING
 
     val iconColor = when {
         isOngoing -> KieroTheme.colors.main
-        status == MapScheduleStatus.PENDING -> KieroTheme.colors.white
+        status == KidMapScheduleStatus.PENDING -> KieroTheme.colors.white
         else -> KieroTheme.colors.white.copy(alpha = 0.5f)
     }
 
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
-        if (showConnectorLine) {
+        if (showLine) {
             Icon(
                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_kid_map_line),
                 contentDescription = null,
