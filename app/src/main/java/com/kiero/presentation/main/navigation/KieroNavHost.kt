@@ -65,10 +65,8 @@ fun KieroNavHost(
             paddingValues = paddingValues,
             navigateUp = appState::navigateUp,
             navigateToParentGraph = appState::navigateToParentGraph,
-            navigateToParentSignUp = { parentName, parentProfileImage ->
+            navigateToParentSignUp = {
                 appState.navigateToParentSignUp(
-                    parentName = parentName,
-                    parentProfileImage = parentProfileImage,
                     navOptions = clearStackNavOptions
                 )
             },
