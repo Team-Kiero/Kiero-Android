@@ -20,28 +20,28 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.theme.KieroTheme
-import com.kiero.presentation.kid.journey.map.model.MapScheduleStatus
+import com.kiero.presentation.kid.journey.map.model.KidMapScheduleStatus
 import com.kiero.presentation.kid.journey.model.KidJourneyStoneType
 
 @Composable
 fun KidMapStoneBadge(
     stoneType: KidJourneyStoneType,
-    status: MapScheduleStatus,
+    status: KidMapScheduleStatus,
     modifier: Modifier = Modifier
 ) {
     val borderColor = when (status) {
-        MapScheduleStatus.COMPLETE,
-        MapScheduleStatus.VERIFIED -> KieroTheme.colors.main
-        MapScheduleStatus.FAILED,
-        MapScheduleStatus.SKIPPED -> KieroTheme.colors.point
-        MapScheduleStatus.PENDING -> KieroTheme.colors.white
+        KidMapScheduleStatus.COMPLETE,
+        KidMapScheduleStatus.VERIFIED -> KieroTheme.colors.main
+        KidMapScheduleStatus.FAILED,
+        KidMapScheduleStatus.SKIPPED -> KieroTheme.colors.point
+        KidMapScheduleStatus.PENDING -> KieroTheme.colors.white
     }
 
     val statusLabel: Pair<String, Color>? = when (status) {
-        MapScheduleStatus.COMPLETE,
-        MapScheduleStatus.VERIFIED -> Pair("획득!", KieroTheme.colors.main)
-        MapScheduleStatus.FAILED,
-        MapScheduleStatus.SKIPPED -> Pair("실패!", KieroTheme.colors.point)
+        KidMapScheduleStatus.COMPLETE,
+        KidMapScheduleStatus.VERIFIED -> Pair("획득!", KieroTheme.colors.main)
+        KidMapScheduleStatus.FAILED,
+        KidMapScheduleStatus.SKIPPED -> Pair("실패!", KieroTheme.colors.point)
         else -> null
     }
 
