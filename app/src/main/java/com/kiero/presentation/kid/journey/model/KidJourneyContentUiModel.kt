@@ -18,7 +18,7 @@ sealed interface KidJourneyContentUiModel {
     data class FirstSchedule(
         val scheduleDetailId: Long?,
         val scheduleName: String?,
-        val stoneType: StoneUiType?,
+        val stoneType: KidJourneyStoneType?,
         val scheduleInfo: KidJourneyScheduleUiModel,
         val isSkippable: Boolean,
         val isNowScheduleVerified: Boolean
@@ -31,7 +31,7 @@ sealed interface KidJourneyContentUiModel {
     data class NowSchedule(
         val scheduleDetailId: Long?,
         val scheduleName: String?,
-        val stoneType: StoneUiType?,
+        val stoneType: KidJourneyStoneType?,
         val scheduleInfo: KidJourneyScheduleUiModel,
         val isSkippable: Boolean,
         val isNowScheduleVerified: Boolean
@@ -44,7 +44,7 @@ sealed interface KidJourneyContentUiModel {
     data class NextSchedule(
         val scheduleDetailId: Long?,
         val scheduleName: String?,
-        val stoneType: StoneUiType?,
+        val stoneType: KidJourneyStoneType?,
         val scheduleInfo: KidJourneyScheduleUiModel,
         val isSkippable: Boolean,
         val isNowScheduleVerified: Boolean

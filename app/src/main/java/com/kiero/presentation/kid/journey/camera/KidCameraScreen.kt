@@ -18,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
@@ -45,7 +44,7 @@ import com.kiero.presentation.kid.component.KidSpeechField
 import com.kiero.presentation.kid.journey.camera.component.StoneFloating
 import com.kiero.presentation.kid.journey.camera.state.KidCameraSideEffect
 import com.kiero.presentation.kid.journey.camera.viewModel.KidCameraViewModel
-import com.kiero.presentation.kid.journey.model.StoneUiType
+import com.kiero.presentation.kid.journey.model.KidJourneyStoneType
 import timber.log.Timber
 import java.io.File
 import java.io.IOException
@@ -125,7 +124,7 @@ fun KidCameraRoute(
 @Composable
 private fun KidCameraScreen(
     imageUri: Uri?,
-    stoneType: StoneUiType,
+    stoneType: KidJourneyStoneType,
     modifier: Modifier = Modifier
 ) {
 
@@ -197,7 +196,7 @@ private fun KidCameraScreenPreview() {
     KieroTheme {
         KidCameraScreen(
             imageUri = null,
-            stoneType = StoneUiType.COURAGE
+            stoneType = KidJourneyStoneType.COURAGE
         )
     }
 }

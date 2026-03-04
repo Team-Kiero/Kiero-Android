@@ -11,7 +11,7 @@ import com.kiero.data.sse.manager.SseManager
 import com.kiero.presentation.kid.journey.model.KidJourneyContentUiModel
 import com.kiero.presentation.kid.journey.model.KidJourneyHeaderUiModel
 import com.kiero.presentation.kid.journey.model.KidJourneyScheduleUiModel
-import com.kiero.presentation.kid.journey.model.StoneUiType
+import com.kiero.presentation.kid.journey.model.KidJourneyStoneType
 import com.kiero.presentation.kid.journey.state.KidJourneySideEffect
 import com.kiero.presentation.kid.journey.state.KidJourneyState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -110,7 +110,7 @@ class KidJourneyViewModel @Inject constructor(
                                 ScheduleStatus.FIRST_SCHEDULE -> KidJourneyContentUiModel.FirstSchedule(
                                     scheduleDetailId = scheduleData.scheduleDetailId,
                                     scheduleName = scheduleData.name,
-                                    stoneType = scheduleData.stoneType?.let { StoneUiType.from(it) },
+                                    stoneType = scheduleData.stoneType?.let { KidJourneyStoneType.from(it) },
                                     scheduleInfo = KidJourneyScheduleUiModel(
                                         order = scheduleData.scheduleOrder,
                                         startTime = scheduleData.startTime,
@@ -123,7 +123,7 @@ class KidJourneyViewModel @Inject constructor(
                                 ScheduleStatus.NOW_SCHEDULE_EXIST -> KidJourneyContentUiModel.NowSchedule(
                                     scheduleDetailId = scheduleData.scheduleDetailId,
                                     scheduleName = scheduleData.name,
-                                    stoneType = scheduleData.stoneType?.let { StoneUiType.from(it) },
+                                    stoneType = scheduleData.stoneType?.let { KidJourneyStoneType.from(it) },
                                     scheduleInfo = KidJourneyScheduleUiModel(
                                         order = scheduleData.scheduleOrder,
                                         startTime = scheduleData.startTime,
@@ -136,7 +136,7 @@ class KidJourneyViewModel @Inject constructor(
                                 ScheduleStatus.NEXT_SCHEDULE_EXIST -> KidJourneyContentUiModel.NextSchedule(
                                     scheduleDetailId = scheduleData.scheduleDetailId,
                                     scheduleName = scheduleData.name,
-                                    stoneType = scheduleData.stoneType?.let { StoneUiType.from(it) },
+                                    stoneType = scheduleData.stoneType?.let { KidJourneyStoneType.from(it) },
                                     scheduleInfo = KidJourneyScheduleUiModel(
                                         order = scheduleData.scheduleOrder,
                                         startTime = scheduleData.startTime,
