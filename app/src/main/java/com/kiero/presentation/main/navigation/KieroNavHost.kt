@@ -73,7 +73,6 @@ fun KieroNavHost(
                 )
             },
             navigateToSelection = appState::navigateToSelection,
-            onEasterEggClick = appState::navigateToKidOnboarding
         )
 
         parentSignUpNavGraph(
