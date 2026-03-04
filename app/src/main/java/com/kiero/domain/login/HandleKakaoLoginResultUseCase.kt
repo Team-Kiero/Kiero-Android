@@ -25,10 +25,7 @@ class HandleKakaoLoginResultUseCase @Inject constructor(
             userInfoManager.saveChildIdInfo(childId = children.first().childId)
             KakaoLoginResult.HasChildren(firstChildId = children.first().childId.toInt())
         } else {
-            KakaoLoginResult.NoChildren(
-                parentName = name,
-                parentProfileImage = image
-            )
+            KakaoLoginResult.NoChildren
         }
     }
 }
