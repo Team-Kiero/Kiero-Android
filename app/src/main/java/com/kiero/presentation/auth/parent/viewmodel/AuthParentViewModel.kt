@@ -47,12 +47,7 @@ class AuthParentViewModel @Inject constructor(
                         is KakaoLoginResult.HasChildren ->
                             _sideEffect.emit(AuthSideEffect.NavigateToParentGraph)
                         is KakaoLoginResult.NoChildren ->
-                            _sideEffect.emit(
-                                AuthSideEffect.NavigateToParentSignUp(
-                                    parentName = kakaoLoginResult.parentName,
-                                    parentProfileImage = kakaoLoginResult.parentProfileImage
-                                )
-                            )
+                            _sideEffect.emit(AuthSideEffect.NavigateToParentSignUp)
                     }
                 }.onFailure { throwable ->
                     Timber.e(throwable)

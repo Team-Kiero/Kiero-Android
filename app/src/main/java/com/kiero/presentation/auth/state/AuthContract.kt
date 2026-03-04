@@ -11,10 +11,7 @@ data class AuthState(
 sealed interface AuthSideEffect {
     data object NavigateUp : AuthSideEffect
 
-    data class NavigateToParentSignUp(
-        val parentName: String,
-        val parentProfileImage: String,
-    ) : AuthSideEffect
+    data object NavigateToParentSignUp : AuthSideEffect
 
     data class ShowSnackbar(val message: String) : AuthSideEffect
 
