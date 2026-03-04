@@ -36,12 +36,12 @@ fun KidMapEmptyView(modifier: Modifier = Modifier) {
                 .size(50.dp)
                 .border(width = 1.dp, color = KieroTheme.colors.main, shape = CircleShape)
                 .dropShadow(
-                            shape = CircleShape,
-                            shadow = Shadow(
-                                radius = 8.dp,
-                                color = KieroTheme.colors.main
-                            )
-                        )
+                    shape = CircleShape,
+                    shadow = Shadow(
+                        radius = 8.dp,
+                        color = KieroTheme.colors.main
+                    )
+                )
                 .background(color = KieroTheme.colors.gray900, shape = CircleShape),
             contentAlignment = Alignment.Center
         ) {
