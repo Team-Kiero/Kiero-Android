@@ -62,11 +62,12 @@ private fun KidMapScreen(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
     state: KidMapState,
+    modifier: Modifier = Modifier,
 ) {
     val listState = rememberLazyListState()
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(paddingValues)
     ) {
