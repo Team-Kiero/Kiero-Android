@@ -212,7 +212,7 @@ private fun ParentJourneyLightDivider(
 }
 
 @Composable
-fun GlowingDot(
+private fun GlowingDot(
     modifier: Modifier = Modifier,
     coreColor: Color = KieroTheme.colors.schedule1,
     glowColor: Color = KieroTheme.colors.schedule1,

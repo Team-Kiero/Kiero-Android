@@ -51,5 +51,7 @@ data class ParentJourneyState(
 }
 
 sealed interface ParentJourneySideEffect {
-    object NavigateUp : ParentJourneySideEffect
+    data object NavigateUp : ParentJourneySideEffect
+
+    data class ShowSnackbar(val message: String) : ParentJourneySideEffect
 }
