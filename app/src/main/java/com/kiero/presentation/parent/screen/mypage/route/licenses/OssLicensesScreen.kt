@@ -10,8 +10,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults
 import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
+import com.mikepenz.aboutlibraries.ui.compose.m3.libraryColors
 
 @Composable
 fun OssLicensesScreen(
@@ -32,6 +34,10 @@ fun OssLicensesScreen(
         )
         LibrariesContainer(
             libraries = libraries,
+            colors = LibraryDefaults.libraryColors(
+                libraryContentColor = KieroTheme.colors.white,
+                libraryBackgroundColor = KieroTheme.colors.gray900
+            ),
             modifier = Modifier.fillMaxSize()
         )
     }
