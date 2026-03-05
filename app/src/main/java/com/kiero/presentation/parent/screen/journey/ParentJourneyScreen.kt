@@ -18,6 +18,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.core.model.trigger.SnackbarState
+import com.kiero.core.trigger.LocalGlobalUiEventTrigger
 import com.kiero.presentation.parent.screen.journey.component.ParentJourneyTodayKidInfo
 import com.kiero.presentation.parent.screen.journey.component.ParentJourneyTodayMissionStatus
 import com.kiero.presentation.parent.screen.journey.component.ParentJourneyTodayStatusItem
@@ -29,11 +31,17 @@ fun ParentJourneyRoute(
     navigateUp: () -> Unit,
     viewModel: ParentJourneyViewModel = hiltViewModel()
 ) {
+    val globalUiEventHolder = LocalGlobalUiEventTrigger.current
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     viewModel.sideEffect.collectSideEffect {
         when (it) {
             ParentJourneySideEffect.NavigateUp -> navigateUp()
+            is ParentJourneySideEffect.ShowSnackbar -> globalUiEventHolder.showSnackbar(
+                SnackbarState(
+                    message = it.message
+                )
+            )
         }
     }
 
