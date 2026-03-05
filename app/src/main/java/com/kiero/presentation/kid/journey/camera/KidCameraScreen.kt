@@ -105,7 +105,7 @@ private fun KidCameraScreen(
 ) {
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(KieroTheme.colors.black)
     ) {
@@ -123,7 +123,7 @@ private fun KidCameraScreen(
             )
 
             KidSpeechField(
-                modifier = modifier
+                modifier = Modifier
                     .padding(top = 87.dp, start = 16.dp, end = 16.dp)
             ) {
                 Text(
