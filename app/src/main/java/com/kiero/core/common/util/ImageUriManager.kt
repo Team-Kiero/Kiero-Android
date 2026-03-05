@@ -3,6 +3,8 @@ package com.kiero.core.common.util
 import android.content.Context
 import androidx.core.content.FileProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 import java.io.IOException
@@ -11,8 +13,8 @@ import javax.inject.Inject
 class ImageUriManager @Inject constructor(
     @param:ApplicationContext private val context: Context
 ) {
-    fun createTempImageUri(): String? {
-        return try {
+    suspend fun createTempImageUri(): String? = withContext(Dispatchers.IO) {
+        try {
             val directory = File(context.cacheDir, "images").apply {
                 if (!exists()) mkdirs()
             }

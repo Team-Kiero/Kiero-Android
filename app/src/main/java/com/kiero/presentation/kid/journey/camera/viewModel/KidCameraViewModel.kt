@@ -13,7 +13,6 @@ import com.kiero.presentation.kid.journey.camera.navigation.Camera
 import com.kiero.presentation.kid.journey.camera.state.KidCameraSideEffect
 import com.kiero.presentation.kid.journey.camera.state.KidCameraState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -22,7 +21,6 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -51,9 +49,7 @@ class KidCameraViewModel @Inject constructor(
         if (_state.value.successData?.tempUri != null) return
 
         viewModelScope.launch {
-            val uriString = withContext(Dispatchers.IO) {
-                imageUriManager.createTempImageUri()
-            }
+            val uriString = imageUriManager.createTempImageUri()
 
             if (uriString != null) {
                 updateTempUri(uriString)
