@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
+import com.kiero.core.common.extension.verticalScrollbar
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.component.button.KieroButtonMedium
 import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
@@ -69,6 +70,7 @@ private fun KidMapScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
+            .background(KieroTheme.colors.black)
             .padding(paddingValues)
     ) {
         Image(
@@ -121,7 +123,8 @@ private fun KidMapScreen(
                     LazyColumn(
                         state = listState,
                         modifier = Modifier
-                            .weight(1f),
+                            .weight(1f)
+                            .verticalScrollbar(state = listState),
                         contentPadding = PaddingValues(horizontal = 20.dp),
                         verticalArrangement = Arrangement.spacedBy(14.dp)
                     ) {
@@ -140,7 +143,7 @@ private fun KidMapScreen(
 
                 KieroButtonMedium(
                     text = "확인",
-                    onClick = {},
+                    onClick = navigateUp,
                     containerColor = KieroTheme.colors.gray100,
                     contentColor = KieroTheme.colors.gray900,
                     modifier = Modifier
