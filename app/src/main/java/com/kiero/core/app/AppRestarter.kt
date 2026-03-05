@@ -1,4 +1,4 @@
-package com.kiero.core.common.app
+package com.kiero.core.app
 
 interface AppRestarter {
     fun restartApp()

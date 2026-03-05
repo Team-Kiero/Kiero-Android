@@ -2,7 +2,7 @@ package com.kiero.presentation.parent.screen.mypage
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kiero.core.common.app.AppRestarter
+import com.kiero.core.app.AppRestarter
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.model.parent.ParentInfo
 import com.kiero.data.auth.repository.AuthRepository

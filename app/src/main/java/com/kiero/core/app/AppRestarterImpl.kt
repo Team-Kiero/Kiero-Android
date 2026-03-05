@@ -1,4 +1,4 @@
-package com.kiero.core.common.app
+package com.kiero.core.app
 
 import android.content.Context
 import android.content.Intent

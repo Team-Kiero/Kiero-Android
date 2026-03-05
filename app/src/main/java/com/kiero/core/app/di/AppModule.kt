@@ -1,7 +1,7 @@
-package com.kiero.core.common.app.di
+package com.kiero.core.app.di
 
-import com.kiero.core.common.app.AppRestarter
-import com.kiero.core.common.app.AppRestarterImpl
+import com.kiero.core.app.AppRestarter
+import com.kiero.core.app.AppRestarterImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
