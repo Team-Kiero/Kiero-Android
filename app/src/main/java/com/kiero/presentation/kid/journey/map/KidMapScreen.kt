@@ -62,11 +62,12 @@ private fun KidMapScreen(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
     state: KidMapState,
+    modifier: Modifier = Modifier,
 ) {
     val listState = rememberLazyListState()
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(paddingValues)
     ) {
@@ -115,12 +116,14 @@ private fun KidMapScreen(
                         )
                     }
 
+                    Spacer(modifier = Modifier.height(25.dp))
+
                     LazyColumn(
                         state = listState,
                         modifier = Modifier
                             .weight(1f),
-                        contentPadding = PaddingValues(vertical = 20.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        contentPadding = PaddingValues(horizontal = 20.dp),
+                        verticalArrangement = Arrangement.spacedBy(14.dp)
                     ) {
                         itemsIndexed(
                             items = state.schedules,
@@ -151,7 +154,7 @@ private fun KidMapScreen(
 @Preview
 @Composable
 private fun KidMapScreenPreview() {
-    KieroTheme{
+    KieroTheme {
         KidMapScreen(
             paddingValues = PaddingValues(),
             navigateUp = {},
