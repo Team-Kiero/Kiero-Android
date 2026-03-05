@@ -39,7 +39,7 @@ import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
 import com.kiero.presentation.kid.component.KidSpeechField
-import com.kiero.presentation.kid.journey.camera.component.StoneFloating
+import com.kiero.presentation.kid.journey.camera.component.KidCameraStoneFloating
 import com.kiero.presentation.kid.journey.camera.state.KidCameraSideEffect
 import com.kiero.presentation.kid.journey.camera.viewModel.KidCameraViewModel
 import com.kiero.presentation.kid.journey.model.StoneUiType
@@ -144,7 +144,7 @@ private fun KidCameraScreen(
                     .align(Alignment.BottomCenter),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                StoneFloating(
+                KidCameraStoneFloating(
                     stoneImageRes = stoneType.imageRes,
                     modifier = Modifier.padding(horizontal = 110.dp)
                 )
@@ -164,7 +164,6 @@ private fun KidCameraScreen(
         }
     }
 }
-
 
 @Composable
 @Preview

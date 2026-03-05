@@ -16,7 +16,7 @@ import androidx.compose.ui.res.painterResource
 import kotlinx.coroutines.delay
 
 @Composable
-fun StoneMoving(
+fun KieroFireStoneMoving(
     stoneRes: Int,
     modifier: Modifier = Modifier
 ) {

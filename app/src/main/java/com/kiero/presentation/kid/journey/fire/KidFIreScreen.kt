@@ -27,7 +27,7 @@ import com.kiero.core.designsystem.component.chip.action.KieroTextAction
 import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
-import com.kiero.presentation.kid.journey.fire.component.KieroButtonLarge
+import com.kiero.presentation.kid.journey.fire.component.KieroFireButton
 import com.kiero.presentation.kid.journey.fire.state.KidFireState
 import com.kiero.presentation.kid.journey.fire.viewModel.KidFireViewModel
 
@@ -133,7 +133,7 @@ private fun KidFIreScreen(
                     verticalPadding = 4,
                 )
             }
-            KieroButtonLarge(
+            KieroFireButton(
                 stoneCount = state.stones,
                 onClick = onClick,
                 modifier = Modifier

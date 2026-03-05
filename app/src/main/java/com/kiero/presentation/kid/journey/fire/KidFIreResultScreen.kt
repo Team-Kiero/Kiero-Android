@@ -42,7 +42,7 @@ import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
 import com.kiero.presentation.kid.component.KidSpeechField
-import com.kiero.presentation.kid.journey.fire.component.StoneMoving
+import com.kiero.presentation.kid.journey.fire.component.KieroFireStoneMoving
 import com.kiero.presentation.kid.journey.fire.state.KidFireResultState
 import com.kiero.presentation.kid.journey.fire.viewModel.KidFireResultVIewModel
 import com.kiero.presentation.kid.journey.model.StoneUiType
@@ -197,7 +197,7 @@ private fun KidFIreResultScreen(
                     .align(Alignment.Center)
                     .padding(top = 240.dp)
             ) { stone ->
-                StoneMoving(stoneRes = stone!!.imageRes)
+                KieroFireStoneMoving(stoneRes = stone!!.imageRes)
             }
         }
 

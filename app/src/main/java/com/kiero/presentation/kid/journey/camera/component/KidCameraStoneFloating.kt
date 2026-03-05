@@ -18,7 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.kiero.R
 
 @Composable
-fun StoneFloating(
+fun KidCameraStoneFloating(
     stoneImageRes: Int,
     modifier: Modifier = Modifier
 ) {
@@ -53,7 +53,7 @@ fun StoneFloating(
 @Preview
 @Composable
 private fun StoneFloatingPreview() {
-    StoneFloating(
+    KidCameraStoneFloating(
         stoneImageRes = R.drawable.img_kid_journey_stone_blue
     )
 }
