@@ -59,7 +59,7 @@ fun KidMapStoneBadge(
                         Modifier.dropShadow(
                             shape = CircleShape,
                             shadow = Shadow(
-                                radius = 3.dp,
+                                radius = 4.dp,
                                 spread = 0.dp,
                                 color = borderColor,
                                 offset = DpOffset(x = 0.dp, y = 0.dp)

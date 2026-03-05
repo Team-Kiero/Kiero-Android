@@ -74,7 +74,7 @@ fun KidMapTimelineNode(
                         Modifier.dropShadow(
                             shape = starShape,
                             shadow = Shadow(
-                                radius = 2.dp,
+                                radius = 3.dp,
                                 spread = 0.dp,
                                 color = KieroTheme.colors.main,
                                 offset = DpOffset(x = 0.dp, y = 0.dp)
