@@ -6,6 +6,7 @@ import com.kiero.core.common.app.AppRestarter
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.model.parent.ParentInfo
 import com.kiero.data.auth.repository.AuthRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -15,12 +16,12 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
+@HiltViewModel
 class ParentMyPageViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val userInfoManager: UserInfoManager,
     private val appRestarter: AppRestarter
 ) : ViewModel() {
-
     private val _state = MutableStateFlow(ParentMyPageState())
     val state = _state.asStateFlow()
 
@@ -34,10 +35,13 @@ class ParentMyPageViewModel @Inject constructor(
 
     fun fetchInfo() {
         viewModelScope.launch {
+            val kidInfo = userInfoManager.getChildIdInfo()
             val userInfo = userInfoManager.getParentInfo()
+
             _state.update {
                 it.copy(
-                    parentInfo = userInfo ?: ParentInfo()
+                    parentInfo = userInfo ?: ParentInfo(),
+                    connectedChildren = if (kidInfo != null) 1 else 0
                 )
             }
         }
@@ -52,9 +56,7 @@ class ParentMyPageViewModel @Inject constructor(
                 }
                 .onFailure {
                     Timber.e("Logout failed $it")
-
                 }
-
         }
     }
 }

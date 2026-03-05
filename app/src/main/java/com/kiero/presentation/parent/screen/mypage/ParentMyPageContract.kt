@@ -3,7 +3,8 @@ package com.kiero.presentation.parent.screen.mypage
 import com.kiero.core.model.parent.ParentInfo
 
 data class ParentMyPageState(
-    val parentInfo : ParentInfo = ParentInfo()
+    val parentInfo : ParentInfo = ParentInfo(),
+    val connectedChildren: Int = 0
 )
 
 sealed interface ParentMyPageSideEffect {

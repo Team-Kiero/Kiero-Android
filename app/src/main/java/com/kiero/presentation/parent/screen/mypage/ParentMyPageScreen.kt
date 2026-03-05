@@ -99,7 +99,7 @@ private fun ParentMyPageScreen(
                 .padding(paddingValues)
         ) {
             ParentMyPageUserInfo(
-                info = state.parentInfo
+                info = state.parentInfo,
             )
 
             Spacer(modifier = Modifier.height(11.dp))
@@ -111,7 +111,8 @@ private fun ParentMyPageScreen(
             ) {
                 SettingItem(
                     text = "자녀 관리",
-                    onClick = onClickChildCare
+                    onClick = onClickChildCare,
+                    connectChildren = state.connectedChildren
                 )
 
                 SettingItem(
