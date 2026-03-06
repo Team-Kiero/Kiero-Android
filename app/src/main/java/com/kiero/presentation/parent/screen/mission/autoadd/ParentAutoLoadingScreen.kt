@@ -28,7 +28,6 @@ import com.kiero.core.designsystem.theme.KieroTheme
 @Composable
 fun ParentAutoLoadingScreen(
     paddingValues: PaddingValues,
-    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -58,17 +57,6 @@ fun ParentAutoLoadingScreen(
             )
         }
 
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 65.dp)
-        ) { data ->
-            KieroSnackbar(
-                message = data.visuals.message,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-        }
     }
 }
 
@@ -78,7 +66,6 @@ private fun ParentAutoLoadingScreenPreview() {
     KieroTheme {
         ParentAutoLoadingScreen(
             paddingValues = PaddingValues(),
-            snackbarHostState = remember { SnackbarHostState() }
         )
     }
 }

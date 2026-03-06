@@ -37,7 +37,6 @@ fun ParentAutoMissionEditForm(
     onDateClick: () -> Unit,
     onRewardClick: (Int) -> Unit,
     awardTextFieldState: TextFieldState,
-    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
     val dateToDisplay = remember(selectedDate, mission.dueAt) {
@@ -112,12 +111,6 @@ fun ParentAutoMissionEditForm(
                 .padding(horizontal = 25.dp)
                 .padding(bottom = 36.dp)
         ) {
-            SnackbarHost(hostState = snackbarHostState) { data ->
-                ParentLocalKieroSnackbar(
-                    message = data.visuals.message,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
         }
     }
 }

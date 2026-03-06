@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,6 +33,7 @@ import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.component.button.KieroButtonMedium
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
 import com.kiero.presentation.parent.screen.mission.autoadd.component.ScrollableAutoInputField
 import com.kiero.presentation.parent.screen.mission.autoadd.state.AutoMissionSideEffect
@@ -46,27 +48,28 @@ fun ParentAutoAddRoute(
     viewModel: AutoMissionViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-
+    val globalUiEventHolder = LocalGlobalUiEventTrigger.current
 
     viewModel.sideEffect.collectSideEffect { effect ->
         when (effect) {
             is AutoMissionSideEffect.ShowToast -> {
-                snackbarHostState.showSnackbar(effect.message)
+                globalUiEventHolder.showSnackbar(
+                    SnackbarState(message = effect.message)
+                )
             }
 
             is AutoMissionSideEffect.NavigateBack -> {
                 navigateUp()
             }
 
-            is AutoMissionSideEffect.ScrollToPage -> {
-            }
-
             is AutoMissionSideEffect.ShowToastAndNavigate -> {
-                Timber.e("parent auto add")
-                snackbarHostState.showSnackbar(effect.message)
+                globalUiEventHolder.showSnackbar(
+                    SnackbarState(message = effect.message)
+                )
                 navigateUp()
             }
+
+            else -> Unit
         }
     }
 
@@ -74,7 +77,6 @@ fun ParentAutoAddRoute(
         AutoMissionState.Screen.LOADING -> {
             ParentAutoLoadingScreen(
                 paddingValues = paddingValues,
-                snackbarHostState = snackbarHostState
             )
         }
 
@@ -83,7 +85,6 @@ fun ParentAutoAddRoute(
                 paddingValues = paddingValues,
                 state = state,
                 viewModel = viewModel,
-                snackbarHostState = snackbarHostState,
                 navigateUp = navigateUp
             )
         }
@@ -94,7 +95,7 @@ fun ParentAutoAddRoute(
                 isAnalyzeEnabled = state.isAnalyzeEnabled,
                 onTextChange = viewModel::updateNoticeText,
                 onAnalyzeClick = viewModel::analyzeNotice,
-                onCancelClick = viewModel::handleCancel,
+                onCancelClick = navigateUp,
                 paddingValues = paddingValues
             )
         }

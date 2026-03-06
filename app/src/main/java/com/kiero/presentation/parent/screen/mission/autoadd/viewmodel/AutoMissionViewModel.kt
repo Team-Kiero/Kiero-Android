@@ -53,6 +53,8 @@ class AutoMissionViewModel @Inject constructor(
         _state.update { it.copy(noticeText = text) }
     }
 
+    // Todo : 문자열 처리, .replace("\"", "\\\"") 같은 텍스트 가공은 Repository나 StringUtil로 옮기기
+    // 실행 흐름(로딩 시작 -> 데이터 요청 -> 상태 업데이트)만 관리
     fun analyzeNotice() {
         viewModelScope.launch {
             _state.update { it.copy(isAnalyzing = true) }
@@ -62,6 +64,7 @@ class AutoMissionViewModel @Inject constructor(
                 .replace("\"", "\\\"")
                 .replace("\n", "\\n")
 
+            // Todo : domainData.map { ... }나 missions.map { SuggestedMissionModel(...) } 같은 변환 로직은 별도의 Mapper 파일로 추출
             autoMissionRepository.analyzeNotice(escapedText)
                 .onSuccess { domainData ->
                     if (domainData.suggestedMissions.isEmpty()) {
@@ -107,6 +110,10 @@ class AutoMissionViewModel @Inject constructor(
         }
     }
 
+    /*
+    Todo : updateMissionName/Date/Reward: 리스트의 특정 항목을 수정하는 함수는 유지하되,
+           리스트 복사 로직은 공통 유틸 함수를 써서 가독성을 높여야 합니다.
+     */
     fun updateMissionName(name: String) {
         val trimmedName = if (name.length > 15) name.substring(0, 15) else name
 
@@ -139,6 +146,7 @@ class AutoMissionViewModel @Inject constructor(
         }
     }
 
+    // Todo : 내 범위 체크: 보상 금액이 MIN/MAX를 넘는지 체크하고 메시지를 결정하는 로직은 Domain 로직
     fun onAwardClick(change: Int) {
         val currentState = _state.value
         val currentReward = currentState.currentReward
@@ -179,6 +187,7 @@ class AutoMissionViewModel @Inject constructor(
         }
     }
 
+    // 현재 보고 있는 페이지 번호를 관리하는 것은 전형적인 UI 상태 관리.
     fun updateCurrentIndex(index: Int) {
         _state.update { currentState ->
             val newHasViewedLastPage = if (index == currentState.missions.size - 1) {
@@ -201,6 +210,7 @@ class AutoMissionViewModel @Inject constructor(
         }
     }
 
+    // 저장 프로세스 제어만 담당하고, 내부의 복잡한 검증과 매핑은 외부 유틸에 맡기기.
     fun saveAllMissions() {
         viewModelScope.launch {
             val childId = userInfoManager.getChildIdInfo() ?: return@launch
@@ -267,12 +277,7 @@ class AutoMissionViewModel @Inject constructor(
         }
     }
 
-    fun handleCancel() {
-        viewModelScope.launch {
-            _sideEffect.emit(AutoMissionSideEffect.NavigateBack)
-        }
-    }
-
+    // Todo : BottomSheet 노출 여부를 rememberSaveable 변수로 관리
     fun showDatePicker() {
         _state.update { it.copy(showBottomSheet = true) }
     }
@@ -281,6 +286,7 @@ class AutoMissionViewModel @Inject constructor(
         _state.update { it.copy(showBottomSheet = false) }
     }
 
+    // Todo : UI에서 직접 updateMissionDate를 호출
     fun onDateSelected(date: LocalDate) {
         updateMissionDate(date)
     }
@@ -333,6 +339,7 @@ class AutoMissionViewModel @Inject constructor(
         }
     }
 
+    // Todo : 입력값의 유효성을 검사하는 로직은 Validator(검증기) 클래스나 Domain 모델의 확장 함수로 분리
     private fun getErrorMessage(mission: MissionUiModel): String = when {
         mission.name.isBlank() -> "미션 이름을 입력해주세요."
         mission.dueAt.isBefore(LocalDate.now()) -> "마감일은 과거로 설정할 수 없습니다."

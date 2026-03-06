@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
@@ -25,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.kiero.R
+import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.component.button.KieroButtonMedium
 import com.kiero.core.designsystem.theme.KieroTheme
@@ -44,9 +46,21 @@ fun ParentAutoResultRoute(
     paddingValues: PaddingValues,
     state: AutoMissionState,
     navigateUp: () -> Unit,
-    viewModel: AutoMissionViewModel,
-    snackbarHostState: SnackbarHostState,
+    viewModel: AutoMissionViewModel = hiltViewModel(),
 ) {
+    val pagerState = rememberPagerState(
+        initialPage = state.currentIndex,
+        pageCount = { state.missions.size }
+    )
+
+    viewModel.sideEffect.collectSideEffect { effect ->
+        when (effect) {
+            is AutoMissionSideEffect.ScrollToPage -> {
+                pagerState.animateScrollToPage(effect.index)
+            }
+            else -> {}
+        }
+    }
 
     LaunchedEffect(state.missions) {
         if (state.missions.isNotEmpty() && state.currentIndex == 0) {
@@ -55,13 +69,13 @@ fun ParentAutoResultRoute(
     }
 
     ParentAutoResultScreen(
+        pagerState = pagerState,
         currentIndex = state.currentIndex,
         missions = state.missions,
         selectedDate = state.selectedDate,
         isSaveEnabled = state.isSaveEnabled,
         isSaving = state.isSaving,
         showBottomSheet = state.showBottomSheet,
-
         onMissionNameChange = viewModel::updateMissionName,
         onDateSelected = viewModel::onDateSelected,
         onRewardClick = viewModel::onAwardClick,
@@ -72,12 +86,12 @@ fun ParentAutoResultRoute(
         onDismissDatePicker = viewModel::dismissDatePicker,
         awardTextFieldState = viewModel.awardTextFieldState,
         paddingValues = paddingValues,
-        snackbarHostState = snackbarHostState
     )
 }
 
 @Composable
 fun ParentAutoResultScreen(
+    pagerState: PagerState,
     currentIndex: Int,
     missions: List<MissionUiModel>,
     selectedDate: LocalDate?,
@@ -94,16 +108,10 @@ fun ParentAutoResultScreen(
     onDismissDatePicker: () -> Unit,
     awardTextFieldState: TextFieldState,
     paddingValues: PaddingValues,
-    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
 
     val focusManager = LocalFocusManager.current
-
-    val pagerState = rememberPagerState(
-        initialPage = currentIndex,
-        pageCount = { missions.size }
-    )
 
     LaunchedEffect(pagerState.currentPage) {
         if (pagerState.currentPage != currentIndex) {
@@ -165,7 +173,6 @@ fun ParentAutoResultScreen(
                         onDateClick = onShowDatePicker,
                         onRewardClick = onRewardClick,
                         awardTextFieldState = awardTextFieldState,
-                        snackbarHostState = snackbarHostState
                     )
                 }
             }
@@ -193,18 +200,15 @@ fun ParentAutoResultScreen(
     }
 }
 
-@Preview(showBackground = true,)
+@Preview(showBackground = true)
 @Composable
 private fun ParentAutoResultScreenPreview() {
-    val snackbarHostState = remember { SnackbarHostState() }
     val awardTextFieldState = rememberTextFieldState("20")
-
-    LaunchedEffect(Unit) {
-        snackbarHostState.showSnackbar("보상은 500개까지 설정할 수 있어요.")
-    }
+    val pagerState = rememberPagerState(initialPage = 0, pageCount = { 2 })
 
     KieroTheme {
         ParentAutoResultScreen(
+            pagerState = pagerState,
             currentIndex = 0,
             missions = listOf(
                 MissionUiModel(
@@ -224,7 +228,6 @@ private fun ParentAutoResultScreenPreview() {
             isSaveEnabled = true,
             isSaving = false,
             showBottomSheet = false,
-
             onMissionNameChange = {},
             onDateSelected = {},
             onRewardClick = {},
@@ -235,7 +238,6 @@ private fun ParentAutoResultScreenPreview() {
             onDismissDatePicker = {},
             awardTextFieldState = awardTextFieldState,
             paddingValues = PaddingValues(0.dp),
-            snackbarHostState = snackbarHostState
         )
     }
 }
