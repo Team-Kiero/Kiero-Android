@@ -61,8 +61,8 @@ fun ParentJourneyTodayMissionStatus(
 
         VerticalDivider(
             modifier = Modifier.fillMaxHeight(),
-            color = KieroTheme.colors.gray700,
-            thickness = 2.dp
+            color = KieroTheme.colors.gray800,
+            thickness = 1.dp
         )
 
         ParentJourneyTodayMissionItem(
