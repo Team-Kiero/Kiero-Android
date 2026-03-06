@@ -14,10 +14,12 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -37,7 +39,6 @@ import com.kiero.presentation.parent.screen.mission.autoadd.state.AutoMissionSid
 import com.kiero.presentation.parent.screen.mission.autoadd.state.AutoMissionState
 import com.kiero.presentation.parent.screen.mission.autoadd.viewmodel.AutoMissionViewModel
 import com.kiero.presentation.parent.screen.mission.component.datepicker.component.CalendarBottomSheet
-import timber.log.Timber
 import java.time.LocalDate
 
 
@@ -52,6 +53,7 @@ fun ParentAutoResultRoute(
         initialPage = state.currentIndex,
         pageCount = { state.missions.size }
     )
+    var showBottomSheet by rememberSaveable { mutableStateOf(false) }
 
     viewModel.sideEffect.collectSideEffect { effect ->
         when (effect) {
@@ -75,15 +77,15 @@ fun ParentAutoResultRoute(
         selectedDate = state.selectedDate,
         isSaveEnabled = state.isSaveEnabled,
         isSaving = state.isSaving,
-        showBottomSheet = state.showBottomSheet,
+        showBottomSheet = showBottomSheet,
         onMissionNameChange = viewModel::updateMissionName,
-        onDateSelected = viewModel::onDateSelected,
+        onDateSelected = viewModel::updateMissionDate,
         onRewardClick = viewModel::onAwardClick,
         onIndexChange = viewModel::updateCurrentIndex,
         onSaveClick = { viewModel.saveAllMissions() },
         onCancelClick = viewModel::backToInputScreen,
-        onShowDatePicker = viewModel::showDatePicker,
-        onDismissDatePicker = viewModel::dismissDatePicker,
+        onShowDatePicker = { showBottomSheet = true },
+        onDismissDatePicker = { showBottomSheet = false },
         awardTextFieldState = viewModel.awardTextFieldState,
         paddingValues = paddingValues,
     )

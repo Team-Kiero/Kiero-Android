@@ -15,7 +15,6 @@ data class AutoMissionState(
     val currentIndex: Int = 0,
 
     val selectedDate: LocalDate? = null,
-    val showBottomSheet: Boolean = false,
     val hasViewedLastPage: Boolean = false,
 ) {
     val currentScreen: Screen

@@ -278,14 +278,6 @@ class AutoMissionViewModel @Inject constructor(
     }
 
     // Todo : BottomSheet 노출 여부를 rememberSaveable 변수로 관리
-    fun showDatePicker() {
-        _state.update { it.copy(showBottomSheet = true) }
-    }
-
-    fun dismissDatePicker() {
-        _state.update { it.copy(showBottomSheet = false) }
-    }
-
     // Todo : UI에서 직접 updateMissionDate를 호출
     fun onDateSelected(date: LocalDate) {
         updateMissionDate(date)

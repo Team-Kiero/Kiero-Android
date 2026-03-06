@@ -14,13 +14,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.pager.PagerState
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -28,6 +24,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
 import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.designsystem.component.KieroTopbar
@@ -39,7 +36,6 @@ import com.kiero.presentation.parent.screen.mission.autoadd.component.Scrollable
 import com.kiero.presentation.parent.screen.mission.autoadd.state.AutoMissionSideEffect
 import com.kiero.presentation.parent.screen.mission.autoadd.state.AutoMissionState
 import com.kiero.presentation.parent.screen.mission.autoadd.viewmodel.AutoMissionViewModel
-import timber.log.Timber
 
 @Composable
 fun ParentAutoAddRoute(
