@@ -141,7 +141,6 @@ class AutoMissionViewModel @Inject constructor(
             currentState.copy(
                 missions = updatedMissions,
                 selectedDate = date,
-                showBottomSheet = false
             )
         }
     }
@@ -276,13 +275,6 @@ class AutoMissionViewModel @Inject constructor(
             )
         }
     }
-
-    // Todo : BottomSheet 노출 여부를 rememberSaveable 변수로 관리
-    // Todo : UI에서 직접 updateMissionDate를 호출
-    fun onDateSelected(date: LocalDate) {
-        updateMissionDate(date)
-    }
-
     private fun observeAwardTextFieldChanges() {
         viewModelScope.launch {
             snapshotFlow { awardTextFieldState.text.toString() }
