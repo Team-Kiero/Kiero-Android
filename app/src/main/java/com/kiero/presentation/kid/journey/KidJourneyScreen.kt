@@ -36,7 +36,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -62,8 +61,6 @@ import com.kiero.presentation.kid.journey.component.KidJourneyHeader
 import com.kiero.presentation.kid.journey.component.KidJourneyScheduleItem
 import com.kiero.presentation.kid.journey.model.KidJourneyButtonType
 import com.kiero.presentation.kid.journey.model.KidJourneyContentUiModel
-import com.kiero.presentation.kid.journey.model.KidJourneyHeaderUiModel
-import com.kiero.presentation.kid.journey.model.KidJourneyScheduleUiModel
 import com.kiero.presentation.kid.journey.model.KidJourneyStoneType
 import com.kiero.presentation.kid.journey.state.KidJourneySideEffect
 import com.kiero.presentation.kid.journey.state.KidJourneyState
@@ -234,9 +231,7 @@ private fun KidJourneyScreen(
                         shape = CircleShape,
                         shadow = Shadow(
                             radius = 10.dp,
-                            spread = 0.dp,
                             color = KieroTheme.colors.gray800,
-                            offset = DpOffset(x = 0.dp, y = 0.dp)
                         )
                     )
                     .background(

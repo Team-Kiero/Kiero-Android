@@ -14,7 +14,6 @@ import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.kiero.R
 import com.kiero.core.designsystem.theme.KieroTheme
@@ -75,9 +74,7 @@ fun KidMapTimelineNode(
                             shape = starShape,
                             shadow = Shadow(
                                 radius = 3.dp,
-                                spread = 0.dp,
                                 color = KieroTheme.colors.main,
-                                offset = DpOffset(x = 0.dp, y = 0.dp)
                             )
                         )
                     } else Modifier
