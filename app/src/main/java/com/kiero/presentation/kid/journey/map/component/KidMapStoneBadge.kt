@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.dropShadow
@@ -23,26 +24,42 @@ import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.kid.journey.map.model.KidMapScheduleStatus
 import com.kiero.presentation.kid.journey.model.KidJourneyStoneType
 
+private data class BadgeUiState(
+    val borderColor: Color,
+    val labelText: String,
+    val labelColor: Color
+)
+
 @Composable
 fun KidMapStoneBadge(
     stoneType: KidJourneyStoneType,
     status: KidMapScheduleStatus,
     modifier: Modifier = Modifier
 ) {
-    val borderColor = when (status) {
-        KidMapScheduleStatus.COMPLETE,
-        KidMapScheduleStatus.VERIFIED -> KieroTheme.colors.main
-        KidMapScheduleStatus.FAILED,
-        KidMapScheduleStatus.SKIPPED -> KieroTheme.colors.point
-        KidMapScheduleStatus.PENDING -> KieroTheme.colors.white
-    }
+    val mainColor = KieroTheme.colors.main
+    val pointColor = KieroTheme.colors.point
+    val whiteColor = KieroTheme.colors.white
 
-    val statusLabel: Pair<String, Color>? = when (status) {
-        KidMapScheduleStatus.COMPLETE,
-        KidMapScheduleStatus.VERIFIED -> Pair("획득!", KieroTheme.colors.main)
-        KidMapScheduleStatus.FAILED,
-        KidMapScheduleStatus.SKIPPED -> Pair("실패!", KieroTheme.colors.point)
-        else -> null
+    val badgeStyle = remember(status, mainColor, pointColor, whiteColor) {
+        when (status) {
+            KidMapScheduleStatus.COMPLETE,
+            KidMapScheduleStatus.VERIFIED -> BadgeUiState(
+                borderColor = mainColor,
+                labelText = "획득!",
+                labelColor = mainColor
+            )
+            KidMapScheduleStatus.FAILED,
+            KidMapScheduleStatus.SKIPPED -> BadgeUiState(
+                borderColor = pointColor,
+                labelText = "실패!",
+                labelColor = pointColor
+            )
+            KidMapScheduleStatus.PENDING -> BadgeUiState(
+                borderColor = whiteColor,
+                labelText = "",
+                labelColor = Color.Transparent
+            )
+        }
     }
 
     Column(
@@ -53,15 +70,15 @@ fun KidMapStoneBadge(
         Box(
             modifier = Modifier
                 .size(30.dp)
-                .border(width = 1.dp, color = borderColor, shape = CircleShape)
+                .border(width = 1.dp, color = badgeStyle.borderColor, shape = CircleShape)
                 .then(
-                    if (borderColor != KieroTheme.colors.white) {
+                    if (badgeStyle.borderColor != KieroTheme.colors.white) {
                         Modifier.dropShadow(
                             shape = CircleShape,
                             shadow = Shadow(
                                 radius = 4.dp,
                                 spread = 0.dp,
-                                color = borderColor,
+                                color = badgeStyle.borderColor,
                                 offset = DpOffset(x = 0.dp, y = 0.dp)
                             )
                         )
@@ -79,10 +96,8 @@ fun KidMapStoneBadge(
         }
 
         Text(
-            text = statusLabel?.first ?: "획득!",
-            color = (statusLabel?.second ?: KieroTheme.colors.main).copy(
-                alpha = if (statusLabel != null) 1f else 0f
-            ),
+            text = badgeStyle.labelText,
+            color = badgeStyle.labelColor,
             style = KieroTheme.typography.regular.body6
         )
     }
