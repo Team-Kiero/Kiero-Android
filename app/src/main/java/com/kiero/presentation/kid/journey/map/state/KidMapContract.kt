@@ -14,7 +14,7 @@ data class KidMapState(
     val schedules: ImmutableList<KidMapItemUiModel> = persistentListOf()
 ) {
     companion object {
-        fun FAKE() = KidMapState(
+        val FAKE = KidMapState(
             date = "12월 5일 목요일",
             scheduleCount = 4,
             schedules = persistentListOf(

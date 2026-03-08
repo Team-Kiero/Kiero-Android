@@ -10,7 +10,7 @@ data class KidFireResultState(
     val content : KidFireUiModel = KidFireUiModel()
 ) {
     companion object{
-        fun fake() = KidFireResultState(
+        val FAKE = KidFireResultState(
             content = KidFireUiModel(
                 earnedStones = listOf(
                     KidJourneyStoneType.WISDOM,
