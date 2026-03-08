@@ -1,8 +1,5 @@
 package com.kiero.presentation.kid.journey.map.model
 
-import kotlinx.serialization.Serializable
-
-@Serializable
 enum class KidMapScheduleStatus(val serverKey: String) {
     PENDING("PENDING"),
     COMPLETE("COMPLETE"),
