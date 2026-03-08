@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.parent.mission.model.SuggestedMissionModel
 import com.kiero.data.parent.mission.repository.AutoMissionRepository
-import com.kiero.domain.usecase.SaveBatchMissionsUseCase
 import com.kiero.presentation.parent.screen.mission.autoadd.model.MissionUiModel
 import com.kiero.presentation.parent.screen.mission.autoadd.state.AutoMissionSideEffect
 import com.kiero.presentation.parent.screen.mission.autoadd.state.AutoMissionState
@@ -33,7 +32,6 @@ import kotlin.collections.toMutableList
 class AutoMissionViewModel @Inject constructor(
     private val autoMissionRepository: AutoMissionRepository,
     private val userInfoManager: UserInfoManager,
-    private val saveBatchMissionsUseCase: SaveBatchMissionsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AutoMissionState())
