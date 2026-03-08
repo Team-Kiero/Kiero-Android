@@ -173,3 +173,7 @@ fun String.validateAsStartTime(): String {
         return this
     }
 }
+
+fun String.escapeForJson(): String =
+    replace("\"", "\\\"")
+        .replace("\n", "\\n")

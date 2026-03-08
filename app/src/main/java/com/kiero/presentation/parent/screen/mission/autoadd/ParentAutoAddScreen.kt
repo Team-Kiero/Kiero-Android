@@ -54,10 +54,6 @@ fun ParentAutoAddRoute(
                 )
             }
 
-            is AutoMissionSideEffect.NavigateBack -> {
-                navigateUp()
-            }
-
             is AutoMissionSideEffect.ShowToastAndNavigate -> {
                 globalUiEventHolder.showSnackbar(
                     SnackbarState(message = effect.message)

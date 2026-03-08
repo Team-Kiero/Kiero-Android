@@ -4,10 +4,13 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.common.extension.escapeForJson
 import com.kiero.core.localstorage.info.UserInfoManager
-import com.kiero.data.parent.mission.model.SuggestedMissionModel
 import com.kiero.data.parent.mission.repository.AutoMissionRepository
-import com.kiero.presentation.parent.screen.mission.autoadd.model.MissionUiModel
+import com.kiero.presentation.parent.screen.mission.autoadd.model.errorMessage
+import com.kiero.presentation.parent.screen.mission.autoadd.model.toDomainModel
+import com.kiero.presentation.parent.screen.mission.autoadd.model.toUiModels
+import com.kiero.presentation.parent.screen.mission.autoadd.model.updateAt
 import com.kiero.presentation.parent.screen.mission.autoadd.state.AutoMissionSideEffect
 import com.kiero.presentation.parent.screen.mission.autoadd.state.AutoMissionState
 import com.kiero.presentation.parent.screen.mission.directadd.model.MissionAwardDefaults
@@ -22,11 +25,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.time.LocalDate
 import javax.inject.Inject
-import kotlin.collections.indexOfFirst
-import kotlin.collections.toMutableList
 
 @HiltViewModel
 class AutoMissionViewModel @Inject constructor(
@@ -39,7 +39,6 @@ class AutoMissionViewModel @Inject constructor(
 
     private val _sideEffect = MutableSharedFlow<AutoMissionSideEffect>()
     val sideEffect: SharedFlow<AutoMissionSideEffect> = _sideEffect.asSharedFlow()
-
     val awardTextFieldState = TextFieldState(initialText = "20")
 
     init {
@@ -51,22 +50,15 @@ class AutoMissionViewModel @Inject constructor(
         _state.update { it.copy(noticeText = text) }
     }
 
-    // Todo : 문자열 처리, .replace("\"", "\\\"") 같은 텍스트 가공은 Repository나 StringUtil로 옮기기
-    // 실행 흐름(로딩 시작 -> 데이터 요청 -> 상태 업데이트)만 관리
     fun analyzeNotice() {
         viewModelScope.launch {
             _state.update { it.copy(isAnalyzing = true) }
-            val rawText = _state.value.noticeText
+            val escapedText = _state.value.noticeText.escapeForJson()
 
-            val escapedText = rawText
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-
-            // Todo : domainData.map { ... }나 missions.map { SuggestedMissionModel(...) } 같은 변환 로직은 별도의 Mapper 파일로 추출
             autoMissionRepository.analyzeNotice(escapedText)
                 .onSuccess { domainData ->
-                    if (domainData.suggestedMissions.isEmpty()) {
-                        Timber.e("message suggestedMissions")
+                    val uiMissions = domainData.toUiModels()
+                    if (uiMissions.isEmpty()) {
                         _sideEffect.emit(AutoMissionSideEffect.ShowToast("알림장 내용을 분석하지 못했어요."))
                         delay(2000L)
                         _state.update {
@@ -78,14 +70,6 @@ class AutoMissionViewModel @Inject constructor(
                             )
                         }
                     } else {
-                        val uiMissions = domainData.suggestedMissions.map { suggested ->
-                            MissionUiModel(
-                                name = suggested.name,
-                                reward = suggested.reward,
-                                dueAt = LocalDate.parse(suggested.dueAt),
-                                isCompleted = false
-                            )
-                        }
                         _state.update {
                             it.copy(
                                 missions = uiMissions,
@@ -101,49 +85,32 @@ class AutoMissionViewModel @Inject constructor(
                         is TimeoutCancellationException -> "잠시 후 다시 시도해주세요."
                         else -> "알림장 내용을 분석하지 못했어요."
                     }
-                    Timber.e("message $message")
                     _sideEffect.emit(AutoMissionSideEffect.ShowToast(message))
                     _state.update { it.copy(isAnalyzing = false) }
                 }
         }
     }
 
-    /*
-    Todo : updateMissionName/Date/Reward: 리스트의 특정 항목을 수정하는 함수는 유지하되,
-           리스트 복사 로직은 공통 유틸 함수를 써서 가독성을 높여야 합니다.
-     */
     fun updateMissionName(name: String) {
         val trimmedName = if (name.length > 15) name.substring(0, 15) else name
-
-        _state.update { currentState ->
-            val updatedMissions = currentState.missions.toMutableList().apply {
-                val index = currentState.currentIndex
-                if (index in indices) {
-                    this[index] = this[index].copy(name = trimmedName)
-                }
-            }
-            currentState.copy(missions = updatedMissions)
+        _state.update { state ->
+            state.copy(missions = state.missions.updateAt(state.currentIndex) {
+                it.copy(name = trimmedName)
+            })
         }
     }
 
     fun updateMissionDate(date: LocalDate) {
-        _state.update { currentState ->
-
-            val updatedMissions = currentState.missions.toMutableList().apply {
-                val index = currentState.currentIndex
-                if (index in indices) {
-                    this[index] = this[index].copy(dueAt = date)
-                }
-            }
-
-            currentState.copy(
-                missions = updatedMissions,
-                selectedDate = date,
+        _state.update { state ->
+            state.copy(
+                missions = state.missions.updateAt(state.currentIndex) {
+                    it.copy(dueAt = date)
+                },
+                selectedDate = date
             )
         }
     }
 
-    // Todo : 내 범위 체크: 보상 금액이 MIN/MAX를 넘는지 체크하고 메시지를 결정하는 로직은 Domain 로직
     fun onAwardClick(change: Int) {
         val currentState = _state.value
         val currentReward = currentState.currentReward
@@ -169,22 +136,16 @@ class AutoMissionViewModel @Inject constructor(
             }
         }
 
-        _state.update { currentState ->
-            val updatedMissions = currentState.missions.toMutableList().apply {
-                val index = currentState.currentIndex
-                if (index in indices) {
-                    this[index] = this[index].copy(reward = newReward)
-                }
-            }
-            currentState.copy(missions = updatedMissions)
+        _state.update { state ->
+            state.copy(missions = state.missions.updateAt(state.currentIndex) {
+                it.copy(reward = newReward)
+            })
         }
-
         awardTextFieldState.edit {
             replace(0, length, newReward.toString())
         }
     }
 
-    // 현재 보고 있는 페이지 번호를 관리하는 것은 전형적인 UI 상태 관리.
     fun updateCurrentIndex(index: Int) {
         _state.update { currentState ->
             val newHasViewedLastPage = if (index == currentState.missions.size - 1) {
@@ -207,7 +168,6 @@ class AutoMissionViewModel @Inject constructor(
         }
     }
 
-    // 저장 프로세스 제어만 담당하고, 내부의 복잡한 검증과 매핑은 외부 유틸에 맡기기.
     fun saveAllMissions() {
         viewModelScope.launch {
             val childId = userInfoManager.getChildIdInfo() ?: return@launch
@@ -225,24 +185,17 @@ class AutoMissionViewModel @Inject constructor(
                 _sideEffect.tryEmit(AutoMissionSideEffect.ScrollToPage(firstErrorIndex))
                 _sideEffect.tryEmit(
                     AutoMissionSideEffect.ShowToast(
-                        getErrorMessage(missions[firstErrorIndex])
+                        missions[firstErrorIndex].errorMessage() ?: return@launch
                     )
                 )
                 return@launch
             }
 
             _state.update { it.copy(isSaving = true) }
-            val domainMissions = missions.map { uiModel ->
-                SuggestedMissionModel(
-                    name = uiModel.name,
-                    reward = uiModel.reward,
-                    dueAt = uiModel.dueAt.toString()
-                )
-            }
+            val domainMissions = missions.map { it.toDomainModel() }
 
             autoMissionRepository.saveBatchMissions(childId, domainMissions)
                 .onSuccess {
-                    Timber.e("message saveBatchMissions")
                     _state.update {
                         it.copy(
                             hasViewedLastPage = false
@@ -311,20 +264,9 @@ class AutoMissionViewModel @Inject constructor(
 
     private fun updateMissionReward(value: Int) {
         _state.update { state ->
-            val updatedMissions = state.missions.toMutableList().apply {
-                val index = state.currentIndex
-                if (index in indices) {
-                    this[index] = this[index].copy(reward = value)
-                }
-            }
-            state.copy(missions = updatedMissions)
+            state.copy(missions = state.missions.updateAt(state.currentIndex) {
+                it.copy(reward = value)
+            })
         }
-    }
-
-    // Todo : 입력값의 유효성을 검사하는 로직은 Validator(검증기) 클래스나 Domain 모델의 확장 함수로 분리
-    private fun getErrorMessage(mission: MissionUiModel): String = when {
-        mission.name.isBlank() -> "미션 이름을 입력해주세요."
-        mission.dueAt.isBefore(LocalDate.now()) -> "마감일은 과거로 설정할 수 없습니다."
-        else -> "보상을 입력해주세요."
     }
 }
