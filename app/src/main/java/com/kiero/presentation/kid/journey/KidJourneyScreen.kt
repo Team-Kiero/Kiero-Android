@@ -333,27 +333,7 @@ private fun KidJourneyScreenPreview() {
         KidJourneyScreen(
             paddingValues = PaddingValues(),
             navigateUp = {},
-            state = KidJourneyState(
-                header = KidJourneyHeaderUiModel(
-                    kidName = "주완",
-                    currentDate = "12월 5일 목요일",
-                    coinCount = 350,
-                    earnedStones = 5,
-                    totalScheduleCount = 7
-                ),
-                content = KidJourneyContentUiModel.NowSchedule(
-                    scheduleDetailId = 1,
-                    scheduleName = "피아노 학원 가기",
-                    stoneType = KidJourneyStoneType.WISDOM,
-                    scheduleInfo = KidJourneyScheduleUiModel(
-                        order = 4,
-                        startTime = "14:00:00",
-                        endTime = "16:00:00"
-                    ),
-                    isSkippable = true,
-                    isNowScheduleVerified = true
-                )
-            ),
+            state = KidJourneyState.FAKE,
             onButtonClick = {},
             onNextClick = {},
             onMapClick = {}

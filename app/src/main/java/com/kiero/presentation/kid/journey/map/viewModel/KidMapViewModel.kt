@@ -20,7 +20,7 @@ class KidMapViewModel @Inject constructor(
 
     private val _state = MutableStateFlow<UiState<KidMapState>>(
         UiState.Success(
-            KidMapState.FAKE().copy(date = map.date)
+            KidMapState.FAKE.copy(date = map.date)
         )
     )
     val state: StateFlow<UiState<KidMapState>> = _state.asStateFlow()

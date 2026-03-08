@@ -161,7 +161,7 @@ private fun KidMapScreenPreview() {
         KidMapScreen(
             paddingValues = PaddingValues(),
             navigateUp = {},
-            state = KidMapState.FAKE()
+            state = KidMapState.FAKE
         )
     }
 }
