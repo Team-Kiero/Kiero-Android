@@ -248,7 +248,7 @@ private fun KidFIreScreenPreview() {
     KieroTheme {
         KidFIreResultScreen(
             paddingValues = PaddingValues(),
-            state = KidFireResultState.fake(),
+            state = KidFireResultState.FAKE,
             navigateUp = {},
             navigateToJourney = {}
         )
