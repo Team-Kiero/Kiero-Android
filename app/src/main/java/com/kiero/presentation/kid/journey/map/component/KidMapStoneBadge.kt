@@ -18,7 +18,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.kid.journey.map.model.KidMapScheduleStatus
@@ -77,9 +76,7 @@ fun KidMapStoneBadge(
                             shape = CircleShape,
                             shadow = Shadow(
                                 radius = 4.dp,
-                                spread = 0.dp,
                                 color = badgeStyle.borderColor,
-                                offset = DpOffset(x = 0.dp, y = 0.dp)
                             )
                         )
                     } else Modifier

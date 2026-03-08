@@ -20,7 +20,6 @@ import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.kiero.R
 import com.kiero.core.designsystem.theme.KieroTheme
@@ -40,9 +39,7 @@ fun KidMapEmptyView(modifier: Modifier = Modifier) {
                             shape = CircleShape,
                             shadow = Shadow(
                                 radius = 8.dp,
-                                spread = 0.dp,
-                                color = KieroTheme.colors.main,
-                                offset = DpOffset(x = 0.dp, y = 0.dp)
+                                color = KieroTheme.colors.main
                             )
                         )
                 .background(color = KieroTheme.colors.gray900, shape = CircleShape),
@@ -56,7 +53,7 @@ fun KidMapEmptyView(modifier: Modifier = Modifier) {
             )
         }
 
-        Spacer(modifier = Modifier.height(25.5.dp))
+        Spacer(modifier = Modifier.height(25.dp))
 
         Text(
             text = "오늘은 등록된 여정이 없어!",
