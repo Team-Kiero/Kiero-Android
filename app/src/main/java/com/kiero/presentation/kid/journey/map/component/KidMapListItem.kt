@@ -24,6 +24,17 @@ fun KidMapListItem(
     item: KidMapItemUiModel,
     modifier: Modifier = Modifier
 ) {
+    val nameColor = when {
+        item.isOngoing || item.status == KidMapScheduleStatus.PENDING -> KieroTheme.colors.white
+        else -> KieroTheme.colors.white.copy(alpha = 0.5f)
+    }
+
+    val timeColor = when {
+        item.isOngoing -> KieroTheme.colors.main
+        item.status == KidMapScheduleStatus.PENDING -> KieroTheme.colors.gray500
+        else -> KieroTheme.colors.gray500.copy(alpha = 0.5f)
+    }
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -42,10 +53,7 @@ fun KidMapListItem(
 
                 Text(
                     text = item.name,
-                    color = when {
-                        item.isOngoing || item.status == KidMapScheduleStatus.PENDING -> KieroTheme.colors.white
-                        else -> KieroTheme.colors.white.copy(alpha = 0.5f)
-                    },
+                    color = nameColor,
                     style = KieroTheme.typography.bold.headLine3,
                     maxLines = 1,
                 )
@@ -59,11 +67,7 @@ fun KidMapListItem(
 
             Text(
                 text = "${item.startTime} ~ ${item.endTime}",
-                color = when {
-                    item.isOngoing -> KieroTheme.colors.main
-                    item.status == KidMapScheduleStatus.PENDING -> KieroTheme.colors.gray500
-                    else -> KieroTheme.colors.gray500.copy(alpha = 0.5f)
-                },
+                color = timeColor,
                 style = KieroTheme.typography.regular.body4
             )
         }
