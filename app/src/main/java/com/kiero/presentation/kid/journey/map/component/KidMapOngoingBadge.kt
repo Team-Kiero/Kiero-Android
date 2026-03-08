@@ -17,9 +17,9 @@ fun KidMapOngoingBadge(modifier: Modifier = Modifier) {
             .border(
                 width = 1.dp,
                 color = KieroTheme.colors.main,
-                shape = RoundedCornerShape(100.dp)
+                shape = RoundedCornerShape(999.dp)
             )
-            .padding(horizontal = 8.dp, vertical = 2.dp)
+            .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
         Text(
             text = "진행중",
