@@ -30,7 +30,7 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import com.kiero.R
 import com.kiero.core.designsystem.theme.KieroTheme
-import com.kiero.presentation.parent.screen.mission.component.missionmain.MissionFabContent
+import com.kiero.presentation.parent.screen.mission.overview.component.missionmain.MissionFabContent
 
 @Composable
 fun ParentFloatingButton(
@@ -96,7 +96,7 @@ fun MissionTabFab(
                                 horizontalAlignment = Alignment.End,
                                 verticalArrangement = Arrangement.spacedBy(10.dp)
                             ) {
-                                MissionFabContent(
+                                _root_ide_package_.com.kiero.presentation.parent.screen.mission.overview.component.missionmain.MissionFabContent(
                                     fabTitle = "미션 직접 입력하기",
                                     fabIconRes = R.drawable.ic_parent_addschedule_mission,
                                     onFabClick = {
@@ -105,7 +105,7 @@ fun MissionTabFab(
                                     }
                                 )
 
-                                MissionFabContent(
+                                _root_ide_package_.com.kiero.presentation.parent.screen.mission.overview.component.missionmain.MissionFabContent(
                                     fabTitle = "알림장 한 번에 입력하기",
                                     fabIconRes = R.drawable.ic_parent_addschedule_notice,
                                     onFabClick = {

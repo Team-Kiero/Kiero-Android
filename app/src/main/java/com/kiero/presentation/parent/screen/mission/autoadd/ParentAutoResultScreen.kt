@@ -38,7 +38,7 @@ import com.kiero.presentation.parent.screen.mission.autoadd.model.MissionUiModel
 import com.kiero.presentation.parent.screen.mission.autoadd.state.AutoMissionSideEffect
 import com.kiero.presentation.parent.screen.mission.autoadd.state.AutoMissionState
 import com.kiero.presentation.parent.screen.mission.autoadd.viewmodel.AutoMissionViewModel
-import com.kiero.presentation.parent.screen.mission.component.datepicker.component.CalendarBottomSheet
+import com.kiero.presentation.parent.screen.mission.overview.component.datepicker.component.CalendarBottomSheet
 import java.time.LocalDate
 
 
@@ -194,7 +194,7 @@ fun ParentAutoResultScreen(
         Spacer(Modifier.height(28.dp))
 
         if (showBottomSheet) {
-            CalendarBottomSheet(
+            _root_ide_package_.com.kiero.presentation.parent.screen.mission.overview.component.datepicker.component.CalendarBottomSheet(
                 onDismissRequest = onDismissDatePicker,
                 onDateSelected = onDateSelected
             )

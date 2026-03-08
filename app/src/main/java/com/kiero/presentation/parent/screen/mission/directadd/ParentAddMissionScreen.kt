@@ -28,10 +28,10 @@ import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
 import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
-import com.kiero.presentation.parent.screen.mission.component.datepicker.component.CalendarBottomSheet
+import com.kiero.presentation.parent.screen.mission.overview.component.datepicker.component.CalendarBottomSheet
 import com.kiero.presentation.parent.screen.mission.directadd.component.MissionAwardInfo
 import com.kiero.presentation.parent.screen.mission.directadd.component.MissionAwardSelect
-import com.kiero.presentation.parent.screen.mission.component.missionmain.MissionCalendar
+import com.kiero.presentation.parent.screen.mission.overview.component.missionmain.MissionCalendar
 import com.kiero.presentation.parent.screen.mission.directadd.state.ParentAddMissionSideEffect
 import com.kiero.presentation.parent.screen.mission.directadd.state.ParentAddMissionState
 import com.kiero.presentation.parent.screen.mission.directadd.viewmodel.ParentAddMissionViewModel
@@ -138,7 +138,7 @@ fun ParentAddMissionScreen(
             maxLength = 15
         )
 
-        MissionCalendar(
+        _root_ide_package_.com.kiero.presentation.parent.screen.mission.overview.component.missionmain.MissionCalendar(
             onDateClick = viewModel::onDateClick,
             dateText = selectedDate ?: "마감일을 선택해주세요"
         )
@@ -153,7 +153,7 @@ fun ParentAddMissionScreen(
         )
 
         if (showBottomSheet) {
-            CalendarBottomSheet(
+            _root_ide_package_.com.kiero.presentation.parent.screen.mission.overview.component.datepicker.component.CalendarBottomSheet(
                 onDismissRequest = viewModel::onDismissBottomSheet,
                 onDateSelected = viewModel::onDateSelected
             )
