@@ -18,7 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -111,7 +111,6 @@ fun Modifier.verticalScrollbar(
     thumbColor: Color = KieroTheme.colors.white,
     trackColor: Color = KieroTheme.colors.gray900
 ): Modifier {
-    val canScroll = state.canScrollForward || state.canScrollBackward
     val targetAlpha = if (state.isScrollInProgress) 1f else 0f
     val duration = if (state.isScrollInProgress) 150 else 500
 
@@ -120,28 +119,27 @@ fun Modifier.verticalScrollbar(
         animationSpec = tween(durationMillis = duration)
     )
 
-    return drawWithContent {
-        drawContent()
-
-        val needDrawScrollbar = state.isScrollInProgress || animationAlpha > 0.0f
-
-        if (!canScroll || !needDrawScrollbar || state.layoutInfo.totalItemsCount == 0) {
-            return@drawWithContent
-        }
-
+    return drawWithCache {
         val thicknessPx = thickness.toPx()
         val thumbHeightPx = thumbHeight.toPx()
         val paddingPx = verticalPadding.toPx()
         val cornerRadius = CornerRadius(thicknessPx / 2f)
 
-        val scrollProportion = calculateScrollProportion(state)
-        val trackHeight = size.height - (paddingPx * 2)
-        val maxScrollOffsetY = trackHeight - thumbHeightPx
+        onDrawWithContent {
+            drawContent()
+            val canScroll = state.canScrollForward || state.canScrollBackward
 
-        val scrollbarOffsetX = size.width - thicknessPx
-        val scrollbarOffsetY = paddingPx + (scrollProportion * maxScrollOffsetY)
+            if (!canScroll || animationAlpha == 0f || state.layoutInfo.totalItemsCount == 0) {
+                return@onDrawWithContent
+            }
 
-        if (animationAlpha > 0f) {
+            val scrollProportion = calculateScrollProportion(state)
+            val trackHeight = size.height - (paddingPx * 2)
+            val maxScrollOffsetY = trackHeight - thumbHeightPx
+
+            val scrollbarOffsetX = size.width - thicknessPx
+            val scrollbarOffsetY = paddingPx + (scrollProportion * maxScrollOffsetY)
+
             drawRoundRect(
                 color = trackColor,
                 topLeft = Offset(scrollbarOffsetX, paddingPx),
@@ -149,15 +147,15 @@ fun Modifier.verticalScrollbar(
                 cornerRadius = cornerRadius,
                 alpha = animationAlpha
             )
-        }
 
-        drawRoundRect(
-            color = thumbColor,
-            topLeft = Offset(scrollbarOffsetX, scrollbarOffsetY),
-            size = Size(thicknessPx, thumbHeightPx),
-            cornerRadius = cornerRadius,
-            alpha = animationAlpha
-        )
+            drawRoundRect(
+                color = thumbColor,
+                topLeft = Offset(scrollbarOffsetX, scrollbarOffsetY),
+                size = Size(thicknessPx, thumbHeightPx),
+                cornerRadius = cornerRadius,
+                alpha = animationAlpha
+            )
+        }
     }
 }
 
