@@ -5,44 +5,26 @@ import kotlinx.serialization.Serializable
 data class PlanAllResponseDto(
     @SerialName("isFireLit")
     val isFireLit: Boolean,
-    @SerialName("recurringSchedules")
-    val recurringSchedules: List<RecurringScheduleDto>,
-    @SerialName("normalSchedules")
-    val normalSchedules: List<NormalScheduleDto>
+    @SerialName("items")
+    val items: List<ScheduleItemDto> = emptyList(),
 )
 
 @Serializable
-data class RecurringScheduleDto(
+data class ScheduleItemDto(
     @SerialName("scheduleId")
-    val scheduleId: Long= 0L,
-    @SerialName("startTime")
-    val startTime: String,
-    @SerialName("endTime")
-    val endTime: String,
-    @SerialName("name")
-    val name: String,
-    @SerialName("colorCode")
-    val colorCode: String,
-    @SerialName("dayOfWeek")
-    val dayOfWeek: String,
-    @SerialName("repeatStartDate")
-    val repeatStartDate: String,
-    @SerialName("repeatEndDate")
-    val repeatEndDate: String? = null,
-)
-
-@Serializable
-data class NormalScheduleDto(
-    @SerialName("scheduleId")
-    val scheduleId: Long= 0L,
-    @SerialName("startTime")
-    val startTime: String,
-    @SerialName("endTime")
-    val endTime: String,
-    @SerialName("name")
-    val name: String,
-    @SerialName("colorCode")
-    val colorCode: String,
+    val scheduleId: Long = 0L,
     @SerialName("date")
-    val date: String
+    val date: String,
+    @SerialName("dayOfWeek")
+    val dayOfWeek: List<String> = emptyList(),
+    @SerialName("startTime")
+    val startTime: String,
+    @SerialName("endTime")
+    val endTime: String,
+    @SerialName("name")
+    val name: String,
+    @SerialName("colorCode")
+    val colorCode: String,
+    @SerialName("scheduleStatus")
+    val scheduleStatus: String? = null,
 )
