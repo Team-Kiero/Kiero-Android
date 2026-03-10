@@ -16,6 +16,7 @@ import com.kiero.presentation.parent.screen.mypage.navigation.parentMypageNavGra
 import com.kiero.presentation.parent.screen.reward.navigation.parentRewardNavGraph
 import com.kiero.presentation.parent.screen.schedule.navigation.parentScheduleNavGraph
 import com.kiero.presentation.parent.screen.schedule.plan.navigation.navigateToScheduleAdd
+import com.kiero.presentation.parent.screen.schedule.plan.navigation.navigateToScheduleEdit
 import com.kiero.presentation.parent.screen.schedule.plan.navigation.parentScheduleAddNavGraph
 import kotlinx.serialization.Serializable
 
@@ -67,6 +68,9 @@ fun NavGraphBuilder.parentNavGraph(
                     initialDate = date,
                     isFireLit = fireLit
                 )
+            },
+            navigateToScheduleEdit = { args ->
+                navController.navigateToScheduleEdit(args)
             },
             navigateToSelection = navigateToSelection,
             navigateToAlarm = navigateToAlarm
