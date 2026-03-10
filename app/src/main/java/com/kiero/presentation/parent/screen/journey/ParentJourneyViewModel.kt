@@ -3,8 +3,10 @@ package com.kiero.presentation.parent.screen.journey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.data.auth.repository.AuthRepository
+import com.kiero.data.parent.journey.repository.ParentJourneyRepository
 import com.kiero.presentation.parent.screen.journey.model.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -17,6 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ParentJourneyViewModel @Inject constructor(
     private val authRepository: AuthRepository,
+    private val parentJourneyRepository: ParentJourneyRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(ParentJourneyState())
     val state = _state.asStateFlow()
@@ -33,12 +36,15 @@ class ParentJourneyViewModel @Inject constructor(
             authRepository.getChildren()
                 .onSuccess { response ->
                     val kidInfo = response.firstOrNull()?.toUiModel()
+                    Timber.e("fetchKidInfo, $kidInfo")
                     if (kidInfo != null) {
                         _state.update { currentState ->
                             currentState.copy(
                                 kidInfo = kidInfo
                             )
                         }
+
+                        fetchParentJourney(kidInfo.kidId.toLong())
                     }
                 }
                 .onFailure {
@@ -48,4 +54,24 @@ class ParentJourneyViewModel @Inject constructor(
         }
     }
 
+    fun fetchParentJourney(
+        childId: Long
+    ) {
+        viewModelScope.launch {
+            parentJourneyRepository.getParentJourney(
+                childId = childId
+            ).onSuccess { result ->
+                _state.update { currentState ->
+                    currentState.copy(
+                        completeMissions = result.completeMissions.map { it.toUiModel() }.toImmutableList(),
+                        incompleteMissions = result.incompleteMissions.map { it.toUiModel() }.toImmutableList(),
+                        todayMissionList = result.schedules.mapIndexed { index, it -> it.toUiModel(id = index) }.toImmutableList()
+                    )
+                }
+            }.onFailure {
+                Timber.e("parentJourney ${it.message.toString()}")
+                _sideEffect.emit(ParentJourneySideEffect.ShowSnackbar(message = "일정 정보 불러오기에 실패하였습니다"))
+            }
+        }
+    }
 }
