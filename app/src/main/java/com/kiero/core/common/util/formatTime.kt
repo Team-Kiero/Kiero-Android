@@ -1,5 +1,7 @@
 package com.kiero.core.common.util
 
+import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -29,3 +31,20 @@ fun formatTime(totalSeconds: Int): String {
     val seconds = totalSeconds % 60
     return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
 }
+
+/**
+ * 오늘의 날짜를 2026.03.07.(일) 처럼 변환하는 함수
+ * */
+fun LocalDate.toDotSeparatedDate(): String {
+    val dayOfWeek = when (dayOfWeek) {
+        DayOfWeek.MONDAY -> "월"
+        DayOfWeek.TUESDAY -> "화"
+        DayOfWeek.WEDNESDAY -> "수"
+        DayOfWeek.THURSDAY -> "목"
+        DayOfWeek.FRIDAY -> "금"
+        DayOfWeek.SATURDAY -> "토"
+        DayOfWeek.SUNDAY -> "일"
+    }
+    return "${year}.${monthValue.toString().padStart(2, '0')}.${dayOfMonth.toString().padStart(2, '0')}.($dayOfWeek)"
+}
+
