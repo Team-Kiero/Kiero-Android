@@ -3,6 +3,7 @@ package com.kiero.presentation.parent.screen.mission
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,6 +29,7 @@ import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
 import com.kiero.core.trigger.LocalRefreshState
 import com.kiero.presentation.main.navigation.ParentMainTab
+import com.kiero.presentation.parent.component.ParentTopbar
 import com.kiero.presentation.parent.screen.mission.component.missionmain.MissionInfo
 import com.kiero.presentation.parent.screen.mission.component.missionmain.MissionListItem
 import com.kiero.presentation.parent.screen.mission.state.ParentMissionState
@@ -92,8 +94,17 @@ fun ParentMissionScreen(
             }
         }
     }
+    Column (
+        modifier = modifier
+            .fillMaxSize()
+            .background(color = KieroTheme.colors.black),
+    ){
+        ParentTopbar(
+            title = "미션",
+            onAlarmClick = { /* TODO: 연결예정*/}
+        )
 
-    LazyColumn(
+        LazyColumn(
         state = listState,
         modifier = modifier
             .fillMaxSize()
@@ -125,7 +136,9 @@ fun ParentMissionScreen(
                 }
             }
         }
-    }
+    } }
+
+
 }
 
 @Preview
