@@ -10,20 +10,28 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.core.common.extension.collectSideEffect
+import com.kiero.core.designsystem.component.emptyview.KieroEmptyView
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
+import com.kiero.presentation.parent.screen.journey.component.ParentJourneyBottomSheet
 import com.kiero.presentation.parent.screen.journey.component.ParentJourneyTodayKidInfo
 import com.kiero.presentation.parent.screen.journey.component.ParentJourneyTodayMissionStatus
 import com.kiero.presentation.parent.screen.journey.component.ParentJourneyTodayStatusItem
 import com.kiero.presentation.parent.screen.journey.model.KidInfo
+import java.time.LocalDate
 
 @Composable
 fun ParentJourneyRoute(
@@ -45,6 +53,12 @@ fun ParentJourneyRoute(
         }
     }
 
+    LaunchedEffect(state.kidInfo.kidId) {
+        if (state.kidInfo.kidId.isNotEmpty()) {
+            viewModel.fetchParentJourney(state.kidInfo.kidId.toLong())
+        }
+    }
+
     ParentJourneyScreen(
         paddingValues = paddingValues,
         navigateUp = navigateUp,
@@ -55,9 +69,12 @@ fun ParentJourneyRoute(
 @Composable
 private fun ParentJourneyScreen(
     paddingValues: PaddingValues,
-    navigateUp: () -> Unit,
     state: ParentJourneyState,
+    navigateUp: () -> Unit,
 ) {
+    var isBottomSheetVisible by remember { mutableStateOf(false) }
+    var initialTab by remember { mutableIntStateOf(0) }
+
     Column (
         modifier = Modifier
             .fillMaxSize()
@@ -85,25 +102,45 @@ private fun ParentJourneyScreen(
                 }
 
                 ParentJourneyTodayMissionStatus(
-                    modifier = Modifier.padding(horizontal = 20.dp)
+                    completeMissions = state.completeMissions,
+                    incompleteMissions = state.incompleteMissions,
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                    onClick = {
+                        initialTab = if (it) 0 else 1
+                        isBottomSheetVisible = true
+                    }
                 )
             }
         }
 
-        // Todo: 서버 내용으로 수정
-        LazyColumn (
-            modifier = Modifier
-                .weight(1f)
-                .padding(vertical = 16.dp, horizontal = 24.dp),
-        ) {
-            itemsIndexed(
-                items = ParentJourneyState.FAKE
-            ) { index, item ->
-                ParentJourneyTodayStatusItem(
-                    item = item,
-                )
+        if (state.todayMissionList.isEmpty()) {
+            KieroEmptyView(
+                description = "일정을 등록해주세요."
+            )
+        } else {
+            LazyColumn (
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = 16.dp, horizontal = 24.dp),
+            ) {
+                itemsIndexed(
+                    items = state.todayMissionList,
+                ) { index, item ->
+                    ParentJourneyTodayStatusItem(
+                        item = item,
+                    )
+                }
             }
         }
+    }
+
+    if (isBottomSheetVisible) {
+        ParentJourneyBottomSheet(
+            completeMissions = state.completeMissions,
+            incompleteMissions = state.incompleteMissions,
+            initialTab = initialTab,
+            onDismiss = { isBottomSheetVisible = false }
+        )
     }
 }
 
@@ -118,7 +155,7 @@ private fun ParentJourneyScreenPreview() {
                 kidInfo = KidInfo(
                     kidId = "1",
                     kidName = "민성",
-                    currentDate = "2023-09-01"
+                    currentDate = LocalDate.now()
                 ),
             )
         )
