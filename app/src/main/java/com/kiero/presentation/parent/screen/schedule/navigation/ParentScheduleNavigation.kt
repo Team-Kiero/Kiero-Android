@@ -7,6 +7,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.kiero.presentation.parent.navigation.ParentSchedule
 import com.kiero.presentation.parent.screen.schedule.ParentScheduleRoute
+import com.kiero.presentation.parent.screen.schedule.plan.navigation.ScheduleEdit
 
 fun NavController.navigateToSchedule(
     navOptions: NavOptions? = null,
@@ -18,6 +19,7 @@ fun NavGraphBuilder.parentScheduleNavGraph(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
     navigateToScheduleAdd: (String, Boolean) -> Unit,
+    navigateToScheduleEdit: (ScheduleEdit) -> Unit,
     navigateToSelection: () -> Unit,
     navigateToAlarm: () -> Unit,
 ) {
@@ -26,6 +28,7 @@ fun NavGraphBuilder.parentScheduleNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
             navigateToScheduleAdd = navigateToScheduleAdd,
+            navigateToScheduleEdit = navigateToScheduleEdit,
             navigateToAlarm = navigateToAlarm,
         )
     }

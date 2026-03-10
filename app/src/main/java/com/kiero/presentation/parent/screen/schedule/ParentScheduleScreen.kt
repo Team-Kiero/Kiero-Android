@@ -44,6 +44,7 @@ import com.kiero.core.designsystem.theme.Gray900
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
 import com.kiero.core.model.trigger.RefreshState
+import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
 import com.kiero.core.trigger.LocalRefreshState
 import com.kiero.data.parent.plan.model.NormalScheduleModel
@@ -52,7 +53,10 @@ import com.kiero.data.parent.plan.model.ScheduleModel
 import com.kiero.presentation.parent.component.ParentContentBottomSheet
 import com.kiero.presentation.parent.component.ParentTopbar
 import com.kiero.presentation.parent.component.PlanTabFab
+import com.kiero.data.parent.plan.model.toScheduleEditArgs
+import com.kiero.data.parent.plan.model.toSelectedDate
 import com.kiero.presentation.parent.screen.schedule.plan.ParentPlanScreen
+import com.kiero.presentation.parent.screen.schedule.plan.navigation.ScheduleEdit
 import com.kiero.presentation.parent.screen.schedule.plan.state.ParentScheduleSideEffect
 import com.kiero.presentation.parent.screen.schedule.plan.state.ParentScheduleState
 import com.kiero.presentation.parent.screen.schedule.plan.state.ParentScheduleState.Companion.formatRepeatText
@@ -64,6 +68,7 @@ fun ParentScheduleRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
     navigateToScheduleAdd: (String, Boolean) -> Unit,
+    navigateToScheduleEdit: (ScheduleEdit) -> Unit,
     navigateToAlarm: () -> Unit,
     viewModel: ParentScheduleViewModel = hiltViewModel(),
 ) {
@@ -74,8 +79,10 @@ fun ParentScheduleRoute(
         viewModel.ensureChildIdAndStartSse()
     }
 
-    viewModel.sideEffect.collectSideEffect {
-        when (it) {
+    viewModel.sideEffect.collectSideEffect { effect ->
+        when (effect) {
+            is ParentScheduleSideEffect.ShowSnackBar ->
+                globalTrigger.showSnackbar(SnackbarState(effect.message))
             ParentScheduleSideEffect.ShowDialog -> globalTrigger.dialogTrigger.show {}
             else -> {}
         }
@@ -87,46 +94,40 @@ fun ParentScheduleRoute(
             .background(KieroTheme.colors.black)
     ) {
         when (val state = uiState) {
-            is UiState.Loading -> {
-                KieroLoadingIndicator()
+            is UiState.Loading -> KieroLoadingIndicator()
+
+            is UiState.Success -> ParentScheduleScreen(
+                paddingValues = paddingValues,
+                scheduleState = state.data,
+                onDateChange = viewModel::onDateChange,
+                onResetToToday = viewModel::resetToday,
+                onDeleteConfirm = viewModel::deleteSchedule,
+                onEditClick = navigateToScheduleEdit,
+                navigateToScheduleAdd = {
+                    navigateToScheduleAdd(state.data.navInitialDate, state.data.isFireLit)
+                },
+                navigateToAlarm = navigateToAlarm,
+            )
+
+            is UiState.Failure -> Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "에러: ${state.message}", color = KieroTheme.colors.white)
             }
 
-            is UiState.Success -> {
-                ParentScheduleScreen(
-                    paddingValues = paddingValues,
-                    scheduleState = state.data,
-                    onDateChange = viewModel::onDateChange,
-                    onResetToToday = viewModel::resetToday,
-                    onDialogClick = {},
-                    navigateToScheduleAdd = {
-                        navigateToScheduleAdd(
-                            state.data.navInitialDate,
-                            state.data.isFireLit
-                        )
-                    },
-                    navigateToAlarm = navigateToAlarm,
-                )
-            }
-
-            is UiState.Failure -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = "에러: ${state.message}", color = KieroTheme.colors.white)
-                }
-            }
-
-            is UiState.Empty -> {
-                ParentScheduleScreen(
-                    paddingValues = paddingValues,
-                    scheduleState = ParentScheduleState(),
-                    onResetToToday = viewModel::resetToday,
-                    onDateChange = viewModel::onDateChange,
-                    onDialogClick = {},
-                    navigateToScheduleAdd = {
-                        navigateToScheduleAdd(LocalDate.now().toString(), false)
-                    },
-                    navigateToAlarm = navigateToAlarm,
-                )
-            }
+            is UiState.Empty -> ParentScheduleScreen(
+                paddingValues = paddingValues,
+                scheduleState = ParentScheduleState(),
+                onResetToToday = viewModel::resetToday,
+                onDateChange = viewModel::onDateChange,
+                onDeleteConfirm = viewModel::deleteSchedule,
+                onEditClick = navigateToScheduleEdit,
+                navigateToScheduleAdd = {
+                    navigateToScheduleAdd(LocalDate.now().toString(), false)
+                },
+                navigateToAlarm = navigateToAlarm,
+            )
         }
     }
 }
@@ -138,18 +139,25 @@ private fun ParentScheduleScreen(
     modifier: Modifier = Modifier,
     onResetToToday: () -> Unit,
     onDateChange: (Boolean) -> Unit,
-    onDialogClick: (Boolean) -> Unit,
+    onDeleteConfirm: (scheduleId: Long, selectedDate: String, isIncludeFollowing: Boolean?) -> Unit,
+    onEditClick: (ScheduleEdit) -> Unit,
     navigateToScheduleAdd: () -> Unit,
     navigateToAlarm: () -> Unit,
 ) {
     var showBottomSheet by remember { mutableStateOf(false) }
-    var showDialog by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
     var selectedEventId by remember { mutableStateOf<String?>(null) }
+    var isIncludeFollowing by remember { mutableStateOf(false) }
 
     val selectedSchedule: ScheduleModel? = selectedEventId?.toLongOrNull()?.let { id ->
         val model = scheduleState.planAllModel
         model?.normalSchedules?.find { it.scheduleId == id }
             ?: model?.recurringSchedules?.find { it.scheduleId == id }
+    }
+    val isSelectedRecurring = selectedSchedule is RecurringScheduleModel
+
+    LaunchedEffect(showDeleteDialog) {
+        if (showDeleteDialog) isIncludeFollowing = false
     }
 
     Box(
@@ -187,37 +195,52 @@ private fun ParentScheduleScreen(
                     showBottomSheet = false
                     selectedEventId = null
                 },
-                onEditClick = { showBottomSheet = false },
+                onEditClick = {
+                    showBottomSheet = false
+                    selectedSchedule?.let { onEditClick(it.toScheduleEditArgs()) }
+                },
                 onDeleteClick = {
                     showBottomSheet = false
-                    showDialog = true
+                    showDeleteDialog = true
                 },
                 cotent = {
                     selectedSchedule?.let { ScheduleDetailContent(schedule = it) }
                 }
             )
         }
-        if (showDialog) {
+
+        if (showDeleteDialog) {
             KieroDialog(
-                onDismiss = { showDialog = false },
-                title = selectedSchedule?.name ?: "일정 상세",
-                subDescription = "삭제하시겠습니다?",
+                onDismiss = { showDeleteDialog = false },
+                title = selectedSchedule?.name ?: "일정 삭제",
+                subDescription = "삭제하시겠습니까?",
                 cancelAction = KieroCancelAction(
                     text = "취소",
-                    onClick = { showDialog = false }
+                    onClick = { showDeleteDialog = false }
                 ),
                 confirmAction = KieroConfirmAction(
                     text = "확인",
                     onClick = {
-                        showDialog = false
-                        selectedSchedule?.let { onDialogClick(it is RecurringScheduleModel) }
+                        val id = selectedEventId?.toLongOrNull()
+                        val date = selectedSchedule.toSelectedDate()
+                        val includeFollowing = if (isSelectedRecurring) isIncludeFollowing else null
+
+                        showDeleteDialog = false
                         selectedEventId = null
+
+                        if (id != null) {
+                            onDeleteConfirm(id, date, includeFollowing)
+                        } else {
+                        }
                     }
                 ),
                 content = {
-                    ScheduleDialogContent(
-                        onContentClick = onDialogClick
-                    )
+                    if (isSelectedRecurring) {
+                        ScheduleDialogContent(
+                            isIncludeFollowing = isIncludeFollowing,
+                            onContentClick = { isIncludeFollowing = !isIncludeFollowing }
+                        )
+                    }
                 }
             )
         }
@@ -233,30 +256,27 @@ private fun ParentScheduleScreen(
 
 @Composable
 private fun ScheduleDialogContent(
-    onContentClick: (Boolean) -> Unit,
+    isIncludeFollowing: Boolean,
+    onContentClick: () -> Unit,
     modifier: Modifier = Modifier,
-    isRecurring: Boolean = false,
 ) {
-    val IconRes = when (isRecurring) {
-        true -> R.drawable.ic_parent_addschedule_check_on
-        false -> R.drawable.ic_parent_addschedule_check_off
+    val iconRes = if (isIncludeFollowing) {
+        R.drawable.ic_parent_addschedule_check_on
+    } else {
+        R.drawable.ic_parent_addschedule_check_off
     }
-    Column {  }
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .noRippleClickable(
-                onClick = { onContentClick(isRecurring) }
-            ),
+            .noRippleClickable(onClick = onContentClick),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.End
     ) {
         Icon(
-            imageVector = ImageVector.vectorResource(id = IconRes),
+            imageVector = ImageVector.vectorResource(id = iconRes),
             contentDescription = null,
             tint = Color.Unspecified
         )
-
         Text(
             text = "이후 반복되는 일정 포함",
             color = KieroTheme.colors.gray400,
@@ -288,9 +308,7 @@ private fun ScheduleDetailContent(
                     style = contentsStyle,
                     color = contentsColor
                 )
-
             }
-
             is RecurringScheduleModel -> {
                 Text(
                     text = ParentFormatters.formatDateWithDayOfWeek(schedule.repeatStartDate),
@@ -316,15 +334,14 @@ private fun ScheduleDetailContent(
 @Preview
 private fun ParentScheduleScreenPreview() {
     KieroTheme {
-        CompositionLocalProvider(
-            LocalRefreshState provides RefreshState()
-        ) {
+        CompositionLocalProvider(LocalRefreshState provides RefreshState()) {
             ParentScheduleScreen(
                 paddingValues = PaddingValues(),
                 scheduleState = ParentScheduleState(),
                 onDateChange = {},
                 onResetToToday = {},
-                onDialogClick = {},
+                onDeleteConfirm = { _, _, _ -> },
+                onEditClick = {},
                 navigateToScheduleAdd = {},
                 navigateToAlarm = {}
             )
