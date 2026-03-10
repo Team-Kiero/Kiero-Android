@@ -29,16 +29,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.kiero.R
+import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.component.divider.KieroDashedVerticalDivider
 import com.kiero.core.designsystem.theme.KieroTheme
-import com.kiero.presentation.parent.screen.journey.model.TodayJourneyModel
+import com.kiero.presentation.parent.screen.journey.model.TodayJourneyUiModel
 import com.kiero.presentation.parent.screen.journey.model.TodayStatus
 
 @Composable
 fun ParentJourneyTodayStatusItem(
-    item: TodayJourneyModel,
+    item: TodayJourneyUiModel,
     modifier: Modifier = Modifier,
-    onItemClick: () -> Unit = {}
+    onItemClick: (Int) -> Unit = {}
 ) {
     Row(
         modifier = modifier
@@ -59,16 +60,18 @@ fun ParentJourneyTodayStatusItem(
         ParentJourneyToday(
             item = item,
             modifier = Modifier.padding(bottom = 12.dp, end = 10.dp),
-            onItemClick = onItemClick
+            onItemClick = if (item.authImageUrl != null) {
+                { onItemClick(item.id) }
+            } else null
         )
     }
 }
 
 @Composable
 private fun ParentJourneyToday(
-    item: TodayJourneyModel,
+    item: TodayJourneyUiModel,
     modifier: Modifier = Modifier,
-    onItemClick: () -> Unit = {}
+    onItemClick: (() -> Unit)? = null
 ) {
     val isUpcoming = item.todayStatus == TodayStatus.UPCOMING
 
@@ -112,7 +115,9 @@ private fun ParentJourneyToday(
     else
         KieroTheme.colors.gray800
 
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier
+    ) {
         if (item.todayStatus != TodayStatus.TODAY_COMPLETED) {
             Text(
                 text = item.date,
@@ -130,6 +135,13 @@ private fun ParentJourneyToday(
                         width = 1.dp,
                         color = item.todayStatus.getColor(KieroTheme.colors),
                         shape = RoundedCornerShape(10.dp)
+                    )
+                    .then(
+                        if (onItemClick != null) {
+                            Modifier.noRippleClickable(
+                                onClick = onItemClick
+                            )
+                        } else Modifier
                     )
                     .padding(horizontal = 10.dp, vertical = 14.dp)
                     .then(
@@ -244,54 +256,54 @@ private fun GlowingDot(
 private fun ParentJourneyTodayStatusItemPreview() {
     KieroTheme {
         Column {
-            // Case2: 지난 일정 + 인증완료
+            // Case2: 지난 일정 + 인증완료 => Completed
             ParentJourneyTodayStatusItem(
-                item = TodayJourneyModel(
+                item = TodayJourneyUiModel(
                     date = "09:00-14:00",
                     todayStatus = TodayStatus.PAST_COMPLETED,
                     todayMission = "학교 수업",
                     isAuthenticated = true
                 )
             )
-            // Case3: 지난 일정 + 미인증
+            // Case3: 지난 일정 + 미인증 => Failed
             ParentJourneyTodayStatusItem(
-                item = TodayJourneyModel(
+                item = TodayJourneyUiModel(
                     date = "09:00-14:00",
                     todayStatus = TodayStatus.PAST_MISSED,
                     todayMission = "학교 수업",
                     isAuthenticated = false
                 )
             )
-            // Case1-c: 현재 일정 + 미인증
+            // Case1-c: 현재 일정 + 미인증 => pendding
             ParentJourneyTodayStatusItem(
-                item = TodayJourneyModel(
+                item = TodayJourneyUiModel(
                     date = "13:00-14:00",
                     todayStatus = TodayStatus.CURRENT_COMPLETED,
                     todayMission = "학교 수업",
                     isAuthenticated = false
                 )
             )
-            // Case1-d: 현재 일정 + 인증함
+            // Case1-d: 현재 일정 + 인증함 => verified
             ParentJourneyTodayStatusItem(
-                item = TodayJourneyModel(
+                item = TodayJourneyUiModel(
                     date = "13:00-14:00",
                     todayStatus = TodayStatus.CURRENT_COMPLETED,
                     todayMission = "학교 수업",
                     isAuthenticated = true
                 )
             )
-            // Case4: 대기 상태
+            // Case4: 대기 상태 => panding
             ParentJourneyTodayStatusItem(
-                item = TodayJourneyModel(
+                item = TodayJourneyUiModel(
                     date = "09:00-14:00",
                     todayStatus = TodayStatus.UPCOMING,
                     todayMission = "학교 수업",
                     isAuthenticated = false
                 )
             )
-            // Case5: 하루 마무리
+            // Case5: 하루 마무리 => isFireLit
             ParentJourneyTodayStatusItem(
-                item = TodayJourneyModel(
+                item = TodayJourneyUiModel(
                     todayStatus = TodayStatus.TODAY_COMPLETED,
                     todayMission = ""
                 )

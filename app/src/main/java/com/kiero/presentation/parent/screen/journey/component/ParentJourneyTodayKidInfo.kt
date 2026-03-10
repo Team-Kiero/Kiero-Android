@@ -22,6 +22,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
+import com.kiero.core.common.util.toDotSeparatedDate
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.screen.journey.ParentJourneyState
 import com.kiero.presentation.parent.screen.journey.model.KidInfo
@@ -56,7 +57,7 @@ fun ParentJourneyTodayKidInfo(
             )
 
             Text(
-                text = kidInfo.currentDate,
+                text = kidInfo.currentDate.toDotSeparatedDate(),
                 style = KieroTheme.typography.regular.body4,
                 color = KieroTheme.colors.gray500
             )

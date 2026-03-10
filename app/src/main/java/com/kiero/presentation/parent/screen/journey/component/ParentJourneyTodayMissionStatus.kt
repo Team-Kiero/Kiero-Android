@@ -26,11 +26,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.kiero.R
+import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.presentation.parent.screen.journey.model.JourneyMissionUiModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
-// Todo: 서버 기준으로 변경하기
 @Composable
 fun ParentJourneyTodayMissionStatus(
+    completeMissions: ImmutableList<JourneyMissionUiModel>,
+    incompleteMissions: ImmutableList<JourneyMissionUiModel>,
+    onClick: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row (
@@ -56,6 +62,10 @@ fun ParentJourneyTodayMissionStatus(
     ) {
         ParentJourneyTodayMissionItem(
             itemTitle = "완료 미션",
+            missionsCount = completeMissions.size,
+            onClick = {
+                onClick(true)
+            },
             modifier = Modifier.weight(1f)
         )
 
@@ -67,6 +77,10 @@ fun ParentJourneyTodayMissionStatus(
 
         ParentJourneyTodayMissionItem(
             itemTitle = "미완료 미션",
+            missionsCount = incompleteMissions.size,
+            onClick = {
+                onClick(false)
+            },
             modifier = Modifier.weight(1f)
         )
     }
@@ -75,12 +89,17 @@ fun ParentJourneyTodayMissionStatus(
 @Composable
 private fun ParentJourneyTodayMissionItem(
     itemTitle: String,
+    missionsCount: Int,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row (
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 10.dp),
+            .padding(vertical = 10.dp)
+            .noRippleClickable(
+                onClick = onClick
+            ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
@@ -93,7 +112,7 @@ private fun ParentJourneyTodayMissionItem(
         Spacer(modifier = Modifier.width(10.dp))
 
         Text(
-            text = "2개",
+            text = "${missionsCount}개",
             style = KieroTheme.typography.semiBold.title4,
             color = KieroTheme.colors.white
         )
@@ -110,6 +129,10 @@ private fun ParentJourneyTodayMissionItem(
 @Composable
 private fun ParentJourneyTodayMissionStatusPreview() {
     KieroTheme {
-        ParentJourneyTodayMissionStatus()
+        ParentJourneyTodayMissionStatus(
+            completeMissions = persistentListOf(),
+            incompleteMissions = persistentListOf(),
+            onClick = {}
+        )
     }
 }
