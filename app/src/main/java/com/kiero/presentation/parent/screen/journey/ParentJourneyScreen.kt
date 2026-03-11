@@ -131,7 +131,7 @@ private fun ParentJourneyScreen(
                     ParentJourneyTodayStatusItem(
                         item = item,
                         onItemClick = {
-                            isBottomSheetVisible = true
+                            isTodayJourneyVisible = true
                         }
                     )
                 }
