@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.data.parent.journey.repository.ParentJourneyRepository
+import com.kiero.data.sse.manager.SseManager
 import com.kiero.presentation.parent.screen.journey.model.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
@@ -19,7 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ParentJourneyViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val parentJourneyRepository: ParentJourneyRepository
+    private val parentJourneyRepository: ParentJourneyRepository,
+    private val sseManager: SseManager
 ) : ViewModel() {
     private val _state = MutableStateFlow(ParentJourneyState())
     val state = _state.asStateFlow()
@@ -29,6 +31,7 @@ class ParentJourneyViewModel @Inject constructor(
 
     init {
         fetchKidInfo()
+        sseManager.startParentSubscription()
     }
 
     private fun fetchKidInfo() {

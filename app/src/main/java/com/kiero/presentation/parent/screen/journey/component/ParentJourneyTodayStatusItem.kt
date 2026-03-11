@@ -143,11 +143,7 @@ private fun ParentJourneyToday(
                             )
                         } else Modifier
                     )
-                    .padding(horizontal = 10.dp, vertical = 14.dp)
-                    .then(
-                        if (isUpcoming) Modifier.blur(2.dp, edgeTreatment = BlurredEdgeTreatment.Rectangle)
-                        else Modifier
-                    ),
+                    .padding(horizontal = 10.dp, vertical = 14.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (statusIcon != null) {

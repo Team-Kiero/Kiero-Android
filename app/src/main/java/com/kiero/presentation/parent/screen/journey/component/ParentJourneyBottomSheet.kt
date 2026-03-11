@@ -14,9 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -33,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.kiero.R
 import com.kiero.core.common.extension.disableNestedScroll
 import com.kiero.core.common.extension.noRippleClickable
+import com.kiero.core.designsystem.component.bottomsheet.KieroBottomSheet
 import com.kiero.core.designsystem.component.chip.KieroChip
 import com.kiero.core.designsystem.component.chip.action.KieroCoinAction
 import com.kiero.core.designsystem.component.emptyview.KieroEmptyView
@@ -50,16 +49,12 @@ fun ParentJourneyBottomSheet(
     modifier: Modifier = Modifier,
     initialTab: Int = 0, // 0 완료, 1 미완료
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
     var selectedTabIndex by remember { mutableIntStateOf(initialTab) }
 
     val tabs = persistentListOf("완료", "미완료")
 
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState,
-        containerColor = KieroTheme.colors.gray900,
+    KieroBottomSheet(
+        onDismiss = onDismiss,
         dragHandle = null,
         modifier = modifier
             .pointerInput(Unit) {

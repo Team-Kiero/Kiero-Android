@@ -1,7 +1,6 @@
 package com.kiero.presentation.parent.screen.journey.component
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -22,7 +21,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
-import com.kiero.core.common.util.toDotSeparatedDate
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.screen.journey.ParentJourneyState
 import com.kiero.presentation.parent.screen.journey.model.KidInfo
@@ -57,7 +55,7 @@ fun ParentJourneyTodayKidInfo(
             )
 
             Text(
-                text = kidInfo.currentDate.toDotSeparatedDate(),
+                text = kidInfo.currentDate,
                 style = KieroTheme.typography.regular.body4,
                 color = KieroTheme.colors.gray500
             )

@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.core.common.extension.collectSideEffect
+import com.kiero.core.common.util.toDotSeparatedDate
 import com.kiero.core.designsystem.component.emptyview.KieroEmptyView
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.trigger.SnackbarState
@@ -73,6 +74,7 @@ private fun ParentJourneyScreen(
     navigateUp: () -> Unit,
 ) {
     var isBottomSheetVisible by remember { mutableStateOf(false) }
+    var isTodayJourneyVisible by remember { mutableStateOf(false) }
     var initialTab by remember { mutableIntStateOf(0) }
 
     Column (
@@ -128,6 +130,9 @@ private fun ParentJourneyScreen(
                 ) { index, item ->
                     ParentJourneyTodayStatusItem(
                         item = item,
+                        onItemClick = {
+                            isBottomSheetVisible = true
+                        }
                     )
                 }
             }
@@ -142,6 +147,10 @@ private fun ParentJourneyScreen(
             onDismiss = { isBottomSheetVisible = false }
         )
     }
+
+    if (isTodayJourneyVisible) {
+
+    }
 }
 
 @Preview
@@ -155,7 +164,7 @@ private fun ParentJourneyScreenPreview() {
                 kidInfo = KidInfo(
                     kidId = "1",
                     kidName = "민성",
-                    currentDate = LocalDate.now()
+                    currentDate = LocalDate.now().toDotSeparatedDate()
                 ),
             )
         )
