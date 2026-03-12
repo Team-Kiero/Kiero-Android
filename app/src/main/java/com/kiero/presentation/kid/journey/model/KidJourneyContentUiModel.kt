@@ -5,6 +5,15 @@ import androidx.compose.runtime.Immutable
 @Immutable
 sealed interface KidJourneyContentUiModel {
 
+    interface ScheduledContent {
+        val scheduleDetailId: Long?
+        val scheduleName: String?
+        val stoneType: StoneUiType?
+        val scheduleInfo: KidJourneyScheduleUiModel
+        val isSkippable: Boolean
+        val isNowScheduleVerified: Boolean
+    }
+
     /**
      * 금일 일정 없음 (NO_SCHEDULE)
      * - 추가 데이터 불필요
@@ -16,39 +25,39 @@ sealed interface KidJourneyContentUiModel {
      * - 일정 이름만 필요
      */
     data class FirstSchedule(
-        val scheduleDetailId: Long?,
-        val scheduleName: String?,
-        val stoneType: StoneUiType?,
-        val scheduleInfo: KidJourneyScheduleUiModel,
-        val isSkippable: Boolean,
-        val isNowScheduleVerified: Boolean
-    ) : KidJourneyContentUiModel
+        override val scheduleDetailId: Long?,
+        override val scheduleName: String?,
+        override val stoneType: StoneUiType?,
+        override val scheduleInfo: KidJourneyScheduleUiModel,
+        override val isSkippable: Boolean,
+        override val isNowScheduleVerified: Boolean
+    ) : KidJourneyContentUiModel, ScheduledContent
 
     /**
      * 현재 일정 진행 중 (NOW_SCHEDULE_EXIST)
      * - 일정 이름, 불조각 타입 필요
      */
     data class NowSchedule(
-        val scheduleDetailId: Long?,
-        val scheduleName: String?,
-        val stoneType: StoneUiType?,
-        val scheduleInfo: KidJourneyScheduleUiModel,
-        val isSkippable: Boolean,
-        val isNowScheduleVerified: Boolean
-    ) : KidJourneyContentUiModel
+        override val scheduleDetailId: Long?,
+        override val scheduleName: String?,
+        override val stoneType: StoneUiType?,
+        override val scheduleInfo: KidJourneyScheduleUiModel,
+        override val isSkippable: Boolean,
+        override val isNowScheduleVerified: Boolean
+    ) : KidJourneyContentUiModel, ScheduledContent
 
     /**
      * 다음 일정 존재 (NEXT_SCHEDULE_EXIST)
      * - 일정 이름, 불조각 타입 필요
      */
     data class NextSchedule(
-        val scheduleDetailId: Long?,
-        val scheduleName: String?,
-        val stoneType: StoneUiType?,
-        val scheduleInfo: KidJourneyScheduleUiModel,
-        val isSkippable: Boolean,
-        val isNowScheduleVerified: Boolean
-    ) : KidJourneyContentUiModel
+        override val scheduleDetailId: Long?,
+        override val scheduleName: String?,
+        override val stoneType: StoneUiType?,
+        override val scheduleInfo: KidJourneyScheduleUiModel,
+        override val isSkippable: Boolean,
+        override val isNowScheduleVerified: Boolean
+    ) : KidJourneyContentUiModel, ScheduledContent
 
     /**
      * 불 피우기 전 (FIRE_NOT_LIT)

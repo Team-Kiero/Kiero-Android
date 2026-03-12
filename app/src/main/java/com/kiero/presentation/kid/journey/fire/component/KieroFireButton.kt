@@ -22,9 +22,8 @@ import com.kiero.R
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
 
-
 @Composable
-fun KieroButtonLarge(
+fun KieroFireButton(
     stoneCount: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -75,7 +74,7 @@ fun KieroButtonLarge(
 @Composable
 private fun KieroButtonLargePreview() {
     KieroTheme {
-        KieroButtonLarge(
+        KieroFireButton(
             stoneCount = 7,
             onClick = {}
         )

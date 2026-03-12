@@ -59,7 +59,6 @@ import com.kiero.presentation.kid.journey.model.KidJourneyScheduleUiModel
 import com.kiero.presentation.kid.journey.model.StoneUiType
 import com.kiero.presentation.kid.journey.state.KidJourneySideEffect
 import com.kiero.presentation.kid.journey.state.KidJourneyState
-import com.kiero.presentation.kid.journey.util.KidJourneyContentUtil
 import com.kiero.presentation.kid.journey.viewmodel.KidJourneyViewModel
 import com.kiero.presentation.main.navigation.KidMainTab
 
@@ -95,7 +94,6 @@ fun KidJourneyRoute(
             is KidJourneySideEffect.ShowSnackbar -> globalTrigger.showSnackbar(
                 SnackbarState(message = sideEffect.message)
             )
-
             KidJourneySideEffect.ShowDialog -> globalTrigger.dialogTrigger.show {}
         }
     }
@@ -104,22 +102,9 @@ fun KidJourneyRoute(
         is UiState.Success -> {
             val onNavigateToCamera = {
                 val content = state.data.content
-                when (content) {
-                    is KidJourneyContentUiModel.FirstSchedule -> {
-                        navigateToCamera(content.scheduleDetailId!!, content.stoneType!!)
-                    }
 
-                    is KidJourneyContentUiModel.NowSchedule -> {
-                        navigateToCamera(content.scheduleDetailId!!, content.stoneType!!)
-                    }
-
-                    is KidJourneyContentUiModel.NextSchedule -> {
-                        navigateToCamera(content.scheduleDetailId!!, content.stoneType!!)
-                    }
-
-                    else -> {
-                        // 데이터가 없는 상태에서 호출된 경우
-                    }
+                if (content is KidJourneyContentUiModel.ScheduledContent) {
+                    navigateToCamera(content.scheduleDetailId!!, content.stoneType!!)
                 }
             }
 
@@ -229,7 +214,7 @@ private fun KidJourneyScreen(
                     .fillMaxWidth()
                     .alpha(if (state.shouldShowSchedule) 1f else 0f)
             ) {
-                KidJourneyContentUtil.getScheduleInfo(state.content)?.let { schedule ->
+                state.currentScheduleInfo?.let { schedule ->
                     KidJourneyScheduleItem(item = schedule)
                 }
             }
