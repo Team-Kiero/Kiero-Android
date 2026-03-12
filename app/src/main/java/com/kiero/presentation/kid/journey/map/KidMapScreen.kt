@@ -71,7 +71,6 @@ private fun KidMapScreen(
         modifier = modifier
             .fillMaxSize()
             .background(KieroTheme.colors.black)
-            .padding(paddingValues)
     ) {
         Image(
             painter = painterResource(id = R.drawable.img_kid_map_background),
@@ -94,7 +93,7 @@ private fun KidMapScreen(
 
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxSize()
                     .padding(horizontal = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
