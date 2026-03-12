@@ -8,7 +8,7 @@ sealed interface KidJourneyContentUiModel {
     interface ScheduledContent {
         val scheduleDetailId: Long?
         val scheduleName: String?
-        val stoneType: StoneUiType?
+        val stoneType: KidJourneyStoneType?
         val scheduleInfo: KidJourneyScheduleUiModel
         val isSkippable: Boolean
         val isNowScheduleVerified: Boolean
