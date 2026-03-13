@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,6 +21,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -52,56 +56,84 @@ import kotlinx.collections.immutable.persistentListOf
 fun ParentRewardRoute(
     paddingValues: PaddingValues,
     navigateToRewardAdd: () -> Unit,
-    navigateToRewardEdit: () -> Unit,
+    navigateToRewardEdit: (Long) -> Unit,
     viewModel: ParentRewardViewModel = hiltViewModel(),
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
     val globalTrigger = LocalGlobalUiEventTrigger.current
     val gridState = rememberLazyGridState()
 
+    var isSheetVisible by remember { mutableStateOf(false) }
+    var isDialogVisible by remember { mutableStateOf(false) }
+    var shouldScrollToTop by remember { mutableStateOf(false) }
+
+    // GNB 재클릭 처리
     LaunchedEffect(globalTrigger) {
         globalTrigger.tabReselectedEvent.collect { route ->
             if (route == Reward) {
-                gridState.animateScrollToItem(0)
-                viewModel.hideBottomSheet()
-                viewModel.hideDeleteDialog()
+                viewModel.fetchRewards()
+                shouldScrollToTop = true
+                isSheetVisible = false
+                isDialogVisible = false
             }
         }
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.fetchRewards()
-    }
-
-    viewModel.sideEffect.collectSideEffect { sideEffect ->
-        when (sideEffect) {
-            is ParentRewardSideEffect.ShowSnackBar -> globalTrigger.showSnackbar(
-                SnackbarState(message = sideEffect.message)
-            )
+    // 스크롤 리셋 처리
+    LaunchedEffect(uiState) {
+        if (uiState is UiState.Success && shouldScrollToTop) {
+            gridState.scrollToItem(0)
+            shouldScrollToTop = false
         }
     }
 
-    when (val uiState = state) {
+    // 초기 로드
+    LaunchedEffect(Unit) { viewModel.fetchRewards() }
+
+    // 사이드 이펙트 처리
+    viewModel.sideEffect.collectSideEffect { sideEffect ->
+        if (sideEffect is ParentRewardSideEffect.ShowSnackBar) {
+            globalTrigger.showSnackbar(SnackbarState(message = sideEffect.message))
+        }
+    }
+
+    // 메인 레이아웃
+    when (val state = uiState) {
         is UiState.Success -> {
             ParentRewardScreen(
                 paddingValues = paddingValues,
-                state = uiState.data,
-                navigateToRewardAdd = navigateToRewardAdd,
+                state = state.data,
                 gridState = gridState,
-                onRewardClick = viewModel::showBottomSheet,
-                onBottomSheetDismiss = viewModel::hideBottomSheet,
-                onEditClick = {
-                    viewModel.hideBottomSheet()
-                    navigateToRewardEdit()
+                isSheetVisible = isSheetVisible,
+                isDialogVisible = isDialogVisible,
+                onAddClick = navigateToRewardAdd,
+                onRewardClick = { reward ->
+                    viewModel.selectReward(reward)
+                    isSheetVisible = true
                 },
-                onDeleteClick = viewModel::showDeleteDialog,
-                onDeleteDialogDismiss = viewModel::hideDeleteDialog,
-                onDeleteConfirm = viewModel::deleteReward,
+                onEditClick = {
+                    state.data.selectedReward?.couponId?.let {
+                        isSheetVisible = false
+                        navigateToRewardEdit(it)
+                    }
+                },
+                onDeleteClick = {
+                    isSheetVisible = false
+                    isDialogVisible = true
+                },
+                onBottomSheetDismiss = { isSheetVisible = false },
+                onDeleteDialogDismiss = {
+                    isDialogVisible = false
+                    isSheetVisible = true
+                },
+                onDeleteConfirm = {
+                    viewModel.deleteReward()
+                    isDialogVisible = false
+                }
             )
         }
         UiState.Loading -> KieroLoadingIndicator()
-        is UiState.Failure -> {}
-        UiState.Empty -> {}
+        else -> Unit
     }
 }
 
@@ -110,19 +142,20 @@ private fun ParentRewardScreen(
     paddingValues: PaddingValues,
     state: ParentRewardState,
     gridState: LazyGridState,
-    navigateToRewardAdd: () -> Unit,
+    isSheetVisible: Boolean,
+    isDialogVisible: Boolean,
+    onAddClick: () -> Unit,
     onRewardClick: (ParentRewardUiModel) -> Unit,
-    onBottomSheetDismiss: () -> Unit,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
+    onBottomSheetDismiss: () -> Unit,
     onDeleteDialogDismiss: () -> Unit,
     onDeleteConfirm: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
-            .background(color = KieroTheme.colors.black)
+            .background(KieroTheme.colors.black)
     ) {
         Column(
             modifier = Modifier
@@ -130,132 +163,211 @@ private fun ParentRewardScreen(
                 .padding(paddingValues)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
-
-            ParentTopbar(
-                title = "보상",
-                onAlarmClick = {},
-            )
+            ParentTopbar(title = "보상", onAlarmClick = {})
 
             if (state.rewards.isEmpty()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Spacer(modifier = Modifier.height(175.dp))
-
-                    Text(
-                        text = "등록된 보상 쿠폰이 없어요!\n우측 하단 버튼을 눌러 보상을 추가해보세요!",
-                        style = KieroTheme.typography.semiBold.title3,
-                        color = KieroTheme.colors.gray400,
-                        textAlign = TextAlign.Center,
-                    )
-
-                    Image(
-                        painter = painterResource(id = R.drawable.img_parent_no_alarm),
-                        contentDescription = null,
-                        modifier = Modifier,
-                        contentScale = ContentScale.FillWidth,
-                    )
-                }
+                EmptyRewardContent()
             } else {
-                LazyVerticalGrid(
-                    state = gridState,
-                    columns = GridCells.Fixed(2),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    contentPadding = PaddingValues(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(13.dp),
-                    verticalArrangement = Arrangement.spacedBy(13.dp),
-                ) {
-                    items(
-                        items = state.rewards,
-                        key = { it.couponId },
-                    ) { reward ->
-                        ParentRewardCard(
-                            name = reward.name,
-                            price = reward.price,
-                            onClick = { onRewardClick(reward) },
-                        )
-                    }
-                }
+                RewardGridContent(
+                    gridState = gridState,
+                    rewards = state.rewards,
+                    onRewardClick = onRewardClick
+                )
             }
         }
 
         ParentFloatingButton(
             buttonColor = KieroTheme.colors.white,
-            onActiveClick = navigateToRewardAdd,
+            onActiveClick = onAddClick,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(end = 31.dp, bottom = 19.dp + paddingValues.calculateBottomPadding())
         )
-    }
 
-    if (state.isBottomSheetVisible && state.selectedReward != null) {
+        RewardOverlays(
+            state = state,
+            isSheetVisible = isSheetVisible,
+            isDialogVisible = isDialogVisible,
+            onBottomSheetDismiss = onBottomSheetDismiss,
+            onEditClick = onEditClick,
+            onDeleteClick = onDeleteClick,
+            onDeleteDialogDismiss = onDeleteDialogDismiss,
+            onDeleteConfirm = onDeleteConfirm
+        )
+    }
+}
+
+@Composable
+private fun EmptyRewardContent() {
+    Column(
+        modifier = Modifier.fillMaxWidth().fillMaxHeight(0.8f),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "등록된 보상 쿠폰이 없어요!\n우측 하단 버튼을 눌러 보상을 추가해보세요!",
+            style = KieroTheme.typography.semiBold.title3,
+            color = KieroTheme.colors.gray400,
+            textAlign = TextAlign.Center,
+        )
+        Image(
+            painter = painterResource(id = R.drawable.img_parent_no_alarm),
+            contentDescription = null,
+            modifier = Modifier.fillMaxWidth(),
+            contentScale = ContentScale.FillWidth,
+        )
+    }
+}
+
+@Composable
+private fun RewardGridContent(
+    gridState: LazyGridState,
+    rewards: List<ParentRewardUiModel>,
+    onRewardClick: (ParentRewardUiModel) -> Unit
+) {
+    LazyVerticalGrid(
+        state = gridState,
+        columns = GridCells.Fixed(2),
+        modifier = Modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(13.dp),
+        verticalArrangement = Arrangement.spacedBy(13.dp),
+    ) {
+        items(items = rewards, key = { it.couponId }) { reward ->
+            ParentRewardCard(
+                name = reward.name,
+                price = reward.price,
+                onClick = { onRewardClick(reward) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun RewardOverlays(
+    state: ParentRewardState,
+    isSheetVisible: Boolean,
+    isDialogVisible: Boolean,
+    onBottomSheetDismiss: () -> Unit,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+    onDeleteDialogDismiss: () -> Unit,
+    onDeleteConfirm: () -> Unit
+) {
+    val selected = state.selectedReward ?: return
+
+    if (isSheetVisible) {
         ParentRewardBottomSheet(
-            reward = state.selectedReward,
+            reward = selected,
             onDismissRequest = onBottomSheetDismiss,
             onEditClick = onEditClick,
             onDeleteClick = onDeleteClick,
         )
     }
 
-    if (state.isDeleteDialogVisible && state.selectedReward != null) {
+    if (isDialogVisible) {
         ParentRewardDeleteDialog(
-            reward = state.selectedReward,
+            reward = selected,
             onDismiss = onDeleteDialogDismiss,
             onConfirm = onDeleteConfirm,
         )
     }
 }
-
-
 @Preview
 @Composable
-private fun ParentRewardScreenPreview() {
+private fun ParentRewardScreenEmptyPreview() {
     KieroTheme {
         ParentRewardScreen(
-            paddingValues = PaddingValues(),
+            paddingValues = PaddingValues(bottom = 56.dp),
+            state = ParentRewardState(rewards = persistentListOf()),
             gridState = rememberLazyGridState(),
-            state = ParentRewardState(),
-            navigateToRewardAdd = {},
+            isSheetVisible = false,
+            isDialogVisible = false,
+            onAddClick = {},
             onRewardClick = {},
-            onBottomSheetDismiss = {},
             onEditClick = {},
             onDeleteClick = {},
+            onBottomSheetDismiss = {},
             onDeleteDialogDismiss = {},
             onDeleteConfirm = {},
         )
     }
 }
+
 @Preview
 @Composable
-private fun ParentRewardScreenWithItemsPreview() {
+private fun ParentRewardScreenListPreview() {
+    val sampleRewards = persistentListOf(
+        ParentRewardUiModel(couponId = 1L, name = "용돈 5,000원 받기", price = 350),
+        ParentRewardUiModel(couponId = 2L, name = "게임시간 30분 추가", price = 50),
+        ParentRewardUiModel(couponId = 3L, name = "저녁으로 치킨먹기", price = 100),
+        ParentRewardUiModel(couponId = 4L, name = "친구랑 파자마파티", price = 200),
+    )
+
     KieroTheme {
         ParentRewardScreen(
-            paddingValues = PaddingValues(),
+            paddingValues = PaddingValues(bottom = 56.dp),
+            state = ParentRewardState(rewards = sampleRewards),
             gridState = rememberLazyGridState(),
-            state = ParentRewardState(
-                rewards = persistentListOf(
-                    ParentRewardUiModel(couponId = 1L, name = "용돈 5000원 받기", price = 350),
-                    ParentRewardUiModel(couponId = 2L, name = "게임시간 30분 추가", price = 50),
-                    ParentRewardUiModel(couponId = 3L, name = "저녁으로 치킨먹기", price = 100),
-                    ParentRewardUiModel(couponId = 4L, name = "친구랑 파자마파티", price = 200),
-                    ParentRewardUiModel(couponId = 5L, name = "주말에 놀이공원 가기", price = 500),
-                    ParentRewardUiModel(couponId = 6L, name = "갖고 싶던 장난감 사기", price = 450),
-                    ParentRewardUiModel(couponId = 7L, name = "유튜브 1시간 시청권", price = 30),
-                    ParentRewardUiModel(couponId = 8L, name = "가족 다같이 영화보기", price = 150),
-                    ParentRewardUiModel(couponId = 9L, name = "원하는 아이스크림 사먹기", price = 20),
-                    ParentRewardUiModel(couponId = 10L, name = "심부름 1회 면제권", price = 80),
-                )
-            ),
-            navigateToRewardAdd = {},
+            isSheetVisible = false,
+            isDialogVisible = false,
+            onAddClick = {},
             onRewardClick = {},
-            onBottomSheetDismiss = {},
             onEditClick = {},
             onDeleteClick = {},
+            onBottomSheetDismiss = {},
+            onDeleteDialogDismiss = {},
+            onDeleteConfirm = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ParentRewardScreenBottomSheetPreview() {
+    val sampleReward = ParentRewardUiModel(couponId = 1L, name = "용돈 5,000원 받기", price = 350)
+
+    KieroTheme {
+        ParentRewardScreen(
+            paddingValues = PaddingValues(bottom = 56.dp),
+            state = ParentRewardState(
+                rewards = persistentListOf(sampleReward),
+                selectedReward = sampleReward
+            ),
+            gridState = rememberLazyGridState(),
+            isSheetVisible = true,
+            isDialogVisible = false,
+            onAddClick = {},
+            onRewardClick = {},
+            onEditClick = {},
+            onDeleteClick = {},
+            onBottomSheetDismiss = {},
+            onDeleteDialogDismiss = {},
+            onDeleteConfirm = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ParentRewardScreenDeleteDialogPreview() {
+    val sampleReward = ParentRewardUiModel(couponId = 1L, name = "용돈 5,000원 받기", price = 350)
+
+    KieroTheme {
+        ParentRewardScreen(
+            paddingValues = PaddingValues(bottom = 56.dp),
+            state = ParentRewardState(
+                rewards = persistentListOf(sampleReward),
+                selectedReward = sampleReward
+            ),
+            gridState = rememberLazyGridState(),
+            isSheetVisible = false,
+            isDialogVisible = true,
+            onAddClick = {},
+            onRewardClick = {},
+            onEditClick = {},
+            onDeleteClick = {},
+            onBottomSheetDismiss = {},
             onDeleteDialogDismiss = {},
             onDeleteConfirm = {},
         )

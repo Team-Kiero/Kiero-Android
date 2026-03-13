@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.Composable
@@ -32,17 +33,15 @@ import com.kiero.presentation.parent.navigation.Reward
 import com.kiero.presentation.parent.screen.reward.component.RewardNameTextField
 import com.kiero.presentation.parent.screen.reward.component.RewardPriceInfo
 import com.kiero.presentation.parent.screen.reward.component.RewardPriceSelect
-import com.kiero.presentation.parent.screen.reward.model.RewardPriceDefaults
-import com.kiero.presentation.parent.screen.reward.state.ParentRewardAddSideEffect
-import com.kiero.presentation.parent.screen.reward.state.ParentRewardAddState
-import com.kiero.presentation.parent.screen.reward.viewmodel.ParentRewardAddEditViewModel
+import com.kiero.presentation.parent.screen.reward.state.ParentRewardSideEffect
+import com.kiero.presentation.parent.screen.reward.viewmodel.ParentAddRewardViewModel
 
 @Composable
 fun ParentRewardAddRoute(
     navigateUp: () -> Unit,
-    viewModel: ParentRewardAddEditViewModel = hiltViewModel(),
+    viewModel: ParentAddRewardViewModel = hiltViewModel(),
 ) {
-    val state by viewModel.addState.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val globalTrigger = LocalGlobalUiEventTrigger.current
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
@@ -51,13 +50,13 @@ fun ParentRewardAddRoute(
         focusRequester.requestFocus()
     }
 
-    viewModel.addSideEffect.collectSideEffect { sideEffect ->
+    viewModel.sideEffect.collectSideEffect { sideEffect ->
         when (sideEffect) {
-            is ParentRewardAddSideEffect.ShowSnackBar -> {
+            is ParentRewardSideEffect.ShowSnackBar -> {
                 focusManager.clearFocus()
                 globalTrigger.showSnackbar(SnackbarState(message = sideEffect.message))
             }
-            ParentRewardAddSideEffect.NavigateUp -> {
+            ParentRewardSideEffect.NavigateUp -> {
                 globalTrigger.onTabReselected(Reward)
                 navigateUp()
             }
@@ -65,31 +64,37 @@ fun ParentRewardAddRoute(
     }
 
     ParentRewardAddScreen(
-        state = state,
+        isLoading = isLoading,
+        nameState = viewModel.nameState,
+        priceState = viewModel.priceState,
+        focusRequester = focusRequester,
         onSaveClick = viewModel::createReward,
         onCancelClick = navigateUp,
-        focusRequester = focusRequester
+        onValidatePrice = viewModel::validateAndFixPrice
     )
 }
 
 @Composable
 private fun ParentRewardAddScreen(
-    state: ParentRewardAddState,
+    isLoading: Boolean,
+    nameState: TextFieldState,
+    priceState: TextFieldState,
     focusRequester: FocusRequester,
-    onSaveClick: (name: String, price: Int) -> Unit,
+    onSaveClick: () -> Unit,
     onCancelClick: () -> Unit,
+    onValidatePrice: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val globalTrigger = LocalGlobalUiEventTrigger.current
     val focusManager = LocalFocusManager.current
-    val nameState = rememberTextFieldState()
-    val priceState = rememberTextFieldState(RewardPriceDefaults.DEFAULT_PRICE.toString())
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(KieroTheme.colors.black)
-            .noRippleClickable { focusManager.clearFocus() },
+            .noRippleClickable {
+                onValidatePrice()
+                focusManager.clearFocus()
+            },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(15.dp),
     ) {
@@ -101,12 +106,7 @@ private fun ParentRewardAddScreen(
             rightIconRes = R.drawable.ic_check,
             leftIconClick = onCancelClick,
             rightIconClick = {
-                if (!state.isLoading) {
-                    onSaveClick(
-                        nameState.text.toString(),
-                        priceState.text.toString().toIntOrNull() ?: 0,
-                    )
-                }
+                if (!isLoading) onSaveClick()
             },
         )
 
@@ -121,14 +121,11 @@ private fun ParentRewardAddScreen(
             textFieldState = priceState,
             onPriceClick = { delta ->
                 val current = priceState.text.toString().toIntOrNull() ?: 0
-                val updated = RewardPriceDefaults.applyChange(current, delta)
+                val updated = (current + delta).coerceIn(1, 500)
                 priceState.setTextAndPlaceCursorAtEnd(updated.toString())
             },
-            onValueAdjust = { adjustedValue ->
-                priceState.setTextAndPlaceCursorAtEnd(adjustedValue.toString())
-                if (adjustedValue == RewardPriceDefaults.MAX_PRICE) {
-                    globalTrigger.showSnackbar(SnackbarState(message = "최대 보상은 500개입니다"))
-                }
+            onValueAdjust = {
+                onValidatePrice()
             }
         )
     }
@@ -139,10 +136,13 @@ private fun ParentRewardAddScreen(
 private fun ParentRewardAddScreenPreview() {
     KieroTheme {
         ParentRewardAddScreen(
-            state = ParentRewardAddState(),
+            isLoading = false,
+            nameState = rememberTextFieldState(),
+            priceState = rememberTextFieldState("20"),
             focusRequester = remember { FocusRequester() },
-            onSaveClick = { _, _ -> },
+            onSaveClick = {},
             onCancelClick = {},
+            onValidatePrice = {}
         )
     }
 }

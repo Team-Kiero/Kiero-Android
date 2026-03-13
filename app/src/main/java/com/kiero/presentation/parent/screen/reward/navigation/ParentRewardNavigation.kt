@@ -18,23 +18,19 @@ fun NavController.navigateToReward(
     navigate(Reward, navOptions)
 }
 
-fun NavController.navigateToRewardAdd(
-    navOptions: NavOptions? = null,
-) {
+fun NavController.navigateToRewardAdd(navOptions: NavOptions? = null) {
     navigate(RewardAdd, navOptions)
 }
 
-fun NavController.navigateToRewardEdit(
-    navOptions: NavOptions? = null,
-) {
-    navigate(RewardEdit, navOptions)
+fun NavController.navigateToRewardEdit(couponId: Long, navOptions: NavOptions? = null) {
+    navigate(RewardEdit(couponId), navOptions)
 }
 
 fun NavGraphBuilder.parentRewardNavGraph(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
     navigateToRewardAdd: () -> Unit,
-    navigateToRewardEdit: () -> Unit,
+    navigateToRewardEdit: (Long) -> Unit,
 ) {
     composable<Reward> {
         ParentRewardRoute(
@@ -45,13 +41,11 @@ fun NavGraphBuilder.parentRewardNavGraph(
     }
     composable<RewardAdd> {
         ParentRewardAddRoute(
-            navigateUp = navigateUp,
+            navigateUp = navigateUp
         )
     }
     composable<RewardEdit> {
-        ParentRewardEditRoute(
-            navigateUp = navigateUp,
-        )
+        ParentRewardEditRoute(navigateUp = navigateUp)
     }
 }
 
@@ -59,4 +53,4 @@ fun NavGraphBuilder.parentRewardNavGraph(
 data object RewardAdd : Route
 
 @Serializable
-data object RewardEdit : Route
+data class RewardEdit(val couponId: Long) : Route

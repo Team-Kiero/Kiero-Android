@@ -44,7 +44,6 @@ data object Reward : ParentTab
 @Serializable
 data object Mypage : ParentTab
 
-
 fun NavController.navigateToParent(
     navOptions: NavOptions? = null,
 ) {
@@ -109,9 +108,10 @@ fun NavGraphBuilder.parentNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
             navigateToRewardAdd = { navController.navigateToRewardAdd() },
-            navigateToRewardEdit = { navController.navigateToRewardEdit() }
+            navigateToRewardEdit = { id ->
+                navController.navigateToRewardEdit(couponId = id)
+            }
         )
-
         parentMypageNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,

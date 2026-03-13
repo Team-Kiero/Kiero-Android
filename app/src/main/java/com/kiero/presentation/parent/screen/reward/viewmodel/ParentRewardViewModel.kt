@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -47,8 +46,7 @@ class ParentRewardViewModel @Inject constructor(
                     _state.update {
                         UiState.Success(
                             data = ParentRewardState(
-                                rewards = result
-                                    .map { it.toUiModel() }
+                                rewards = result.map { it.toUiModel() }
                                     .sortedWith(compareBy<ParentRewardUiModel> { it.price }
                                         .thenByDescending { it.couponId })
                                     .toImmutableList()
@@ -57,59 +55,24 @@ class ParentRewardViewModel @Inject constructor(
                     }
                 }
                 .onFailure {
-                    Timber.e("fetchRewards fail: $it")
                     _sideEffect.emit(ParentRewardSideEffect.ShowSnackBar(it.toHandleErrorMessage()))
                 }
         }
     }
 
-    fun showBottomSheet(reward: ParentRewardUiModel) {
-        _state.updateSuccess { state ->
-            state.copy(
-                selectedReward = reward,
-                isBottomSheetVisible = true,
-            )
-        }
-    }
-
-    fun hideBottomSheet() {
-        _state.updateSuccess { state ->
-            state.copy(isBottomSheetVisible = false)
-        }
-    }
-
-    fun showDeleteDialog() {
-        _state.updateSuccess { state ->
-            state.copy(
-                isBottomSheetVisible = false,
-                isDeleteDialogVisible = true,
-            )
-        }
-    }
-
-    fun hideDeleteDialog() {
-        _state.updateSuccess { state ->
-            state.copy(
-                isDeleteDialogVisible = false,
-                isBottomSheetVisible = true,
-            )
-        }
+    fun selectReward(reward: ParentRewardUiModel?) {
+        _state.updateSuccess { it.copy(selectedReward = reward) }
     }
 
     fun deleteReward() {
         viewModelScope.launch {
-            val currentState = _state.value
-            if (currentState !is UiState.Success) return@launch
-            val couponId = currentState.data.selectedReward?.couponId ?: return@launch
-
+            val couponId = (_state.value as? UiState.Success)?.data?.selectedReward?.couponId ?: return@launch
             rewardRepository.deleteCoupon(couponId)
                 .onSuccess {
                     _sideEffect.emit(ParentRewardSideEffect.ShowSnackBar("보상이 삭제되었습니다."))
-                    hideDeleteDialog()
                     fetchRewards()
                 }
                 .onFailure {
-                    Timber.e("deleteReward fail: $it")
                     _sideEffect.emit(ParentRewardSideEffect.ShowSnackBar(it.toHandleErrorMessage()))
                 }
         }

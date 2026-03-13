@@ -9,35 +9,19 @@ import kotlinx.collections.immutable.persistentListOf
 data class ParentRewardState(
     val rewards: ImmutableList<ParentRewardUiModel> = persistentListOf(),
     val selectedReward: ParentRewardUiModel? = null,
-    val isBottomSheetVisible: Boolean = false,
-    val isDeleteDialogVisible: Boolean = false,
 )
+
+@Immutable
+data class ParentRewardFormState(
+    val couponId: Long? = null,
+    val name: String = "",
+    val price: Int = 0,
+    val isLoading: Boolean = false,
+) {
+    val isEditMode: Boolean get() = couponId != null
+}
 
 sealed interface ParentRewardSideEffect {
     data class ShowSnackBar(val message: String) : ParentRewardSideEffect
-}
-
-@Immutable
-data class ParentRewardAddState(
-    val name: String = "",
-    val price: Int = 0,
-    val isLoading: Boolean = false,
-)
-
-sealed interface ParentRewardAddSideEffect {
-    data class ShowSnackBar(val message: String) : ParentRewardAddSideEffect
-    data object NavigateUp : ParentRewardAddSideEffect
-}
-
-@Immutable
-data class ParentRewardEditState(
-    val couponId: Long = 0L,
-    val name: String = "",
-    val price: Int = 0,
-    val isLoading: Boolean = false,
-)
-
-sealed interface ParentRewardEditSideEffect {
-    data class ShowSnackBar(val message: String) : ParentRewardEditSideEffect
-    data object NavigateUp : ParentRewardEditSideEffect
+    data object NavigateUp : ParentRewardSideEffect
 }
