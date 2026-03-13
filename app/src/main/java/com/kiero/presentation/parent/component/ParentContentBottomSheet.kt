@@ -34,7 +34,7 @@ fun ParentContentBottomSheet(
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier,
-    cotent: @Composable () -> Unit,
+    content: @Composable () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -55,7 +55,7 @@ fun ParentContentBottomSheet(
                 onCancelClick = onDismissRequest
             )
 
-            cotent()
+            content()
 
             Spacer(modifier = Modifier.height(35.dp))
 
@@ -64,6 +64,8 @@ fun ParentContentBottomSheet(
                 onActionClick = onEditClick,
                 actionIcon = R.drawable.ic_parent_content_edit
             )
+
+            Spacer(modifier= Modifier.height(12.dp))
 
             BottomSheetActionArea(
                 actionTitle = "삭제하기",
@@ -140,7 +142,7 @@ private fun PreviewParentContentBottomSheet() {
             onDismissRequest = {},
             onEditClick = {},
             onDeleteClick = {},
-            cotent = {
+            content = {
                 Text(
                     text = "테스트 텍스트",
                     color = KieroTheme.colors.white
