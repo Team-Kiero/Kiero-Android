@@ -7,6 +7,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -124,15 +125,28 @@ fun KieroChip(
 @Composable
 private fun KieroChipPreview() {
     KieroTheme {
-        KieroChip(
-            isCompleted = true,
-            isEnabled = true,
-            action = KieroCoinAction(
-                coinCount = 150,
+        Column {
+            KieroChip(
+                isCompleted = false,
+                isEnabled = true,
+                action = KieroCoinAction(
+                    coinCount = 150,
+                    isCompleted = true,
+                    isEnabled = true,
+                    onClick = {}
+                )
+            )
+
+            KieroChip(
                 isCompleted = true,
                 isEnabled = true,
-                onClick = {}
+                action = KieroCoinAction(
+                    coinCount = 150,
+                    isCompleted = true,
+                    isEnabled = true,
+                    onClick = {}
+                )
             )
-        )
+        }
     }
 }

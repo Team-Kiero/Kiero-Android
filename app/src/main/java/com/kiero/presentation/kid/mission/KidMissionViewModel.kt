@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -90,12 +91,14 @@ class KidMissionViewModel @Inject constructor(
                 .onSuccess { result ->
                     Timber.e("fetchMissions $result")
                     minLoadingTime.join()
-                    _state.value = UiState.Success(
-                        KidMissionState(
-                            kidMissionByDateList = result.toUiModel(),
-                            isRefreshing = false
+                    _state.update {
+                        UiState.Success(
+                            KidMissionState(
+                                kidMissionByDateList = result.toUiModel(),
+                                isRefreshing = false
+                            )
                         )
-                    )
+                    }
                 }
                 .onFailure {
                     minLoadingTime.join()

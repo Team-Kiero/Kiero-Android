@@ -1,5 +1,6 @@
 package com.kiero.core.designsystem.component
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -26,9 +27,9 @@ import com.kiero.core.designsystem.theme.KieroTheme
 @Composable
 fun KieroTopbar(
     title: String,
-    leftIconRes: Int,
     leftIconClick: () -> Unit,
     modifier: Modifier = Modifier,
+    @DrawableRes leftIconRes: Int = R.drawable.ic_arrow_left,
     rightIconRes: Int? = null,
     rightIconClick: () -> Unit = {},
     textStyle: TextStyle = KieroTheme.typography.bold.headLine2,

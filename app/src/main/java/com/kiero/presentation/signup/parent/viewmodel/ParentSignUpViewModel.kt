@@ -1,21 +1,19 @@
 package com.kiero.presentation.signup.parent.viewmodel
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
 import com.kiero.core.common.extension.toHandleErrorMessage
 import com.kiero.core.common.util.formatTime
 import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.core.common.viewmodel.throttleFirst
 import com.kiero.core.localstorage.TokenManager
 import com.kiero.core.localstorage.info.UserInfoManager
-import com.kiero.data.sse.manager.SseManager
 import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.data.parent.signup.repository.ParentSignUpRepository
+import com.kiero.data.sse.manager.SseManager
+import com.kiero.presentation.signup.parent.model.ParentInfoUiModel
 import com.kiero.presentation.signup.parent.model.ParentSignUpStep
 import com.kiero.presentation.signup.parent.model.toUiModel
-import com.kiero.presentation.signup.parent.navigation.ParentSignUp
 import com.kiero.presentation.signup.parent.state.ParentSignUpSideEffect
 import com.kiero.presentation.signup.parent.state.ParentSignUpState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,7 +34,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ParentSignUpViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
     private val repository: ParentSignUpRepository,
     private val authRepository: AuthRepository,
     private val userInfoManager: UserInfoManager,
@@ -49,17 +46,12 @@ class ParentSignUpViewModel @Inject constructor(
     private val _sideEffect = MutableSharedFlow<ParentSignUpSideEffect>()
     val sideEffect: SharedFlow<ParentSignUpSideEffect> = _sideEffect.asSharedFlow()
 
-    private val parentInfo = savedStateHandle.toRoute<ParentSignUp>()
-
     private var timerJob: Job? = null
     private var copyJob: Job? = null
     private val TIMER_DURATION_SECONDS = 10 * 60
 
     init {
-        initFetchParentInfo(
-            parentName = parentInfo.parentName,
-            parentProfileImage = parentInfo.parentProfileImage
-        )
+        initFetchParentInfo()
         sseManager.startParentSubscription()
         collectInviteEvents()
     }
@@ -94,17 +86,13 @@ class ParentSignUpViewModel @Inject constructor(
         }
     }
 
-    fun initFetchParentInfo(
-        parentName: String,
-        parentProfileImage: String,
-    ) {
+    fun initFetchParentInfo() {
         viewModelScope.launch {
+            val userInfo = userInfoManager.getParentInfo()
+
             _state.update {
                 it.copy(
-                    parentInfo = it.parentInfo.copy(
-                        parentName = parentName,
-                        parentProfileImage = parentProfileImage
-                    )
+                    parentInfo = userInfo?.toUiModel() ?: ParentInfoUiModel()
                 )
             }
         }

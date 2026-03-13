@@ -41,7 +41,7 @@ fun AuthParentRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
     navigateToSelection: () -> Unit,
-    navigateToParentSignUp: (String, String) -> Unit,
+    navigateToParentSignUp: () -> Unit,
     navigateToParentGraph: () -> Unit,
     viewModel: AuthParentViewModel = hiltViewModel(),
 ) {
@@ -52,11 +52,7 @@ fun AuthParentRoute(
     viewModel.sideEffect.collectSingleEvent {
         when (it) {
             is AuthSideEffect.NavigateUp -> navigateUp()
-            is AuthSideEffect.NavigateToParentSignUp -> {
-                navigateToParentSignUp(
-                    it.parentName, it.parentProfileImage
-                )
-            }
+            is AuthSideEffect.NavigateToParentSignUp -> navigateToParentSignUp()
 
             is AuthSideEffect.ShowSnackbar -> {
                 globalTrigger.showSnackbar(
