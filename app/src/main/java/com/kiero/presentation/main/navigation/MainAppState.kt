@@ -26,6 +26,9 @@ import com.kiero.presentation.kid.navigation.Mission
 import com.kiero.presentation.kid.navigation.Wish
 import com.kiero.presentation.kid.onboarding.navigation.navigateToKidOnboarding
 import com.kiero.presentation.kid.wish.navigation.navigateToWish
+import com.kiero.presentation.parent.screen.alarm.navigation.navigateToAlarm
+import com.kiero.presentation.parent.screen.journey.navigation.navigateToParentJourney
+import com.kiero.presentation.parent.screen.mypage.navigation.navigateToMypage
 import com.kiero.presentation.parent.navigation.Mypage
 import com.kiero.presentation.parent.navigation.ParentGraph
 import com.kiero.presentation.parent.navigation.ParentJourney
@@ -137,8 +140,12 @@ class MainAppState(
     )
 
     fun navigateToParentSignUp(
+        parentName: String,
+        parentProfileImage: String,
         navOptions: NavOptions? = null,
     ) = navController.navigateToParentSignUp(
+        parentName = parentName,
+        parentProfileImage = parentProfileImage,
         navOptions = navOptions
     )
 
@@ -253,9 +260,9 @@ class MainAppState(
         date: String,
         navOptions: NavOptions? = null
     ) = navController.navigateToMap(
-        date = date,
-        navOptions = navOptions
-    )
+            date = date,
+            navOptions = navOptions
+        )
 
     fun navigateToParentMission(navOptions: NavOptions? = null) =
         navController.navigateToParentMission(navOptions)
