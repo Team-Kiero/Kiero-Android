@@ -17,11 +17,11 @@ data class ParentJourneyMissionModel(
 )
 
 data class ParentJourneyScheduleModel(
+    val scheduleDetailId : Long,
     val name : String,
     val startTime : String,
     val endTime : String,
     val isOngoing : Boolean,
-    val imageUrl : String?,
     val status : String
 )
 
@@ -38,10 +38,10 @@ fun ParentJourneyMissionDto.toModel() = ParentJourneyMissionModel(
 )
 
 fun ParentJourneyScheduleDto.toModel() = ParentJourneyScheduleModel(
+    scheduleDetailId = scheduleDetailId,
     name = name,
     startTime = startTime,
     endTime = endTime,
     isOngoing = isOngoing,
-    imageUrl = imageUrl,
     status = status
 )

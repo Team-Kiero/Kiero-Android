@@ -31,10 +31,10 @@ data class ParentJourneyScheduleDto(
     @SerialName("startTime") val startTime: String,
     /** 일정 종료 시간 */
     @SerialName("endTime") val endTime: String,
-    /** 현재 진행 중인 일정 여부 (true면 색인 필요) */
+    /** 일정 상세 id */
+    @SerialName("scheduleDetailId") val scheduleDetailId: Long,
+    /** 현재 진행 중인 일정 여부 (true면 현재 시간대에 해당하는 일정) */
     @SerialName("isOngoing") val isOngoing: Boolean,
-    /** 일정 인증 이미지 URL (실패 또는 스킵 시 null) */
-    @SerialName("imageUrl") val imageUrl: String?,
     /** 일정 상태 ENUM */
     @SerialName("status") val status: String
 )
