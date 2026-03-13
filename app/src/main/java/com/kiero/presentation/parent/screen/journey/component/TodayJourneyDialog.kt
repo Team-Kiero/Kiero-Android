@@ -32,7 +32,6 @@ import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.component.UrlImage
 import com.kiero.core.designsystem.theme.KieroTheme
 
-// Todo: 서버 구현되는대로 이미지 id로 변경
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodayJourneyDialog(
@@ -83,6 +82,7 @@ fun TodayJourneyDialog(
                         imageVector = ImageVector.vectorResource(R.drawable.ic_close),
                         contentDescription = null,
                         tint = Color.Unspecified,
+                        modifier = Modifier.noRippleClickable(onDismiss)
                     )
                 }
 

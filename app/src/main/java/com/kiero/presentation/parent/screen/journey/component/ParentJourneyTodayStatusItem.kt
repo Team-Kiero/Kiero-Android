@@ -39,7 +39,7 @@ import com.kiero.presentation.parent.screen.journey.model.TodayStatus
 fun ParentJourneyTodayStatusItem(
     item: TodayJourneyUiModel,
     modifier: Modifier = Modifier,
-    onItemClick: (Int) -> Unit = {}
+    onItemClick: (TodayJourneyUiModel) -> Unit = {}
 ) {
     Row(
         modifier = modifier
@@ -60,8 +60,8 @@ fun ParentJourneyTodayStatusItem(
         ParentJourneyToday(
             item = item,
             modifier = Modifier.padding(bottom = 12.dp, end = 10.dp),
-            onItemClick = if (item.authImageUrl != null) {
-                { onItemClick(item.id) }
+            onItemClick = if (item.isAuthenticated) {
+                { onItemClick(item) }
             } else null
         )
     }

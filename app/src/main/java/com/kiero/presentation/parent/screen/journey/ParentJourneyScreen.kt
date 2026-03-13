@@ -31,7 +31,9 @@ import com.kiero.presentation.parent.screen.journey.component.ParentJourneyBotto
 import com.kiero.presentation.parent.screen.journey.component.ParentJourneyTodayKidInfo
 import com.kiero.presentation.parent.screen.journey.component.ParentJourneyTodayMissionStatus
 import com.kiero.presentation.parent.screen.journey.component.ParentJourneyTodayStatusItem
+import com.kiero.presentation.parent.screen.journey.component.TodayJourneyDialog
 import com.kiero.presentation.parent.screen.journey.model.KidInfo
+import com.kiero.presentation.parent.screen.journey.model.TodayJourneyUiModel
 import java.time.LocalDate
 
 @Composable
@@ -63,6 +65,7 @@ fun ParentJourneyRoute(
     ParentJourneyScreen(
         paddingValues = paddingValues,
         navigateUp = navigateUp,
+        onClickJourneyItem = viewModel::fetchScheduleImage,
         state = state
     )
 }
@@ -72,10 +75,15 @@ private fun ParentJourneyScreen(
     paddingValues: PaddingValues,
     state: ParentJourneyState,
     navigateUp: () -> Unit,
+    onClickJourneyItem: (Long) -> Unit = {}
 ) {
+    var initialTab by remember { mutableIntStateOf(0) }
+
     var isBottomSheetVisible by remember { mutableStateOf(false) }
     var isTodayJourneyVisible by remember { mutableStateOf(false) }
-    var initialTab by remember { mutableIntStateOf(0) }
+
+    var selectedJourneyItem by remember { mutableStateOf<TodayJourneyUiModel?>(null) }
+
 
     Column (
         modifier = Modifier
@@ -131,6 +139,8 @@ private fun ParentJourneyScreen(
                     ParentJourneyTodayStatusItem(
                         item = item,
                         onItemClick = {
+                            selectedJourneyItem = it
+                            onClickJourneyItem(it.scheduleDetailId)
                             isTodayJourneyVisible = true
                         }
                     )
@@ -149,7 +159,13 @@ private fun ParentJourneyScreen(
     }
 
     if (isTodayJourneyVisible) {
-
+        TodayJourneyDialog(
+            missionTitle = selectedJourneyItem?.todayMission.orEmpty(),
+            imageUrl = state.selectedJourneyImageUrl,
+            onDismiss = {
+                isTodayJourneyVisible = false
+            }
+        )
     }
 }
 
