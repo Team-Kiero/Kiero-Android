@@ -7,6 +7,7 @@ import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.core.localstorage.constant.DataStoreConstant.KEY_CHILD_ID
 import com.kiero.core.localstorage.constant.DataStoreConstant.KEY_PARENT_NAME
 import com.kiero.core.localstorage.constant.DataStoreConstant.KEY_PARENT_PROFILE_IMAGE
+import com.kiero.core.model.parent.ParentInfo
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import timber.log.Timber

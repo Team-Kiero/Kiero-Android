@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -31,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.kiero.R
-import com.kiero.core.common.extension.forcePixelToDp
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.component.dialog.action.DialogAction
 import com.kiero.core.designsystem.component.dialog.action.KieroCancelAction
@@ -91,7 +89,7 @@ fun KieroDialog(
 
                 if (title != null) {
                     Text(
-                        text = title.orEmpty(),
+                        text = title,
                         color = KieroTheme.colors.white,
                         style = KieroTheme.typography.semiBold.title2,
                         modifier = Modifier.fillMaxWidth(),

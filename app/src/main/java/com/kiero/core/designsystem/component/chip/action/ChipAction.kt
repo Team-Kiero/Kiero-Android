@@ -1,8 +1,10 @@
 package com.kiero.core.designsystem.component.chip.action
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 
+@Stable
 fun interface ChipAction {
     @Composable
     operator fun invoke(modifier: Modifier)

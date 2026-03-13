@@ -5,8 +5,16 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import com.kiero.presentation.parent.screen.mypage.ParentMypageRoute
+import androidx.navigation.navigation
 import com.kiero.presentation.parent.navigation.Mypage
+import com.kiero.presentation.parent.screen.mypage.ParentMyPageRoute
+import com.kiero.presentation.parent.screen.mypage.route.licenses.OssLicensesScreen
+import com.kiero.presentation.parent.screen.mypage.route.licenses.navigation.OssLicenses
+import com.kiero.presentation.parent.screen.mypage.route.licenses.navigation.navigateToOssLicenses
+import kotlinx.serialization.Serializable
+
+@Serializable
+data object MyPageGraph
 
 fun NavController.navigateToMypage(
     navOptions: NavOptions? = null,
@@ -16,12 +24,25 @@ fun NavController.navigateToMypage(
 
 fun NavGraphBuilder.parentMypageNavGraph(
     paddingValues: PaddingValues,
+    navController: NavController,
     navigateUp: () -> Unit,
 ) {
-    composable<Mypage> {
-        ParentMypageRoute(
-            paddingValues = paddingValues,
-            navigateUp = navigateUp,
-        )
+    navigation<MyPageGraph> (
+        startDestination = Mypage
+    ) {
+        composable<Mypage> {
+            ParentMyPageRoute(
+                paddingValues = paddingValues,
+                navigateUp = navigateUp,
+                navigateToOssLicenses = navController::navigateToOssLicenses
+            )
+        }
+
+        composable<OssLicenses> {
+            OssLicensesScreen(
+                paddingValues = paddingValues,
+                onBackClick = navigateUp
+            )
+        }
     }
 }

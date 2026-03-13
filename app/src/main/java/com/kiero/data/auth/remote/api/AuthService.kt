@@ -16,7 +16,7 @@ interface AuthService {
     ): BaseResponse<AuthLoginResponseDto>
 
     // 아이
-    @POST("api/v1/children/signup")
+    @POST("api/v1/children/login")
     suspend fun postAuthKidLogin(
         @Body body: AuthKidRequestDto
     ): BaseResponse<AuthKidResponseDto>
