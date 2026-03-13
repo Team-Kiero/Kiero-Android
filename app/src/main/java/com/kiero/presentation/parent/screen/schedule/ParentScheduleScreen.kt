@@ -203,7 +203,7 @@ private fun ParentScheduleScreen(
                     showBottomSheet = false
                     showDeleteDialog = true
                 },
-                cotent = {
+                content = {
                     selectedSchedule?.let { ScheduleDetailContent(schedule = it) }
                 }
             )
@@ -230,7 +230,6 @@ private fun ParentScheduleScreen(
 
                         if (id != null) {
                             onDeleteConfirm(id, date, includeFollowing)
-                        } else {
                         }
                     }
                 ),
