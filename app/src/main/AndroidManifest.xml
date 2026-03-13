@@ -7,6 +7,10 @@
 
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
+    <queries>
+        <package android:name="com.kakao.talk" />
+    </queries>
+
     <application
         android:name="com.kiero.KieroApplication"
         android:allowBackup="true"
