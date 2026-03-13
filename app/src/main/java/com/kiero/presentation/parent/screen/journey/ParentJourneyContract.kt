@@ -13,7 +13,9 @@ data class ParentJourneyState(
 
     val completeMissions: ImmutableList<JourneyMissionUiModel> = persistentListOf(),
     val incompleteMissions: ImmutableList<JourneyMissionUiModel> = persistentListOf(),
-    val todayMissionList: ImmutableList<TodayJourneyUiModel> = persistentListOf()
+    val todayMissionList: ImmutableList<TodayJourneyUiModel> = persistentListOf(),
+
+    val selectedJourneyImageUrl: String = ""
 ) {
     companion object {
         val FAKE = persistentListOf(

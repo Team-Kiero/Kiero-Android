@@ -34,6 +34,14 @@ class ParentJourneyViewModel @Inject constructor(
         sseManager.startParentSubscription()
     }
 
+    fun collectParentJourneyScheduleEvents() {
+        viewModelScope.launch {
+            sseManager.parentScheduleEvents.collect { event ->
+                Timber.e("parentScheduleEvents $event")
+            }
+        }
+    }
+
     private fun fetchKidInfo() {
         viewModelScope.launch {
             authRepository.getChildren()
@@ -47,6 +55,7 @@ class ParentJourneyViewModel @Inject constructor(
                             )
                         }
 
+                        collectParentJourneyScheduleEvents()
                         fetchParentJourney(kidInfo.kidId.toLong())
                     }
                 }
@@ -68,7 +77,7 @@ class ParentJourneyViewModel @Inject constructor(
                     currentState.copy(
                         completeMissions = result.completeMissions.map { it.toUiModel() }.toImmutableList(),
                         incompleteMissions = result.incompleteMissions.map { it.toUiModel() }.toImmutableList(),
-                        todayMissionList = result.schedules.mapIndexed { index, it -> it.toUiModel(id = index) }.toImmutableList()
+                        todayMissionList = result.schedules.map { it.toUiModel() }.toImmutableList()
                     )
                 }
             }.onFailure {
@@ -76,5 +85,29 @@ class ParentJourneyViewModel @Inject constructor(
                 _sideEffect.emit(ParentJourneySideEffect.ShowSnackbar(message = "일정 정보 불러오기에 실패하였습니다"))
             }
         }
+    }
+
+    fun fetchScheduleImage(
+        scheduleDetailId: Long
+    ) {
+        viewModelScope.launch {
+            parentJourneyRepository.patchScheduleImage(
+                scheduleDetailId = scheduleDetailId
+            ).onSuccess { result ->
+                _state.update {
+                    it.copy(
+                        selectedJourneyImageUrl = result.imageUrl
+                    )
+                }
+            }.onFailure {
+                Timber.e(it)
+                _sideEffect.emit(ParentJourneySideEffect.ShowSnackbar(message = "이미지 정보 불러오기에 실패하였습니다"))
+            }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        sseManager.stopSubscription()
     }
 }
