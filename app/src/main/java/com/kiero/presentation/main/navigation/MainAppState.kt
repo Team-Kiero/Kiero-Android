@@ -140,12 +140,8 @@ class MainAppState(
     )
 
     fun navigateToParentSignUp(
-        parentName: String,
-        parentProfileImage: String,
         navOptions: NavOptions? = null,
     ) = navController.navigateToParentSignUp(
-        parentName = parentName,
-        parentProfileImage = parentProfileImage,
         navOptions = navOptions
     )
 
