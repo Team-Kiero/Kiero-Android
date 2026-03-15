@@ -6,6 +6,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
@@ -72,6 +73,18 @@ val String.formatWithDayOfWeek: String
         }
     }
 
+val String.toKoreanTimeString: String
+    get() {
+        if (this.isBlank()) return this
+
+        return try {
+            val time = LocalTime.parse(this)
+            val formatter = DateTimeFormatter.ofPattern("a hh:mm", Locale.KOREAN)
+            time.format(formatter)
+        } catch (e: Exception) {
+            this
+        }
+    }
 
 private val SERVER_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")
 

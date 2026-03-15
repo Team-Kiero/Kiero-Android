@@ -1,6 +1,7 @@
 package com.kiero.presentation.kid.journey.map.model
 
 import androidx.compose.runtime.Immutable
+import com.kiero.core.common.extension.toKoreanTimeString
 import com.kiero.data.kid.schedule.model.ScheduleProgressItemModel
 import com.kiero.presentation.kid.journey.model.KidJourneyStoneType
 
@@ -16,8 +17,8 @@ data class KidMapItemUiModel(
 
 fun ScheduleProgressItemModel.toUiModel() = KidMapItemUiModel(
     name = this.name,
-    startTime = this.startTime,
-    endTime = this.endTime,
+    startTime = this.startTime.toKoreanTimeString,
+    endTime = this.endTime.toKoreanTimeString,
     isOngoing = this.isOngoing,
     stoneType = runCatching { KidJourneyStoneType.valueOf(this.stoneType) }.getOrDefault(
         KidJourneyStoneType.COURAGE
