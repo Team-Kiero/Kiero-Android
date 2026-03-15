@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -203,10 +204,13 @@ private fun ParentRewardScreen(
 @Composable
 private fun EmptyRewardContent() {
     Column(
-        modifier = Modifier.fillMaxWidth().fillMaxHeight(0.8f),
+        modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+
+        Spacer(modifier = Modifier.height(161.dp))
+
         Text(
             text = "등록된 보상 쿠폰이 없어요!\n우측 하단 버튼을 눌러 보상을 추가해보세요!",
             style = KieroTheme.typography.semiBold.title3,
@@ -216,7 +220,9 @@ private fun EmptyRewardContent() {
         Image(
             painter = painterResource(id = R.drawable.img_parent_no_alarm),
             contentDescription = null,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth(0.7f)
+                .aspectRatio(154f / 186f),
             contentScale = ContentScale.FillWidth,
         )
     }
