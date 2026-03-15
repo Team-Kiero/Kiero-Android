@@ -50,14 +50,14 @@ fun ParentRewardDeleteDialog(
                         painter = painterResource(id = R.drawable.img_coin),
                         contentDescription = null,
                         tint = Color.Unspecified,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(21.dp)
                     )
 
                     Spacer(modifier = Modifier.width(10.dp))
 
                     Text(
                         text = "${reward.price} 개",
-                        style = KieroTheme.typography.semiBold.title3,
+                        style = KieroTheme.typography.semiBold.title4,
                         color = KieroTheme.colors.main
                     )
                 }

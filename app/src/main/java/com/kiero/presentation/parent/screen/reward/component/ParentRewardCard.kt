@@ -34,11 +34,11 @@ fun ParentRewardCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp, vertical = 35.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
                 text = name,
-                style = KieroTheme.typography.semiBold.title3,
+                style = KieroTheme.typography.regular.body3,
                 color = KieroTheme.colors.white,
             )
 

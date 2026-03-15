@@ -54,14 +54,14 @@ fun RewardNameTextField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(color = Color.Unspecified)
-                    .padding(horizontal = 20.dp, vertical = 14.dp),
+                    .padding(horizontal = 16.dp, vertical = 9.dp),
                 contentAlignment = Alignment.CenterStart,
             ) {
                 if (state.text.isEmpty()) {
                     Text(
                         text = "보상 이름을 입력해주세요",
                         style = KieroTheme.typography.regular.body1,
-                        color = KieroTheme.colors.gray500,
+                        color = KieroTheme.colors.gray600,
                     )
                 }
                 innerTextField()
