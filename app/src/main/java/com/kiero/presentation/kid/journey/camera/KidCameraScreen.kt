@@ -42,7 +42,7 @@ import com.kiero.presentation.kid.component.KidSpeechField
 import com.kiero.presentation.kid.journey.camera.component.KidCameraStoneFloating
 import com.kiero.presentation.kid.journey.camera.state.KidCameraSideEffect
 import com.kiero.presentation.kid.journey.camera.viewModel.KidCameraViewModel
-import com.kiero.presentation.kid.journey.model.StoneUiType
+import com.kiero.presentation.kid.journey.model.KidJourneyStoneType
 
 @Composable
 fun KidCameraRoute(
@@ -100,7 +100,7 @@ fun KidCameraRoute(
 @Composable
 private fun KidCameraScreen(
     imageUri: Uri?,
-    stoneType: StoneUiType,
+    stoneType: KidJourneyStoneType,
     modifier: Modifier = Modifier
 ) {
 
@@ -171,7 +171,7 @@ private fun KidCameraScreenPreview() {
     KieroTheme {
         KidCameraScreen(
             imageUri = null,
-            stoneType = StoneUiType.COURAGE
+            stoneType = KidJourneyStoneType.COURAGE
         )
     }
 }

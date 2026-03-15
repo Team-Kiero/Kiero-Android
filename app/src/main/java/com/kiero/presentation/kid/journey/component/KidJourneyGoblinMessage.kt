@@ -10,7 +10,7 @@ import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.kid.component.KidSpeechField
 import com.kiero.presentation.kid.journey.model.KidJourneyContentUiModel
 import com.kiero.presentation.kid.journey.model.KidJourneyScheduleUiModel
-import com.kiero.presentation.kid.journey.model.StoneUiType
+import com.kiero.presentation.kid.journey.model.KidJourneyStoneType
 
 @Composable
 fun KidJourneyGoblinMessage(
@@ -154,7 +154,7 @@ private fun KidJourneyGoblinMessagePreview() {
                 content = KidJourneyContentUiModel.FirstSchedule(
                     scheduleDetailId = 1,
                     scheduleName = "피아노 학원 가기",
-                    stoneType = StoneUiType.WISDOM,
+                    stoneType = KidJourneyStoneType.WISDOM,
                     scheduleInfo = KidJourneyScheduleUiModel(
                         order = 4,
                         startTime = "14:00:00",

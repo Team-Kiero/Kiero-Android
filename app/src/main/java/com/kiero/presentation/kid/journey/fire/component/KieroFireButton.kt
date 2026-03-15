@@ -55,14 +55,14 @@ fun KieroFireButton(
                 )
 
                 Text(
-                    text = "${stoneCount}개",
+                    text = "${stoneCount} 개",
                     style = KieroTheme.typography.regular.body2,
                     color = KieroTheme.colors.gray500
                 )
             }
 
             Text(
-                text = "불 조각 건네주기",
+                text = "불조각 건네주기",
                 style = KieroTheme.typography.semiBold.title3,
                 color = KieroTheme.colors.white
             )
