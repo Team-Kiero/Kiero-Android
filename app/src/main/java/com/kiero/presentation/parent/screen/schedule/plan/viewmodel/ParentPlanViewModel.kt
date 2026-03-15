@@ -108,9 +108,42 @@ class ParentPlanViewModel @Inject constructor(
             }
 
             val today = LocalDate.now()
+            val now = LocalTime.now()
+
+            if (!s.isRecurring) {
+                val selectedDates = s.selectedDate
+                    .split(",")
+                    .mapNotNull { dateStr -> runCatching { LocalDate.parse(dateStr.trim()) }.getOrNull() }
+
+                val hasPastDate = selectedDates.any { it.isBefore(today) }
+                if (hasPastDate) {
+                    _sideEffect.emit(ShowSnackBar("과거 날짜에는 일정을 등록할 수 없습니다"))
+                    return@launch
+                }
+
+                val isTodayOnly = selectedDates.size == 1 && selectedDates.first() == today
+                if (isTodayOnly) {
+                    val startTime = s.startTime?.let {
+                        runCatching {
+                            LocalTime.parse(it.take(5), java.time.format.DateTimeFormatter.ofPattern("HH:mm"))
+                        }.getOrNull()
+                    }
+
+                    if (startTime != null && startTime.isBefore(now)) {
+                        _sideEffect.emit(ShowSnackBar("이미 지난 시간에는 일정을 등록할 수 없어요"))
+                        return@launch
+                    }
+
+                    if (s.isFireLit) {
+                        _sideEffect.emit(ShowSnackBar("오늘 일정이 마감되어, 일정을 추가할 수 없어요"))
+                        return@launch
+                    }
+                }
+            }
+
             val isTodayIncluded = s.isTodayIncluded(today)
             val isClosedToday = isTodayIncluded &&
-                    (s.parseLocalTime(s.displayStartTime).isBefore(LocalTime.now()) || s.isFireLit)
+                    (s.parseLocalTime(s.displayStartTime).isBefore(now) || s.isFireLit)
 
             if (!s.isRecurring && isClosedToday) {
                 _sideEffect.emit(ShowSnackBar("일정이 등록되었어요. (오늘 일정은 마감되어 다음부터 적용돼요!)"))
@@ -147,6 +180,7 @@ class ParentPlanViewModel @Inject constructor(
         if (_state.value.isLoading) return
         val scheduleId   = editArgs?.scheduleId ?: return
         val selectedDate = editArgs?.selectedDate ?: return
+        val isIncludeFollowing = editArgs?.isIncludeFollowing
 
         viewModelScope.launch {
             val name = textState.text.toString().trim()
@@ -174,7 +208,7 @@ class ParentPlanViewModel @Inject constructor(
                 scheduleColor      = s.selectedColorType.name,
                 dayOfWeek          = s.formattedDays.takeIf { s.isRecurring },
                 dates              = s.selectedDate.takeUnless { s.isRecurring },
-                isIncludeFollowing = null,
+                isIncludeFollowing = isIncludeFollowing,
             ).onSuccess {
                 _sideEffect.emit(ShowSnackBar("일정이 수정되었습니다"))
                 delay(200)
