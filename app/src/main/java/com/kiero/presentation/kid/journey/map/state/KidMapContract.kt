@@ -24,7 +24,7 @@ data class KidMapState(
                     endTime = "오후 05:00",
                     isOngoing = false,
                     stoneType = KidJourneyStoneType.COURAGE,
-                    status = KidMapScheduleStatus.COMPLETE
+                    status = KidMapScheduleStatus.COMPLETED
                 ),
                 KidMapItemUiModel(
                     name = "꾸비 성수팝업 가기",
@@ -56,7 +56,7 @@ data class KidMapState(
                     endTime = "오후 05:00",
                     isOngoing = false,
                     stoneType = KidJourneyStoneType.COURAGE,
-                    status = KidMapScheduleStatus.COMPLETE
+                    status = KidMapScheduleStatus.COMPLETED
                 ),
                 KidMapItemUiModel(
                     name = "꾸비 성수팝업 가기",

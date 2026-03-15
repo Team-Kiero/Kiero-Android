@@ -104,7 +104,7 @@ private fun KidMapListItemPreview() {
                     endTime = "오후 05:00",
                     isOngoing = false,
                     stoneType = KidJourneyStoneType.COURAGE,
-                    status = KidMapScheduleStatus.COMPLETE
+                    status = KidMapScheduleStatus.COMPLETED
                 )
             )
             // 실패 - 라인 없음, 흐리게
