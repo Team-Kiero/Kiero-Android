@@ -2,6 +2,7 @@ package com.kiero.data.kid.schedule.repositoryimpl
 
 import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.data.kid.schedule.model.ScheduleFireModel
+import com.kiero.data.kid.schedule.model.ScheduleProgressModel
 import com.kiero.data.kid.schedule.model.ScheduleTodayModel
 import com.kiero.data.kid.schedule.model.toModel
 import com.kiero.data.kid.schedule.remote.datasource.ScheduleDataSource
@@ -36,5 +37,10 @@ class ScheduleRepositoryImpl @Inject constructor(
     override suspend fun patchScheduleFireLit(
     ): Result<ScheduleFireModel> = suspendRunCatching {
         dataSource.patchScheduleFireLit().data!!.toModel()
+    }
+
+    override suspend fun getScheduleProgress(
+    ): Result<ScheduleProgressModel> = suspendRunCatching {
+        dataSource.getScheduleProgress().data!!.toModel()
     }
 }
