@@ -109,8 +109,8 @@ fun ParentMissionScreen(
                         .padding(vertical = 8.dp)
                 ) {
                     MissionInfo(
-                        dayOfWeek = missionsByDate.dueAt.toRelativeDayFromDate,
-                        dueAt = missionsByDate.dueAt.formatWithDayOfWeek
+                        dayOfWeek = missionsByDate.dueAt.toRelativeDayFromDate(),
+                        dueAt = missionsByDate.dueAt.formatWithDayOfWeek()
                     )
                 }
             }

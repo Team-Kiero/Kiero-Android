@@ -51,7 +51,7 @@ class ParentAddMissionViewModel @Inject constructor(
     val selectedDate = _selectedDate.asStateFlow()
 
     val displayDate: String
-        get() = _selectedDate.value?.formatWithDayOfWeek ?: "마감일을 선택해주세요"
+        get() = _selectedDate.value?.formatWithDayOfWeek() ?: "마감일을 선택해주세요"
 
     init {
         _state.update {

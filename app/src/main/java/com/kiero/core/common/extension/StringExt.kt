@@ -11,93 +11,82 @@ import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 
-val String.formattedDeadLine: String
-    get() {
-        if (this.isBlank()) return ""
-
-        return try {
-            val dateString = this.take(10)
-            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-            val dueDate = LocalDate.parse(dateString, formatter)
-            val today = LocalDate.now()
-
-            when {
-                dueDate.isEqual(today) -> "오늘까지"
-                else -> {
-                    val outputFormatter = DateTimeFormatter.ofPattern("MM.dd")
-                    dueDate.format(outputFormatter)
-                }
-            }
-        } catch (e: Exception) {
-            this
-        }
-    }
-
-
-val String.toRelativeDayFromDate: String?
-    get() {
-        if (this.isBlank()) return null
-
-        return try {
-            val inputFormatter = DateTimeFormatter.ofPattern("u-M-d")
-            val dueDate = LocalDate.parse(this.take(10), inputFormatter)
-
-            val today = LocalDate.now()
-            val tomorrow = today.plusDays(1)
-
-            when {
-                dueDate.isEqual(today) -> "오늘"
-                dueDate.isEqual(tomorrow) -> "내일"
-                else -> null
-            }
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-
-val String.formatWithDayOfWeek: String
-    get() {
-        if (this.isBlank()) return ""
-
-        return try {
-            val inputFormatter = DateTimeFormatter.ofPattern("u-M-d")
-            val date = LocalDate.parse(this, inputFormatter)
-
-            val outputFormatter =
-                DateTimeFormatter.ofPattern("yyyy.M.d.(E)", java.util.Locale.KOREAN)
-
-            date.format(outputFormatter)
-        } catch (e: Exception) {
-            this
-        }
-    }
-
+private val DATE_FORMAT_DASH = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+private val DATE_FORMAT_DOT = DateTimeFormatter.ofPattern("MM.dd")
+private val DATE_FORMAT_SINGLE_DIGIT = DateTimeFormatter.ofPattern("u-M-d")
+private val DATE_FORMAT_WITH_DAY = DateTimeFormatter.ofPattern("yyyy.M.d.(E)", Locale.KOREAN)
 private val SERVER_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")
+private val ALARM_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy.MM.dd")
+private val ALARM_TIME_FORMAT = DateTimeFormatter.ofPattern("HH : mm")
+private val KOREAN_TIME_FORMATTER = DateTimeFormatter.ofPattern("a hh:mm", Locale.KOREAN)
 
-val String.formattedAlarmDate: String
-    get() {
-        if (this.isBlank()) return ""
-        return try {
-            val dateTime = LocalDateTime.parse(this, SERVER_DATE_FORMAT)
-            val outputFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd")
-            val dayOfWeek = dateTime.dayOfWeek.getDisplayName(TextStyle.NARROW, Locale.KOREAN)
-            "${dateTime.format(outputFormatter)}.($dayOfWeek)"
-        } catch (e: Exception) {
-            this
-        }
-    }
+fun String.formattedDeadLine(): String {
+    if (this.isBlank()) return ""
 
-val String.formattedAlarmTime: String
-    get() {
-        if (this.isBlank()) return "00 : 00"
-        return try {
-            val dateTime = LocalDateTime.parse(this, SERVER_DATE_FORMAT)
-            dateTime.format(DateTimeFormatter.ofPattern("HH : mm"))
-        } catch (e: Exception) {
-            "00 : 00"
+    return try {
+        val dateString = this.take(10)
+        val dueDate = LocalDate.parse(dateString, DATE_FORMAT_DASH)
+        val today = LocalDate.now()
+
+        when {
+            dueDate.isEqual(today) -> "오늘까지"
+            else -> dueDate.format(DATE_FORMAT_DOT)
         }
+    } catch (e: Exception) {
+        this
     }
+}
+
+fun String.toRelativeDayFromDate(): String? {
+    if (this.isBlank()) return null
+
+    return try {
+        val dueDate = LocalDate.parse(this.take(10), DATE_FORMAT_SINGLE_DIGIT)
+
+        val today = LocalDate.now()
+        val tomorrow = today.plusDays(1)
+
+        when {
+            dueDate.isEqual(today) -> "오늘"
+            dueDate.isEqual(tomorrow) -> "내일"
+            else -> null
+        }
+    } catch (e: Exception) {
+        null
+    }
+}
+
+fun String.formatWithDayOfWeek(): String {
+    if (this.isBlank()) return ""
+
+    return try {
+        val date = LocalDate.parse(this, DATE_FORMAT_SINGLE_DIGIT)
+        date.format(DATE_FORMAT_WITH_DAY)
+    } catch (e: Exception) {
+        this
+    }
+}
+
+fun String.formattedAlarmDate(): String {
+    if (this.isBlank()) return ""
+    return try {
+        val dateTime = LocalDateTime.parse(this, SERVER_DATE_FORMAT)
+        val dayOfWeek = dateTime.dayOfWeek.getDisplayName(TextStyle.NARROW, Locale.KOREAN)
+        "${dateTime.format(ALARM_DATE_FORMAT)}.($dayOfWeek)"
+    } catch (e: Exception) {
+        this
+    }
+}
+
+fun String.formattedAlarmTime(): String {
+    if (this.isBlank()) return "00 : 00"
+    return try {
+        val dateTime = LocalDateTime.parse(this, SERVER_DATE_FORMAT)
+        dateTime.format(ALARM_TIME_FORMAT)
+    } catch (e: Exception) {
+        "00 : 00"
+    }
+}
 
 fun String.toHighlightedText(
     highlightColor: Color,
@@ -175,8 +164,6 @@ fun String.validateAsStartTime(): String {
 }
 
 fun String.toShortTime(): String = split(":").take(2).joinToString(":")
-
-private val KOREAN_TIME_FORMATTER = DateTimeFormatter.ofPattern("a hh:mm", Locale.KOREAN)
 
 fun String.toKoreanTimeString(): String {
     if (this.isBlank()) return this
