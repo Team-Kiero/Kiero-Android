@@ -52,13 +52,13 @@ class KidMapViewModel @Inject constructor(
                         item.copy(isNext = !hasOngoing && index == pendingIndex)
                     }.toPersistentList()
 
-                    _state.updateSuccess {
+                    _state.value = UiState.Success(
                         KidMapState(
                             date = map.date,
                             scheduleCount = scheduleData.scheduleCount,
                             schedules = finalSchedules
                         )
-                    }
+                    )
                     Timber.d("fetchScheduleProgress success: $scheduleData")
                 }
                 .onFailure {
