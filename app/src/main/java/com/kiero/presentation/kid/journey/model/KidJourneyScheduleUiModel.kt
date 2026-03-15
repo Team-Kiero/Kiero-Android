@@ -13,11 +13,11 @@ data class KidJourneyScheduleUiModel(
     val endTime: String?
 ) {
     fun getFormattedStartTime(): String {
-        return startTime?.toKoreanTimeString ?: ""
+        return startTime?.toKoreanTimeString() ?: ""
     }
 
     fun getFormattedEndTime(): String {
-        return endTime?.toKoreanTimeString ?: ""
+        return endTime?.toKoreanTimeString() ?: ""
     }
 
     val orderText: String

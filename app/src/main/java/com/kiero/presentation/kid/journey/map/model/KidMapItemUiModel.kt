@@ -18,11 +18,9 @@ data class KidMapItemUiModel(
 
 fun ScheduleProgressItemModel.toUiModel() = KidMapItemUiModel(
     name = this.name,
-    startTime = this.startTime.toKoreanTimeString,
-    endTime = this.endTime.toKoreanTimeString,
+    startTime = this.startTime.toKoreanTimeString(),
+    endTime = this.endTime.toKoreanTimeString(),
     isOngoing = this.isOngoing,
-    stoneType = runCatching { KidJourneyStoneType.valueOf(this.stoneType) }.getOrDefault(
-        KidJourneyStoneType.COURAGE
-    ),
+    stoneType = KidJourneyStoneType.from(this.stoneType),
     status = KidMapScheduleStatus.from(this.status)
 )

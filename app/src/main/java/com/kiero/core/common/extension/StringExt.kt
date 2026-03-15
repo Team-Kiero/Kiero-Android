@@ -73,19 +73,6 @@ val String.formatWithDayOfWeek: String
         }
     }
 
-val String.toKoreanTimeString: String
-    get() {
-        if (this.isBlank()) return this
-
-        return try {
-            val time = LocalTime.parse(this)
-            val formatter = DateTimeFormatter.ofPattern("a hh:mm", Locale.KOREAN)
-            time.format(formatter)
-        } catch (e: Exception) {
-            this
-        }
-    }
-
 private val SERVER_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")
 
 val String.formattedAlarmDate: String
@@ -188,3 +175,16 @@ fun String.validateAsStartTime(): String {
 }
 
 fun String.toShortTime(): String = split(":").take(2).joinToString(":")
+
+private val KOREAN_TIME_FORMATTER = DateTimeFormatter.ofPattern("a hh:mm", Locale.KOREAN)
+
+fun String.toKoreanTimeString(): String {
+    if (this.isBlank()) return this
+
+    return try {
+        val time = LocalTime.parse(this)
+        time.format(KOREAN_TIME_FORMATTER)
+    } catch (e: Exception) {
+        this
+    }
+}
