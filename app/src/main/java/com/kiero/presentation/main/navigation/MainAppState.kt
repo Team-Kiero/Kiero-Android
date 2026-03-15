@@ -26,10 +26,10 @@ import com.kiero.presentation.kid.navigation.KidMission
 import com.kiero.presentation.kid.navigation.KidWish
 import com.kiero.presentation.kid.onboarding.navigation.navigateToKidOnboarding
 import com.kiero.presentation.kid.wish.navigation.navigateToWish
+import com.kiero.presentation.parent.navigation.Mypage
 import com.kiero.presentation.parent.navigation.ParentGraph
 import com.kiero.presentation.parent.navigation.ParentJourney
 import com.kiero.presentation.parent.navigation.ParentMission
-import com.kiero.presentation.parent.navigation.ParentMypage
 import com.kiero.presentation.parent.navigation.ParentReward
 import com.kiero.presentation.parent.navigation.ParentSchedule
 import com.kiero.presentation.parent.screen.alarm.navigation.navigateToAlarm
@@ -174,7 +174,7 @@ class MainAppState(
             ParentMainTab.SCHEDULE -> navController.navigate(ParentSchedule, navOptions)
             ParentMainTab.MISSION -> navController.navigate(ParentMission, navOptions)
             ParentMainTab.REWARD -> navController.navigate(ParentReward, navOptions)
-            ParentMainTab.MYPAGE -> navController.navigate(ParentMypage, navOptions)
+            ParentMainTab.MYPAGE -> navController.navigate(Mypage, navOptions)
         }
     }
 
@@ -217,6 +217,7 @@ class MainAppState(
         isFireLit: Boolean,
         navOptions: NavOptions? = null,
     ) = navController.navigateToScheduleAdd(initialDate, isFireLit, navOptions)
+
 
     fun navigateToKidOnboarding(navOptions: NavOptions? = null) =
         navController.navigateToKidOnboarding(navOptions)

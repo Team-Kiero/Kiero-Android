@@ -8,9 +8,9 @@ import com.kiero.presentation.kid.navigation.KidMission
 import com.kiero.presentation.kid.navigation.KidTab
 import com.kiero.presentation.kid.navigation.KidWish
 import com.kiero.presentation.main.navigation.component.BottomBarTab
+import com.kiero.presentation.parent.navigation.Mypage
 import com.kiero.presentation.parent.navigation.ParentJourney
 import com.kiero.presentation.parent.navigation.ParentMission
-import com.kiero.presentation.parent.navigation.ParentMypage
 import com.kiero.presentation.parent.navigation.ParentReward
 import com.kiero.presentation.parent.navigation.ParentSchedule
 import com.kiero.presentation.parent.navigation.ParentTab
@@ -52,7 +52,7 @@ enum class ParentMainTab(
         iconRes = R.drawable.ic_parent_tab_mypage,
         contentDescription = R.string.mypage_tab_content_description,
         labelRes = R.string.mypage_tab_content_description,
-        route = ParentMypage,
+        route = Mypage,
     );
 
     companion object {
