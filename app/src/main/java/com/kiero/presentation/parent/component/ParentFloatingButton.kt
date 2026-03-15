@@ -133,7 +133,7 @@ fun MissionTabFab(
                 onActiveClick = { onExpandedChange(true) },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(end = 16.dp, bottom = 51.dp)
+                    .padding(end = 16.dp, bottom = 87.dp)
             )
         }
     }
