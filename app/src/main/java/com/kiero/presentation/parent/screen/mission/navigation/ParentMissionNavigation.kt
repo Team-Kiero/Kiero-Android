@@ -17,11 +17,17 @@ fun NavController.navigateToParentMission(
 fun NavGraphBuilder.parentMissionNavGraph(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
+    navigateToAddMission: () -> Unit,
+    navigateToAutoMission: () -> Unit,
+    navigateToMissionEdit: (MissionEdit) -> Unit,
 ) {
     composable<ParentMission> {
         ParentMissionRoute(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
+            navigateToMissionEdit = navigateToMissionEdit,
+            navigateToAddMission = navigateToAddMission,
+            navigateToAutoMission = navigateToAutoMission,
         )
     }
 }

@@ -83,4 +83,24 @@ data class ParentScheduleState(
             else -> 0
         }
     }
+
+    companion object {
+        fun formatRepeatText(dayOfWeek: String): String {
+            val dayMap = linkedMapOf(
+                "MON" to "월", "TUE" to "화", "WED" to "수",
+                "THU" to "목", "FRI" to "금", "SAT" to "토", "SUN" to "일"
+            )
+            val days = dayOfWeek.split(",").map { it.trim() }
+            if (days.containsAll(dayMap.keys)) return "매일 반복"
+            val sorted = dayMap.keys.filter { it in days }.mapNotNull { dayMap[it] }.joinToString("")
+            return "매주 ${sorted} 반복"
+        }
+    }
 }
+
+sealed interface ParentScheduleSideEffect {
+    data class ShowSnackBar(val message: String) : ParentScheduleSideEffect
+    data object navigateUp : ParentScheduleSideEffect
+    data object ShowDialog : ParentScheduleSideEffect
+}
+

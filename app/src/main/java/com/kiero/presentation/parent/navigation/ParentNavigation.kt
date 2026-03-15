@@ -5,17 +5,23 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.kiero.core.navigation.Route
 import com.kiero.presentation.parent.screen.alarm.navigation.parentAlarmNavGraph
 import com.kiero.presentation.parent.screen.journey.navigation.parentJourneyNavGraph
+import com.kiero.presentation.parent.screen.mission.ParentAddMissionRoute
+import com.kiero.presentation.parent.screen.mission.auto.navigation.navigateToAutoMissionAdd
 import com.kiero.presentation.parent.screen.mission.auto.navigation.parentAutoMissionAddNavGraph
+import com.kiero.presentation.parent.screen.mission.navigation.MissionEdit
+import com.kiero.presentation.parent.screen.mission.navigation.navigateToMissionAdd
 import com.kiero.presentation.parent.screen.mission.navigation.parentMissionAddNavGraph
 import com.kiero.presentation.parent.screen.mission.navigation.parentMissionNavGraph
 import com.kiero.presentation.parent.screen.mypage.navigation.parentMypageNavGraph
 import com.kiero.presentation.parent.screen.reward.navigation.parentRewardNavGraph
 import com.kiero.presentation.parent.screen.schedule.navigation.parentScheduleNavGraph
 import com.kiero.presentation.parent.screen.schedule.plan.navigation.navigateToScheduleAdd
+import com.kiero.presentation.parent.screen.schedule.plan.navigation.navigateToScheduleEdit
 import com.kiero.presentation.parent.screen.schedule.plan.navigation.parentScheduleAddNavGraph
 import kotlinx.serialization.Serializable
 
@@ -25,7 +31,7 @@ sealed interface ParentTab : Route
 data object ParentGraph : Route
 
 @Serializable
-data object Schedule : ParentTab
+data object ParentSchedule : ParentTab
 
 @Serializable
 data object Alarm : ParentTab
@@ -37,7 +43,7 @@ data object ParentJourney : ParentTab
 data object ParentMission : ParentTab
 
 @Serializable
-data object Reward : ParentTab
+data object ParentReward : ParentTab
 
 @Serializable
 data object Mypage : ParentTab
@@ -57,7 +63,7 @@ fun NavGraphBuilder.parentNavGraph(
     navigateToAlarm: () -> Unit,
 ) {
     navigation<ParentGraph>(
-        startDestination = Schedule
+        startDestination = ParentSchedule
     ) {
         parentScheduleNavGraph(
             paddingValues = paddingValues,
@@ -67,6 +73,9 @@ fun NavGraphBuilder.parentNavGraph(
                     initialDate = date,
                     isFireLit = fireLit
                 )
+            },
+            navigateToScheduleEdit = { args ->
+                navController.navigateToScheduleEdit(args)
             },
             navigateToSelection = navigateToSelection,
             navigateToAlarm = navigateToAlarm
@@ -82,11 +91,20 @@ fun NavGraphBuilder.parentNavGraph(
             navigateUp = navigateUp,
         )
 
+        composable<MissionEdit> {
+            ParentAddMissionRoute(
+                paddingValues = paddingValues,
+                navigateUp = navigateUp,
+            )
+        }
+
         parentMissionNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
+            navigateToMissionEdit = { args -> navController.navigate(args) },
+            navigateToAddMission = navController::navigateToMissionAdd,
+            navigateToAutoMission = { navController.navigateToAutoMissionAdd(childId = 0)}
         )
-
         parentAutoMissionAddNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp

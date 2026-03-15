@@ -20,21 +20,18 @@ import com.kiero.presentation.kid.journey.map.navigation.navigateToMap
 import com.kiero.presentation.kid.journey.model.KidJourneyStoneType
 import com.kiero.presentation.kid.journey.navigation.navigateToJourney
 import com.kiero.presentation.kid.mission.navigation.navigateToMission
-import com.kiero.presentation.kid.navigation.Journey
 import com.kiero.presentation.kid.navigation.KidGraph
-import com.kiero.presentation.kid.navigation.Mission
-import com.kiero.presentation.kid.navigation.Wish
+import com.kiero.presentation.kid.navigation.KidJourney
+import com.kiero.presentation.kid.navigation.KidMission
+import com.kiero.presentation.kid.navigation.KidWish
 import com.kiero.presentation.kid.onboarding.navigation.navigateToKidOnboarding
 import com.kiero.presentation.kid.wish.navigation.navigateToWish
-import com.kiero.presentation.parent.screen.alarm.navigation.navigateToAlarm
-import com.kiero.presentation.parent.screen.journey.navigation.navigateToParentJourney
-import com.kiero.presentation.parent.screen.mypage.navigation.navigateToMypage
 import com.kiero.presentation.parent.navigation.Mypage
 import com.kiero.presentation.parent.navigation.ParentGraph
 import com.kiero.presentation.parent.navigation.ParentJourney
 import com.kiero.presentation.parent.navigation.ParentMission
-import com.kiero.presentation.parent.navigation.Reward
-import com.kiero.presentation.parent.navigation.Schedule
+import com.kiero.presentation.parent.navigation.ParentReward
+import com.kiero.presentation.parent.navigation.ParentSchedule
 import com.kiero.presentation.parent.screen.alarm.navigation.navigateToAlarm
 import com.kiero.presentation.parent.screen.journey.navigation.navigateToParentJourney
 import com.kiero.presentation.parent.screen.mission.navigation.navigateToMissionAdd
@@ -174,9 +171,9 @@ class MainAppState(
         }
         when (tab) {
             ParentMainTab.JOURNEY -> navController.navigate(ParentJourney, navOptions)
-            ParentMainTab.SCHEDULE -> navController.navigate(Schedule, navOptions)
+            ParentMainTab.SCHEDULE -> navController.navigate(ParentSchedule, navOptions)
             ParentMainTab.MISSION -> navController.navigate(ParentMission, navOptions)
-            ParentMainTab.REWARD -> navController.navigate(Reward, navOptions)
+            ParentMainTab.REWARD -> navController.navigate(ParentReward, navOptions)
             ParentMainTab.MYPAGE -> navController.navigate(Mypage, navOptions)
         }
     }
@@ -188,9 +185,9 @@ class MainAppState(
             restoreState = true
         }
         when (tab) {
-            KidMainTab.JOURNEY -> navController.navigate(Journey, navOptions)
-            KidMainTab.MISSION -> navController.navigate(Mission, navOptions)
-            KidMainTab.WISH -> navController.navigate(Wish, navOptions)
+            KidMainTab.JOURNEY -> navController.navigate(KidJourney, navOptions)
+            KidMainTab.MISSION -> navController.navigate(KidMission, navOptions)
+            KidMainTab.WISH -> navController.navigate(KidWish, navOptions)
         }
     }
 
@@ -220,6 +217,7 @@ class MainAppState(
         isFireLit: Boolean,
         navOptions: NavOptions? = null,
     ) = navController.navigateToScheduleAdd(initialDate, isFireLit, navOptions)
+
 
     fun navigateToKidOnboarding(navOptions: NavOptions? = null) =
         navController.navigateToKidOnboarding(navOptions)

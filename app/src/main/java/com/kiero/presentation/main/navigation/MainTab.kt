@@ -3,17 +3,17 @@ package com.kiero.presentation.main.navigation
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.kiero.R
-import com.kiero.presentation.kid.navigation.Journey
+import com.kiero.presentation.kid.navigation.KidJourney
+import com.kiero.presentation.kid.navigation.KidMission
 import com.kiero.presentation.kid.navigation.KidTab
-import com.kiero.presentation.kid.navigation.Mission
-import com.kiero.presentation.kid.navigation.Wish
+import com.kiero.presentation.kid.navigation.KidWish
 import com.kiero.presentation.main.navigation.component.BottomBarTab
 import com.kiero.presentation.parent.navigation.Mypage
 import com.kiero.presentation.parent.navigation.ParentJourney
 import com.kiero.presentation.parent.navigation.ParentMission
+import com.kiero.presentation.parent.navigation.ParentReward
+import com.kiero.presentation.parent.navigation.ParentSchedule
 import com.kiero.presentation.parent.navigation.ParentTab
-import com.kiero.presentation.parent.navigation.Reward
-import com.kiero.presentation.parent.navigation.Schedule
 
 enum class ParentMainTab(
     @param:DrawableRes override val iconRes: Int,
@@ -32,7 +32,7 @@ enum class ParentMainTab(
         iconRes = R.drawable.ic_parent_tab_schedule,
         contentDescription = R.string.schedule_tab_content_description,
         labelRes = R.string.schedule_tab_content_description,
-        route = Schedule,
+        route = ParentSchedule,
     ),
 
     MISSION(
@@ -46,7 +46,7 @@ enum class ParentMainTab(
         iconRes = R.drawable.ic_parent_tab_reward,
         contentDescription = R.string.reward_tab_content_description,
         labelRes = R.string.reward_tab_content_description,
-        route = Reward,
+        route = ParentReward,
     ),
     MYPAGE(
         iconRes = R.drawable.ic_parent_tab_mypage,
@@ -77,19 +77,19 @@ enum class KidMainTab(
         iconRes = R.drawable.ic_kid_tab_journey,
         contentDescription = R.string.kid_journey_tab_content_description,
         labelRes = R.string.kid_journey_tab_content_description,
-        route = Journey,
+        route = KidJourney,
     ),
     MISSION(
         iconRes = R.drawable.ic_kid_tab_mission,
         contentDescription = R.string.kid_mission_tab_content_description,
         labelRes = R.string.kid_mission_tab_content_description,
-        route = Mission,
+        route = KidMission,
     ),
     WISH(
         iconRes = R.drawable.ic_kid_tab_wish,
         contentDescription = R.string.wish_tab_content_description,
         labelRes = R.string.wish_tab_content_description,
-        route = Wish,
+        route = KidWish,
     );
 
     companion object {
