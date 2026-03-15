@@ -8,7 +8,6 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.kiero.core.navigation.Route
-import com.kiero.presentation.parent.screen.alarm.navigation.parentAlarmNavGraph
 import com.kiero.presentation.parent.screen.journey.navigation.parentJourneyNavGraph
 import com.kiero.presentation.parent.screen.mission.ParentAddMissionRoute
 import com.kiero.presentation.parent.screen.mission.auto.navigation.navigateToAutoMissionAdd
@@ -32,9 +31,6 @@ data object ParentGraph : Route
 
 @Serializable
 data object ParentSchedule : ParentTab
-
-@Serializable
-data object Alarm : ParentTab
 
 @Serializable
 data object ParentJourney : ParentTab
@@ -108,12 +104,6 @@ fun NavGraphBuilder.parentNavGraph(
         parentAutoMissionAddNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp
-        )
-
-        parentAlarmNavGraph(
-            paddingValues = paddingValues,
-            navigateUp = navigateUp,
-            navigateToSelection = navigateToSelection
         )
 
         parentJourneyNavGraph(

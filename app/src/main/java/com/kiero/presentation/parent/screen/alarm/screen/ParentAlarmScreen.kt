@@ -33,9 +33,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
 import com.kiero.core.common.extension.collectSideEffect
-import com.kiero.core.designsystem.component.dialog.KieroDialog
-import com.kiero.core.designsystem.component.dialog.action.KieroCancelAction
-import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
+import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.component.pulltorefresh.KieroPullToRefresh
 import com.kiero.core.designsystem.theme.KieroTheme
@@ -45,7 +43,6 @@ import com.kiero.presentation.parent.screen.alarm.component.ParentAlarmDateHeade
 import com.kiero.presentation.parent.screen.alarm.model.ParentAlarmUiModel
 import com.kiero.presentation.parent.screen.alarm.state.AlarmFeedState
 import com.kiero.presentation.parent.screen.alarm.viewmodel.ParentAlarmViewModel
-import com.kiero.presentation.parent.component.ParentUserSection
 import com.kiero.presentation.signup.parent.state.ParentSignUpSideEffect
 import com.kiero.presentation.signup.parent.state.ParentSignUpState
 
@@ -84,30 +81,12 @@ fun ParentAlarmRoute(
         ParentAlarmScreen(
             state = state,
             authState = authState,
+            navigateUp = navigateUp,
             onExpandClick = viewModel::toggleExpand,
-            onUserNameClick = viewModel::onProfileClick,
             listState = listState,
             paddingValues = paddingValues,
             modifier = Modifier.fillMaxSize()
         )
-
-        if (authState.isLogoutDialogVisible) {
-            KieroDialog(
-                title = "로그아웃",
-                subDescription = "로그아웃 하시겠습니까?",
-                onDismiss = viewModel::onLogoutCancel,
-                confirmAction = KieroConfirmAction(
-                    text = "확인",
-                    onClick = viewModel::onLogoutConfirm
-                ),
-                cancelAction = KieroCancelAction(
-                    text = "취소",
-                    onClick = viewModel::onLogoutCancel
-                ),
-                isDisabled = true,
-                content = {}
-            )
-        }
 
         if (authState.isLoading) {
             KieroLoadingIndicator()
@@ -120,7 +99,7 @@ private fun ParentAlarmScreen(
     state: AlarmFeedState,
     authState: ParentSignUpState,
     onExpandClick: (String) -> Unit,
-    onUserNameClick: () -> Unit,
+    navigateUp: () -> Unit,
     listState: LazyListState,
     paddingValues: PaddingValues,
     modifier: Modifier = Modifier,
@@ -130,12 +109,11 @@ private fun ParentAlarmScreen(
             .background(color = KieroTheme.colors.black)
             .padding(paddingValues)
     ) {
-        ParentUserSection(
-            userName = authState.parentInfo.parentName,
-            profileImage = authState.parentInfo.parentProfileImage,
-            onUserNameClick = onUserNameClick,
-            backgroundColor = KieroTheme.colors.black,
-            modifier = Modifier
+        Spacer(modifier = Modifier.height(16.dp))
+
+        KieroTopbar(
+            title = "알람",
+            leftIconClick = navigateUp
         )
 
         when {
