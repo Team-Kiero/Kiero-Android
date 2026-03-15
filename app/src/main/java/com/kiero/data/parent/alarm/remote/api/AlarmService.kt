@@ -2,6 +2,7 @@ package com.kiero.data.parent.alarm.remote.api
 
 import com.kiero.core.network.model.BaseResponse
 import com.kiero.data.parent.alarm.remote.dto.response.AlarmFeedResponseDto
+import com.kiero.data.parent.alarm.remote.dto.response.UnreadAlarmFeedResponseDto
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -13,4 +14,7 @@ interface AlarmService {
         @Query("size") size: Int? = null,
         @Query("cursor") cursor: String? = null
     ): BaseResponse<AlarmFeedResponseDto>
+
+    @GET("api/v1/feeds/unread")
+    suspend fun getUnreadAlarm(): BaseResponse<UnreadAlarmFeedResponseDto>
 }
