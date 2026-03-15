@@ -1,5 +1,6 @@
 package com.kiero.data.kid.schedule.model
 
+import com.kiero.data.kid.schedule.remote.dto.response.ScheduleProgressItemDto
 import com.kiero.data.kid.schedule.remote.dto.response.ScheduleProgressResponseDto
 
 data class ScheduleProgressModel(
@@ -18,14 +19,14 @@ data class ScheduleProgressItemModel(
 
 fun ScheduleProgressResponseDto.toModel() = ScheduleProgressModel(
     scheduleCount = this.scheduleCount,
-    schedules = this.schedules.map {
-        ScheduleProgressItemModel(
-            name = it.name,
-            startTime = it.startTime,
-            endTime = it.endTime,
-            isOngoing = it.isOngoing,
-            stoneType = it.stoneType,
-            status = it.status
-        )
-    }
+    schedules = this.schedules.map { it.toModel() }
+)
+
+fun ScheduleProgressItemDto.toModel() = ScheduleProgressItemModel(
+    name = this.name,
+    startTime = this.startTime,
+    endTime = this.endTime,
+    isOngoing = this.isOngoing,
+    stoneType = this.stoneType,
+    status = this.status
 )
