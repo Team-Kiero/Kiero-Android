@@ -276,10 +276,10 @@ private fun MissionBottomSheetContent(
         verticalArrangement = Arrangement.spacedBy(0.dp),
     ) {
         Text(
-
             text = ParentFormatters.formatDateWithDayOfWeek(dueAt),
+            color = KieroTheme.colors.gray200,
+            style = KieroTheme.typography.semiBold.title3
         )
-
 
         KieroChip(
             isEnabled = false,
