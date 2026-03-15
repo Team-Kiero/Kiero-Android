@@ -4,6 +4,7 @@ import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.data.parent.alarm.remote.datasource.AlarmDataSource
 import com.kiero.data.parent.alarm.model.AlarmFeedModel
 import com.kiero.data.parent.alarm.model.AlarmItemModel
+import com.kiero.data.parent.alarm.model.UnreadAlarmFeedModel
 import com.kiero.data.parent.alarm.model.toModel
 import com.kiero.data.parent.alarm.repository.AlarmRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -92,6 +93,10 @@ class AlarmRepositoryImpl @Inject constructor(
         _cachedAlarms.value = emptyList()
         _childName.value = ""
         _nextCursor.value = null
+    }
+
+    override suspend fun getUnreadAlarm(): Result<UnreadAlarmFeedModel> = suspendRunCatching {
+        dataSource.getUnreadAlarm().data!!.toModel()
     }
 
     companion object {
