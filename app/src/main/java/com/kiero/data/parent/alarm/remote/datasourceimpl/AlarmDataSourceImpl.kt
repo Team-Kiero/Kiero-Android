@@ -4,6 +4,7 @@ import com.kiero.core.network.model.BaseResponse
 import com.kiero.data.parent.alarm.remote.api.AlarmService
 import com.kiero.data.parent.alarm.remote.datasource.AlarmDataSource
 import com.kiero.data.parent.alarm.remote.dto.response.AlarmFeedResponseDto
+import com.kiero.data.parent.alarm.remote.dto.response.UnreadAlarmFeedResponseDto
 
 import javax.inject.Inject
 
@@ -17,4 +18,7 @@ class AlarmDataSourceImpl @Inject constructor(
         cursor: String?
     ): BaseResponse<AlarmFeedResponseDto> =
         service.getAlarmFeed(childId, size, cursor)
+
+    override suspend fun getUnreadAlarm(): BaseResponse<UnreadAlarmFeedResponseDto> =
+        service.getUnreadAlarm()
 }
