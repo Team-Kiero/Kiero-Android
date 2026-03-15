@@ -194,7 +194,7 @@ fun ParentAutoResultScreen(
         Spacer(Modifier.height(28.dp))
 
         if (showBottomSheet) {
-            _root_ide_package_.com.kiero.presentation.parent.screen.mission.overview.component.datepicker.component.CalendarBottomSheet(
+            CalendarBottomSheet(
                 onDismissRequest = onDismissDatePicker,
                 onDateSelected = onDateSelected
             )

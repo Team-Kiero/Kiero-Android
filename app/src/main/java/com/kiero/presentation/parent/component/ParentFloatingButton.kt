@@ -96,7 +96,7 @@ fun MissionTabFab(
                                 horizontalAlignment = Alignment.End,
                                 verticalArrangement = Arrangement.spacedBy(10.dp)
                             ) {
-                                _root_ide_package_.com.kiero.presentation.parent.screen.mission.overview.component.missionmain.MissionFabContent(
+                                MissionFabContent(
                                     fabTitle = "미션 직접 입력하기",
                                     fabIconRes = R.drawable.ic_parent_addschedule_mission,
                                     onFabClick = {
@@ -105,7 +105,7 @@ fun MissionTabFab(
                                     }
                                 )
 
-                                _root_ide_package_.com.kiero.presentation.parent.screen.mission.overview.component.missionmain.MissionFabContent(
+                                MissionFabContent(
                                     fabTitle = "알림장 한 번에 입력하기",
                                     fabIconRes = R.drawable.ic_parent_addschedule_notice,
                                     onFabClick = {
