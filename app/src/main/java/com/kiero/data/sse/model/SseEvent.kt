@@ -1,5 +1,6 @@
 package com.kiero.data.sse.model
 
+import com.kiero.data.sse.remote.dto.response.DateDataDto
 import com.kiero.data.sse.remote.dto.response.FeedDataDto
 import com.kiero.data.sse.remote.dto.response.InviteDataDto
 import com.kiero.data.sse.remote.dto.response.MissionDataDto
@@ -20,15 +21,6 @@ sealed interface SseEvent {
     sealed interface Kid : SseEvent {
         data class Mission(val data: MissionDataDto) : Kid
         data class Schedule(val data: ScheduleDataDto) : Kid
+        data class Date(val data: DateDataDto) : Kid
     }
-}
-
-    // 자녀 전용 이벤트
-    data class Mission(
-        val data: MissionDataDto
-    ) : SseEvent
-
-    data class Schedule(
-        val data: ScheduleDataDto
-    ) : SseEvent
 }
