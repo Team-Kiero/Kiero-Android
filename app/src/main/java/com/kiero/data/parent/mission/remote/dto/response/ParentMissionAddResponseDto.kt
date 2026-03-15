@@ -16,3 +16,15 @@ data class ParentMissionAddResponseDto (
     @SerialName("isCompleted")
     val isCompleted: Boolean
 )
+
+@Serializable
+data class UpdateMissionResponseDto(
+    @SerialName("id")
+    val id: Long,
+    @SerialName("name")
+    val name: String,
+    @SerialName("reward")
+    val reward: Int,
+    @SerialName("dueAt")
+    val dueAt: String,
+)
