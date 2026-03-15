@@ -20,7 +20,7 @@ interface MissionService {
         @Query("childId") childId: Long? = null,
     ): BaseResponse<MissionByDateResponseDto>
 
-    @PATCH("api/v1/missions/{missionId}/complete")
+    @PATCH("api/v1/missions/{missionId}")
     suspend fun completeMission(
         @Path("missionId") missionId: Long
     ): BaseResponse<MissionCompleteResponseDto>
