@@ -5,11 +5,16 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.kiero.core.navigation.Route
 import com.kiero.presentation.parent.screen.alarm.navigation.parentAlarmNavGraph
 import com.kiero.presentation.parent.screen.journey.navigation.parentJourneyNavGraph
+import com.kiero.presentation.parent.screen.mission.ParentAddMissionRoute
+import com.kiero.presentation.parent.screen.mission.auto.navigation.navigateToAutoMissionAdd
 import com.kiero.presentation.parent.screen.mission.auto.navigation.parentAutoMissionAddNavGraph
+import com.kiero.presentation.parent.screen.mission.navigation.MissionEdit
+import com.kiero.presentation.parent.screen.mission.navigation.navigateToMissionAdd
 import com.kiero.presentation.parent.screen.mission.navigation.parentMissionAddNavGraph
 import com.kiero.presentation.parent.screen.mission.navigation.parentMissionNavGraph
 import com.kiero.presentation.parent.screen.mypage.navigation.parentMypageNavGraph
@@ -41,7 +46,7 @@ data object ParentMission : ParentTab
 data object ParentReward : ParentTab
 
 @Serializable
-data object ParentMypage : ParentTab
+data object Mypage : ParentTab
 
 
 fun NavController.navigateToParent(
@@ -86,11 +91,20 @@ fun NavGraphBuilder.parentNavGraph(
             navigateUp = navigateUp,
         )
 
+        composable<MissionEdit> {
+            ParentAddMissionRoute(
+                paddingValues = paddingValues,
+                navigateUp = navigateUp,
+            )
+        }
+
         parentMissionNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
+            navigateToMissionEdit = { args -> navController.navigate(args) },
+            navigateToAddMission = navController::navigateToMissionAdd,
+            navigateToAutoMission = { navController.navigateToAutoMissionAdd(childId = 0)}
         )
-
         parentAutoMissionAddNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp
