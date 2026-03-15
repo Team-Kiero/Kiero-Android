@@ -32,19 +32,20 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
-import com.kiero.core.designsystem.component.KieroGifImage
 import com.kiero.core.designsystem.component.KieroToolTip
 import com.kiero.core.designsystem.component.KieroTopbar
+import com.kiero.core.designsystem.component.animation.KieroAnimationType
+import com.kiero.core.designsystem.component.animation.KieroAnimationView
 import com.kiero.core.designsystem.component.chip.KieroChip
 import com.kiero.core.designsystem.component.chip.action.KieroTextAction
 import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
 import com.kiero.presentation.kid.component.KidSpeechField
-import com.kiero.presentation.kid.journey.fire.component.StoneMoving
+import com.kiero.presentation.kid.journey.fire.component.KieroFireStoneMoving
 import com.kiero.presentation.kid.journey.fire.state.KidFireResultState
 import com.kiero.presentation.kid.journey.fire.viewModel.KidFireResultVIewModel
-import com.kiero.presentation.kid.journey.model.StoneUiType
+import com.kiero.presentation.kid.journey.model.KidJourneyStoneType
 import kotlinx.coroutines.delay
 
 @Composable
@@ -65,9 +66,11 @@ fun KidFireResultRoute(
                 navigateToJourney = navigateToJourney
             )
         }
+
         is UiState.Loading -> {
             KieroLoadingIndicator()
         }
+
         is UiState.Failure -> {}
         else -> {}
     }
@@ -82,7 +85,7 @@ private fun KidFIreResultScreen(
     modifier: Modifier = Modifier
 ) {
     var isFinished by remember { mutableStateOf(false) }
-    var currentStone by remember { mutableStateOf<StoneUiType?>(null) }
+    var currentStone by remember { mutableStateOf<KidJourneyStoneType?>(null) }
 
     LaunchedEffect(state.content.earnedStones) {
         if (state.content.earnedStones.isNotEmpty()) {
@@ -154,8 +157,8 @@ private fun KidFIreResultScreen(
                     .padding(top = 4.dp)
             ) {
                 if (isFinished) {
-                    KieroGifImage(
-                        drawableId = R.drawable.gif_kid_fire,
+                    KieroAnimationView(
+                        type = KieroAnimationType.Image(R.drawable.webp_kid_fire),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 12.dp)
@@ -194,7 +197,7 @@ private fun KidFIreResultScreen(
                     .align(Alignment.Center)
                     .padding(top = 240.dp)
             ) { stone ->
-                StoneMoving(stoneRes = stone!!.imageRes)
+                KieroFireStoneMoving(stoneRes = stone!!.imageRes)
             }
         }
 
@@ -226,8 +229,7 @@ private fun KidFIreResultScreen(
                         },
                         color = KieroTheme.colors.gray300
                     )
-                }
-                else {
+                } else {
                     Text(
                         text = buildAnnotatedString {
                             append("오늘도 도와줘서 고마워.")
@@ -246,7 +248,7 @@ private fun KidFIreScreenPreview() {
     KieroTheme {
         KidFIreResultScreen(
             paddingValues = PaddingValues(),
-            state = KidFireResultState.fake(),
+            state = KidFireResultState.FAKE,
             navigateUp = {},
             navigateToJourney = {}
         )

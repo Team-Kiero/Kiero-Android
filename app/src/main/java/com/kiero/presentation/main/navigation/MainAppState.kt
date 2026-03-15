@@ -16,7 +16,8 @@ import com.kiero.presentation.auth.parent.navigation.navigateToAuthParent
 import com.kiero.presentation.kid.journey.camera.navigation.navigateToCamera
 import com.kiero.presentation.kid.journey.fire.navigation.navigateToFire
 import com.kiero.presentation.kid.journey.fire.navigation.navigateToFireResult
-import com.kiero.presentation.kid.journey.model.StoneUiType
+import com.kiero.presentation.kid.journey.map.navigation.navigateToMap
+import com.kiero.presentation.kid.journey.model.KidJourneyStoneType
 import com.kiero.presentation.kid.journey.navigation.navigateToJourney
 import com.kiero.presentation.kid.mission.navigation.navigateToMission
 import com.kiero.presentation.kid.navigation.KidGraph
@@ -136,12 +137,8 @@ class MainAppState(
     )
 
     fun navigateToParentSignUp(
-        parentName: String,
-        parentProfileImage: String,
         navOptions: NavOptions? = null,
     ) = navController.navigateToParentSignUp(
-        parentName = parentName,
-        parentProfileImage = parentProfileImage,
         navOptions = navOptions
     )
 
@@ -226,7 +223,7 @@ class MainAppState(
 
     fun navigateToCamera(
         scheduleDetailId: Long,
-        stoneType: StoneUiType,
+        stoneType: KidJourneyStoneType,
         navOptions: NavOptions? = null,
     ) = navController.navigateToCamera(
         scheduleDetailId = scheduleDetailId,
@@ -251,6 +248,14 @@ class MainAppState(
         date = date,
         navOptions = navOptions
     )
+
+    fun navigateToMap(
+        date: String,
+        navOptions: NavOptions? = null
+    ) = navController.navigateToMap(
+            date = date,
+            navOptions = navOptions
+        )
 
     fun navigateToParentMission(navOptions: NavOptions? = null) =
         navController.navigateToParentMission(navOptions)

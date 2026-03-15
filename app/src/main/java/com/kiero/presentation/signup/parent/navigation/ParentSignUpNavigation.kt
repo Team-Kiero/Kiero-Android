@@ -10,11 +10,9 @@ import com.kiero.presentation.signup.parent.ParentSignUpRoute
 import kotlinx.serialization.Serializable
 
 fun NavController.navigateToParentSignUp(
-    parentName: String,
-    parentProfileImage: String,
     navOptions: NavOptions? = null,
 ) {
-    navigate(ParentSignUp(parentName, parentProfileImage), navOptions)
+    navigate(ParentSignUp, navOptions)
 }
 
 fun NavGraphBuilder.parentSignUpNavGraph(
@@ -32,7 +30,4 @@ fun NavGraphBuilder.parentSignUpNavGraph(
 }
 
 @Serializable
-data class ParentSignUp(
-    val parentName: String,
-    val parentProfileImage: String,
-) : Route
+data object ParentSignUp: Route

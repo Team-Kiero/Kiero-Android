@@ -5,10 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.kiero.core.common.extension.updateSuccess
+import com.kiero.core.common.util.ImageUriManager
 import com.kiero.core.common.util.successData
 import com.kiero.core.model.UiState
-import com.kiero.data.kid.schedule.repository.PresignedUrlRepository
-import com.kiero.data.kid.schedule.repository.ScheduleRepository
+import com.kiero.domain.kid.schedule.usecase.CompleteScheduleWithImageUseCase
 import com.kiero.presentation.kid.journey.camera.navigation.Camera
 import com.kiero.presentation.kid.journey.camera.state.KidCameraSideEffect
 import com.kiero.presentation.kid.journey.camera.state.KidCameraState
@@ -27,8 +27,8 @@ import javax.inject.Inject
 @HiltViewModel
 class KidCameraViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val repository: ScheduleRepository,
-    private val presignedUrlRepository: PresignedUrlRepository
+    private val completeScheduleWithImageUseCase: CompleteScheduleWithImageUseCase,
+    private val imageUriManager: ImageUriManager
 ) : ViewModel() {
     private val camera = savedStateHandle.toRoute<Camera>()
 
@@ -44,6 +44,18 @@ class KidCameraViewModel @Inject constructor(
 
     private val _sideEffect = MutableSharedFlow<KidCameraSideEffect>()
     val sideEffect: SharedFlow<KidCameraSideEffect> = _sideEffect.asSharedFlow()
+
+    fun createTempFile() {
+        if (_state.value.successData?.tempUri != null) return
+
+        viewModelScope.launch {
+            val uriString = imageUriManager.createTempImageUri()
+
+            if (uriString != null) {
+                updateTempUri(uriString)
+            }
+        }
+    }
 
     fun updateTempUri(uri: String) {
         _state.updateSuccess {
@@ -76,81 +88,29 @@ class KidCameraViewModel @Inject constructor(
             }
 
             val apiJob = async {
-                repository.postPresignedUrl(
+                completeScheduleWithImageUseCase(
+                    uriString = currentState.imageUri.orEmpty(),
                     fileName = fileName,
-                    contentType = contentType
-                ).mapCatching { presignedModel ->
-                    val isUploaded = presignedUrlRepository.uploadImage(
-                        presignedUrl = presignedModel.presignedUrl,
-                        uriString = currentState.imageUri.orEmpty()
-                    )
-
-                    if (!isUploaded) {
-                        throw Exception("S3 Upload Failed")
-                    }
-
-                    repository.patchScheduleComplete(
-                        scheduleDetailId = currentState.scheduleDetailId,
-                        imageUrl = presignedModel.presignedUrl.split("?").first()
-                    ).getOrThrow()
-                }
+                    contentType = contentType,
+                    scheduleDetailId = currentState.scheduleDetailId
+                )
             }
 
             try {
                 timerJob.await()
-                val apiResult = apiJob.await()
-
-                apiResult
+                apiJob.await()
                     .onSuccess {
+                        Timber.d("이미지 업로드 및 일정 완료 성공")
                         _sideEffect.emit(KidCameraSideEffect.NavigateUp)
-                        _state.updateSuccess { it.copy(isLoading = false) }
                     }
                     .onFailure { e ->
-                        _state.updateSuccess { it.copy(isLoading = false) }
+                        Timber.e(e, "이미지 업로드 또는 일정 완료 실패")
                     }
             } catch (e: Exception) {
+                Timber.e(e, "예외 발생")
+            } finally {
                 _state.updateSuccess { it.copy(isLoading = false) }
             }
         }
     }
-
-    /*fun postImage(
-        fileName: String,
-        contentType: String
-    ) {
-        viewModelScope.launch {
-            val currentState = _state.value.successData ?: return@launch
-            _state.updateSuccess { it.copy(isLoading = true) }
-
-            val timerJob = async {
-                delay(4000L)
-            }
-
-            val apiJob = async {
-                repository.postPresignedUrl(
-                    fileName = fileName,
-                    contentType = contentType
-                ).mapCatching { result ->
-                    repository.patchScheduleComplete(
-                        scheduleDetailId = currentState.scheduleDetailId,
-                        imageUrl = result.presignedUrl.split("?").first()
-                    ).getOrThrow()
-                }
-            }
-
-            val apiResult = apiJob.await()
-            timerJob.await()
-
-            apiResult
-                .onSuccess {
-                    Timber.d("scheduleComplete success")
-                    _sideEffect.emit(KidCameraSideEffect.NavigateUp)
-                    _state.updateSuccess { it.copy(isLoading = false) }
-                }
-                .onFailure {
-                    Timber.e("postImage or scheduleComplete fail: $it")
-                    _state.updateSuccess { it.copy(isLoading = false) }
-                }
-        }
-    }*/
 }

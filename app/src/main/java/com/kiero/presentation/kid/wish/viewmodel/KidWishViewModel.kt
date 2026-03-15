@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -95,14 +96,16 @@ class KidWishViewModel @Inject constructor(
                 .onSuccess { result ->
                     minLoadingTime.join()
 
-                    _state.value = UiState.Success(
-                        data = KidWishState(
-                            kidWishList = result.map { wish ->
-                                wish.toUiModel()
-                            }.toImmutableList(),
-                            isRefreshing = false
+                    _state.update {
+                        UiState.Success(
+                            data = KidWishState(
+                                kidWishList = result.map { wish ->
+                                    wish.toUiModel()
+                                }.toImmutableList(),
+                                isRefreshing = false
+                            )
                         )
-                    )
+                    }
                 }
                 .onFailure {
                     minLoadingTime.join()

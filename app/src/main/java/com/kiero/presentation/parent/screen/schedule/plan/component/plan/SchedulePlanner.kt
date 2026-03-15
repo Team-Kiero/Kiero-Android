@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
 import com.kiero.core.common.extension.noRippleClickable
+import com.kiero.core.designsystem.component.emptyview.KieroEmptyView
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.screen.schedule.model.ScheduleEvent
 import com.kiero.presentation.parent.screen.schedule.model.toScheduleBlocks
@@ -95,35 +96,7 @@ fun SchedulePlanner(
     ) {
         val dayWidth = maxWidth / daysCount
         if (events.isEmpty()) {
-            Box(
-                modifier = modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_parent_empty_state),
-                        contentDescription = null,
-                        tint = Color.Unspecified
-                    )
-
-                    Spacer(modifier = Modifier.height(7.dp))
-
-                    Text(
-                        text = "등록된 일정이 없어요",
-                        style = KieroTheme.typography.semiBold.title4,
-                        color = KieroTheme.colors.gray400
-                    )
-                    Text(
-                        text = "우측 하단 버튼을 눌러 일정을 추가해보세요!",
-                        style = KieroTheme.typography.semiBold.title4,
-                        color = KieroTheme.colors.gray400
-                    )
-                    Spacer(modifier = Modifier.height(172.dp))
-                }
-            }
+            KieroEmptyView()
         } else {
             allBlocks.forEach { block ->
                 val hourOffset = hourHeight * (block.startHour - 8)

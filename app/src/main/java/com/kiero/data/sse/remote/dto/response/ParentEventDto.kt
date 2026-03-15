@@ -44,3 +44,11 @@ data class EventMetadataDto(
     @SerialName("amount")
     val amount: Int? = null
 )
+
+@Serializable
+data class ParentScheduleDataDto(
+    @SerialName("eventType")
+    val eventType: String,
+    @SerialName("childId")
+    val childId: String
+)

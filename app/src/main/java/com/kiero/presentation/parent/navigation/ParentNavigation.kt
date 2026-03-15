@@ -115,6 +115,7 @@ fun NavGraphBuilder.parentNavGraph(
         parentMypageNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
+            navController = navController
         )
     }
 }

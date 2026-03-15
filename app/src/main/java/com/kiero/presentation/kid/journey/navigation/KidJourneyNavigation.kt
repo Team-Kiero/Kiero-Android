@@ -6,8 +6,9 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.kiero.presentation.kid.journey.KidJourneyRoute
-import com.kiero.presentation.kid.journey.model.StoneUiType
 import com.kiero.presentation.kid.navigation.KidJourney
+import com.kiero.presentation.kid.journey.model.KidJourneyStoneType
+
 
 fun NavController.navigateToJourney(
     navOptions: NavOptions? = null,
@@ -18,8 +19,9 @@ fun NavController.navigateToJourney(
 fun NavGraphBuilder.kidJourneyNavGraph(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
-    navigateToCamera: (Long, StoneUiType) -> Unit,
+    navigateToCamera: (Long, KidJourneyStoneType) -> Unit,
     navigateToFire: (String, Int) -> Unit,
+    navigateToMap: (String) -> Unit
 ) {
     composable<KidJourney> {
         KidJourneyRoute(
@@ -30,6 +32,9 @@ fun NavGraphBuilder.kidJourneyNavGraph(
             },
             navigateToFire = { date, stones ->
                 navigateToFire(date, stones)
+            },
+            navigateToMap = { date ->
+                navigateToMap(date)
             }
         )
     }

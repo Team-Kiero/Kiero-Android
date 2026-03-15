@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.devtools.ksp)
     alias(libs.plugins.baselineprofile)
+    alias(libs.plugins.aboutlibraries.android)
 }
 
 val properties = Properties().apply {
@@ -136,6 +137,7 @@ dependencies {
     ksp(libs.hilt.compiler)
 
     implementation(libs.bundles.coil)
+    implementation(libs.lottie.compose)
 
     implementation(libs.timber)
 
@@ -144,4 +146,6 @@ dependencies {
 
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.tink.android)
+
+    implementation(libs.aboutlibraries.compose.m3)
 }
