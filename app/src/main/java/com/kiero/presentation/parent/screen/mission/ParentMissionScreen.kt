@@ -47,7 +47,6 @@ import com.kiero.core.trigger.LocalRefreshState
 import com.kiero.presentation.main.navigation.ParentMainTab
 import com.kiero.presentation.parent.component.MissionTabFab
 import com.kiero.presentation.parent.component.ParentContentBottomSheet
-import com.kiero.presentation.parent.component.ParentTopbar
 import com.kiero.presentation.parent.screen.mission.component.missionmain.MissionInfo
 import com.kiero.presentation.parent.screen.mission.component.missionmain.MissionListItem
 import com.kiero.presentation.parent.screen.mission.navigation.MissionEdit
@@ -148,8 +147,6 @@ private fun ParentMissionScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            ParentTopbar(title = "미션", onAlarmClick = { })
-
             if (isEmpty) {
                 Box(
                     modifier = Modifier

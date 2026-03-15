@@ -7,10 +7,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -50,11 +48,10 @@ import com.kiero.core.trigger.LocalRefreshState
 import com.kiero.data.parent.plan.model.NormalScheduleModel
 import com.kiero.data.parent.plan.model.RecurringScheduleModel
 import com.kiero.data.parent.plan.model.ScheduleModel
-import com.kiero.presentation.parent.component.ParentContentBottomSheet
-import com.kiero.presentation.parent.component.ParentTopbar
-import com.kiero.presentation.parent.component.PlanTabFab
 import com.kiero.data.parent.plan.model.toScheduleEditArgs
 import com.kiero.data.parent.plan.model.toSelectedDate
+import com.kiero.presentation.parent.component.ParentContentBottomSheet
+import com.kiero.presentation.parent.component.PlanTabFab
 import com.kiero.presentation.parent.screen.schedule.plan.ParentPlanScreen
 import com.kiero.presentation.parent.screen.schedule.plan.navigation.ScheduleEdit
 import com.kiero.presentation.parent.screen.schedule.plan.state.ParentScheduleSideEffect
@@ -195,13 +192,6 @@ private fun ParentScheduleScreen(
                 .statusBarColor(backgroundColor = Gray900)
                 .padding(paddingValues)
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
-
-            ParentTopbar(
-                title = "일정",
-                onAlarmClick = navigateToAlarm
-            )
-
             ParentPlanScreen(
                 state = scheduleState,
                 onDateChange = onDateChange,

@@ -1,4 +1,4 @@
-package com.kiero.presentation.parent.component
+package com.kiero.presentation.main.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -26,6 +27,7 @@ fun ParentTopbar(
     title: String,
     onAlarmClick: () -> Unit,
     modifier: Modifier = Modifier,
+    backgroundColor: Color = KieroTheme.colors.black,
     isAlarmActive: Boolean = false,
 ) {
     val alarmRes = when (isAlarmActive) {
@@ -37,16 +39,20 @@ fun ParentTopbar(
         modifier = modifier
             .fillMaxWidth()
             .background(
-                color = KieroTheme.colors.black
+                color = backgroundColor
             )
-            .padding(vertical = 8.dp, horizontal = 16.dp),
+            .padding(top = 24.dp, bottom = 9.dp)
+            .padding(horizontal = 16.dp)
+            .height(41.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (title.isEmpty()) {
             Image(
                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_logo),
                 contentDescription = null,
-                modifier = Modifier.aspectRatio(108f / 23f)
+                modifier = Modifier
+                    .height(23.dp)
+                    .aspectRatio(108f / 23f)
             )
         } else {
             Text(
