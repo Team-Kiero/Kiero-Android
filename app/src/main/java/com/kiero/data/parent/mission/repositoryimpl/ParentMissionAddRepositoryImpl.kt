@@ -4,6 +4,9 @@ import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.data.parent.mission.remote.datasource.ParentMissionAddDataSource
 import com.kiero.data.parent.mission.remote.dto.request.ParentMissionAddRequestDto
 import com.kiero.data.parent.mission.model.ParentMissionAddModel
+import com.kiero.data.parent.mission.model.UpdateMissionModel
+import com.kiero.data.parent.mission.model.UpdateMissionResultModel
+import com.kiero.data.parent.mission.model.toDto
 import com.kiero.data.parent.mission.model.toModel
 import com.kiero.data.parent.mission.repository.ParentMissionAddRepository
 import javax.inject.Inject
@@ -31,5 +34,21 @@ class ParentMissionAddRepositoryImpl @Inject constructor(
         val responseData = response.data ?: throw Exception(response.message)
 
         responseData.toModel()
+    }
+
+    override suspend fun updateMission(
+        missionId: Long,
+        request: UpdateMissionModel,
+    ): Result<UpdateMissionResultModel> = suspendRunCatching {
+        dataSource.patchMission(
+            missionId = missionId,
+            body      = request.toDto(),
+        ).data!!.toModel()
+    }
+
+    override suspend fun deleteMission(
+        missionId: Long,
+    ): Result<Unit> = suspendRunCatching {
+        dataSource.deleteMission(missionId)
     }
 }

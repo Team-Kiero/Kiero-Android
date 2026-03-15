@@ -6,13 +6,14 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.kiero.presentation.kid.journey.KidJourneyRoute
+import com.kiero.presentation.kid.navigation.KidJourney
 import com.kiero.presentation.kid.journey.model.KidJourneyStoneType
-import com.kiero.presentation.kid.navigation.Journey
+
 
 fun NavController.navigateToJourney(
     navOptions: NavOptions? = null,
 ) {
-    navigate(Journey, navOptions)
+    navigate(KidJourney, navOptions)
 }
 
 fun NavGraphBuilder.kidJourneyNavGraph(
@@ -22,7 +23,7 @@ fun NavGraphBuilder.kidJourneyNavGraph(
     navigateToFire: (String, Int) -> Unit,
     navigateToMap: (String) -> Unit
 ) {
-    composable<Journey> {
+    composable<KidJourney> {
         KidJourneyRoute(
             paddingValues = paddingValues,
             navigateUp = navigateUp,

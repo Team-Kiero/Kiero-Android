@@ -55,7 +55,7 @@ fun ScheduleEvent.toScheduleBlocks(dayIndex: Int): List<ScheduleBlock> {
 
         blocks.add(
             ScheduleBlock(
-                id = if (blockIndex == 0) id else "$id-$blockIndex",
+                id = id,
                 title = if (blockIndex == 0) name else "",
                 color = color,
                 startHour = currentHour,

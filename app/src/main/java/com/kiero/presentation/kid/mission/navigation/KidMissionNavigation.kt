@@ -6,19 +6,19 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.kiero.presentation.kid.mission.KidMissionRoute
-import com.kiero.presentation.kid.navigation.Mission
+import com.kiero.presentation.kid.navigation.KidMission
 
 fun NavController.navigateToMission(
     navOptions: NavOptions? = null,
 ) {
-    navigate(Mission, navOptions)
+    navigate(KidMission, navOptions)
 }
 
 fun NavGraphBuilder.kidMissionNavGraph(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
 ) {
-    composable<Mission> {
+    composable<KidMission> {
         KidMissionRoute(
             paddingValues = paddingValues,
             navigateUp = navigateUp,

@@ -16,7 +16,7 @@ data class ParentPlanState(
     val isRecurring: Boolean = false,
     val selectedDays: Set<Int> = emptySet(),
     val startTime: String? = null,
-    val endTime: String ?= null,
+    val endTime: String? = null,
     val selectedDate: String = LocalDate.now().toString(),
     val currentReferenceDate: LocalDate = LocalDate.now(),
     val isFireLit: Boolean = false,
@@ -44,6 +44,22 @@ data class ParentPlanState(
     val isTimeValid: Boolean
         get() = timeToMinutes(displayEndTime) > timeToMinutes(displayStartTime)
 
+    fun serverTimeToDisplayTime(serverTime: String): String {
+        return try {
+            val parts = serverTime.split(":")
+            var hour = parts[0].toInt()
+            val minute = parts[1]
+            val amPm = if (hour < 12) "AM" else "PM"
+            when {
+                hour == 0    -> hour = 12
+                hour > 12    -> hour -= 12
+            }
+            String.format("%02d:%s %s", hour, minute, amPm)
+        } catch (e: Exception) {
+            "12:00 PM"
+        }
+    }
+
     fun formatTimeForServer(time: String?): String {
         val targetTime = if (time.isNullOrEmpty()) "12:00 PM" else time
 
@@ -66,7 +82,6 @@ data class ParentPlanState(
         }
     }
 
-
     val dateRangeText: String
         get() {
             val monday =
@@ -76,7 +91,6 @@ data class ParentPlanState(
             val formatter = DateTimeFormatter.ofPattern("M.d(E)", Locale.KOREAN)
             return "${monday.format(formatter)} - ${sunday.format(formatter)}"
         }
-
 
     val canGoToPrevious: Boolean
         get() {
@@ -90,17 +104,11 @@ data class ParentPlanState(
     val weekDaysList: List<String>
         get() {
             val monday = currentReferenceDate.with(DayOfWeek.MONDAY)
-            val formatter =
-                DateTimeFormatter.ofPattern("d(E)", Locale.KOREAN)
+            val formatter = DateTimeFormatter.ofPattern("d(E)", Locale.KOREAN)
             return (0..6).map { offset ->
                 monday.plusDays(offset.toLong()).format(formatter)
             }
         }
-
-    private fun getWeekOfMonth(date: LocalDate): Int {
-        return ((date.dayOfMonth - 1) / 7) + 1
-    }
-
 
     fun isTimeValid(start: String, end: String): Boolean {
         val startVal = timeToMinutes(start)
@@ -121,6 +129,7 @@ data class ParentPlanState(
             0
         }
     }
+
     fun validateAndTimeAdjustment(timeStr: String): TimeValidationResult {
         return try {
             val regex = Regex("""(\d{1,2}):(\d{2})\s*(AM|PM)""", RegexOption.IGNORE_CASE)
@@ -138,17 +147,12 @@ data class ParentPlanState(
             val endLimit = 22 * 60
 
             when {
-                totalMinutes < startLimit -> {
+                totalMinutes < startLimit ->
                     TimeValidationResult(false, "시각은 08:00AM부터 설정가능합니다.", "08:00 AM")
-                }
-
-                totalMinutes > endLimit -> {
+                totalMinutes > endLimit ->
                     TimeValidationResult(false, "시각은 10:00PM까지 설정가능합니다.", "10:00 PM")
-                }
-
-                else -> {
+                else ->
                     TimeValidationResult(true, null, timeStr)
-                }
             }
         } catch (e: Exception) {
             TimeValidationResult(false, "시간 확인 중 오류 발생", timeStr)
@@ -175,4 +179,3 @@ sealed interface ParentPlanSideEffect {
     data class ShowSnackBar(val message: String) : ParentPlanSideEffect
     data object navigateUp : ParentPlanSideEffect
 }
-

@@ -8,12 +8,40 @@ import androidx.navigation.compose.composable
 import com.kiero.presentation.parent.screen.schedule.plan.ParentScheduleAddRoute
 import kotlinx.serialization.Serializable
 
+
+@Serializable
+data class ScheduleAdd(
+    val initialDate: String,
+    val isFireLit: Boolean,
+)
+
+@Serializable
+data class ScheduleEdit(
+    val scheduleId: Long,
+    val selectedDate: String,
+    val name: String,
+    val isRecurring: Boolean,
+    val startTime: String,
+    val endTime: String,
+    val scheduleColor: String,
+    val dayOfWeek: String?,
+    val dates: String?,
+    val isIncludeFollowing: Boolean? = null,
+)
+
 fun NavController.navigateToScheduleAdd(
     initialDate: String,
     isFireLit: Boolean,
     navOptions: NavOptions? = null,
 ) {
     navigate(ScheduleAdd(initialDate = initialDate, isFireLit = isFireLit), navOptions)
+}
+
+fun NavController.navigateToScheduleEdit(
+    args: ScheduleEdit,
+    navOptions: NavOptions? = null,
+) {
+    navigate(args, navOptions)
 }
 
 fun NavGraphBuilder.parentScheduleAddNavGraph(
@@ -26,11 +54,11 @@ fun NavGraphBuilder.parentScheduleAddNavGraph(
             navigateUp = navigateUp,
         )
     }
-}
 
-// ScheduleAdd navigation data class에 isFireLit 추가
-@Serializable
-data class ScheduleAdd(
-    val initialDate: String,
-    val isFireLit: Boolean, // 이 값을 추가로 받습니다.
-)
+    composable<ScheduleEdit> {
+        ParentScheduleAddRoute(
+            paddingValues = paddingValues,
+            navigateUp = navigateUp,
+        )
+    }
+}
