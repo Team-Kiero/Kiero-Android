@@ -6,16 +6,16 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.kiero.core.navigation.Route
-import com.kiero.presentation.parent.navigation.Reward
 import com.kiero.presentation.parent.screen.reward.ParentRewardAddRoute
 import com.kiero.presentation.parent.screen.reward.ParentRewardEditRoute
+import com.kiero.presentation.parent.navigation.ParentReward
 import com.kiero.presentation.parent.screen.reward.ParentRewardRoute
 import kotlinx.serialization.Serializable
 
 fun NavController.navigateToReward(
     navOptions: NavOptions? = null,
 ) {
-    navigate(Reward, navOptions)
+    navigate(ParentReward, navOptions)
 }
 
 fun NavController.navigateToRewardAdd(navOptions: NavOptions? = null) {
@@ -32,7 +32,7 @@ fun NavGraphBuilder.parentRewardNavGraph(
     navigateToRewardAdd: () -> Unit,
     navigateToRewardEdit: (Long) -> Unit,
 ) {
-    composable<Reward> {
+    composable<ParentReward> {
         ParentRewardRoute(
             paddingValues = paddingValues,
             navigateToRewardAdd = navigateToRewardAdd,

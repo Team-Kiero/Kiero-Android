@@ -1,8 +1,10 @@
 package com.kiero.presentation.parent.component
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -40,11 +42,19 @@ fun ParentTopbar(
             .padding(vertical = 8.dp, horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = title,
-            color = KieroTheme.colors.white,
-            style = KieroTheme.typography.bold.headLine2
-        )
+        if (title.isEmpty()) {
+            Image(
+                imageVector = ImageVector.vectorResource(id = R.drawable.ic_logo),
+                contentDescription = null,
+                modifier = Modifier.aspectRatio(108f / 23f)
+            )
+        } else {
+            Text(
+                text = title,
+                color = KieroTheme.colors.white,
+                style = KieroTheme.typography.bold.headLine2
+            )
+        }
 
         Spacer(modifier = Modifier.weight(1f))
 
@@ -63,7 +73,7 @@ fun ParentTopbar(
 private fun ParentTopbarPreview() {
     KieroTheme {
         ParentTopbar(
-            title = "일정",
+            title = "",
             onAlarmClick = {},
             isAlarmActive = true
         )

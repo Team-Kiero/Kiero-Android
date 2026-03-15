@@ -22,4 +22,23 @@ interface PlanRepository {
         startDate: String,
         endDate: String,
     ): Result<PlanAllModel>
+
+    suspend fun updateSchedule(
+        scheduleId: Long,
+        selectedDate: String,
+        name: String,
+        isRecurring: Boolean,
+        startTime: String,
+        endTime: String,
+        scheduleColor: String,
+        dayOfWeek: String?,
+        dates: String?,
+        isIncludeFollowing: Boolean?,
+    ): Result<Unit>
+
+    suspend fun deleteSchedule(
+        scheduleId: Long,
+        selectedDate: String,
+        isIncludeFollowing: Boolean?,
+    ): Result<Unit>
 }

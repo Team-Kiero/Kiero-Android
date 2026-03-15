@@ -45,7 +45,7 @@ import com.kiero.presentation.kid.component.KidSpeechField
 import com.kiero.presentation.kid.journey.fire.component.KieroFireStoneMoving
 import com.kiero.presentation.kid.journey.fire.state.KidFireResultState
 import com.kiero.presentation.kid.journey.fire.viewModel.KidFireResultVIewModel
-import com.kiero.presentation.kid.journey.model.StoneUiType
+import com.kiero.presentation.kid.journey.model.KidJourneyStoneType
 import kotlinx.coroutines.delay
 
 @Composable
@@ -85,7 +85,7 @@ private fun KidFIreResultScreen(
     modifier: Modifier = Modifier
 ) {
     var isFinished by remember { mutableStateOf(false) }
-    var currentStone by remember { mutableStateOf<StoneUiType?>(null) }
+    var currentStone by remember { mutableStateOf<KidJourneyStoneType?>(null) }
 
     LaunchedEffect(state.content.earnedStones) {
         if (state.content.earnedStones.isNotEmpty()) {
@@ -248,7 +248,7 @@ private fun KidFIreScreenPreview() {
     KieroTheme {
         KidFIreResultScreen(
             paddingValues = PaddingValues(),
-            state = KidFireResultState.fake(),
+            state = KidFireResultState.FAKE,
             navigateUp = {},
             navigateToJourney = {}
         )

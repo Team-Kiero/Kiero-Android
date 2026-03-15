@@ -27,6 +27,8 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
+import com.kiero.core.common.extension.noRippleClickable
+import com.kiero.core.designsystem.component.emptyview.KieroEmptyView
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.screen.schedule.model.ScheduleEvent
 import com.kiero.presentation.parent.screen.schedule.model.toScheduleBlocks
@@ -36,6 +38,7 @@ import com.kiero.presentation.parent.screen.schedule.plan.state.ParentScheduleSt
 fun ScheduleTimeTable(
     state: ParentScheduleState,
     events: List<ScheduleEvent>,
+    onContentClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -50,7 +53,11 @@ fun ScheduleTimeTable(
         ) {
             ScheduleTimeColumn()
 
-            SchedulePlanner(events = events, state = state)
+            SchedulePlanner(
+                events = events,
+                state = state,
+                onContentClick = onContentClick,
+            )
         }
     }
 }
@@ -59,6 +66,7 @@ fun ScheduleTimeTable(
 fun SchedulePlanner(
     events: List<ScheduleEvent>,
     state: ParentScheduleState,
+    onContentClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     daysCount: Int = 7,
 ) {
@@ -88,35 +96,7 @@ fun SchedulePlanner(
     ) {
         val dayWidth = maxWidth / daysCount
         if (events.isEmpty()) {
-            Box(
-                modifier = modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_parent_empty_state),
-                        contentDescription = null,
-                        tint = Color.Unspecified
-                    )
-
-                    Spacer(modifier = Modifier.height(7.dp))
-
-                    Text(
-                        text = "등록된 일정이 없어요",
-                        style = KieroTheme.typography.semiBold.title4,
-                        color = KieroTheme.colors.gray400
-                    )
-                    Text(
-                        text = "우측 하단 버튼을 눌러 일정을 추가해보세요!",
-                        style = KieroTheme.typography.semiBold.title4,
-                        color = KieroTheme.colors.gray400
-                    )
-                    Spacer(modifier = Modifier.height(172.dp))
-                }
-            }
+            KieroEmptyView()
         } else {
             allBlocks.forEach { block ->
                 val hourOffset = hourHeight * (block.startHour - 8)
@@ -129,6 +109,7 @@ fun SchedulePlanner(
                         .offset(x = dayWidth * block.dayIndex, y = topOffset)
                         .width(dayWidth)
                         .height(blockHeight)
+                        .noRippleClickable(onClick = { onContentClick(block.id) })
                         .padding(horizontal = 3.dp)
                 ) {
                     ScheduleEventBlock(block = block)
@@ -148,7 +129,8 @@ private fun ScheduleTimeTablePreview() {
         Box(modifier = Modifier.padding(16.dp)) {
             ScheduleTimeTable(
                 state = ParentScheduleState(),
-                events = mockEvents
+                events = mockEvents,
+                onContentClick = {}
             )
         }
     }

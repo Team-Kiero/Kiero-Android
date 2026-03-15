@@ -25,9 +25,9 @@ fun KidJourneyActionButton(
         text = if (buttonTextRes != null) stringResource(buttonTextRes) else "",
         leadingIcon = if (isAuthButton) {
             ImageVector.vectorResource(id = R.drawable.ic_kid_camera)
-        } else null,
-        containerColor = KieroTheme.colors.gray900,
-        contentColor = KieroTheme.colors.white,
+        } else ImageVector.vectorResource(id = R.drawable.ic_fire),
+        containerColor = KieroTheme.colors.gray100,
+        contentColor = KieroTheme.colors.gray900,
         onClick = onClick,
         modifier = modifier.alpha(if (buttonType != KidJourneyButtonType.NONE) 1f else 0f)
     )

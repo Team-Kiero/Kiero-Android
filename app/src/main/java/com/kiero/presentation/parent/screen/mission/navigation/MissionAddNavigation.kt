@@ -30,3 +30,12 @@ fun NavGraphBuilder.parentMissionAddNavGraph(
 
 @Serializable
 data object MissionAdd : Route
+
+
+@Serializable
+data class MissionEdit(
+    val missionId: Long = -1L,
+    val name: String = "",
+    val reward: Int = 0,
+    val dueAt: String = "",
+)

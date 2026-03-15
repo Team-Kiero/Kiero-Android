@@ -14,6 +14,8 @@ import com.kiero.presentation.kid.journey.fire.navigation.kidJourneyFireNavGraph
 import com.kiero.presentation.kid.journey.fire.navigation.kidJourneyFireResultNavGraph
 import com.kiero.presentation.kid.journey.fire.navigation.navigateToFire
 import com.kiero.presentation.kid.journey.fire.navigation.navigateToFireResult
+import com.kiero.presentation.kid.journey.map.navigation.kidJourneyMapNavGraph
+import com.kiero.presentation.kid.journey.map.navigation.navigateToMap
 import com.kiero.presentation.kid.journey.navigation.kidJourneyNavGraph
 import com.kiero.presentation.kid.journey.navigation.navigateToJourney
 import com.kiero.presentation.kid.mission.navigation.kidMissionNavGraph
@@ -27,13 +29,13 @@ sealed interface KidTab : Route
 data object KidGraph : Route
 
 @Serializable
-data object Journey : KidTab
+data object KidJourney : KidTab
 
 @Serializable
-data object Mission : KidTab
+data object KidMission : KidTab
 
 @Serializable
-data object Wish : KidTab
+data object KidWish : KidTab
 
 @Serializable
 data object Onboarding : KidTab
@@ -50,7 +52,7 @@ fun NavGraphBuilder.kidNavGraph(
     navigateUp: () -> Unit,
 ) {
     navigation<KidGraph>(
-        startDestination = Journey
+        startDestination = KidJourney
     ) {
         kidJourneyNavGraph(
             paddingValues = paddingValues,
@@ -60,6 +62,9 @@ fun NavGraphBuilder.kidNavGraph(
             },
             navigateToFire = { date, stones->
                 navController.navigateToFire(date, stones)
+            },
+            navigateToMap = { date ->
+                navController.navigateToMap(date)
             }
         )
 
@@ -72,7 +77,7 @@ fun NavGraphBuilder.kidNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
         )
-        
+
         kidOnboardingNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
@@ -103,6 +108,11 @@ fun NavGraphBuilder.kidNavGraph(
 
                 navController.navigateToJourney(clearStackNavOptions)
             }
+        )
+
+        kidJourneyMapNavGraph(
+            paddingValues = paddingValues,
+            navigateUp = navigateUp
         )
     }
 }
