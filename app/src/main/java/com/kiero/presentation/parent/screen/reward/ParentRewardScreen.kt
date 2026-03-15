@@ -38,11 +38,13 @@ import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
-import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
+import com.kiero.core.trigger.LocalRefreshState
+import com.kiero.presentation.main.navigation.ParentMainTab
+import com.kiero.presentation.main.navigation.component.BottomBarTab
 import com.kiero.presentation.parent.component.ParentFloatingButton
 import com.kiero.presentation.parent.component.ParentTopbar
-import com.kiero.presentation.parent.navigation.Reward
+import com.kiero.presentation.parent.navigation.ParentReward
 import com.kiero.presentation.parent.screen.reward.component.ParentRewardBottomSheet
 import com.kiero.presentation.parent.screen.reward.component.ParentRewardCard
 import com.kiero.presentation.parent.screen.reward.component.ParentRewardDeleteDialog
@@ -61,6 +63,7 @@ fun ParentRewardRoute(
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val globalTrigger = LocalGlobalUiEventTrigger.current
+    val refreshState = LocalRefreshState.current
     val gridState = rememberLazyGridState()
 
     var isSheetVisible by remember { mutableStateOf(false) }
@@ -68,11 +71,11 @@ fun ParentRewardRoute(
     var shouldScrollToTop by remember { mutableStateOf(false) }
 
     // GNB 재클릭 처리
-    LaunchedEffect(globalTrigger) {
-        globalTrigger.tabReselectedEvent.collect { route ->
-            if (route == Reward) {
+    LaunchedEffect(refreshState) {
+        refreshState.refreshEvent.collect { tab: BottomBarTab ->
+            if (tab is ParentMainTab && tab.route == ParentReward) {
                 viewModel.fetchRewards()
-                shouldScrollToTop = true
+                gridState.animateScrollToItem(0)
                 isSheetVisible = false
                 isDialogVisible = false
             }
@@ -93,7 +96,7 @@ fun ParentRewardRoute(
     // 사이드 이펙트 처리
     viewModel.sideEffect.collectSideEffect { sideEffect ->
         if (sideEffect is ParentRewardSideEffect.ShowSnackBar) {
-            globalTrigger.showSnackbar(SnackbarState(message = sideEffect.message))
+            globalTrigger.showToast(sideEffect.message)
         }
     }
 

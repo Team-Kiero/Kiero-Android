@@ -29,10 +29,11 @@ import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
-import com.kiero.presentation.parent.navigation.Reward
+import com.kiero.presentation.parent.navigation.ParentReward
 import com.kiero.presentation.parent.screen.reward.component.RewardNameTextField
 import com.kiero.presentation.parent.screen.reward.component.RewardPriceInfo
 import com.kiero.presentation.parent.screen.reward.component.RewardPriceSelect
+import com.kiero.presentation.parent.screen.reward.model.RewardPriceDefaults
 import com.kiero.presentation.parent.screen.reward.state.ParentRewardSideEffect
 import com.kiero.presentation.parent.screen.reward.viewmodel.ParentEditRewardViewModel
 
@@ -41,7 +42,7 @@ fun ParentRewardEditRoute(
     navigateUp: () -> Unit,
     viewModel: ParentEditRewardViewModel = hiltViewModel(),
 ) {
-    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
     val globalTrigger = LocalGlobalUiEventTrigger.current
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
@@ -54,17 +55,17 @@ fun ParentRewardEditRoute(
         when (sideEffect) {
             is ParentRewardSideEffect.ShowSnackBar -> {
                 focusManager.clearFocus()
-                globalTrigger.showSnackbar(SnackbarState(message = sideEffect.message))
+                globalTrigger.showToast(sideEffect.message)
             }
             ParentRewardSideEffect.NavigateUp -> {
-                globalTrigger.onTabReselected(Reward)
+                globalTrigger.onTabReselected(ParentReward)
                 navigateUp()
             }
         }
     }
 
     ParentRewardEditScreen(
-        isLoading = isLoading,
+        isLoading = uiState.isLoading,
         nameState = viewModel.nameState,
         priceState = viewModel.priceState,
         focusRequester = focusRequester,
@@ -121,7 +122,8 @@ private fun ParentRewardEditScreen(
             textFieldState = priceState,
             onPriceClick = { delta ->
                 val current = priceState.text.toString().toIntOrNull() ?: 0
-                val updated = (current + delta).coerceIn(1, 500)
+                val updated = (current + delta).coerceIn(
+                    RewardPriceDefaults.MIN_PRICE,RewardPriceDefaults.MAX_PRICE)
                 priceState.setTextAndPlaceCursorAtEnd(updated.toString())
             },
             onValueAdjust = {

@@ -36,6 +36,7 @@ import com.kiero.core.model.trigger.DialogTrigger
 import com.kiero.core.model.trigger.GlobalUiEventHolder
 import com.kiero.core.model.trigger.RefreshState
 import com.kiero.core.model.trigger.SnackbarState
+import com.kiero.core.navigation.Route
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
 import com.kiero.core.trigger.LocalRefreshState
 import com.kiero.presentation.main.navigation.KidMainTab
@@ -144,7 +145,7 @@ fun MainScreen(
         }
     }
 
-    val tabReselectedEvent = remember { MutableSharedFlow<com.kiero.core.navigation.Route>() }
+    val tabReselectedEvent = remember { MutableSharedFlow<Route>() }
     val eventHolder = remember(dialogState, onShowToast, onShowSnackbar) {
         GlobalUiEventHolder(
             dialogTrigger = DialogTrigger(
@@ -157,7 +158,6 @@ fun MainScreen(
             ),
             showToast = onShowToast,
             showSnackbar = onShowSnackbar,
-            tabReselectedEvent = tabReselectedEvent.asSharedFlow(),
             onTabReselected = { route ->
                 scope.launch {
                     tabReselectedEvent.emit(route)

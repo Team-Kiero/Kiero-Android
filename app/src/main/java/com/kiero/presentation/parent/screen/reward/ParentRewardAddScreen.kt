@@ -27,9 +27,8 @@ import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.theme.KieroTheme
-import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
-import com.kiero.presentation.parent.navigation.Reward
+import com.kiero.presentation.parent.navigation.ParentReward
 import com.kiero.presentation.parent.screen.reward.component.RewardNameTextField
 import com.kiero.presentation.parent.screen.reward.component.RewardPriceInfo
 import com.kiero.presentation.parent.screen.reward.component.RewardPriceSelect
@@ -41,7 +40,7 @@ fun ParentRewardAddRoute(
     navigateUp: () -> Unit,
     viewModel: ParentAddRewardViewModel = hiltViewModel(),
 ) {
-    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
     val globalTrigger = LocalGlobalUiEventTrigger.current
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
@@ -54,17 +53,17 @@ fun ParentRewardAddRoute(
         when (sideEffect) {
             is ParentRewardSideEffect.ShowSnackBar -> {
                 focusManager.clearFocus()
-                globalTrigger.showSnackbar(SnackbarState(message = sideEffect.message))
+                globalTrigger.showToast(sideEffect.message)
             }
             ParentRewardSideEffect.NavigateUp -> {
-                globalTrigger.onTabReselected(Reward)
+                globalTrigger.onTabReselected(ParentReward)
                 navigateUp()
             }
         }
     }
 
     ParentRewardAddScreen(
-        isLoading = isLoading,
+        isLoading = uiState.isLoading,
         nameState = viewModel.nameState,
         priceState = viewModel.priceState,
         focusRequester = focusRequester,

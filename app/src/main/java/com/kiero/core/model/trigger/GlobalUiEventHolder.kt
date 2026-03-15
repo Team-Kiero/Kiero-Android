@@ -9,6 +9,5 @@ class GlobalUiEventHolder(
     val dialogTrigger: DialogTrigger,
     val showToast: (String) -> Unit,
     val showSnackbar: (SnackbarState) -> Unit,
-    val tabReselectedEvent: SharedFlow<Route>,
     val onTabReselected: (Route) -> Unit
 )
