@@ -36,7 +36,9 @@ fun OssLicensesScreen(
             libraries = libraries,
             colors = LibraryDefaults.libraryColors(
                 libraryContentColor = KieroTheme.colors.white,
-                libraryBackgroundColor = KieroTheme.colors.gray900
+                libraryBackgroundColor = KieroTheme.colors.gray900,
+                dialogContentColor = KieroTheme.colors.white,
+                dialogConfirmButtonColor = KieroTheme.colors.white
             ),
             modifier = Modifier.fillMaxSize()
         )

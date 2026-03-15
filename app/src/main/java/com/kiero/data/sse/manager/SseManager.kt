@@ -33,37 +33,39 @@ class SseManager @Inject constructor(
     private val mutex = Mutex()
 
     // 부모 이벤트
-    private val _parentInviteEvents = MutableSharedFlow<SseEvent.Invite>(
+    private val _parentInviteEvents = MutableSharedFlow<SseEvent.Parent.Invite>(
         replay = 0,
         extraBufferCapacity = 1
     )
-    val parentInviteEvents: SharedFlow<SseEvent.Invite> = _parentInviteEvents.asSharedFlow()
+    val parentInviteEvents: SharedFlow<SseEvent.Parent.Invite> = _parentInviteEvents.asSharedFlow()
 
-    private val _parentFeedEvents = MutableSharedFlow<SseEvent.Feed>(
+    private val _parentFeedEvents = MutableSharedFlow<SseEvent.Parent.Feed>(
         replay = 0,
         extraBufferCapacity = 1
     )
-    val parentFeedEvents: SharedFlow<SseEvent.Feed> = _parentFeedEvents.asSharedFlow()
+    val parentFeedEvents: SharedFlow<SseEvent.Parent.Feed> = _parentFeedEvents.asSharedFlow()
+
+    private val _parentScheduleEvents = MutableSharedFlow<SseEvent.Parent.Schedule>(
+        replay = 0,
+        extraBufferCapacity = 1
+    )
+
+    val parentScheduleEvents = _parentScheduleEvents.asSharedFlow()
+
+
 
     // 자녀 이벤트
-    private val _childMissionEvents = MutableSharedFlow<SseEvent.Mission>(
+    private val _childMissionEvents = MutableSharedFlow<SseEvent.Kid.Mission>(
         replay = 0,
         extraBufferCapacity = 1
     )
-    val childMissionEvents: SharedFlow<SseEvent.Mission> = _childMissionEvents.asSharedFlow()
+    val childMissionEvents: SharedFlow<SseEvent.Kid.Mission> = _childMissionEvents.asSharedFlow()
 
-    private val _childScheduleEvents = MutableSharedFlow<SseEvent.Schedule>(
+    private val _childScheduleEvents = MutableSharedFlow<SseEvent.Kid.Schedule>(
         replay = 0,
         extraBufferCapacity = 1
     )
-    val childScheduleEvents: SharedFlow<SseEvent.Schedule> = _childScheduleEvents.asSharedFlow()
-
-    // 날짜 이벤트
-    private val _childDateEvents = MutableSharedFlow<SseEvent.Date>(
-        replay = 0,
-        extraBufferCapacity = 1
-    )
-    val dateEvents: SharedFlow<SseEvent.Date> = _childDateEvents.asSharedFlow()
+    val childScheduleEvents: SharedFlow<SseEvent.Kid.Schedule> = _childScheduleEvents.asSharedFlow()
 
     // 연결 상태
     private val _connectionState = MutableSharedFlow<Boolean>(replay = 1)
@@ -196,8 +198,9 @@ class SseManager @Inject constructor(
     private suspend fun handleParentEvent(event: SseEvent) {
         when (event) {
             is SseEvent.Connected -> Timber.d("부모 SSE Connected")
-            is SseEvent.Invite -> _parentInviteEvents.emit(event)
-            is SseEvent.Feed -> _parentFeedEvents.emit(event)
+            is SseEvent.Parent.Invite -> _parentInviteEvents.emit(event)
+            is SseEvent.Parent.Feed -> _parentFeedEvents.emit(event)
+            is SseEvent.Parent.Schedule -> _parentScheduleEvents.emit(event)
             else -> Timber.w("부모 모드에서 알 수 없는 이벤트: $event")
         }
     }
@@ -205,9 +208,8 @@ class SseManager @Inject constructor(
     private suspend fun handleChildEvent(event: SseEvent) {
         when (event) {
             is SseEvent.Connected -> Timber.d("아이 SSE Connected")
-            is SseEvent.Mission -> _childMissionEvents.emit(event)
-            is SseEvent.Schedule -> _childScheduleEvents.emit(event)
-            is SseEvent.Date -> _childDateEvents.emit(event)
+            is SseEvent.Kid.Mission -> _childMissionEvents.emit(event)
+            is SseEvent.Kid.Schedule -> _childScheduleEvents.emit(event)
             else -> Timber.w("자녀 모드에서 알 수 없는 이벤트: $event")
         }
     }

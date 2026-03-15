@@ -1,13 +1,15 @@
 package com.kiero.data.sse.repositoryimpl
 
-import com.kiero.data.sse.remote.datasource.SseDataSource
+import com.kiero.core.localstorage.TokenManager
+import com.kiero.core.model.auth.UserRole
 import com.kiero.data.sse.model.RawSseEvent
 import com.kiero.data.sse.model.SseEvent
 import com.kiero.data.sse.model.SseEventType
-import com.kiero.data.sse.remote.dto.response.DateDataDto
+import com.kiero.data.sse.remote.datasource.SseDataSource
 import com.kiero.data.sse.remote.dto.response.FeedDataDto
 import com.kiero.data.sse.remote.dto.response.InviteDataDto
 import com.kiero.data.sse.remote.dto.response.MissionDataDto
+import com.kiero.data.sse.remote.dto.response.ParentScheduleDataDto
 import com.kiero.data.sse.remote.dto.response.ScheduleDataDto
 import com.kiero.data.sse.repository.SseRepository
 import kotlinx.coroutines.flow.Flow
@@ -18,6 +20,7 @@ import javax.inject.Inject
 
 class SseRepositoryImpl @Inject constructor(
     private val sseDataSource: SseDataSource,
+    private val tokenManager: TokenManager,
     private val json: Json
 ) : SseRepository {
 
@@ -46,7 +49,7 @@ class SseRepositoryImpl @Inject constructor(
             }
     }
 
-    private fun parseEvent(raw: RawSseEvent): SseEvent? {
+    private suspend fun parseEvent(raw: RawSseEvent): SseEvent? {
         return when (SseEventType.from(raw.type)) {
             SseEventType.CONNECTED -> {
                 Timber.d("SSE connected 이벤트")
@@ -58,11 +61,12 @@ class SseRepositoryImpl @Inject constructor(
                 null
             }
 
+            // 부모
             SseEventType.INVITE -> {
                 try {
                     val data = json.decodeFromString<InviteDataDto>(raw.data)
                     Timber.d("Invite 이벤트 파싱 성공: childId=${data.childId}")
-                    SseEvent.Invite(data)
+                    SseEvent.Parent.Invite(data)
                 } catch (e: Exception) {
                     Timber.e(e, "Invite 파싱 실패: ${raw.data}")
                     null
@@ -73,18 +77,19 @@ class SseRepositoryImpl @Inject constructor(
                 try {
                     val data = json.decodeFromString<FeedDataDto>(raw.data)
                     Timber.d("📢 Feed 이벤트 파싱 성공: ${data.eventType}")
-                    SseEvent.Feed(data)
+                    SseEvent.Parent.Feed(data)
                 } catch (e: Exception) {
                     Timber.e(e, "Feed 파싱 실패: ${raw.data}")
                     null
                 }
             }
 
+            // 아이
             SseEventType.MISSION -> {
                 try {
                     val data = json.decodeFromString<MissionDataDto>(raw.data)
                     Timber.d("📋 Mission 이벤트 파싱 성공: ${data.missionName}")
-                    SseEvent.Mission(data)
+                    SseEvent.Kid.Mission(data)
                 } catch (e: Exception) {
                     Timber.e(e, "Mission 파싱 실패: ${raw.data}")
                     null
@@ -93,22 +98,18 @@ class SseRepositoryImpl @Inject constructor(
 
             SseEventType.SCHEDULE -> {
                 try {
-                    val data = json.decodeFromString<ScheduleDataDto>(raw.data)
-                    Timber.d("📅 Schedule 이벤트 파싱 성공: ${data.scheduleName}")
-                    SseEvent.Schedule(data)
+                    val userRole = tokenManager.getUserRole()
+                    if (userRole == UserRole.PARENT) {
+                        val data = json.decodeFromString<ParentScheduleDataDto>(raw.data)
+                        Timber.d("📅 Parent Schedule 이벤트 파싱 성공: ${data.childId}")
+                        SseEvent.Parent.Schedule(data)
+                    } else {
+                        val data = json.decodeFromString<ScheduleDataDto>(raw.data)
+                        Timber.d("📅 Schedule 이벤트 파싱 성공: ${data.scheduleName}")
+                        SseEvent.Kid.Schedule(data)
+                    }
                 } catch (e: Exception) {
                     Timber.e(e, "Schedule 파싱 실패: ${raw.data}")
-                    null
-                }
-            }
-
-            SseEventType.DATE -> {
-                try {
-                    val data = json.decodeFromString<DateDataDto>(raw.data)
-                    Timber.d("📅 Date 이벤트 파싱 성공: ${data.date}")
-                    SseEvent.Date(data)
-                } catch (e: Exception) {
-                    Timber.e(e, "Date 파싱 실패: ${raw.data}")
                     null
                 }
             }

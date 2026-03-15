@@ -4,7 +4,9 @@ import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.core.designsystem.component.KieroSnackbar
@@ -42,6 +45,7 @@ import com.kiero.presentation.main.navigation.ParentMainTab
 import com.kiero.presentation.main.navigation.component.BottomBarTab
 import com.kiero.presentation.main.navigation.component.MainBottomBar
 import com.kiero.presentation.main.state.rememberDialogStateHolder
+import com.kiero.presentation.parent.component.ParentTopbar
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.delay
@@ -191,6 +195,24 @@ fun MainScreen(
                                 .padding(horizontal = 16.dp)
                                 .padding(bottom = bottomPadding.dp)
                         )
+                    }
+                },
+                topBar = {
+                    when (tabs) {
+                        ParentMainTab -> {
+                            ParentTopbar(
+                                title = when (currentTab) {
+                                    ParentMainTab.JOURNEY -> ""
+                                    null -> ""
+                                    else -> stringResource(currentTab.contentDescription)
+                                },
+                                onAlarmClick = {}
+                            )
+                        }
+
+                        KidMainTab -> {
+
+                        }
                     }
                 },
                 bottomBar = {

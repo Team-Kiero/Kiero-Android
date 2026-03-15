@@ -186,3 +186,5 @@ fun String.validateAsStartTime(): String {
         return this
     }
 }
+
+fun String.toShortTime(): String = split(":").take(2).joinToString(":")
