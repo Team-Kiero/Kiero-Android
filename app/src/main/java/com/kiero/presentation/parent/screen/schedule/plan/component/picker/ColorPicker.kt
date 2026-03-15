@@ -46,16 +46,17 @@ fun ColorPickerBottomSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var tempColorType by remember { mutableStateOf(selectedColorType) }
 
-
     ModalBottomSheet(
-        onDismissRequest = onDismissRequest,
+        onDismissRequest = {
+            onColorConfirmed(tempColorType)
+            onDismissRequest()
+        },
         sheetState = sheetState,
         containerColor = KieroTheme.colors.gray900,
         dragHandle = null,
         modifier = modifier
             .pointerInput(Unit) {
-                detectTapGestures {
-                }
+                detectTapGestures { }
             }
     ) {
         Column(
@@ -66,11 +67,14 @@ fun ColorPickerBottomSheet(
             PickerTopbar(
                 title = "컬러",
                 leftIconRes = R.drawable.ic_close_light,
-                leftIconClick = onDismissRequest,
+                leftIconClick = {
+                    onColorConfirmed(tempColorType)
+                    onDismissRequest()
+                },
                 rightIconRes = R.drawable.ic_check,
                 rightIconClick = {
                     onColorConfirmed(tempColorType)
-                },
+                  },
             )
 
             Spacer(modifier = Modifier.height(25.dp))
@@ -135,7 +139,6 @@ fun ColorPickerItem(
         }
     }
 }
-
 
 @Preview(showBackground = true, backgroundColor = 0xFF2C2C2E)
 @Composable

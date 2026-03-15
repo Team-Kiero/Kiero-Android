@@ -177,3 +177,5 @@ fun String.validateAsStartTime(): String {
 fun String.escapeForJson(): String =
     replace("\"", "\\\"")
         .replace("\n", "\\n")
+
+fun String.toShortTime(): String = split(":").take(2).joinToString(":")

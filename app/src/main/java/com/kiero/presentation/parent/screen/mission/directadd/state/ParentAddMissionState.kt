@@ -24,4 +24,6 @@ sealed interface ParentAddMissionSideEffect {
     data class NavigateToMissionList(
         val mission: ParentMissionAddModel
     ) : ParentAddMissionSideEffect
+
+    data object NavigateUp : ParentAddMissionSideEffect
 }

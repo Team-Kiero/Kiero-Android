@@ -1,4 +1,4 @@
-package com.kiero.presentation.parent.screen.mission.directadd
+package com.kiero.presentation.parent.screen.mission
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -25,16 +25,15 @@ import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.theme.KieroTheme
-import com.kiero.core.model.UiState
 import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
-import com.kiero.presentation.parent.screen.mission.overview.component.datepicker.component.CalendarBottomSheet
-import com.kiero.presentation.parent.screen.mission.directadd.component.MissionAwardInfo
-import com.kiero.presentation.parent.screen.mission.directadd.component.MissionAwardSelect
-import com.kiero.presentation.parent.screen.mission.overview.component.missionmain.MissionCalendar
-import com.kiero.presentation.parent.screen.mission.directadd.state.ParentAddMissionSideEffect
-import com.kiero.presentation.parent.screen.mission.directadd.state.ParentAddMissionState
-import com.kiero.presentation.parent.screen.mission.directadd.viewmodel.ParentAddMissionViewModel
+import com.kiero.presentation.parent.screen.mission.component.datepicker.component.CalendarBottomSheet
+import com.kiero.presentation.parent.screen.mission.component.missionadd.MissionAwardInfo
+import com.kiero.presentation.parent.screen.mission.component.missionadd.MissionAwardSelect
+import com.kiero.presentation.parent.screen.mission.component.missionmain.MissionCalendar
+import com.kiero.presentation.parent.screen.mission.state.ParentAddMissionSideEffect
+import com.kiero.presentation.parent.screen.mission.state.ParentAddMissionState
+import com.kiero.presentation.parent.screen.mission.viewmodel.ParentAddMissionViewModel
 import com.kiero.presentation.parent.screen.schedule.plan.component.select.ScheduleTextField
 
 @Composable
@@ -45,7 +44,6 @@ fun ParentAddMissionRoute(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val showBottomSheet by viewModel.showBottomSheet.collectAsStateWithLifecycle()
-    val selectedDate by viewModel.selectedDate.collectAsStateWithLifecycle()
 
     val dateText = viewModel.displayDate
     val globalTrigger = LocalGlobalUiEventTrigger.current
@@ -59,40 +57,36 @@ fun ParentAddMissionRoute(
         when (effect) {
             is ParentAddMissionSideEffect.ShowSnackbar -> {
                 focusManager.clearFocus()
-
-                globalTrigger.showSnackbar(
-                    SnackbarState(message = effect.message),
-                )
+                globalTrigger.showSnackbar(SnackbarState(message = effect.message))
             }
 
             is ParentAddMissionSideEffect.NavigateToMissionList -> {
                 navigateUp()
             }
-        }
-    }
 
-    when (val uiState = state) {
-        is UiState.Loading -> {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = KieroTheme.colors.main)
+            ParentAddMissionSideEffect.NavigateUp -> {
+                navigateUp()
             }
         }
-
-        is UiState.Failure -> {
-        }
-
-        else -> {
-            ParentAddMissionScreen(
-                paddingValues = paddingValues,
-                navigateUp = navigateUp,
-                viewModel = viewModel,
-                showBottomSheet = showBottomSheet,
-                selectedDate = dateText,
-                state = state
-            )
-        }
     }
 
+    if (state.isLoading) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            CircularProgressIndicator(color = KieroTheme.colors.main)
+        }
+    } else {
+        ParentAddMissionScreen(
+            paddingValues = paddingValues,
+            navigateUp = navigateUp,
+            viewModel = viewModel,
+            showBottomSheet = showBottomSheet,
+            selectedDate = dateText,
+            state = state,
+        )
+    }
 }
 
 @Composable
@@ -106,41 +100,38 @@ fun ParentAddMissionScreen(
     modifier: Modifier = Modifier,
 ) {
     val focusManager = LocalFocusManager.current
+    val topbarTitle = if (viewModel.isEditMode) "미션 수정" else "미션추가"
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(color = KieroTheme.colors.black)
             .padding(paddingValues)
-            .noRippleClickable {
-                focusManager.clearFocus()
-            },
+            .noRippleClickable { focusManager.clearFocus() },
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(15.dp)
+        verticalArrangement = Arrangement.spacedBy(15.dp),
     ) {
         Spacer(modifier = Modifier.height(25.dp))
 
         KieroTopbar(
-            title = "미션추가",
+            title = topbarTitle,
             leftIconRes = R.drawable.ic_close_light,
             rightIconRes = R.drawable.ic_check,
             leftIconClick = navigateUp,
             rightIconClick = {
-                if (!state.isLoading) {
-                    viewModel.createMission()
-                }
+                if (!state.isLoading) viewModel.createMission()
             },
         )
 
         ScheduleTextField(
             state = viewModel.missionNameState,
             placeholder = "미션 이름을 입력해주세요.",
-            maxLength = 15
+            maxLength = 15,
         )
 
-        _root_ide_package_.com.kiero.presentation.parent.screen.mission.overview.component.missionmain.MissionCalendar(
+        MissionCalendar(
             onDateClick = viewModel::onDateClick,
-            dateText = selectedDate ?: "마감일을 선택해주세요"
+            dateText = selectedDate ?: "마감일을 선택해주세요",
         )
 
         MissionAwardInfo()
@@ -153,9 +144,9 @@ fun ParentAddMissionScreen(
         )
 
         if (showBottomSheet) {
-            _root_ide_package_.com.kiero.presentation.parent.screen.mission.overview.component.datepicker.component.CalendarBottomSheet(
+            CalendarBottomSheet(
                 onDismissRequest = viewModel::onDismissBottomSheet,
-                onDateSelected = viewModel::onDateSelected
+                onDateSelected = viewModel::onDateSelected,
             )
         }
     }
@@ -167,7 +158,7 @@ private fun ParentAddMissionScreenPreview() {
     KieroTheme {
         ParentAddMissionRoute(
             paddingValues = PaddingValues(),
-            navigateUp = {}
+            navigateUp = {},
         )
     }
 }

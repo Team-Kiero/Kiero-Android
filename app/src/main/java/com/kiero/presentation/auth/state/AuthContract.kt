@@ -1,24 +1,17 @@
 package com.kiero.presentation.auth.state
 
 import androidx.compose.runtime.Immutable
-import com.kiero.core.model.UiState
-
+import com.kiero.core.model.auth.UserRole
 
 @Immutable
 data class AuthState(
-    val uiState: UiState<Unit> = UiState.Empty
-) {
-    val isLoading: Boolean
-        get() = uiState is UiState.Loading
-}
+    val userRole: UserRole? = null
+)
 
 sealed interface AuthSideEffect {
     data object NavigateUp : AuthSideEffect
 
-    data class NavigateToParentSignUp(
-        val parentName: String,
-        val parentProfileImage: String,
-    ) : AuthSideEffect
+    data object NavigateToParentSignUp : AuthSideEffect
 
     data class ShowSnackbar(val message: String) : AuthSideEffect
 

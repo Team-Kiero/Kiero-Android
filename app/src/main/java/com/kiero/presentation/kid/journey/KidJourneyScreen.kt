@@ -16,7 +16,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,10 +28,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.dropShadow
+import androidx.compose.ui.graphics.shadow.Shadow
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -36,6 +42,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
 import com.kiero.core.common.extension.collectSideEffect
+import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.component.animation.KieroAnimationType
 import com.kiero.core.designsystem.component.animation.KieroAnimationView
 import com.kiero.core.designsystem.component.dialog.KieroDialog
@@ -54,12 +61,9 @@ import com.kiero.presentation.kid.journey.component.KidJourneyHeader
 import com.kiero.presentation.kid.journey.component.KidJourneyScheduleItem
 import com.kiero.presentation.kid.journey.model.KidJourneyButtonType
 import com.kiero.presentation.kid.journey.model.KidJourneyContentUiModel
-import com.kiero.presentation.kid.journey.model.KidJourneyHeaderUiModel
-import com.kiero.presentation.kid.journey.model.KidJourneyScheduleUiModel
-import com.kiero.presentation.kid.journey.model.StoneUiType
+import com.kiero.presentation.kid.journey.model.KidJourneyStoneType
 import com.kiero.presentation.kid.journey.state.KidJourneySideEffect
 import com.kiero.presentation.kid.journey.state.KidJourneyState
-import com.kiero.presentation.kid.journey.util.KidJourneyContentUtil
 import com.kiero.presentation.kid.journey.viewmodel.KidJourneyViewModel
 import com.kiero.presentation.main.navigation.KidMainTab
 
@@ -67,8 +71,9 @@ import com.kiero.presentation.main.navigation.KidMainTab
 fun KidJourneyRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
-    navigateToCamera: (Long, StoneUiType) -> Unit,
+    navigateToCamera: (Long, KidJourneyStoneType) -> Unit,
     navigateToFire: (String, Int) -> Unit,
+    navigateToMap: (String) -> Unit,
     viewModel: KidJourneyViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -77,7 +82,6 @@ fun KidJourneyRoute(
     val refreshState = LocalRefreshState.current
 
     LaunchedEffect(Unit) {
-
         refreshState.refreshEvent.collect { tab ->
             if (tab == KidMainTab.JOURNEY) {
                 viewModel.fetchData()
@@ -95,7 +99,6 @@ fun KidJourneyRoute(
             is KidJourneySideEffect.ShowSnackbar -> globalTrigger.showSnackbar(
                 SnackbarState(message = sideEffect.message)
             )
-
             KidJourneySideEffect.ShowDialog -> globalTrigger.dialogTrigger.show {}
         }
     }
@@ -104,22 +107,9 @@ fun KidJourneyRoute(
         is UiState.Success -> {
             val onNavigateToCamera = {
                 val content = state.data.content
-                when (content) {
-                    is KidJourneyContentUiModel.FirstSchedule -> {
-                        navigateToCamera(content.scheduleDetailId!!, content.stoneType!!)
-                    }
 
-                    is KidJourneyContentUiModel.NowSchedule -> {
-                        navigateToCamera(content.scheduleDetailId!!, content.stoneType!!)
-                    }
-
-                    is KidJourneyContentUiModel.NextSchedule -> {
-                        navigateToCamera(content.scheduleDetailId!!, content.stoneType!!)
-                    }
-
-                    else -> {
-                        // 데이터가 없는 상태에서 호출된 경우
-                    }
+                if (content is KidJourneyContentUiModel.ScheduledContent) {
+                    navigateToCamera(content.scheduleDetailId!!, content.stoneType!!)
                 }
             }
 
@@ -160,6 +150,7 @@ fun KidJourneyRoute(
                     }
                 },
                 onNextClick = viewModel::onNextClick,
+                onMapClick = { navigateToMap(state.data.header!!.currentDate) },
                 navigateUp = navigateUp,
             )
         }
@@ -180,6 +171,7 @@ private fun KidJourneyScreen(
     state: KidJourneyState,
     onButtonClick: () -> Unit,
     onNextClick: () -> Unit,
+    onMapClick: () -> Unit,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -221,17 +213,42 @@ private fun KidJourneyScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(22.dp))
+            if (state.shouldShowSchedule) {
+                Spacer(modifier = Modifier.height(21.dp))
 
-            // 스케줄 정보 (특정 상태에서만 표시)
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .alpha(if (state.shouldShowSchedule) 1f else 0f)
-            ) {
-                KidJourneyContentUtil.getScheduleInfo(state.content)?.let { schedule ->
+                state.currentScheduleInfo?.let { schedule ->
                     KidJourneyScheduleItem(item = schedule)
                 }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .align(Alignment.End)
+                    .dropShadow(
+                        shape = CircleShape,
+                        shadow = Shadow(
+                            radius = 10.dp,
+                            color = KieroTheme.colors.gray800,
+                        )
+                    )
+                    .background(
+                        color = KieroTheme.colors.gray800,
+                        shape = CircleShape
+                    )
+                    .noRippleClickable {
+                        onMapClick()
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_kid_tab_journey),
+                    contentDescription = null,
+                    tint = KieroTheme.colors.white,
+                    modifier = Modifier.size(16.dp)
+                )
             }
 
             Spacer(modifier = Modifier.weight(1f))
@@ -296,29 +313,10 @@ private fun KidJourneyScreenPreview() {
         KidJourneyScreen(
             paddingValues = PaddingValues(),
             navigateUp = {},
-            state = KidJourneyState(
-                header = KidJourneyHeaderUiModel(
-                    kidName = "주완",
-                    currentDate = "12월 5일 목요일",
-                    coinCount = 350,
-                    earnedStones = 5,
-                    totalScheduleCount = 7
-                ),
-                content = KidJourneyContentUiModel.NowSchedule(
-                    scheduleDetailId = 1,
-                    scheduleName = "피아노 학원 가기",
-                    stoneType = StoneUiType.WISDOM,
-                    scheduleInfo = KidJourneyScheduleUiModel(
-                        order = 4,
-                        startTime = "14:00:00",
-                        endTime = "16:00:00"
-                    ),
-                    isSkippable = true,
-                    isNowScheduleVerified = true
-                )
-            ),
+            state = KidJourneyState.FAKE,
             onButtonClick = {},
-            onNextClick = {}
+            onNextClick = {},
+            onMapClick = {}
         )
     }
 }

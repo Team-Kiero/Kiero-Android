@@ -1,7 +1,9 @@
 package com.kiero.presentation.parent.screen.schedule.model
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 
+@Immutable
 data class ScheduleEvent(
     val id: String,
     val name: String,

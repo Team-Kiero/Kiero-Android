@@ -3,10 +3,12 @@ package com.kiero.presentation.kid.onboarding
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -15,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,6 +58,7 @@ fun KidOnboardingRoute(
                 onSuccess = viewModel::startJourney
             )
         }
+
         is UiState.Success -> {
             KidOnboardingScreen(
                 paddingValues = paddingValues,
@@ -64,6 +68,7 @@ fun KidOnboardingRoute(
                 onNextClick = {}
             )
         }
+
         is UiState.Failure -> {}
         UiState.Empty -> {}
     }
@@ -86,23 +91,33 @@ fun KidOnboardingScreen(
             OnboardingUiModel.STORY2 -> OnboardingUiModel.STORY3
             OnboardingUiModel.STORY3 -> OnboardingUiModel.STORY4
             OnboardingUiModel.STORY4 -> OnboardingUiModel.STORY5
-            OnboardingUiModel.STORY5 -> {
-                navigateToKid()
-                currentStep
-            }
+            OnboardingUiModel.STORY5 -> currentStep
         }
     }
 
-    Box(
+    BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
             .background(color = KieroTheme.colors.black)
     ) {
+        val screenHeight = maxHeight
+
         Image(
             painter = painterResource(id = currentStep.backImage),
             contentDescription = null,
             contentScale = ContentScale.FillBounds,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .run {
+                    if (currentStep == OnboardingUiModel.STORY1) {
+                        this.graphicsLayer(
+                            scaleX = 1.3f,
+                            scaleY = 1.2f
+                        )
+                    } else {
+                        this
+                    }
+                }
         )
 
         Column(
@@ -110,31 +125,31 @@ fun KidOnboardingScreen(
                 .fillMaxSize()
                 .padding(paddingValues),
         ) {
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(screenHeight * 0.65f))
 
-            if (currentStep == OnboardingUiModel.STORY5) {
-                KidSpeechField(
-                    name = "꾸비",
-                    modifier = Modifier
-                        .noRippleClickable(onClick = moveToNextStep)
-                        .padding(horizontal = 16.dp)
-                        .padding(bottom = 11.dp),
-                ) {
-                    KidOnboardingMessage(step = currentStep)
-                }
-            } else {
-                KidSpeechField(
-                    name = "꾸비",
-                    modifier = Modifier
-                        .noRippleClickable(onClick = moveToNextStep)
-                        .padding(horizontal = 16.dp)
-                        .padding(bottom = 11.dp),
-                    buttonText = "다음",
-                    isVisibleButton = true,
-                    nextButtonColor = KieroTheme.colors.main,
-                    onClick = moveToNextStep
-                ) {
-                    KidOnboardingMessage(step = currentStep, kidName = kidName)
+            Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                if (currentStep == OnboardingUiModel.STORY5) {
+                    KidSpeechField(
+                        name = "꾸비",
+                        modifier = Modifier
+                            .noRippleClickable(onClick = moveToNextStep)
+                            .padding(bottom = 11.dp),
+                    ) {
+                        KidOnboardingMessage(step = currentStep)
+                    }
+                } else {
+                    KidSpeechField(
+                        name = "꾸비",
+                        modifier = Modifier
+                            .noRippleClickable(onClick = moveToNextStep)
+                            .padding(bottom = 11.dp),
+                        buttonText = "다음",
+                        isVisibleButton = true,
+                        nextButtonColor = KieroTheme.colors.main,
+                        onClick = moveToNextStep
+                    ) {
+                        KidOnboardingMessage(step = currentStep, kidName = kidName)
+                    }
                 }
             }
 
@@ -144,7 +159,6 @@ fun KidOnboardingScreen(
                 modifier = Modifier
                     .alpha(if (currentStep == OnboardingUiModel.STORY5) 1f else 0f)
                     .padding(horizontal = 16.dp)
-                    .padding(bottom = 55.dp)
             )
         }
     }

@@ -5,6 +5,8 @@ import com.kiero.R
 import com.kiero.presentation.kid.journey.model.KidJourneyButtonType
 import com.kiero.presentation.kid.journey.model.KidJourneyContentUiModel
 import com.kiero.presentation.kid.journey.model.KidJourneyHeaderUiModel
+import com.kiero.presentation.kid.journey.model.KidJourneyScheduleUiModel
+import com.kiero.presentation.kid.journey.model.KidJourneyStoneType
 
 @Immutable
 data class KidJourneyState(
@@ -15,21 +17,7 @@ data class KidJourneyState(
     // 버튼 타입
     val buttonType: KidJourneyButtonType
         get() = when (content) {
-            is KidJourneyContentUiModel.FirstSchedule-> {
-                if (content.isNowScheduleVerified) {
-                    KidJourneyButtonType.NONE
-                } else {
-                    KidJourneyButtonType.AUTH
-                }
-            }
-            is KidJourneyContentUiModel.NextSchedule-> {
-                if (content.isNowScheduleVerified) {
-                    KidJourneyButtonType.NONE
-                } else {
-                    KidJourneyButtonType.AUTH
-                }
-            }
-            is KidJourneyContentUiModel.NowSchedule -> {
+            is KidJourneyContentUiModel.ScheduledContent -> {
                 if (content.isNowScheduleVerified) {
                     KidJourneyButtonType.NONE
                 } else {
@@ -37,8 +25,7 @@ data class KidJourneyState(
                 }
             }
             is KidJourneyContentUiModel.FireNotLit -> KidJourneyButtonType.FIRE
-            is KidJourneyContentUiModel.NoSchedule,
-            is KidJourneyContentUiModel.FireLit -> KidJourneyButtonType.NONE
+            else -> KidJourneyButtonType.NONE
         }
 
     // 버튼 텍스트 리소스 ID
@@ -51,45 +38,37 @@ data class KidJourneyState(
 
     // 다음 일정 버튼 활성화
     val shouldShowNextButton: Boolean
-        get() = when (content) {
-            is KidJourneyContentUiModel.FirstSchedule -> content.isSkippable
-            is KidJourneyContentUiModel.NowSchedule -> content.isSkippable
-            is KidJourneyContentUiModel.NextSchedule -> content.isSkippable
-            else -> false
-        }
+        get() = (content as? KidJourneyContentUiModel.ScheduledContent)?.isSkippable ?: false
 
     // 일정 정보 표시 여부
     val shouldShowSchedule: Boolean
-        get() = when (content) {
-            is KidJourneyContentUiModel.FirstSchedule,
-            is KidJourneyContentUiModel.NowSchedule,
-            is KidJourneyContentUiModel.NextSchedule -> true
-            else -> false
-        }
+        get() = content is KidJourneyContentUiModel.ScheduledContent
+
+    //  스케줄 정보
+    val currentScheduleInfo: KidJourneyScheduleUiModel?
+        get() = (content as? KidJourneyContentUiModel.ScheduledContent)?.scheduleInfo
 
     companion object {
-        fun fake() = KidJourneyState(
+        val FAKE = KidJourneyState(
             header = KidJourneyHeaderUiModel(
-                kidName = "민성",
-                currentDate = "1월 5일 목요일",
+                kidName = "주완",
+                currentDate = "12월 5일 목요일",
                 coinCount = 350,
-                earnedStones = 4,
+                earnedStones = 5,
                 totalScheduleCount = 7
             ),
-            content = KidJourneyContentUiModel.FireNotLit(
-                kidName = "주완"
+            content = KidJourneyContentUiModel.NowSchedule(
+                scheduleDetailId = 1,
+                scheduleName = "피아노 학원 가기",
+                stoneType = KidJourneyStoneType.WISDOM,
+                scheduleInfo = KidJourneyScheduleUiModel(
+                    order = 1,
+                    startTime = "14:00:00",
+                    endTime = "16:00:00"
+                ),
+                isSkippable = true,
+                isNowScheduleVerified = true
             )
-//            content = KidJourneyContentUiModel.NowSchedule(
-//                scheduleDetailId = 1,
-//                scheduleName = "피아노 학원 가기",
-//                stoneType = StoneUiType.WISDOM,
-//                scheduleInfo = KidJourneyScheduleUiModel(
-//                    order = 1,
-//                    startTime = "14:00:00",
-//                    endTime = "16:00:00"
-//                ),
-//                isSkippable = true
-//            )
         )
     }
 }

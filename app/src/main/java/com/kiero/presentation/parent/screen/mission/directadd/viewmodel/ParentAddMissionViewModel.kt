@@ -1,21 +1,19 @@
-package com.kiero.presentation.parent.screen.mission.directadd.viewmodel
+package com.kiero.presentation.parent.screen.mission.viewmodel
 
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
-import androidx.compose.runtime.snapshotFlow
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kiero.core.common.extension.formatWithDayOfWeek
+import androidx.navigation.toRoute
 import com.kiero.core.localstorage.info.UserInfoManager
+import com.kiero.data.parent.mission.model.UpdateMissionModel
 import com.kiero.data.parent.mission.repository.ParentMissionAddRepository
-import com.kiero.presentation.parent.screen.mission.directadd.model.MissionAddValid
-import com.kiero.presentation.parent.screen.mission.directadd.model.MissionAwardDefaults
-import com.kiero.presentation.parent.screen.mission.directadd.state.ParentAddMissionSideEffect
-import com.kiero.presentation.parent.screen.mission.directadd.state.ParentAddMissionState
+import com.kiero.presentation.parent.screen.mission.navigation.MissionEdit
+import com.kiero.presentation.parent.screen.mission.state.ParentAddMissionSideEffect
+import com.kiero.presentation.parent.screen.mission.state.ParentAddMissionState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -26,203 +24,132 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ParentAddMissionViewModel @Inject constructor(
-    private val repository: ParentMissionAddRepository,
+    savedStateHandle: SavedStateHandle,
+    private val parentMissionAddRepository: ParentMissionAddRepository,
     private val userInfoManager: UserInfoManager,
 ) : ViewModel() {
 
-    val missionNameState = TextFieldState()
-    val awardTextFieldState = TextFieldState(MissionAwardDefaults.DEFAULT_AWARD.toString())
+    private val editArgs: MissionEdit? = runCatching {
+        savedStateHandle.toRoute<MissionEdit>()
+    }.getOrNull()?.takeIf { it.missionId != -1L }
+
+    val isEditMode: Boolean = editArgs != null
 
     private val _state = MutableStateFlow(ParentAddMissionState())
     val state = _state.asStateFlow()
 
     private val _sideEffect = MutableSharedFlow<ParentAddMissionSideEffect>()
-    val sideEffect: SharedFlow<ParentAddMissionSideEffect> = _sideEffect.asSharedFlow()
+    val sideEffect = _sideEffect.asSharedFlow()
 
-    private val _showBottomSheet = MutableStateFlow(false)
-    val showBottomSheet = _showBottomSheet.asStateFlow()
+    val missionNameState = TextFieldState(
+        initialText = editArgs?.name.orEmpty()
+    )
+    val awardTextFieldState = TextFieldState(
+        initialText = if (editArgs != null && editArgs.reward > 0) editArgs.reward.toString() else ""
+    )
 
-    private val _currentAwardValue = MutableStateFlow(MissionAwardDefaults.DEFAULT_AWARD)
-    val currentAwardValue = _currentAwardValue.asStateFlow()
-
-    private val _selectedDate = MutableStateFlow<String?>(
-        LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
+    private val _selectedDate = MutableStateFlow<LocalDate?>(
+        editArgs?.dueAt
+            ?.takeIf { it.isNotBlank() }
+            ?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
     )
     val selectedDate = _selectedDate.asStateFlow()
 
     val displayDate: String
-        get() = _selectedDate.value?.formatWithDayOfWeek ?: "마감일을 선택해주세요"
+        get() = _selectedDate.value
+            ?.format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
+            ?: "마감일을 선택해주세요"
 
-    init {
-        _state.update {
-            it.copy(selectedDate = _selectedDate.value)
-        }
-        observeAwardInput()
-        observeCurrentAwardValueChanges()
-        observeMissionNameChanges()
-    }
+    private val _showBottomSheet = MutableStateFlow(false)
+    val showBottomSheet = _showBottomSheet.asStateFlow()
 
-    private fun observeAwardTextFieldChanges() {
-        viewModelScope.launch {
-            snapshotFlow { awardTextFieldState.text.toString() }
-                .collect { text ->
-                    if (text.isNotEmpty()) {
-                        val parsed = text.toIntOrNull()
-
-                        if (parsed != null) {
-                            if (parsed > 500) {
-                                _sideEffect.emit(
-                                    ParentAddMissionSideEffect.ShowSnackbar(
-                                        MissionAddValid.MAX.message
-                                    )
-                                )
-
-                            }
-
-                            val newValue = MissionAwardDefaults.constrainValue(parsed)
-                            if (newValue != _currentAwardValue.value) {
-                                _currentAwardValue.value = newValue
-                                _state.update { it.copy(reward = newValue) }
-                            }
-                        }
-                    }
-                }
-        }
-    }
-
-    private fun observeAwardInput() {
-        viewModelScope.launch {
-            snapshotFlow { awardTextFieldState.text.toString() }
-                .collect { text ->
-                    val parsed = text.toIntOrNull()
-                    if (parsed != null) {
-                        if (parsed > MissionAwardDefaults.MAX_AWARD) {
-                            _sideEffect.emit(
-                                ParentAddMissionSideEffect.ShowSnackbar(
-                                    MissionAddValid.MAX.message
-                                )
-                            )
-                        }
-                        _currentAwardValue.value = parsed
-                        _state.update { it.copy(reward = parsed) }
-                    } else if (text.isEmpty()) {
-                        _currentAwardValue.value = 0
-                        _state.update { it.copy(reward = 0) }
-                    }
-                }
-        }
-    }
-
-    private fun observeCurrentAwardValueChanges() {
-        viewModelScope.launch {
-            _currentAwardValue.collect { value ->
-                val currentText = awardTextFieldState.text.toString()
-                val currentInt = currentText.toIntOrNull()
-
-                if (value != 0 && currentInt != value) {
-                    awardTextFieldState.setTextAndPlaceCursorAtEnd(value.toString())
-                }
-            }
-        }
-    }
-
-    private fun observeMissionNameChanges() {
-        viewModelScope.launch {
-            snapshotFlow { missionNameState.text.toString() }
-                .collect { name ->
-                    _state.update { it.copy(missionName = name) }
-                }
-        }
-    }
-
-    fun onDateClick() {
-        _showBottomSheet.value = true
-    }
-
-    fun onDismissBottomSheet() {
-        _showBottomSheet.value = false
-    }
-
-    fun onAwardClick(change: Int) {
-        val current = _currentAwardValue.value
-        val nextReward = (current + change).coerceIn(
-            MissionAwardDefaults.MIN_AWARD,
-            MissionAwardDefaults.MAX_AWARD
-        )
-
-        if (nextReward != current) {
-            awardTextFieldState.setTextAndPlaceCursorAtEnd(nextReward.toString())
-        } else {
-            val message =
-                if (nextReward >= MissionAwardDefaults.MAX_AWARD) "최대 보상은 500개입니다." else "최소 보상은 1개입니다."
-            viewModelScope.launch {
-                _sideEffect.emit(ParentAddMissionSideEffect.ShowSnackbar(message))
-            }
-        }
-    }
+    private var childId: Long? = null
 
     fun setChildId() {
-        viewModelScope.launch {
-            val childId = userInfoManager.getChildIdInfo() ?: return@launch
-            _state.update { it.copy(childId = childId) }
-        }
+        viewModelScope.launch { childId = userInfoManager.getChildIdInfo() }
     }
 
+    fun onDateClick() { _showBottomSheet.update { true } }
+    fun onDismissBottomSheet() { _showBottomSheet.update { false } }
     fun onDateSelected(date: LocalDate) {
-        val formattedDate = date.format(DateTimeFormatter.ISO_LOCAL_DATE)
-        _selectedDate.value = formattedDate
-
-        _state.update { it.copy(selectedDate = formattedDate) }
-        onDismissBottomSheet()
+        _selectedDate.update { date }
+        _showBottomSheet.update { false }
     }
 
-    private var isProcessing = false
+    fun onAwardClick(reward: Int) {
+        val current = awardTextFieldState.text.toString().toIntOrNull() ?: 0
+        val newValue = current + reward
+        awardTextFieldState.edit { replace(0, length, newValue.toString()) }
+    }
 
     fun createMission() {
-        if (isProcessing) return
-        isProcessing = true
+        if (isEditMode) updateMission() else addMission()
+    }
 
-        val currentState = _state.value
-        val awardValue = _currentAwardValue.value
-        val name = missionNameState.text.toString().trim()
-
-        val validationError = when {
-            name.isBlank() -> MissionAddValid.MISSION
-            awardValue <= 0 -> MissionAddValid.AWARD
-            awardValue > 500 -> MissionAddValid.MAX
-            else -> null
-        }
-
-        if (validationError != null) {
-            isProcessing = false
-            viewModelScope.launch {
-                _sideEffect.emit(ParentAddMissionSideEffect.ShowSnackbar(validationError.message))
-            }
-            return
-        }
-
+    private fun addMission() {
         viewModelScope.launch {
+            val name   = missionNameState.text.toString().trim()
+            val reward = awardTextFieldState.text.toString().toIntOrNull()
+            val dueAt  = _selectedDate.value
+
+            if (!validate(name, reward, dueAt)) return@launch
+
+            val id = childId ?: run {
+                _sideEffect.emit(ParentAddMissionSideEffect.ShowSnackbar("자녀 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요."))
+                return@launch
+            }
+
             _state.update { it.copy(isLoading = true) }
 
-            val childId = currentState.childId ?: 1L
-            val dueAt = currentState.selectedDate ?: LocalDate.now().toString()
-
-            repository.postParentMission(
-                childId = childId,
-                name = name,
-                reward = currentState.reward,
-                dueAt = dueAt
-            ).onSuccess { mission ->
-                _state.update { it.copy(isLoading = false) }
-                _sideEffect.emit(ParentAddMissionSideEffect.ShowSnackbar("미션이 등록되었습니다."))
-                _sideEffect.emit(ParentAddMissionSideEffect.NavigateToMissionList(mission))
-            }.onFailure { error ->
-                _state.update { it.copy(isLoading = false) }
-                isProcessing = false
-                _sideEffect.emit(
-                    ParentAddMissionSideEffect.ShowSnackbar(error.message ?: "미션 생성에 실패했습니다.")
-                )
+            parentMissionAddRepository.postParentMission(
+                childId = id,
+                name    = name,
+                reward  = reward!!,
+                dueAt   = dueAt!!.toString(),
+            ).onSuccess { result ->
+                _sideEffect.emit(ParentAddMissionSideEffect.ShowSnackbar("미션이 추가되었습니다"))
+                _sideEffect.emit(ParentAddMissionSideEffect.NavigateToMissionList(result))
+            }.onFailure {
+                _sideEffect.emit(ParentAddMissionSideEffect.ShowSnackbar("미션 추가에 실패했습니다"))
+                _state.update { s -> s.copy(isLoading = false) }
             }
+        }
+    }
+
+    private fun updateMission() {
+        viewModelScope.launch {
+            val missionId = editArgs?.missionId ?: return@launch
+            val name      = missionNameState.text.toString().trim()
+            val reward    = awardTextFieldState.text.toString().toIntOrNull()
+            val dueAt     = _selectedDate.value
+
+            if (!validate(name, reward, dueAt)) return@launch
+
+            _state.update { it.copy(isLoading = true) }
+
+            parentMissionAddRepository.updateMission(
+                missionId = missionId,
+                request   = UpdateMissionModel(
+                    name   = name,
+                    reward = reward!!,
+                    dueAt  = dueAt!!.toString(),
+                ),
+            ).onSuccess {
+                _sideEffect.emit(ParentAddMissionSideEffect.ShowSnackbar("미션이 수정되었습니다"))
+                _sideEffect.emit(ParentAddMissionSideEffect.NavigateUp)
+            }.onFailure {
+                _sideEffect.emit(ParentAddMissionSideEffect.ShowSnackbar("미션 수정에 실패했습니다"))
+                _state.update { s -> s.copy(isLoading = false) }
+            }
+        }
+    }
+
+    private suspend fun validate(name: String, reward: Int?, dueAt: LocalDate?): Boolean {
+        return when {
+            name.isBlank() -> { _sideEffect.emit(ParentAddMissionSideEffect.ShowSnackbar("미션 이름을 입력해주세요")); false }
+            reward == null -> { _sideEffect.emit(ParentAddMissionSideEffect.ShowSnackbar("보상 금액을 올바르게 입력해주세요")); false }
+            dueAt == null  -> { _sideEffect.emit(ParentAddMissionSideEffect.ShowSnackbar("마감일을 선택해주세요")); false }
+            else           -> true
         }
     }
 }

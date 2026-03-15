@@ -11,7 +11,7 @@ import com.kiero.data.sse.manager.SseManager
 import com.kiero.presentation.kid.journey.model.KidJourneyContentUiModel
 import com.kiero.presentation.kid.journey.model.KidJourneyHeaderUiModel
 import com.kiero.presentation.kid.journey.model.KidJourneyScheduleUiModel
-import com.kiero.presentation.kid.journey.model.StoneUiType
+import com.kiero.presentation.kid.journey.model.KidJourneyStoneType
 import com.kiero.presentation.kid.journey.state.KidJourneySideEffect
 import com.kiero.presentation.kid.journey.state.KidJourneyState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -95,6 +95,13 @@ class KidJourneyViewModel @Inject constructor(
         viewModelScope.launch {
             repository.patchScheduleToday()
                 .onSuccess { scheduleData ->
+                    val stoneType = scheduleData.stoneType?.let { KidJourneyStoneType.from(it) }
+                    val scheduleInfo = KidJourneyScheduleUiModel(
+                        order = scheduleData.scheduleOrder,
+                        startTime = scheduleData.startTime,
+                        endTime = scheduleData.endTime
+                    )
+
                     _state.value = UiState.Success(
                         KidJourneyState(
                             header = KidJourneyHeaderUiModel(
@@ -110,12 +117,8 @@ class KidJourneyViewModel @Inject constructor(
                                 ScheduleStatus.FIRST_SCHEDULE -> KidJourneyContentUiModel.FirstSchedule(
                                     scheduleDetailId = scheduleData.scheduleDetailId,
                                     scheduleName = scheduleData.name,
-                                    stoneType = scheduleData.stoneType?.let { StoneUiType.from(it) },
-                                    scheduleInfo = KidJourneyScheduleUiModel(
-                                        order = scheduleData.scheduleOrder,
-                                        startTime = scheduleData.startTime,
-                                        endTime = scheduleData.endTime
-                                    ),
+                                    stoneType = stoneType,
+                                    scheduleInfo = scheduleInfo,
                                     isSkippable = scheduleData.isSkippable,
                                     isNowScheduleVerified = scheduleData.isNowScheduleVerified
                                 )
@@ -123,12 +126,8 @@ class KidJourneyViewModel @Inject constructor(
                                 ScheduleStatus.NOW_SCHEDULE_EXIST -> KidJourneyContentUiModel.NowSchedule(
                                     scheduleDetailId = scheduleData.scheduleDetailId,
                                     scheduleName = scheduleData.name,
-                                    stoneType = scheduleData.stoneType?.let { StoneUiType.from(it) },
-                                    scheduleInfo = KidJourneyScheduleUiModel(
-                                        order = scheduleData.scheduleOrder,
-                                        startTime = scheduleData.startTime,
-                                        endTime = scheduleData.endTime
-                                    ),
+                                    stoneType = stoneType,
+                                    scheduleInfo = scheduleInfo,
                                     isSkippable = scheduleData.isSkippable,
                                     isNowScheduleVerified = scheduleData.isNowScheduleVerified
                                 )
@@ -136,12 +135,8 @@ class KidJourneyViewModel @Inject constructor(
                                 ScheduleStatus.NEXT_SCHEDULE_EXIST -> KidJourneyContentUiModel.NextSchedule(
                                     scheduleDetailId = scheduleData.scheduleDetailId,
                                     scheduleName = scheduleData.name,
-                                    stoneType = scheduleData.stoneType?.let { StoneUiType.from(it) },
-                                    scheduleInfo = KidJourneyScheduleUiModel(
-                                        order = scheduleData.scheduleOrder,
-                                        startTime = scheduleData.startTime,
-                                        endTime = scheduleData.endTime
-                                    ),
+                                    stoneType = stoneType,
+                                    scheduleInfo = scheduleInfo,
                                     isSkippable = scheduleData.isSkippable,
                                     isNowScheduleVerified = scheduleData.isNowScheduleVerified
                                 )
@@ -164,12 +159,9 @@ class KidJourneyViewModel @Inject constructor(
 
     fun onNextClick() {
         val content = _state.value.successData?.content
-        val scheduleDetailId = when (content) {
-            is KidJourneyContentUiModel.FirstSchedule -> content.scheduleDetailId
-            is KidJourneyContentUiModel.NowSchedule -> content.scheduleDetailId
-            is KidJourneyContentUiModel.NextSchedule -> content.scheduleDetailId
-            else -> null
-        }
+
+        val scheduleDetailId =
+            (content as? KidJourneyContentUiModel.ScheduledContent)?.scheduleDetailId
 
         if (scheduleDetailId != null) {
             viewModelScope.launch {

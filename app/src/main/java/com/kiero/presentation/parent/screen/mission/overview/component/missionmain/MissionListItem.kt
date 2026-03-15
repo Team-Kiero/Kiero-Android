@@ -94,14 +94,14 @@ fun MissionInfo(
     ) {
         Text(
             text = dayOfWeek ?: " ",
-            color = KieroTheme.colors.gray300,
+            color = KieroTheme.colors.main,
             style = KieroTheme.typography.semiBold.title4
         )
 
         Text(
             text = annotateDate,
-            color = KieroTheme.colors.gray500,
-            style = KieroTheme.typography.regular.body3
+            color = KieroTheme.colors.gray200,
+            style = KieroTheme.typography.semiBold.title3
         )
     }
 }
