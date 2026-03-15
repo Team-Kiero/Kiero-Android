@@ -1,5 +1,6 @@
 package com.kiero.data.sse.model
 
+import com.kiero.data.sse.remote.dto.response.DateDataDto
 import com.kiero.data.sse.remote.dto.response.FeedDataDto
 import com.kiero.data.sse.remote.dto.response.InviteDataDto
 import com.kiero.data.sse.remote.dto.response.MissionDataDto
@@ -25,5 +26,9 @@ sealed interface SseEvent {
 
     data class Schedule(
         val data: ScheduleDataDto
+    ) : SseEvent
+
+    data class Date(
+        val data: DateDataDto
     ) : SseEvent
 }
