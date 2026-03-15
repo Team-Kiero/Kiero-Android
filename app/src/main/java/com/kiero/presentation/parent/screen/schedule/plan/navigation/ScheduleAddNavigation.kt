@@ -26,6 +26,7 @@ data class ScheduleEdit(
     val scheduleColor: String,
     val dayOfWeek: String?,
     val dates: String?,
+    val isIncludeFollowing: Boolean? = null,
 )
 
 fun NavController.navigateToScheduleAdd(
