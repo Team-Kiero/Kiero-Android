@@ -2,6 +2,8 @@ package com.kiero.presentation.parent.screen.schedule.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.common.extension.updateSuccess
+import com.kiero.core.common.util.successData
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.model.UiState
 import com.kiero.data.auth.repository.AuthRepository
@@ -41,7 +43,7 @@ class ParentScheduleViewModel @Inject constructor(
     private val _sideEffect = MutableSharedFlow<ParentScheduleSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
 
-    private val currentScheduleState get() = (_state.value as? UiState.Success)?.data
+    private val currentScheduleState get() = _state.value.successData
 
     init {
         fetchParentInfo()
@@ -69,21 +71,21 @@ class ParentScheduleViewModel @Inject constructor(
 
             if (childId != null) fetchSchedule()
             else _state.value = UiState.Empty
-
-            sseManager.startParentSubscription()
         }
     }
 
     fun fetchSchedule() {
-        val s = currentScheduleState ?: ParentScheduleState()
         val today = LocalDate.now()
-        val monday = s.currentDate.with(DayOfWeek.MONDAY).toString()
-        val sunday = s.currentDate.with(DayOfWeek.SUNDAY).toString()
 
         viewModelScope.launch {
             val childId = userInfoManager.getChildIdInfo() ?: return@launch
+            val s = currentScheduleState ?: ParentScheduleState()
+            if (_state.value is UiState.Success) {
+                _state.updateSuccess { it.copy(isFetching = true) }
+            }
 
-            _state.value = UiState.Success(s.copy(isFetching = true))
+            val monday = s.currentDate.with(DayOfWeek.MONDAY).toString()
+            val sunday = s.currentDate.with(DayOfWeek.SUNDAY).toString()
 
             planRepository.getPlanAll(childId, monday, sunday)
                 .onSuccess { model ->
@@ -93,15 +95,17 @@ class ParentScheduleViewModel @Inject constructor(
                             list.filterNot { it.dayOfWeek.contains(todayDow) }
                         else list
                     }
-                    _state.value = UiState.Success(
-                        s.copy(
-                            planAllModel = model.copy(recurringSchedules = recurringSchedules),
-                            isFireLit    = model.isFireLit,
-                            isFetching   = false,
-                        )
+
+                    val newData = s.copy(
+                        planAllModel = model.copy(recurringSchedules = recurringSchedules),
+                        isFireLit    = model.isFireLit,
+                        isFetching   = false,
                     )
+                    _state.value = UiState.Success(newData)
                 }
-                .onFailure { _state.value = UiState.Failure(it.message ?: "데이터 로드 실패") }
+                .onFailure {
+                    _state.value = UiState.Failure(it.message ?: "데이터 로드 실패")
+                }
         }
     }
 
