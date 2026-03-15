@@ -69,7 +69,7 @@ fun CalendarMonthHeader(
 @Composable
 private fun CalendarMonthHeaderPreview() {
     KieroTheme {
-        _root_ide_package_.com.kiero.presentation.parent.screen.mission.overview.component.datepicker.component.CalendarMonthHeader(
+        CalendarMonthHeader(
             onLeftArrowClick = {},
             onRightArrowClick = {},
             modifier = Modifier,

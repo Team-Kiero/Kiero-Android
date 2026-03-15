@@ -65,10 +65,10 @@ fun CalendarBottomSheet(
                 }
             )
 
-            _root_ide_package_.com.kiero.presentation.parent.screen.mission.overview.component.datepicker.component.KieroCalendar(
+            KieroCalendar(
                 yearMonth = yearMonth,
                 selectedDate = selectedDate,
-                displayMode = _root_ide_package_.com.kiero.presentation.parent.screen.mission.overview.component.datepicker.model.CalendarDisplayMode.Normal(
+                displayMode = CalendarDisplayMode.Normal(
                     procedureCountByDate = emptyMap()
                 ),
                 onDateClick = { selectedDate = it },
@@ -84,7 +84,7 @@ fun CalendarBottomSheet(
 @Composable
 private fun PreviewCalendarBottomSheet() {
     KieroTheme {
-        _root_ide_package_.com.kiero.presentation.parent.screen.mission.overview.component.datepicker.component.CalendarBottomSheet(
+        CalendarBottomSheet(
             onDismissRequest = {},
             onDateSelected = {}
         )

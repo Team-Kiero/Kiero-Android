@@ -29,7 +29,7 @@ import java.time.LocalDate
 
 @Composable
 fun DayItem(
-    day: com.kiero.presentation.parent.screen.mission.overview.component.datepicker.model.CalendarDay,
+    day: CalendarDay,
     onDateClick: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
     isSelected: Boolean = false,
