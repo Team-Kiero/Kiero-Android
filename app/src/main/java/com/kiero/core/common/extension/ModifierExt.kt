@@ -1,7 +1,8 @@
 package com.kiero.core.common.extension
 
-import android.graphics.BlurMaskFilter
 import androidx.activity.compose.LocalActivity
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.WindowInsets
@@ -9,25 +10,26 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.drawOutline
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
+import com.kiero.core.designsystem.theme.KieroTheme
 
 fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier = composed {
     this.clickable(
@@ -98,4 +100,84 @@ fun Modifier.statusBarColor(backgroundColor: Color): Modifier = composed {
             size = Size(size.width, statusBarHeight.toPx())
         )
     }
+}
+
+@Composable
+fun Modifier.verticalScrollbar(
+    state: LazyListState,
+    thickness: Dp = 5.dp,
+    thumbHeight: Dp = 40.dp,
+    verticalPadding: Dp = 30.dp,
+    thumbColor: Color = KieroTheme.colors.white,
+    trackColor: Color = KieroTheme.colors.gray900
+): Modifier {
+    val targetAlpha = if (state.isScrollInProgress) 1f else 0f
+    val duration = if (state.isScrollInProgress) 150 else 500
+
+    val animationAlpha by animateFloatAsState(
+        targetValue = targetAlpha,
+        animationSpec = tween(durationMillis = duration)
+    )
+
+    return drawWithCache {
+        val thicknessPx = thickness.toPx()
+        val thumbHeightPx = thumbHeight.toPx()
+        val paddingPx = verticalPadding.toPx()
+        val cornerRadius = CornerRadius(thicknessPx / 2f)
+
+        onDrawWithContent {
+            drawContent()
+            val canScroll = state.canScrollForward || state.canScrollBackward
+
+            if (!canScroll || animationAlpha == 0f || state.layoutInfo.totalItemsCount == 0) {
+                return@onDrawWithContent
+            }
+
+            val scrollProportion = calculateScrollProportion(state)
+            val trackHeight = size.height - (paddingPx * 2)
+            val maxScrollOffsetY = trackHeight - thumbHeightPx
+
+            val scrollbarOffsetX = size.width - thicknessPx
+            val scrollbarOffsetY = paddingPx + (scrollProportion * maxScrollOffsetY)
+
+            drawRoundRect(
+                color = trackColor,
+                topLeft = Offset(scrollbarOffsetX, paddingPx),
+                size = Size(thicknessPx, trackHeight),
+                cornerRadius = cornerRadius,
+                alpha = animationAlpha
+            )
+
+            drawRoundRect(
+                color = thumbColor,
+                topLeft = Offset(scrollbarOffsetX, scrollbarOffsetY),
+                size = Size(thicknessPx, thumbHeightPx),
+                cornerRadius = cornerRadius,
+                alpha = animationAlpha
+            )
+        }
+    }
+}
+
+private fun calculateScrollProportion(state: LazyListState): Float {
+    val layoutInfo = state.layoutInfo
+    val totalItems = layoutInfo.totalItemsCount
+    val visibleItems = layoutInfo.visibleItemsInfo
+
+    val viewportHeight = layoutInfo.viewportEndOffset - layoutInfo.viewportStartOffset
+    val firstVisibleIndex = state.firstVisibleItemIndex
+    val firstVisibleOffset = state.firstVisibleItemScrollOffset
+    val firstItemSize = visibleItems.firstOrNull { it.index == firstVisibleIndex }?.size?.toFloat() ?: 1f
+
+    val averageItemSize = if (visibleItems.isNotEmpty()) {
+        visibleItems.sumOf { it.size }.toFloat() / visibleItems.size
+    } else {
+        firstItemSize
+    }
+
+    val exactIndex = firstVisibleIndex.toFloat() + (firstVisibleOffset.toFloat() / firstItemSize)
+
+    val maxExactIndex = (totalItems - viewportHeight.toFloat() / averageItemSize).coerceAtLeast(0.1f)
+
+    return (exactIndex / maxExactIndex).coerceIn(0f, 1f)
 }

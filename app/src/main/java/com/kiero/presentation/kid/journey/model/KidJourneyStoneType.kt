@@ -7,8 +7,7 @@ import kotlinx.serialization.Serializable
 
 @Keep
 @Serializable
-
-enum class StoneUiType(
+enum class KidJourneyStoneType(
     val serverKey: String,
     val text: String,
     @param: DrawableRes val imageRes: Int,
@@ -29,7 +28,7 @@ enum class StoneUiType(
     );
 
     companion object {
-        fun from(key: String): StoneUiType =
+        fun from(key: String): KidJourneyStoneType =
             entries.find { it.serverKey == key } ?: COURAGE
     }
 }
