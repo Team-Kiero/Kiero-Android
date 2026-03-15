@@ -1,6 +1,7 @@
 package com.kiero.presentation.kid.journey.model
 
 import androidx.compose.runtime.Immutable
+import com.kiero.core.common.extension.toKoreanTimeString
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -11,25 +12,12 @@ data class KidJourneyScheduleUiModel(
     val startTime: String?,
     val endTime: String?
 ) {
-    private fun parseTime(time: String?): LocalTime {
-        return try {
-            LocalTime.parse(time)
-        } catch (e: Exception) {
-            LocalTime.now()
-        }
-    }
-
-    val amPmFormatter: DateTimeFormatter? = DateTimeFormatter.ofPattern("a", Locale.KOREAN)
-    val timeNumberFormatter: DateTimeFormatter? = DateTimeFormatter.ofPattern("hh : mm", Locale.KOREAN)
-
     fun getFormattedStartTime(): String {
-        val time = parseTime(startTime)
-        return "${time.format(amPmFormatter)} ${time.format(timeNumberFormatter)}"
+        return startTime?.toKoreanTimeString ?: ""
     }
 
     fun getFormattedEndTime(): String {
-        val time = parseTime(endTime)
-        return "${time.format(amPmFormatter)} ${time.format(timeNumberFormatter)}"
+        return endTime?.toKoreanTimeString ?: ""
     }
 
     val orderText: String
