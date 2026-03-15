@@ -6,6 +6,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.kiero.presentation.parent.navigation.ParentMission
+import com.kiero.presentation.parent.screen.mission.directadd.navigation.MissionEdit
 import com.kiero.presentation.parent.screen.mission.overview.ParentMissionRoute
 
 fun NavController.navigateToParentMission(
