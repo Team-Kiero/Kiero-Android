@@ -31,8 +31,8 @@ import com.kiero.core.designsystem.theme.KieroTheme
 fun ParentContentBottomSheet(
     topTitle: String,
     onDismissRequest: () -> Unit,
-    onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit,
+    onEditClick: (() -> Unit)?,
+    onDeleteClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
@@ -57,21 +57,29 @@ fun ParentContentBottomSheet(
 
             content()
 
-            Spacer(modifier = Modifier.height(35.dp))
+            if (onEditClick != null || onDeleteClick != null) {
+                Spacer(modifier = Modifier.height(35.dp))
+            }
 
-            BottomSheetActionArea(
-                actionTitle = "수정하기",
-                onActionClick = onEditClick,
-                actionIcon = R.drawable.ic_parent_content_edit
-            )
+            onEditClick?.let { editAction ->
+                BottomSheetActionArea(
+                    actionTitle = "수정하기",
+                    onActionClick = editAction,
+                    actionIcon = R.drawable.ic_parent_content_edit
+                )
+            }
 
-            Spacer(modifier= Modifier.height(12.dp))
+            if (onEditClick != null && onDeleteClick != null) {
+                Spacer(modifier = Modifier.height(12.dp))
+            }
 
-            BottomSheetActionArea(
-                actionTitle = "삭제하기",
-                onActionClick = onDeleteClick,
-                actionIcon = R.drawable.ic_parent_content_delete
-            )
+            onDeleteClick?.let { deleteAction ->
+                BottomSheetActionArea(
+                    actionTitle = "삭제하기",
+                    onActionClick = deleteAction,
+                    actionIcon = R.drawable.ic_parent_content_delete
+                )
+            }
         }
     }
 }
@@ -135,18 +143,32 @@ private fun BottomSheetActionArea(
 
 @Preview
 @Composable
-private fun PreviewParentContentBottomSheet() {
+private fun PreviewParentContentBottomSheetFull() {
     KieroTheme {
         ParentContentBottomSheet(
             topTitle = "피아노 학원",
             onDismissRequest = {},
-            onEditClick = {},
+            onEditClick = {},    // 수정/삭제 모두 표시
             onDeleteClick = {},
             content = {
-                Text(
-                    text = "테스트 텍스트",
-                    color = KieroTheme.colors.white
-                )
+                Text(text = "테스트 텍스트", color = KieroTheme.colors.white)
+            }
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewParentContentBottomSheetReadOnly() {
+    KieroTheme {
+        // 이미 시작된 일정 등 → 수정/삭제 버튼 없음
+        ParentContentBottomSheet(
+            topTitle = "피아노 학원",
+            onDismissRequest = {},
+            onEditClick = null,
+            onDeleteClick = null,
+            content = {
+                Text(text = "이미 시작된 일정 (수정/삭제 불가)", color = KieroTheme.colors.white)
             }
         )
     }
