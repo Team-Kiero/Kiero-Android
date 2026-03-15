@@ -49,15 +49,11 @@ fun ParentAutoAddRoute(
     viewModel.sideEffect.collectSideEffect { effect ->
         when (effect) {
             is AutoMissionSideEffect.ShowToast -> {
-                globalUiEventHolder.showSnackbar(
-                    SnackbarState(message = effect.message)
-                )
+                globalUiEventHolder.showToast(effect.message)
             }
 
             is AutoMissionSideEffect.ShowToastAndNavigate -> {
-                globalUiEventHolder.showSnackbar(
-                    SnackbarState(message = effect.message)
-                )
+                globalUiEventHolder.showToast(effect.message)
                 navigateUp()
             }
 
