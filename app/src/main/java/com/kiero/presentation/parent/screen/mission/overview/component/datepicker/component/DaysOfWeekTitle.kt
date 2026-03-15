@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.theme.KieroTheme
-import com.kiero.presentation.parent.screen.mission.component.datepicker.util.daysOfWeek
+import com.kiero.presentation.parent.screen.mission.overview.component.datepicker.util.daysOfWeek
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import java.time.DayOfWeek

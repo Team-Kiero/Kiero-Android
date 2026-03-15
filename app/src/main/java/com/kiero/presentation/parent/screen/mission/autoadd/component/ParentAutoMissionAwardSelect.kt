@@ -18,7 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
-import com.kiero.presentation.parent.screen.mission.directadd.model.MissionAwardDefaults
+import com.kiero.presentation.parent.screen.mission.autoadd.model.AutoMissionAwardDefaults
 
 @Composable
 fun ParentAutoMissionAwardSelect(
@@ -33,7 +33,7 @@ fun ParentAutoMissionAwardSelect(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        MissionAwardDefaults.PRESET_VALUES.forEachIndexed { index, presetValue ->
+        AutoMissionAwardDefaults.PRESET_VALUES.forEachIndexed { index, presetValue ->
             if (index == 2) {
                 ParentAutoMissionTextField(
                     state = textFieldState,

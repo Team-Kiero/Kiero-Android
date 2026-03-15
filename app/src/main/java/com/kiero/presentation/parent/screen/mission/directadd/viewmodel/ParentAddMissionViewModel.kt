@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.kiero.core.common.extension.formatWithDayOfWeek
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.parent.mission.repository.ParentMissionAddRepository
-import com.kiero.presentation.parent.screen.mission.overview.component.model.ParentMissionAddValid
+import com.kiero.presentation.parent.screen.mission.directadd.model.MissionAddValid
 import com.kiero.presentation.parent.screen.mission.directadd.model.MissionAwardDefaults
 import com.kiero.presentation.parent.screen.mission.directadd.state.ParentAddMissionSideEffect
 import com.kiero.presentation.parent.screen.mission.directadd.state.ParentAddMissionState
@@ -73,7 +73,7 @@ class ParentAddMissionViewModel @Inject constructor(
                             if (parsed > 500) {
                                 _sideEffect.emit(
                                     ParentAddMissionSideEffect.ShowSnackbar(
-                                        _root_ide_package_.com.kiero.presentation.parent.screen.mission.overview.component.model.ParentMissionAddValid.MAX.message
+                                        MissionAddValid.MAX.message
                                     )
                                 )
 
@@ -99,7 +99,7 @@ class ParentAddMissionViewModel @Inject constructor(
                         if (parsed > MissionAwardDefaults.MAX_AWARD) {
                             _sideEffect.emit(
                                 ParentAddMissionSideEffect.ShowSnackbar(
-                                    _root_ide_package_.com.kiero.presentation.parent.screen.mission.overview.component.model.ParentMissionAddValid.MAX.message
+                                    MissionAddValid.MAX.message
                                 )
                             )
                         }
@@ -187,9 +187,9 @@ class ParentAddMissionViewModel @Inject constructor(
         val name = missionNameState.text.toString().trim()
 
         val validationError = when {
-            name.isBlank() -> _root_ide_package_.com.kiero.presentation.parent.screen.mission.overview.component.model.ParentMissionAddValid.MISSION
-            awardValue <= 0 -> _root_ide_package_.com.kiero.presentation.parent.screen.mission.overview.component.model.ParentMissionAddValid.AWARD
-            awardValue > 500 -> _root_ide_package_.com.kiero.presentation.parent.screen.mission.overview.component.model.ParentMissionAddValid.MAX
+            name.isBlank() -> MissionAddValid.MISSION
+            awardValue <= 0 -> MissionAddValid.AWARD
+            awardValue > 500 -> MissionAddValid.MAX
             else -> null
         }
 

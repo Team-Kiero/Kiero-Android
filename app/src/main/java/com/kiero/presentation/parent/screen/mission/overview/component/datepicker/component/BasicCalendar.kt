@@ -23,14 +23,14 @@ import java.time.YearMonth
 
 @Composable
 fun BasicCalendar(
-    displayMode: com.kiero.presentation.parent.screen.mission.overview.component.datepicker.model.CalendarDisplayMode,
+    displayMode: CalendarDisplayMode,
     modifier: Modifier = Modifier,
     yearMonth: YearMonth = YearMonth.now(),
     firstDayOfWeek: DayOfWeek = DayOfWeek.SUNDAY,
-    dayContent: @Composable (com.kiero.presentation.parent.screen.mission.overview.component.datepicker.model.CalendarDay) -> Unit,
+    dayContent: @Composable (CalendarDay) -> Unit,
 ) {
     val monthData = remember(yearMonth, displayMode, firstDayOfWeek) {
-        _root_ide_package_.com.kiero.presentation.parent.screen.mission.overview.component.datepicker.util.generateMonthData(
+        generateMonthData(
             yearMonth = yearMonth,
             firstDayOfWeek = firstDayOfWeek,
             displayMode = displayMode
@@ -38,7 +38,7 @@ fun BasicCalendar(
     }
 
     val daysOfWeek = remember(firstDayOfWeek) {
-        _root_ide_package_.com.kiero.presentation.parent.screen.mission.overview.component.datepicker.util.daysOfWeek(
+        daysOfWeek(
             firstDayOfWeek = firstDayOfWeek
         ).toImmutableList()
     }
@@ -48,11 +48,11 @@ fun BasicCalendar(
             .fillMaxWidth()
             .background(color = KieroTheme.colors.gray900)
     ) {
-        _root_ide_package_.com.kiero.presentation.parent.screen.mission.overview.component.datepicker.component.DaysOfWeekTitle(
+        DaysOfWeekTitle(
             daysOfWeek = daysOfWeek
         )
 
-        _root_ide_package_.com.kiero.presentation.parent.screen.mission.overview.component.datepicker.component.CalendarMonthGrid(
+        CalendarMonthGrid(
             month = monthData,
             dayContent = dayContent
         )
@@ -61,9 +61,9 @@ fun BasicCalendar(
 
 @Composable
 private fun CalendarMonthGrid(
-    month: com.kiero.presentation.parent.screen.mission.overview.component.datepicker.model.CalendarMonth,
+    month: CalendarMonth,
     modifier: Modifier = Modifier,
-    dayContent: @Composable (com.kiero.presentation.parent.screen.mission.overview.component.datepicker.model.CalendarDay) -> Unit,
+    dayContent: @Composable (CalendarDay) -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),

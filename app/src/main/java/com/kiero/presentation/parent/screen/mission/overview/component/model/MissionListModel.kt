@@ -9,20 +9,6 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 
-
-enum class ParentMissionAddValid(
-    val message: String,
-){
-    MISSION(
-        message ="미션 이름을 입력해주세요"
-    ),
-    AWARD(
-        message = "보상을 입력해주세요"
-    ),
-    MAX(
-        message = "최대 보상은 500개입니다."
-    )
-}
 @Immutable
 data class ParentMissionByDateUiModel(
     val missionsByDate: ImmutableList<ParentMissionListUiModel> = persistentListOf(),

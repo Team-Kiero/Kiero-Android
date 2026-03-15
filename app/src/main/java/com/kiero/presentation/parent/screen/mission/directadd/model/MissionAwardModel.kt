@@ -28,3 +28,9 @@ object MissionAwardDefaults {
         return value.coerceIn(MIN_AWARD, MAX_AWARD)
     }
 }
+
+enum class MissionAddValid(val message: String) {
+    MISSION(message = "미션 이름을 입력해주세요"),
+    AWARD(message = "보상을 입력해주세요"),
+    MAX(message = "최대 보상은 500개입니다.")
+}

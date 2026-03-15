@@ -7,13 +7,13 @@ import androidx.lifecycle.viewModelScope
 import com.kiero.core.common.extension.escapeForJson
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.parent.mission.repository.AutoMissionRepository
+import com.kiero.presentation.parent.screen.mission.autoadd.model.AutoMissionAwardDefaults
 import com.kiero.presentation.parent.screen.mission.autoadd.model.errorMessage
 import com.kiero.presentation.parent.screen.mission.autoadd.model.toDomainModel
 import com.kiero.presentation.parent.screen.mission.autoadd.model.toUiModels
 import com.kiero.presentation.parent.screen.mission.autoadd.model.updateAt
 import com.kiero.presentation.parent.screen.mission.autoadd.state.AutoMissionSideEffect
 import com.kiero.presentation.parent.screen.mission.autoadd.state.AutoMissionState
-import com.kiero.presentation.parent.screen.mission.directadd.model.MissionAwardDefaults
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
@@ -39,7 +39,7 @@ class AutoMissionViewModel @Inject constructor(
 
     private val _sideEffect = MutableSharedFlow<AutoMissionSideEffect>()
     val sideEffect: SharedFlow<AutoMissionSideEffect> = _sideEffect.asSharedFlow()
-    val awardTextFieldState = TextFieldState(initialText = "20")
+    val awardTextFieldState = TextFieldState(AutoMissionAwardDefaults.DEFAULT_AWARD.toString())
 
     init {
         observeAwardTextFieldChanges()
@@ -114,22 +114,22 @@ class AutoMissionViewModel @Inject constructor(
     fun onAwardClick(change: Int) {
         val currentState = _state.value
         val currentReward = currentState.currentReward
-        val newReward = MissionAwardDefaults.applyChange(currentReward, change)
+        val newReward = AutoMissionAwardDefaults.applyChange(currentReward, change)
 
         viewModelScope.launch {
             when {
-                currentReward + change < MissionAwardDefaults.MIN_AWARD -> {
+                currentReward + change < AutoMissionAwardDefaults.MIN_AWARD -> {
                     _sideEffect.emit(
                         AutoMissionSideEffect.ShowToast(
-                            "최소 보상은 ${MissionAwardDefaults.MIN_AWARD}개입니다."
+                            "최소 보상은 ${AutoMissionAwardDefaults.MIN_AWARD}개입니다."
                         )
                     )
                 }
 
-                currentReward + change > MissionAwardDefaults.MAX_AWARD -> {
+                currentReward + change > AutoMissionAwardDefaults.MAX_AWARD -> {
                     _sideEffect.emit(
                         AutoMissionSideEffect.ShowToast(
-                            "최대 보상은 ${MissionAwardDefaults.MAX_AWARD}개입니다."
+                            "최대 보상은 ${AutoMissionAwardDefaults.MAX_AWARD}개입니다."
                         )
                     )
                 }
@@ -237,21 +237,15 @@ class AutoMissionViewModel @Inject constructor(
                     val currentState = _state.value
 
                     when {
-                        value > 500 -> {
-                            awardTextFieldState.edit {
-                                replace(0, length, "500")
-                            }
-                            _sideEffect.emit(
-                                AutoMissionSideEffect.ShowToast("최대 보상은 500개입니다.")
-                            )
-                            updateMissionReward(500)
+                        value > AutoMissionAwardDefaults.MAX_AWARD -> {
+                            awardTextFieldState.edit { replace(0, length, AutoMissionAwardDefaults.MAX_AWARD.toString()) }
+                            _sideEffect.emit(AutoMissionSideEffect.ShowToast("최대 보상은 ${AutoMissionAwardDefaults.MAX_AWARD}개입니다."))
+                            updateMissionReward(AutoMissionAwardDefaults.MAX_AWARD)
                         }
 
-                        value < 1 -> {
-                            awardTextFieldState.edit {
-                                replace(0, length, "1")
-                            }
-                            updateMissionReward(1)
+                        value < AutoMissionAwardDefaults.MIN_AWARD -> {
+                            awardTextFieldState.edit { replace(0, length, AutoMissionAwardDefaults.MIN_AWARD.toString()) }
+                            updateMissionReward(AutoMissionAwardDefaults.MIN_AWARD)
                         }
 
                         value != currentState.currentReward -> {
