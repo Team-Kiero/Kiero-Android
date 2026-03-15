@@ -2,20 +2,13 @@ package com.kiero.presentation.kid.journey.map
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -27,14 +20,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
-import com.kiero.core.common.extension.verticalScrollbar
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.component.button.KieroButtonMedium
 import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
 import com.kiero.presentation.kid.journey.map.component.KidMapEmptyView
-import com.kiero.presentation.kid.journey.map.component.KidMapListItem
+import com.kiero.presentation.kid.journey.map.component.KidMapHeader
+import com.kiero.presentation.kid.journey.map.component.KidMapScheduleList
 import com.kiero.presentation.kid.journey.map.state.KidMapState
 import com.kiero.presentation.kid.journey.map.viewModel.KidMapViewModel
 
@@ -65,8 +58,6 @@ private fun KidMapScreen(
     state: KidMapState,
     modifier: Modifier = Modifier,
 ) {
-    val listState = rememberLazyListState()
-
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -100,40 +91,14 @@ private fun KidMapScreen(
                 Spacer(modifier = Modifier.height(30.dp))
 
                 if (state.schedules.isNotEmpty()) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(
-                                color = KieroTheme.colors.gray900,
-                                shape = RoundedCornerShape(8.dp)
-                            )
-                            .padding(vertical = 12.dp, horizontal = 20.dp),
-                        contentAlignment = Alignment.CenterStart
-                    ) {
-                        Text(
-                            text = "오늘은 ${state.scheduleCount}개의 여정이 있어!",
-                            color = KieroTheme.colors.gray200,
-                            style = KieroTheme.typography.regular.body4
-                        )
-                    }
+                    KidMapHeader(scheduleCount = state.scheduleCount)
 
                     Spacer(modifier = Modifier.height(25.dp))
 
-                    LazyColumn(
-                        state = listState,
-                        modifier = Modifier
-                            .weight(1f)
-                            .verticalScrollbar(state = listState),
-                        contentPadding = PaddingValues(horizontal = 20.dp),
-                        verticalArrangement = Arrangement.spacedBy(14.dp)
-                    ) {
-                        itemsIndexed(
-                            items = state.schedules,
-                            key = { index, _ -> index }
-                        ) { _, item ->
-                            KidMapListItem(item = item)
-                        }
-                    }
+                    KidMapScheduleList(
+                        schedules = state.schedules,
+                        modifier = Modifier.weight(1f)
+                    )
                 } else {
                     KidMapEmptyView(
                         modifier = Modifier.weight(1f)
