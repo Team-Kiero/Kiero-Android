@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.kiero.core.common.extension.updateSuccess
 import com.kiero.core.model.UiState
 import com.kiero.data.kid.schedule.repository.ScheduleRepository
 import com.kiero.data.sse.manager.SseManager
@@ -51,13 +52,13 @@ class KidMapViewModel @Inject constructor(
                         item.copy(isNext = !hasOngoing && index == pendingIndex)
                     }.toPersistentList()
 
-                    _state.value = UiState.Success(
+                    _state.updateSuccess {
                         KidMapState(
                             date = map.date,
                             scheduleCount = scheduleData.scheduleCount,
                             schedules = finalSchedules
                         )
-                    )
+                    }
                     Timber.d("fetchScheduleProgress success: $scheduleData")
                 }
                 .onFailure {
