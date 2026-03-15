@@ -7,6 +7,7 @@ import androidx.navigation.toRoute
 import com.kiero.core.model.UiState
 import com.kiero.data.kid.schedule.repository.ScheduleRepository
 import com.kiero.data.sse.manager.SseManager
+import com.kiero.presentation.kid.journey.map.model.KidMapScheduleStatus
 import com.kiero.presentation.kid.journey.map.model.toUiModel
 import com.kiero.presentation.kid.journey.map.navigation.Map
 import com.kiero.presentation.kid.journey.map.state.KidMapState
@@ -42,11 +43,19 @@ class KidMapViewModel @Inject constructor(
         viewModelScope.launch {
             repository.getScheduleProgress()
                 .onSuccess { scheduleData ->
+                    val mappedSchedules = scheduleData.schedules.map { it.toUiModel() }
+                    val hasOngoing = mappedSchedules.any { it.isOngoing }
+                    val pendingIndex = mappedSchedules.indexOfFirst { it.status == KidMapScheduleStatus.PENDING }
+
+                    val finalSchedules = mappedSchedules.mapIndexed { index, item ->
+                        item.copy(isNext = !hasOngoing && index == pendingIndex)
+                    }.toPersistentList()
+
                     _state.value = UiState.Success(
                         KidMapState(
                             date = map.date,
                             scheduleCount = scheduleData.scheduleCount,
-                            schedules = scheduleData.schedules.map { it.toUiModel() }.toPersistentList()
+                            schedules = finalSchedules
                         )
                     )
                     Timber.d("fetchScheduleProgress success: $scheduleData")

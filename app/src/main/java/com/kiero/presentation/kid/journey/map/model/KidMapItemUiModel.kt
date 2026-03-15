@@ -11,6 +11,7 @@ data class KidMapItemUiModel(
     val startTime: String = "",
     val endTime: String = "",
     val isOngoing: Boolean = false,
+    val isNext: Boolean = false,
     val stoneType: KidJourneyStoneType = KidJourneyStoneType.COURAGE,
     val status: KidMapScheduleStatus = KidMapScheduleStatus.PENDING
 )
