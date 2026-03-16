@@ -41,7 +41,7 @@ fun KidMapStoneBadge(
 
     val badgeStyle = remember(status, mainColor, pointColor, whiteColor) {
         when (status) {
-            KidMapScheduleStatus.COMPLETE,
+            KidMapScheduleStatus.COMPLETED,
             KidMapScheduleStatus.VERIFIED -> BadgeUiState(
                 borderColor = mainColor,
                 labelText = "획득!",

@@ -187,7 +187,7 @@ private fun ParentMissionScreen(
                                     .padding(vertical = 8.dp),
                             ) {
                                 MissionInfo(
-                                    dayOfWeek = missionsByDate.dueAt.toRelativeDayFromDate,
+                                    dayOfWeek = missionsByDate.dueAt.toRelativeDayFromDate(),
                                     dueAt = ParentFormatters.formatDateWithDayOfWeek(missionsByDate.dueAt),
                                 )
                             }

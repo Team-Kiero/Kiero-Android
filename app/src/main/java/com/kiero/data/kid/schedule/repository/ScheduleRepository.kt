@@ -1,6 +1,7 @@
 package com.kiero.data.kid.schedule.repository
 
 import com.kiero.data.kid.schedule.model.ScheduleFireModel
+import com.kiero.data.kid.schedule.model.ScheduleProgressModel
 import com.kiero.data.kid.schedule.model.ScheduleTodayModel
 
 interface ScheduleRepository {
@@ -16,4 +17,6 @@ interface ScheduleRepository {
     ): Result<Unit>
 
     suspend fun patchScheduleFireLit(): Result<ScheduleFireModel>
+
+    suspend fun getScheduleProgress(): Result<ScheduleProgressModel>
 }

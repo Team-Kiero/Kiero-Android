@@ -22,6 +22,8 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -82,16 +84,25 @@ class KidJourneyViewModel @Inject constructor(
         fetchCoin()
     }
 
-    fun collectChildKidScheduleEvents() {
+    private fun collectChildKidScheduleEvents() {
         viewModelScope.launch {
-            sseManager.childScheduleEvents.collect { event ->
-                Timber.e("collectChildKidScheduleEvents")
-                fetchTodaySchedule()
+            val scheduleFlow = sseManager.childScheduleEvents.map { it.data.eventType }
+            val dateFlow = sseManager.dateEvents.map { it.data.eventType }
+
+            merge(scheduleFlow, dateFlow).collect { eventType ->
+                Timber.e("이벤트 수신: $eventType")
+
+                if (eventType == "SCHEDULE_STATUS_UPDATED" ||
+                    eventType == "SCHEDULE_MODIFIED" ||
+                    eventType == "DATE_CHANGED"
+                ) {
+                    fetchData()
+                }
             }
         }
     }
 
-    fun fetchTodaySchedule() {
+    private fun fetchTodaySchedule() {
         viewModelScope.launch {
             repository.patchScheduleToday()
                 .onSuccess { scheduleData ->
@@ -179,7 +190,7 @@ class KidJourneyViewModel @Inject constructor(
         }
     }
 
-    fun fetchCoin() {
+    private fun fetchCoin() {
         viewModelScope.launch {
             coinRepository.getCurrentCoin()
                 .onSuccess {

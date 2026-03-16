@@ -6,6 +6,7 @@ import com.kiero.data.sse.model.RawSseEvent
 import com.kiero.data.sse.model.SseEvent
 import com.kiero.data.sse.model.SseEventType
 import com.kiero.data.sse.remote.datasource.SseDataSource
+import com.kiero.data.sse.remote.dto.response.DateDataDto
 import com.kiero.data.sse.remote.dto.response.FeedDataDto
 import com.kiero.data.sse.remote.dto.response.InviteDataDto
 import com.kiero.data.sse.remote.dto.response.MissionDataDto
@@ -110,6 +111,17 @@ class SseRepositoryImpl @Inject constructor(
                     }
                 } catch (e: Exception) {
                     Timber.e(e, "Schedule 파싱 실패: ${raw.data}")
+                    null
+                }
+            }
+
+            SseEventType.DATE -> {
+                try {
+                    val data = json.decodeFromString<DateDataDto>(raw.data)
+                    Timber.d("Date 이벤트 파싱 성공: ${data.date}")
+                    SseEvent.Kid.Date(data)
+                } catch (e: Exception) {
+                    Timber.e(e, "Date 파싱 실패: ${raw.data}")
                     null
                 }
             }

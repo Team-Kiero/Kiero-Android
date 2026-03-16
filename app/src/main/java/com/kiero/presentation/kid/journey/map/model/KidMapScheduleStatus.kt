@@ -2,7 +2,7 @@ package com.kiero.presentation.kid.journey.map.model
 
 enum class KidMapScheduleStatus(val serverKey: String) {
     PENDING("PENDING"),
-    COMPLETE("COMPLETE"),
+    COMPLETED("COMPLETED"),
     FAILED("FAILED"),
     SKIPPED("SKIPPED"),
     VERIFIED("VERIFIED");
