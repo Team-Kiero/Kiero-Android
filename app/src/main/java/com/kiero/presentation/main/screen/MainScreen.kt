@@ -38,6 +38,7 @@ import com.kiero.core.model.trigger.DialogTrigger
 import com.kiero.core.model.trigger.GlobalUiEventHolder
 import com.kiero.core.model.trigger.RefreshState
 import com.kiero.core.model.trigger.SnackbarState
+import com.kiero.core.navigation.Route
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
 import com.kiero.core.trigger.LocalRefreshState
 import com.kiero.presentation.main.navigation.KidMainTab
@@ -53,6 +54,8 @@ import com.kiero.presentation.main.component.ParentTopbar
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -153,6 +156,7 @@ fun MainScreen(
         }
     }
 
+    val tabReselectedEvent = remember { MutableSharedFlow<Route>() }
     val eventHolder = remember(dialogState, onShowToast, onShowSnackbar) {
         GlobalUiEventHolder(
             dialogTrigger = DialogTrigger(
@@ -164,7 +168,12 @@ fun MainScreen(
                 }
             ),
             showToast = onShowToast,
-            showSnackbar = onShowSnackbar
+            showSnackbar = onShowSnackbar,
+            onTabReselected = { route ->
+                scope.launch {
+                    tabReselectedEvent.emit(route)
+                }
+            }
         )
     }
 
@@ -249,6 +258,12 @@ fun MainScreen(
                         currentTab = currentTab,
                         onTabSelected = { tab ->
                             if (currentTab == tab) {
+                                val route = when (tab) {
+                                    is ParentMainTab -> tab.route
+                                    is KidMainTab -> tab.route
+                                    else -> null
+                                }
+                                route?.let { eventHolder.onTabReselected(it) }
                                 scope.launch {
                                     refreshState.trigger(tab)
                                 }
