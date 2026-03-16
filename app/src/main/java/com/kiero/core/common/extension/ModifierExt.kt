@@ -202,7 +202,7 @@ private fun calculateScrollProportion(state: LazyListState): Float {
 
     val exactIndex = firstVisibleIndex.toFloat() + (firstVisibleOffset.toFloat() / firstItemSize)
 
-    val maxExactIndex = (totalItems - viewportHeight.toFloat() / averageItemSize).coerceAtLeast(0.1f)
+    val maxExactIndex = (totalItems - viewportHeight.toFloat() / averageItemSize).coerceAtLeast(0.1f) + 1f
 
     return (exactIndex / maxExactIndex).coerceIn(0f, 1f)
 }

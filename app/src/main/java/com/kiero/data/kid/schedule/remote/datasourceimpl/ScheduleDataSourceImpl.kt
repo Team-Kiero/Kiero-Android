@@ -5,6 +5,7 @@ import com.kiero.data.kid.schedule.remote.api.ScheduleService
 import com.kiero.data.kid.schedule.remote.datasource.ScheduleDataSource
 import com.kiero.data.kid.schedule.remote.dto.request.ScheduleCompleteRequestDto
 import com.kiero.data.kid.schedule.remote.dto.response.ScheduleFireResponseDto
+import com.kiero.data.kid.schedule.remote.dto.response.ScheduleProgressResponseDto
 import com.kiero.data.kid.schedule.remote.dto.response.ScheduleSkipResponseDto
 import com.kiero.data.kid.schedule.remote.dto.response.ScheduleTodayResponseDto
 import javax.inject.Inject
@@ -33,4 +34,7 @@ class ScheduleDataSourceImpl @Inject constructor(
 
     override suspend fun patchScheduleFireLit(): BaseResponse<ScheduleFireResponseDto> =
         service.patchScheduleFireLit()
+
+    override suspend fun getScheduleProgress(): BaseResponse<ScheduleProgressResponseDto> =
+        service.getScheduleProgress()
 }

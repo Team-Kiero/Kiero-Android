@@ -7,6 +7,7 @@ enum class SseEventType(val value: String) {
     FEED("feed"),
     MISSION("mission"),
     SCHEDULE("schedule"),
+    DATE("date"),
     UNKNOWN("unknown");
 
     companion object {

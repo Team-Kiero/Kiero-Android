@@ -39,6 +39,7 @@ class ParentPlanViewModel @Inject constructor(
     private val editArgs = runCatching { savedStateHandle.toRoute<ScheduleEdit>() }.getOrNull()
 
     val isEditMode = editArgs != null
+    val isEditRecurring = editArgs?.isRecurring ?: false
 
     private val _state = MutableStateFlow(
         ParentPlanState(
@@ -86,8 +87,8 @@ class ParentPlanViewModel @Inject constructor(
         }
     }
 
-    fun onCreatePlanClick() {
-        if (isEditMode) onUpdatePlanClick() else onAddPlanClick()
+    fun onCreatePlanClick(isIncludeFollowing: Boolean? = null) {
+        if (isEditMode) onUpdatePlanClick(isIncludeFollowing) else onAddPlanClick()
     }
 
     private fun onAddPlanClick() {
@@ -176,11 +177,10 @@ class ParentPlanViewModel @Inject constructor(
         }
     }
 
-    private fun onUpdatePlanClick() {
+    private fun onUpdatePlanClick(isIncludeFollowing: Boolean?) {
         if (_state.value.isLoading) return
         val scheduleId   = editArgs?.scheduleId ?: return
         val selectedDate = editArgs?.selectedDate ?: return
-        val isIncludeFollowing = editArgs?.isIncludeFollowing
 
         viewModelScope.launch {
             val name = textState.text.toString().trim()

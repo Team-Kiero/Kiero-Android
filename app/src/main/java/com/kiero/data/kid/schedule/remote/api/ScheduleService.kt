@@ -5,16 +5,14 @@ import com.kiero.data.kid.schedule.remote.dto.request.ScheduleCompleteRequestDto
 import com.kiero.data.kid.schedule.remote.dto.request.ScheduleImageUploadRequestDto
 import com.kiero.data.kid.schedule.remote.dto.response.ScheduleFireResponseDto
 import com.kiero.data.kid.schedule.remote.dto.response.ScheduleImageUploadResponseDto
+import com.kiero.data.kid.schedule.remote.dto.response.ScheduleProgressResponseDto
 import com.kiero.data.kid.schedule.remote.dto.response.ScheduleSkipResponseDto
 import com.kiero.data.kid.schedule.remote.dto.response.ScheduleTodayResponseDto
-import okhttp3.RequestBody
-import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
-import retrofit2.http.PUT
 import retrofit2.http.Path
-import retrofit2.http.Url
 
 interface ScheduleService {
     @PATCH("api/v1/schedules/today")
@@ -25,7 +23,7 @@ interface ScheduleService {
         @Body request: ScheduleImageUploadRequestDto
     ): BaseResponse<ScheduleImageUploadResponseDto>
 
-    @PATCH("api/v1/schedules/{scheduleDetailId}")
+    @PATCH("api/v1/schedules/verify/{scheduleDetailId}")
     suspend fun patchScheduleComplete(
         @Path("scheduleDetailId") scheduleDetailId: Long,
         @Body request: ScheduleCompleteRequestDto
@@ -38,4 +36,7 @@ interface ScheduleService {
 
     @PATCH("api/v1/schedules/fire-lit")
     suspend fun patchScheduleFireLit(): BaseResponse<ScheduleFireResponseDto>
+
+    @GET("api/v1/schedules/progress")
+    suspend fun getScheduleProgress(): BaseResponse<ScheduleProgressResponseDto>
 }

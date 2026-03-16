@@ -23,5 +23,17 @@ data class ScheduleDataDto(
     val eventType: String,  // "SCHEDULE_CREATED"
 
     @SerialName("scheduleName")
-    val scheduleName: String
+    val scheduleName: String? = null,
+
+    @SerialName("childId")
+    val childId: Long? = null
+)
+
+// Date 이벤트 (DATE_CHANGED)
+@Serializable
+data class DateDataDto(
+    @SerialName("eventType")
+    val eventType: String,  // "DATE_CHANGED"
+    @SerialName("date")
+    val date: String        // "2026-03-14"
 )

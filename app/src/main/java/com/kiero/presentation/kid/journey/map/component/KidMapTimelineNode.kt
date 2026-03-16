@@ -23,12 +23,13 @@ import com.kiero.presentation.kid.journey.map.model.KidMapScheduleStatus
 fun KidMapTimelineNode(
     isOngoing: Boolean,
     status: KidMapScheduleStatus,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isNext: Boolean = false
 ) {
-    val showLine = isOngoing || status == KidMapScheduleStatus.PENDING
+    val showLine = isOngoing || isNext || status == KidMapScheduleStatus.PENDING
 
     val iconColor = when {
-        isOngoing -> KieroTheme.colors.main
+        isOngoing || isNext -> KieroTheme.colors.main
         status == KidMapScheduleStatus.PENDING -> KieroTheme.colors.white
         else -> KieroTheme.colors.white.copy(alpha = 0.5f)
     }
@@ -69,7 +70,7 @@ fun KidMapTimelineNode(
             modifier = Modifier
                 .size(12.dp)
                 .then(
-                    if (isOngoing) {
+                    if (isOngoing || isNext) {
                         Modifier.dropShadow(
                             shape = starShape,
                             shadow = Shadow(
