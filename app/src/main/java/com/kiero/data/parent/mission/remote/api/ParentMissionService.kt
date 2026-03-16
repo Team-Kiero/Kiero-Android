@@ -18,13 +18,13 @@ interface ParentMissionService {
         @Body requestDto: ParentMissionAddRequestDto,
     ): BaseResponse<ParentMissionAddResponseDto>
 
-    @PATCH("missions/{missionId}")
+    @PATCH("api/v1/missions/{missionId}")
     suspend fun patchMission(
         @Path("missionId") missionId: Long,
         @Body body: UpdateMissionRequestDto,
     ): BaseResponse<UpdateMissionResponseDto>
 
-    @DELETE("missions/{missionId}")
+    @DELETE("api/v1/missions/{missionId}")
     suspend fun deleteMission(
         @Path("missionId") missionId: Long,
     ): BaseResponse<Unit>

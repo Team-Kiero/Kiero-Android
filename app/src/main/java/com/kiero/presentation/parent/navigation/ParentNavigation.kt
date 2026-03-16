@@ -18,6 +18,8 @@ import com.kiero.presentation.parent.screen.mission.navigation.navigateToMission
 import com.kiero.presentation.parent.screen.mission.navigation.parentMissionAddNavGraph
 import com.kiero.presentation.parent.screen.mission.navigation.parentMissionNavGraph
 import com.kiero.presentation.parent.screen.mypage.navigation.parentMypageNavGraph
+import com.kiero.presentation.parent.screen.reward.navigation.navigateToRewardAdd
+import com.kiero.presentation.parent.screen.reward.navigation.navigateToRewardEdit
 import com.kiero.presentation.parent.screen.reward.navigation.parentRewardNavGraph
 import com.kiero.presentation.parent.screen.schedule.navigation.parentScheduleNavGraph
 import com.kiero.presentation.parent.screen.schedule.plan.navigation.navigateToScheduleAdd
@@ -47,7 +49,6 @@ data object ParentReward : ParentTab
 
 @Serializable
 data object Mypage : ParentTab
-
 
 fun NavController.navigateToParent(
     navOptions: NavOptions? = null,
@@ -124,8 +125,11 @@ fun NavGraphBuilder.parentNavGraph(
         parentRewardNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
+            navigateToRewardAdd = { navController.navigateToRewardAdd() },
+            navigateToRewardEdit = { id ->
+                navController.navigateToRewardEdit(couponId = id)
+            }
         )
-
         parentMypageNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
