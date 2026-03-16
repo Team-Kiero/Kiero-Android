@@ -30,7 +30,7 @@ fun KidMapListItem(
     }
 
     val timeColor = when {
-        item.isOngoing -> KieroTheme.colors.main
+        item.isOngoing || item.isNext -> KieroTheme.colors.main
         item.status == KidMapScheduleStatus.PENDING -> KieroTheme.colors.gray500
         else -> KieroTheme.colors.gray500.copy(alpha = 0.5f)
     }
@@ -48,6 +48,7 @@ fun KidMapListItem(
             ) {
                 KidMapTimelineNode(
                     isOngoing = item.isOngoing,
+                    isNext = item.isNext,
                     status = item.status
                 )
 
@@ -103,7 +104,7 @@ private fun KidMapListItemPreview() {
                     endTime = "오후 05:00",
                     isOngoing = false,
                     stoneType = KidJourneyStoneType.COURAGE,
-                    status = KidMapScheduleStatus.COMPLETE
+                    status = KidMapScheduleStatus.COMPLETED
                 )
             )
             // 실패 - 라인 없음, 흐리게

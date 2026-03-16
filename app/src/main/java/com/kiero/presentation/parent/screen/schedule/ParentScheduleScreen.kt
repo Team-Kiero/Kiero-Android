@@ -62,8 +62,6 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-private enum class EditRepeatOption { THIS_ONLY, INCLUDE_FOLLOWING }
-
 @Composable
 fun ParentScheduleRoute(
     paddingValues: PaddingValues,
@@ -147,17 +145,15 @@ private fun ParentScheduleScreen(
 ) {
     var showBottomSheet by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
-    var showEditDialog by remember { mutableStateOf(false) }
     var selectedEventId by remember { mutableStateOf<String?>(null) }
     var isDeleteIncludeFollowing by remember { mutableStateOf(false) }
-    var editRepeatOption by remember { mutableStateOf(EditRepeatOption.THIS_ONLY) }
+    var snapshotSchedule by remember { mutableStateOf<ScheduleModel?>(null) }
 
     val selectedSchedule: ScheduleModel? = selectedEventId?.toLongOrNull()?.let { id ->
         val model = scheduleState.planAllModel
         model?.normalSchedules?.find { it.scheduleId == id }
             ?: model?.recurringSchedules?.find { it.scheduleId == id }
     }
-    val isSelectedRecurring = selectedSchedule is RecurringScheduleModel
 
     val canShowEditDelete = remember(selectedSchedule) {
         selectedSchedule?.let { schedule ->
@@ -177,9 +173,6 @@ private fun ParentScheduleScreen(
 
     LaunchedEffect(showDeleteDialog) {
         if (showDeleteDialog) isDeleteIncludeFollowing = false
-    }
-    LaunchedEffect(showEditDialog) {
-        if (showEditDialog) editRepeatOption = EditRepeatOption.THIS_ONLY
     }
 
     Box(
@@ -212,16 +205,15 @@ private fun ParentScheduleScreen(
                 },
                 onEditClick = if (canShowEditDelete) {
                     {
+                        val captured = selectedSchedule
                         showBottomSheet = false
-                        if (isSelectedRecurring) {
-                            showEditDialog = true
-                        } else {
-                            selectedSchedule?.let { onEditClick(it.toScheduleEditArgs()) }
-                        }
+                        captured?.let { onEditClick(it.toScheduleEditArgs()) }
+                        selectedEventId = null
                     }
                 } else null,
                 onDeleteClick = if (canShowEditDelete) {
                     {
+                        snapshotSchedule = selectedSchedule
                         showBottomSheet = false
                         showDeleteDialog = true
                     }
@@ -235,7 +227,7 @@ private fun ParentScheduleScreen(
         if (showDeleteDialog) {
             KieroDialog(
                 onDismiss = { showDeleteDialog = false },
-                title = selectedSchedule?.name ?: "일정 삭제",
+                title = snapshotSchedule?.name ?: "일정 삭제",
                 subDescription = "삭제하시겠습니까?",
                 cancelAction = KieroCancelAction(
                     text = "취소",
@@ -244,12 +236,15 @@ private fun ParentScheduleScreen(
                 confirmAction = KieroConfirmAction(
                     text = "확인",
                     onClick = {
-                        val id = selectedEventId?.toLongOrNull()
-                        val date = selectedSchedule.toSelectedDate()
-                        val includeFollowing = if (isSelectedRecurring) isDeleteIncludeFollowing else null
+                        val id = snapshotSchedule?.scheduleId
+                        val date = snapshotSchedule.toSelectedDate()
+                        val includeFollowing = if (snapshotSchedule is RecurringScheduleModel) {
+                            isDeleteIncludeFollowing
+                        } else null
 
                         showDeleteDialog = false
                         selectedEventId = null
+                        snapshotSchedule = null
 
                         if (id != null) {
                             onDeleteConfirm(id, date, includeFollowing)
@@ -257,42 +252,9 @@ private fun ParentScheduleScreen(
                     }
                 ),
                 content = {
-                    if (isSelectedRecurring) {
-                        ScheduleDeleteDialogContent(
-                            isIncludeFollowing = isDeleteIncludeFollowing,
-                            onContentClick = { isDeleteIncludeFollowing = !isDeleteIncludeFollowing }
-                        )
-                    }
-                }
-            )
-        }
-
-        if (showEditDialog) {
-            KieroDialog(
-                onDismiss = { showEditDialog = false },
-                title = selectedSchedule?.name ?: "일정 수정",
-                subDescription = "저장하시겠습니까?",
-                cancelAction = KieroCancelAction(
-                    text = "취소",
-                    onClick = { showEditDialog = false }
-                ),
-                confirmAction = KieroConfirmAction(
-                    text = "확인",
-                    onClick = {
-                        showEditDialog = false
-                        selectedSchedule?.let {
-                            val editArgs = it.toScheduleEditArgs().copy(
-                                isIncludeFollowing = editRepeatOption == EditRepeatOption.INCLUDE_FOLLOWING
-                            )
-                            onEditClick(editArgs)
-                        }
-                        selectedEventId = null
-                    }
-                ),
-                content = {
-                    ScheduleEditDialogContent(
-                        selectedOption = editRepeatOption,
-                        onOptionClick = { editRepeatOption = it }
+                    ScheduleDeleteDialogContent(
+                        isIncludeFollowing = isDeleteIncludeFollowing,
+                        onContentClick = { isDeleteIncludeFollowing = !isDeleteIncludeFollowing }
                     )
                 }
             )
@@ -335,61 +297,6 @@ private fun ScheduleDeleteDialogContent(
             color = KieroTheme.colors.gray400,
             style = KieroTheme.typography.regular.body4
         )
-    }
-}
-
-@Composable
-private fun ScheduleEditDialogContent(
-    selectedOption: EditRepeatOption,
-    onOptionClick: (EditRepeatOption) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.End)
-    ) {
-        Row(
-            modifier = Modifier.noRippleClickable { onOptionClick(EditRepeatOption.THIS_ONLY) },
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            val iconResThis = if (selectedOption == EditRepeatOption.THIS_ONLY) {
-                R.drawable.ic_parent_addschedule_check_on
-            } else {
-                R.drawable.ic_parent_addschedule_check_off
-            }
-            Icon(
-                imageVector = ImageVector.vectorResource(id = iconResThis),
-                contentDescription = null,
-                tint = Color.Unspecified
-            )
-            Text(
-                text = "이번 일정만 포함",
-                color = KieroTheme.colors.gray400,
-                style = KieroTheme.typography.regular.body4
-            )
-        }
-
-        Row(
-            modifier = Modifier.noRippleClickable { onOptionClick(EditRepeatOption.INCLUDE_FOLLOWING) },
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            val iconResFollowing = if (selectedOption == EditRepeatOption.INCLUDE_FOLLOWING) {
-                R.drawable.ic_parent_addschedule_check_on
-            } else {
-                R.drawable.ic_parent_addschedule_check_off
-            }
-            Icon(
-                imageVector = ImageVector.vectorResource(id = iconResFollowing),
-                contentDescription = null,
-                tint = Color.Unspecified
-            )
-            Text(
-                text = "이후 일정 포함",
-                color = KieroTheme.colors.gray400,
-                style = KieroTheme.typography.regular.body4
-            )
-        }
     }
 }
 

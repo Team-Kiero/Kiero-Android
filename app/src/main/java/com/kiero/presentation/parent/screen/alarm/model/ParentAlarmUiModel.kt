@@ -39,8 +39,8 @@ fun AlarmItemModel.toUiModel(childName: String): ParentAlarmUiModel {
     val uniqueId = "${occurredAt}_${this::class.simpleName}_${contentKey.hashCode()}"
     val subject = childName.withJosa("이가")
 
-    val dateStr = occurredAt.formattedAlarmDate
-    val timeStr = occurredAt.formattedAlarmTime
+    val dateStr = occurredAt.formattedAlarmDate()
+    val timeStr = occurredAt.formattedAlarmTime()
 
     return when (this) {
         is AlarmItemModel.Schedule -> ParentAlarmUiModel(
