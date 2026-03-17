@@ -108,12 +108,24 @@ class SseManager @Inject constructor(
         }
     }
     private suspend fun subscriptionLoop(isParent: Boolean) {
+        var retryCount = 0
+        val maxRetry = 5
+
         while (currentCoroutineContext().isActive && isSubscribed) {
             try {
-                // 실패 시 재발급으로 continue
-                val token = getValidToken() ?: continue
-
-                Timber.d("🔄 SSE 연결 시도 (Token: ${token.take(10)}...)")
+                val token = getValidToken()
+                if (token == null) {
+                    retryCount++
+                    if (retryCount >= maxRetry) {
+                        Timber.e("SSE 최대 재시도 초과 → 구독 중지")
+                        stopSubscriptionInternal()
+                        return
+                    }
+                    delay(3000L * (1 shl (retryCount - 1)).coerceAtMost(16))
+                    continue
+                }
+                retryCount = 0
+                Timber.d("🔄 SSE 연결 시도")
 
                 sseRepository.subscribeEvents(token)
                     .collect { event ->
@@ -122,21 +134,25 @@ class SseManager @Inject constructor(
                         else handleChildEvent(event)
                     }
 
-                Timber.w("SSE 스트림 종료됨. 즉시 재연결 시도.")
-
             } catch (e: Exception) {
-                // 상위에 에러 던지기
                 if (e is CancellationException) throw e
 
-                Timber.e(e, "SSE 연결 중 에러 발생")
+                retryCount++
+                Timber.e(e, "SSE 에러 (시도 $retryCount/$maxRetry)")
                 _connectionState.emit(false)
 
-                if (isTokenExpiredError(e)) {
-                    Timber.w("토큰 만료 감지 -> 캐시 삭제 후 재발급 예정")
-                    cachedAccessToken = null
+                if (retryCount >= maxRetry) {
+                    Timber.e("SSE 최대 재시도 초과 → 구독 중지")
+                    stopSubscriptionInternal()
+                    return
                 }
 
-                delay(3000L)
+                if (isTokenExpiredError(e)) cachedAccessToken = null
+
+                // Exponential Backoff: 3s, 6s, 12s, 24s, 48s
+                val backoffDelay = 3000L * (1 shl (retryCount - 1)).coerceAtMost(16)
+                Timber.d("⏳ ${backoffDelay}ms 후 재시도")
+                delay(backoffDelay)
             }
         }
     }
