@@ -119,6 +119,14 @@ private fun ParentJourneyToday(
         modifier = modifier
     ) {
         if (item.todayStatus != TodayStatus.TODAY_COMPLETED) {
+            if (item.scheduleLabel.isNotEmpty()) {
+                Text(
+                    text = item.scheduleLabel,
+                    style = KieroTheme.typography.regular.body6,
+                    color = if (item.isOngoing) KieroTheme.colors.gray600 else KieroTheme.colors.gray400
+                )
+            }
+
             Text(
                 text = item.date,
                 style = KieroTheme.typography.regular.body4,

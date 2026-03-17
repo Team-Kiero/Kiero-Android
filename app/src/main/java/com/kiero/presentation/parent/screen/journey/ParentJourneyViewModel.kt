@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.LocalTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -67,18 +68,18 @@ class ParentJourneyViewModel @Inject constructor(
         }
     }
 
-    fun fetchParentJourney(
-        childId: Long
-    ) {
+    fun fetchParentJourney(childId: Long) {
         viewModelScope.launch {
             parentJourneyRepository.getParentJourney(
                 childId = childId
             ).onSuccess { result ->
+                val currentTime = LocalTime.now()
+
                 _state.update { currentState ->
                     currentState.copy(
                         completeMissions = result.completeMissions.map { it.toUiModel() }.toImmutableList(),
                         incompleteMissions = result.incompleteMissions.map { it.toUiModel() }.toImmutableList(),
-                        todayMissionList = result.schedules.map { it.toUiModel() }.toImmutableList()
+                        todayMissionList = result.schedules.toUiModels(currentTime).toImmutableList()
                     )
                 }
             }.onFailure {
