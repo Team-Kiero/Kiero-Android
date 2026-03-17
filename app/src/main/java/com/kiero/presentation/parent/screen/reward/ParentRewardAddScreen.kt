@@ -32,6 +32,7 @@ import com.kiero.presentation.parent.navigation.ParentReward
 import com.kiero.presentation.parent.screen.reward.component.RewardNameTextField
 import com.kiero.presentation.parent.screen.reward.component.RewardPriceInfo
 import com.kiero.presentation.parent.screen.reward.component.RewardPriceSelect
+import com.kiero.presentation.parent.screen.reward.model.RewardPriceDefaults
 import com.kiero.presentation.parent.screen.reward.state.ParentRewardSideEffect
 import com.kiero.presentation.parent.screen.reward.viewmodel.ParentAddRewardViewModel
 
@@ -119,8 +120,11 @@ private fun ParentRewardAddScreen(
         RewardPriceSelect(
             textFieldState = priceState,
             onPriceClick = { delta ->
-                val current = priceState.text.toString().toIntOrNull() ?: 0
-                val updated = (current + delta).coerceIn(1, 500)
+                val current = priceState.text.toString().toIntOrNull() ?: RewardPriceDefaults.DEFAULT_PRICE
+                val updated = (current + delta).coerceIn(
+                    RewardPriceDefaults.MIN_PRICE,
+                    RewardPriceDefaults.MAX_PRICE
+                )
                 priceState.setTextAndPlaceCursorAtEnd(updated.toString())
             },
             onValueAdjust = {
