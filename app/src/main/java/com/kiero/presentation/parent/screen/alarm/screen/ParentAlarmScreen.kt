@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -95,6 +96,7 @@ private fun ParentAlarmScreen(
 ) {
     Column(
         modifier = modifier
+            .fillMaxSize()
             .background(color = KieroTheme.colors.black)
             .padding(paddingValues)
     ) {
@@ -113,6 +115,9 @@ private fun ParentAlarmScreen(
             state.alarms.isEmpty() -> {
                 KieroEntireEmptyScreen(
                     text = "아직 아이로부터 도착한 알림이 없어요!",
+                    modifier = Modifier
+                        .weight(1f)
+                        .align(Alignment.CenterHorizontally)
                 )
             }
 

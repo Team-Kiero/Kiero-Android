@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -124,7 +123,8 @@ fun ParentJourneyBottomSheet(
                 KieroContentEmptyScreen(
                     description = if (selectedTabIndex == 0) "아직 완료한 미션이 없어요." else "남은 미션이 없어요! 모두 완료했어요.",
                     modifier = Modifier
-                        .fillMaxSize(),
+                        .weight(1f)
+                        .align(Alignment.CenterHorizontally),
                     bottomHeight = 0.dp
                 )
             } else {

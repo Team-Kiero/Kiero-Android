@@ -155,6 +155,9 @@ private fun ParentMissionScreen(
             if (isEmpty) {
                 KieroEntireEmptyScreen(
                     text = "등록된 미션이 없어요.\n우측 하단 버튼을 눌러 미션을 추가해보세요!",
+                    modifier = Modifier
+                        .weight(1f)
+                        .align(Alignment.CenterHorizontally)
                 )
             } else {
                 LazyColumn(
@@ -210,7 +213,7 @@ private fun ParentMissionScreen(
             onMissionRecommend = navigateToAutoMission,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(16.dp),
+                .padding(end = 27.dp, bottom = 24.dp + paddingValues.calculateBottomPadding())
         )
 
         if (showBottomSheet) {

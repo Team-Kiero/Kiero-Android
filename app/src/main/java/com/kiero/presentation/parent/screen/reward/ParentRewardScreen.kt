@@ -177,7 +177,7 @@ private fun ParentRewardScreen(
             onActiveClick = onAddClick,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(end = 31.dp, bottom = 19.dp + paddingValues.calculateBottomPadding())
+                .padding(end = 27.dp, bottom = 24.dp + paddingValues.calculateBottomPadding())
         )
 
         RewardOverlays(
