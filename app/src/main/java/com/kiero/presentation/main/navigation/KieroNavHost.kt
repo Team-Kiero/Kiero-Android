@@ -68,7 +68,7 @@ fun KieroNavHost(
                 appState.navigateToAuth(clearStackNavOptions)
             },
             navigateToParentHome = {
-                appState.navigateToSchedule(clearStackNavOptions)
+                appState.navigateToParentJourney(clearStackNavOptions)
             },
             navigateToKidHome = {
                 appState.navigateToJourney(clearStackNavOptions)
