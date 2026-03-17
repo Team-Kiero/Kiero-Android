@@ -60,10 +60,6 @@ class KidWishViewModel @Inject constructor(
     private val _sideEffect = MutableSharedFlow<KidWishSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
 
-    init {
-        fetchWish()
-    }
-
     fun fetchCoin() {
         viewModelScope.launch {
             repository.getCurrentCoin()
