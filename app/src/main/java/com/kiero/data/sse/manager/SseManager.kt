@@ -145,8 +145,8 @@ class SseManager @Inject constructor(
         tokenRefreshJob?.cancel()
         tokenRefreshJob = scope.launch {
             while (isActive) {
-                delay(180_000L)
-                Timber.d("⏰ SSE 토큰 갱신 주기 도래 (3분)")
+                delay(300_000L)
+                Timber.d("⏰ SSE 토큰 갱신 주기 도래 (5분)")
 
                 mutex.withLock {
                     if (isSubscribed) {
