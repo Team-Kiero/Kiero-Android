@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,8 +31,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -156,15 +159,27 @@ private fun ParentMissionScreen(
                 .padding(paddingValues)
         ) {
             if (isEmpty) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(color = KieroTheme.colors.black),
-                    contentAlignment = Alignment.Center,
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
+
+                    Spacer(modifier = Modifier.height(161.dp))
+
+                    Text(
+                        text = "등록된 미션이 없어요.\n우측 하단 버튼을 눌러 미션을 추가해보세요!",
+                        style = KieroTheme.typography.semiBold.title3,
+                        color = KieroTheme.colors.gray400,
+                        textAlign = TextAlign.Center,
+                    )
                     Image(
-                        painter = painterResource(id = R.drawable.img_mission_empty_view),
+                        painter = painterResource(id = R.drawable.img_parent_no_alarm),
                         contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth(0.7f)
+                            .aspectRatio(154f / 186f),
+                        contentScale = ContentScale.FillWidth,
                     )
                 }
             } else {
@@ -198,7 +213,9 @@ private fun ParentMissionScreen(
                                         selectedName = mission.name
                                         selectedReward = mission.reward
                                         selectedDueAt = missionsByDate.dueAt
-                                        showBottomSheet = true
+                                        if (!mission.isCompleted) {
+                                            showBottomSheet = true
+                                        }
                                     }
                             ) {
                                 MissionListItem(

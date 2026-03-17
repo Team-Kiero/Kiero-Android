@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -44,7 +43,6 @@ import com.kiero.core.trigger.LocalRefreshState
 import com.kiero.presentation.main.navigation.ParentMainTab
 import com.kiero.presentation.main.navigation.component.BottomBarTab
 import com.kiero.presentation.parent.component.ParentFloatingButton
-import com.kiero.presentation.parent.component.ParentTopbar
 import com.kiero.presentation.parent.navigation.ParentReward
 import com.kiero.presentation.parent.screen.reward.component.ParentRewardBottomSheet
 import com.kiero.presentation.parent.screen.reward.component.ParentRewardCard
@@ -166,9 +164,6 @@ private fun ParentRewardScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
-            ParentTopbar(title = "보상", onAlarmClick = {})
-
             if (state.rewards.isEmpty()) {
                 EmptyRewardContent()
             } else {
@@ -212,7 +207,7 @@ private fun EmptyRewardContent() {
         Spacer(modifier = Modifier.height(161.dp))
 
         Text(
-            text = "등록된 보상 쿠폰이 없어요!\n우측 하단 버튼을 눌러 보상을 추가해보세요!",
+            text = "등록된 보상이 없어요.\n우측 하단 버튼을 눌러 보상을 추가해보세요!",
             style = KieroTheme.typography.semiBold.title3,
             color = KieroTheme.colors.gray400,
             textAlign = TextAlign.Center,
