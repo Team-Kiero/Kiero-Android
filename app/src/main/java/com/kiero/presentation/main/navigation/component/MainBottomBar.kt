@@ -128,7 +128,9 @@ private fun MainNavigationBarItem(
             text = stringResource(tab.labelRes),
             color = textColor,
             style = KieroTheme.typography.regular.body5,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
+            maxLines = 1
         )
     }
 }
