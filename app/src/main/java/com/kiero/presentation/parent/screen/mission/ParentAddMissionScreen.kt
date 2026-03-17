@@ -79,6 +79,7 @@ fun ParentAddMissionRoute(
             showBottomSheet = showBottomSheet,
             selectedDate = dateText,
             state = state,
+            onMaxLengthReached = viewModel::onMissionNameMaxLength
         )
     }
 }
@@ -91,6 +92,7 @@ fun ParentAddMissionScreen(
     showBottomSheet: Boolean,
     selectedDate: String?,
     state: ParentAddMissionState,
+    onMaxLengthReached: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val focusManager = LocalFocusManager.current
@@ -121,6 +123,7 @@ fun ParentAddMissionScreen(
             state = viewModel.missionNameState,
             placeholder = "미션 이름을 입력해주세요.",
             maxLength = 15,
+            onMaxLengthReached = onMaxLengthReached
         )
 
         MissionCalendar(
