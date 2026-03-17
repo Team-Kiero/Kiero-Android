@@ -58,6 +58,7 @@ import com.kiero.presentation.parent.screen.schedule.plan.state.ParentScheduleSi
 import com.kiero.presentation.parent.screen.schedule.plan.state.ParentScheduleState
 import com.kiero.presentation.parent.screen.schedule.plan.state.ParentScheduleState.Companion.formatRepeatText
 import com.kiero.presentation.parent.screen.schedule.viewmodel.ParentScheduleViewModel
+import timber.log.Timber
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -155,6 +156,11 @@ private fun ParentScheduleScreen(
             ?: model?.recurringSchedules?.find { it.scheduleId == id }
     }
 
+    /**
+     * startTime > LocalTime.now() → 수정/삭제 가능
+     * startTime <= LocalTime.now() → 수정/삭제 불가 (이미 시작된 일정)
+     * startTime 파싱 실패 또는 null → 기본값 true로 가능
+     * */
     val canShowEditDelete = remember(selectedSchedule) {
         selectedSchedule?.let { schedule ->
             val startTimeStr = when (schedule) {
@@ -162,13 +168,32 @@ private fun ParentScheduleScreen(
                 is RecurringScheduleModel -> schedule.startTime
                 else -> null
             }
+
+            // 반복 일정은 날짜도 함께 고려
+            val referenceDate = when (schedule) {
+                is NormalScheduleModel -> runCatching { LocalDate.parse(schedule.date) }.getOrNull()
+                is RecurringScheduleModel -> runCatching { LocalDate.parse(schedule.repeatStartDate) }.getOrNull()
+                else -> null
+            }
+
             startTimeStr?.let { timeStr ->
                 runCatching {
                     val startTime = LocalTime.parse(timeStr.take(5), DateTimeFormatter.ofPattern("HH:mm"))
-                    startTime.isAfter(LocalTime.now())
+                    val today = LocalDate.now()
+
+                    when {
+                        referenceDate == null -> startTime.isAfter(LocalTime.now())
+                        referenceDate.isAfter(today) -> true  // 미래 날짜면 무조건 수정/삭제 가능
+                        referenceDate.isBefore(today) -> false // 과거 날짜면 불가
+                        else -> startTime.isAfter(LocalTime.now()) // 오늘이면 시간 비교
+                    }
                 }.getOrDefault(true)
             } ?: true
         } ?: true
+    }
+
+    LaunchedEffect(canShowEditDelete) {
+        Timber.e("canShowEditDelete: $canShowEditDelete")
     }
 
     LaunchedEffect(showDeleteDialog) {
