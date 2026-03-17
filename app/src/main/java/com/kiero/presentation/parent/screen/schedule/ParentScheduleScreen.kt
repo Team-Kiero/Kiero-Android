@@ -289,7 +289,7 @@ private fun ParentScheduleScreen(
             onScheduleAdd = { navigateToScheduleAdd() },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(bottom = 24.dp, end = 27.dp)
+                .padding(end = 27.dp, bottom = 24.dp + paddingValues.calculateBottomPadding())
         )
     }
 }

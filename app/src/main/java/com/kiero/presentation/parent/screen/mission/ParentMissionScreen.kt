@@ -211,6 +211,7 @@ private fun ParentMissionScreen(
             onExpandedChange = { isFabExpanded = it },
             onMissionAdd = navigateToAddMission,
             onMissionRecommend = navigateToAutoMission,
+            bottomPadding = paddingValues.calculateBottomPadding(),
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(end = 27.dp, bottom = 24.dp + paddingValues.calculateBottomPadding())
@@ -293,7 +294,6 @@ private fun MissionBottomSheetContent(
 ) {
     Column(
         modifier = modifier.padding(vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(0.dp),
     ) {
         Text(
             text = ParentFormatters.formatDateWithDayOfWeek(dueAt),
