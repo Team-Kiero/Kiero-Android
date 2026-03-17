@@ -22,7 +22,7 @@ import com.kiero.core.designsystem.theme.KieroTheme
 fun KieroEntireEmptyScreen(
     modifier: Modifier = Modifier,
     @DrawableRes imageRes: Int = R.drawable.img_parent_no_alarm,
-    contentScale: ContentScale= ContentScale.FillWidth,
+    contentScale: ContentScale= ContentScale.Crop,
     text: String = "등록된 일정이 없어요.\n우측 하단 버튼을 눌러 일정을 추가해보세요!",
 ) {
     Column(
@@ -43,7 +43,7 @@ fun KieroEntireEmptyScreen(
             contentDescription = null,
             modifier = Modifier
                 .fillMaxWidth(0.7f)
-                .aspectRatio(154f / 186f),
+                .aspectRatio(251f / 251f),
             contentScale = contentScale,
         )
     }

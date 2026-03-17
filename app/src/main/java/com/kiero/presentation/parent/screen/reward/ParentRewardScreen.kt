@@ -158,7 +158,10 @@ private fun ParentRewardScreen(
         ) {
             if (state.rewards.isEmpty()) {
                 KieroEntireEmptyScreen(
-                    text = "등록된 보상이 없어요.\n우측 하단 버튼을 눌러 보상을 추가해보세요!"
+                    text = "등록된 보상이 없어요.\n우측 하단 버튼을 눌러 보상을 추가해보세요!",
+                    modifier = Modifier
+                        .weight(1f)
+                        .align(Alignment.CenterHorizontally)
                 )
             } else {
                 RewardGridContent(
