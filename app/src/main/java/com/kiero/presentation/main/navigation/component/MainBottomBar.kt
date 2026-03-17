@@ -78,9 +78,9 @@ fun MainBottomBar(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                        .padding(horizontal = 26.dp, vertical = 34.dp)
                         .selectableGroup(),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     tabs.forEach { tab ->
@@ -112,8 +112,7 @@ private fun MainNavigationBarItem(
 
     Column(
         modifier = modifier
-            .noRippleClickable(onClick)
-            .padding(vertical = 8.dp),
+            .noRippleClickable(onClick),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
