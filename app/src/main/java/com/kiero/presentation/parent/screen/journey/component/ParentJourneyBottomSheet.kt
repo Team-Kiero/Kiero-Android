@@ -34,7 +34,7 @@ import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.component.bottomsheet.KieroBottomSheet
 import com.kiero.core.designsystem.component.chip.KieroChip
 import com.kiero.core.designsystem.component.chip.action.KieroCoinAction
-import com.kiero.core.designsystem.component.emptyview.KieroEmptyView
+import com.kiero.core.designsystem.component.emptyview.KieroContentEmptyScreen
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.screen.journey.model.JourneyMissionUiModel
 import kotlinx.collections.immutable.ImmutableList
@@ -65,7 +65,7 @@ fun ParentJourneyBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.8f)
+                .fillMaxHeight(0.85f)
                 .pointerInput(Unit) {
                     detectTapGestures {
                     }
@@ -121,7 +121,7 @@ fun ParentJourneyBottomSheet(
             val currentList = if (selectedTabIndex == 0) completeMissions else incompleteMissions
 
             if (currentList.isEmpty()) {
-                KieroEmptyView(
+                KieroContentEmptyScreen(
                     description = if (selectedTabIndex == 0) "아직 완료한 미션이 없어요." else "남은 미션이 없어요! 모두 완료했어요.",
                     modifier = Modifier
                         .fillMaxSize(),
