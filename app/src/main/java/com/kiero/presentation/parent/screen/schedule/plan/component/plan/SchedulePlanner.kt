@@ -90,7 +90,9 @@ fun SchedulePlanner(
     ) {
         val dayWidth = maxWidth / daysCount
         if (events.isEmpty()) {
-            KieroContentEmptyScreen()
+            KieroContentEmptyScreen(
+                bottomHeight = 50.dp
+            )
         } else {
             allBlocks.forEach { block ->
                 val hourOffset = hourHeight * (block.startHour - 8)

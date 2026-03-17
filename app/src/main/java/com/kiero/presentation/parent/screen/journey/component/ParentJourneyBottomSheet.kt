@@ -125,7 +125,7 @@ fun ParentJourneyBottomSheet(
                     modifier = Modifier
                         .weight(1f)
                         .align(Alignment.CenterHorizontally),
-                    bottomHeight = 0.dp
+                    bottomHeight = 50.dp
                 )
             } else {
                 LazyColumn(

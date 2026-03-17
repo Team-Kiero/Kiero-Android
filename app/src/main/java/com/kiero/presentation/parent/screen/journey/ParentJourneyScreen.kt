@@ -129,7 +129,8 @@ private fun ParentJourneyScreen(
                 description = "일정을 등록해주세요.",
                 modifier = Modifier
                     .weight(1f)
-                    .align(Alignment.CenterHorizontally)
+                    .align(Alignment.CenterHorizontally),
+                bottomHeight = 50.dp
             )
         } else {
             LazyColumn (
