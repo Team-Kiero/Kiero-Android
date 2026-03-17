@@ -44,7 +44,7 @@ fun RewardPriceInfo(
         Spacer(modifier = Modifier.width(4.dp))
 
         Text(
-            text = "보상",
+            text = "금화",
             color = KieroTheme.colors.white,
             style = KieroTheme.typography.regular.body2,
         )
