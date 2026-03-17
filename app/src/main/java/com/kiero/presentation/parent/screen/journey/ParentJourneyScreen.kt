@@ -16,6 +16,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -23,7 +24,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.common.util.toDotSeparatedDate
-import com.kiero.core.designsystem.component.emptyview.KieroEmptyView
+import com.kiero.core.designsystem.component.emptyview.KieroContentEmptyScreen
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
@@ -124,8 +125,11 @@ private fun ParentJourneyScreen(
         }
 
         if (state.todayMissionList.isEmpty()) {
-            KieroEmptyView(
-                description = "일정을 등록해주세요."
+            KieroContentEmptyScreen(
+                description = "일정을 등록해주세요.",
+                modifier = Modifier
+                    .weight(1f)
+                    .align(Alignment.CenterHorizontally)
             )
         } else {
             LazyColumn (

@@ -1,14 +1,10 @@
 package com.kiero.presentation.parent.screen.alarm.screen
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,23 +13,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.kiero.R
 import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.designsystem.component.KieroTopbar
+import com.kiero.core.designsystem.component.emptyview.KieroEntireEmptyScreen
 import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.component.pulltorefresh.KieroPullToRefresh
 import com.kiero.core.designsystem.theme.KieroTheme
@@ -118,16 +107,13 @@ private fun ParentAlarmScreen(
 
         when {
             state.isLoading -> {
-                Box(
-                    Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = KieroTheme.colors.main)
-                }
+                KieroLoadingIndicator()
             }
 
             state.alarms.isEmpty() -> {
-                EmptyAlarmView()
+                KieroEntireEmptyScreen(
+                    text = "아직 아이로부터 도착한 알림이 없어요!",
+                )
             }
 
             else -> {
@@ -171,34 +157,5 @@ private fun ParentAlarmScreen(
                 }
             }
         }
-    }
-}
-
-@Preview
-@Composable
-private fun EmptyAlarmView() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .background(KieroTheme.colors.black),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(modifier = Modifier.height(175.dp))
-        Text(
-            text = "아직 아이로부터 도착한 알림이 없어요!",
-            style = KieroTheme.typography.semiBold.title3,
-            color = KieroTheme.colors.gray400,
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(30.dp))
-        Image(
-            painter = painterResource(id = R.drawable.img_parent_no_alarm),
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(360f / 274f),
-            contentScale = ContentScale.FillWidth
-        )
     }
 }
