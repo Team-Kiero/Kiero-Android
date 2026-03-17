@@ -60,7 +60,7 @@ fun NavGraphBuilder.parentNavGraph(
     navigateToAlarm: () -> Unit,
 ) {
     navigation<ParentGraph>(
-        startDestination = ParentSchedule
+        startDestination = ParentJourney
     ) {
         parentScheduleNavGraph(
             paddingValues = paddingValues,
