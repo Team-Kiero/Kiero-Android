@@ -32,6 +32,7 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             alarmRepository.getUnreadAlarm()
                 .onSuccess { result ->
+                    Timber.e("fetchUnreadAlarmStatus $result")
                     _state.update {
                         it.copy(unreadAlarm = result.toUiModel())
                     }
