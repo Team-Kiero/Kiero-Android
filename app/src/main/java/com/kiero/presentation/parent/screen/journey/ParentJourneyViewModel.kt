@@ -38,6 +38,7 @@ class ParentJourneyViewModel @Inject constructor(
         viewModelScope.launch {
             sseManager.parentScheduleEvents.collect { event ->
                 Timber.e("parentScheduleEvents $event")
+                fetchParentJourney(_state.value.kidInfo.kidId.toLong())
             }
         }
     }
