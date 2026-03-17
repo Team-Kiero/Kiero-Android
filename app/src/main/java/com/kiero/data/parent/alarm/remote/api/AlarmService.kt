@@ -4,11 +4,12 @@ import com.kiero.core.network.model.BaseResponse
 import com.kiero.data.parent.alarm.remote.dto.response.AlarmFeedResponseDto
 import com.kiero.data.parent.alarm.remote.dto.response.UnreadAlarmFeedResponseDto
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface AlarmService {
-    @GET("api/v1/feeds/{childId}")
+    @PATCH("api/v1/feeds/{childId}")
     suspend fun getAlarmFeed(
         @Path("childId") childId: Long,
         @Query("size") size: Int? = null,
