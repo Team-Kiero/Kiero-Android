@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -88,7 +89,8 @@ private fun DayBox(
     Text(
         text = dayTitle,
         color = textColor,
-        style = KieroTheme.typography.bold.headLine1,
+        style = KieroTheme.typography.regular.body1,
+        textAlign = TextAlign.Center,
         modifier = modifier
             .noRippleClickable(onClick = isSelectClick)
             .background(
@@ -100,8 +102,18 @@ private fun DayBox(
                 color = borderColor,
                 shape = CircleShape
             )
-            .padding(horizontal = 8.dp, vertical = 6.dp),
-        textAlign = TextAlign.Center
+            .layout { measurable, constraints ->
+                val placeable = measurable.measure(constraints)
+                val maxSize = maxOf(placeable.width, placeable.height)
+
+                layout(maxSize, maxSize) {
+                    placeable.placeRelative(
+                        x = (maxSize - placeable.width) / 2,
+                        y = (maxSize - placeable.height) / 2
+                    )
+                }
+            }
+            .padding(8.dp)
     )
 }
 
@@ -241,9 +253,10 @@ private fun DayToggle(
 private fun PreviewDayBox() {
     KieroTheme {
         Column {
-//            WeekSelectArea(
-//
-//            )
+            DayBox(
+                isSelectClick = {},
+                dayTitle = "월",
+            )
         }
     }
 }
