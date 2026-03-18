@@ -18,7 +18,7 @@ private val DATE_FORMAT_WITH_DAY = DateTimeFormatter.ofPattern("yyyy.M.d.(E)", L
 private val SERVER_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")
 private val ALARM_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy.MM.dd")
 private val ALARM_TIME_FORMAT = DateTimeFormatter.ofPattern("HH : mm")
-private val KOREAN_TIME_FORMATTER = DateTimeFormatter.ofPattern("a hh:mm", Locale.KOREAN)
+private val KOREAN_TIME_FORMATTER = DateTimeFormatter.ofPattern("a hh : mm", Locale.KOREAN)
 
 fun String.formattedDeadLine(): String {
     if (this.isBlank()) return ""
