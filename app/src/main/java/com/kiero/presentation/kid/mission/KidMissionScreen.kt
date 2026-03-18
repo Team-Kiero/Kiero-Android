@@ -47,6 +47,7 @@ import com.kiero.core.designsystem.component.chip.action.KieroCoinAction
 import com.kiero.core.designsystem.component.dialog.KieroDialog
 import com.kiero.core.designsystem.component.dialog.action.KieroCancelAction
 import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
+import com.kiero.core.designsystem.component.emptyview.KieroEmptyView
 import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.component.pulltorefresh.KieroPullToRefresh
 import com.kiero.core.designsystem.theme.KieroTheme
@@ -163,7 +164,7 @@ private fun KidMissionScreen(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(5.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
 
                     Box(
                         contentAlignment = Alignment.Center
@@ -213,14 +214,12 @@ private fun KidMissionScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .fillParentMaxHeight(0.6f),
+                            .fillParentMaxHeight(0.8f),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = "아직 등록된 미션이 없어!",
-                            style = KieroTheme.typography.semiBold.title3,
-                            color = KieroTheme.colors.gray400,
-                            textAlign = TextAlign.Center
+                        KieroEmptyView(
+                            title = "아직 등록된 미션이 없어!",
+                            description = "부모님과 함께 나만의 미션을 정해볼까?",
                         )
                     }
                 }
