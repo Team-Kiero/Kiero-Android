@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.component.divider.KieroDashedHorizontalDivider
@@ -33,6 +34,11 @@ fun KidMapListItem(
         item.isOngoing || item.isNext -> KieroTheme.colors.main
         item.status == KidMapScheduleStatus.PENDING -> KieroTheme.colors.gray500
         else -> KieroTheme.colors.gray500.copy(alpha = 0.5f)
+    }
+
+    val dividerColor = when {
+        item.isOngoing || item.isNext || item.status == KidMapScheduleStatus.PENDING -> KieroTheme.colors.gray600
+        else -> Color.Transparent
     }
 
     Row(
@@ -74,7 +80,8 @@ fun KidMapListItem(
         }
 
         KieroDashedHorizontalDivider(
-            color = KieroTheme.colors.gray600,
+            color = dividerColor,
+            endColor = dividerColor,
             thickness = 1.dp,
             modifier = Modifier
                 .weight(0.25f)
@@ -126,6 +133,18 @@ private fun KidMapListItemPreview() {
                     endTime = "오후 05 : 00",
                     isOngoing = true,
                     stoneType = KidJourneyStoneType.GRIT,
+                    status = KidMapScheduleStatus.PENDING
+                )
+            )
+            // 미래 PENDING 중 첫번째 - 라인 있음, main 색상
+            KidMapListItem(
+                item = KidMapItemUiModel(
+                    name = "꾸비 성수팝업 가기",
+                    startTime = "오후 04 : 00",
+                    endTime = "오후 05 : 00",
+                    isOngoing = false,
+                    isNext = true,
+                    stoneType = KidJourneyStoneType.WISDOM,
                     status = KidMapScheduleStatus.PENDING
                 )
             )
