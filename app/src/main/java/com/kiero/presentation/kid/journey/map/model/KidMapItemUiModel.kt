@@ -16,11 +16,33 @@ data class KidMapItemUiModel(
     val status: KidMapScheduleStatus = KidMapScheduleStatus.PENDING
 )
 
-fun ScheduleProgressItemModel.toUiModel() = KidMapItemUiModel(
-    name = this.name,
-    startTime = this.startTime.toKoreanTimeString(),
-    endTime = this.endTime.toKoreanTimeString(),
-    isOngoing = this.isOngoing,
-    stoneType = KidJourneyStoneType.from(this.stoneType),
-    status = KidMapScheduleStatus.from(this.status)
-)
+fun ScheduleProgressItemModel.toUiModel(): KidMapItemUiModel {
+    val mappedStatus = KidMapScheduleStatus.from(this.status)
+
+    val validIsOngoing = this.isOngoing &&
+            (mappedStatus == KidMapScheduleStatus.PENDING || mappedStatus == KidMapScheduleStatus.VERIFIED)
+
+    return KidMapItemUiModel(
+        name = this.name,
+        startTime = this.startTime.toKoreanTimeString(),
+        endTime = this.endTime.toKoreanTimeString(),
+        isOngoing = validIsOngoing,
+        stoneType = KidJourneyStoneType.from(this.stoneType),
+        status = mappedStatus
+    )
+}
+
+fun List<ScheduleProgressItemModel>.toUiModelList(): List<KidMapItemUiModel> {
+    val mappedList = this.map { it.toUiModel() }.toMutableList()
+
+    val hasOngoing = mappedList.any { it.isOngoing }
+
+    if (!hasOngoing) {
+        val pendingIndex = mappedList.indexOfFirst { it.status == KidMapScheduleStatus.PENDING }
+        if (pendingIndex != -1) {
+            mappedList[pendingIndex] = mappedList[pendingIndex].copy(isNext = true)
+        }
+    }
+
+    return mappedList
+}
