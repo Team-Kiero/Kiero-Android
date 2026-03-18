@@ -155,6 +155,17 @@ private fun KidMapListItemPreview() {
                     startTime = "오후 04 : 00",
                     endTime = "오후 05 : 00",
                     isOngoing = false,
+                    isNext = true,
+                    stoneType = KidJourneyStoneType.WISDOM,
+                    status = KidMapScheduleStatus.PENDING
+                )
+            )
+            KidMapListItem(
+                item = KidMapItemUiModel(
+                    name = "꾸비 성수팝업 가기",
+                    startTime = "오후 04 : 00",
+                    endTime = "오후 05 : 00",
+                    isOngoing = false,
                     stoneType = KidJourneyStoneType.WISDOM,
                     status = KidMapScheduleStatus.PENDING
                 )
