@@ -27,6 +27,7 @@ interface ScheduleModel {
     val startTime: String
     val endTime: String
     val colorCode: String
+    val scheduleStatus: String?
 }
 data class RecurringScheduleModel(
     override val scheduleId: Long,
@@ -34,6 +35,7 @@ data class RecurringScheduleModel(
     override val endTime: String,
     override val name: String,
     override val colorCode: String,
+    override val scheduleStatus: String? = null,
     val dayOfWeek: String,
     val repeatStartDate: String,
 ) : ScheduleModel
@@ -44,6 +46,7 @@ data class NormalScheduleModel(
     override val endTime: String,
     override val name: String,
     override val colorCode: String,
+    override val scheduleStatus: String? = null,
     val date: String,
 ) : ScheduleModel
 
@@ -58,6 +61,7 @@ fun PlanAllResponseDto.toModel(): PlanAllModel {
                 endTime       = item.endTime,
                 name          = item.name,
                 colorCode     = item.colorCode,
+                scheduleStatus  = item.scheduleStatus,
                 dayOfWeek     = item.dayOfWeek.joinToString(", "),
                 repeatStartDate = item.date,
             )
@@ -72,6 +76,7 @@ fun PlanAllResponseDto.toModel(): PlanAllModel {
                 endTime    = item.endTime,
                 name       = item.name,
                 colorCode  = item.colorCode,
+                scheduleStatus  = item.scheduleStatus,
                 date       = item.date,
             )
         }
