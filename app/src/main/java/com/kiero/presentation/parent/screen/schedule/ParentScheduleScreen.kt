@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -62,6 +63,7 @@ import com.kiero.presentation.parent.screen.schedule.plan.state.ParentScheduleSt
 import com.kiero.presentation.parent.screen.schedule.plan.state.ParentScheduleState.Companion.formatRepeatText
 import com.kiero.presentation.parent.screen.schedule.viewmodel.ParentScheduleViewModel
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
@@ -109,6 +111,7 @@ fun ParentScheduleRoute(
                     navigateToScheduleAdd(state.data.navInitialDate, state.data.isFireLit)
                 },
                 navigateToAlarm = navigateToAlarm,
+                isScheduleEditable = viewModel::isScheduleEditable
             )
 
             is UiState.Failure -> Box(
@@ -129,6 +132,7 @@ fun ParentScheduleRoute(
                     navigateToScheduleAdd(LocalDate.now().toString(), false)
                 },
                 navigateToAlarm = navigateToAlarm,
+                isScheduleEditable = viewModel::isScheduleEditable
             )
         }
     }
@@ -145,33 +149,26 @@ private fun ParentScheduleScreen(
     onEditClick: (ScheduleEdit) -> Unit,
     navigateToScheduleAdd: () -> Unit,
     navigateToAlarm: () -> Unit,
+    isScheduleEditable: (ScheduleModel) -> Boolean,
 ) {
     var showBottomSheet by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var selectedEventId by remember { mutableStateOf<String?>(null) }
+    var selectedEventDate by remember { mutableStateOf<String?>(null) }
     var isDeleteIncludeFollowing by remember { mutableStateOf(false) }
     var snapshotSchedule by remember { mutableStateOf<ScheduleModel?>(null) }
 
-    val selectedSchedule: ScheduleModel? = selectedEventId?.toLongOrNull()?.let { id ->
+    val selectedSchedule: ScheduleModel? = remember(selectedEventId, selectedEventDate, scheduleState.planAllModel) {
+        val id = selectedEventId?.toLongOrNull() ?: return@remember null
+        val date = selectedEventDate
         val model = scheduleState.planAllModel
-        model?.normalSchedules?.find { it.scheduleId == id }
+
+        model?.normalSchedules?.find { it.scheduleId == id && it.date == date }
             ?: model?.recurringSchedules?.find { it.scheduleId == id }
     }
 
     val canShowEditDelete = remember(selectedSchedule) {
-        selectedSchedule?.let { schedule ->
-            val startTimeStr = when (schedule) {
-                is NormalScheduleModel -> schedule.startTime
-                is RecurringScheduleModel -> schedule.startTime
-                else -> null
-            }
-            startTimeStr?.let { timeStr ->
-                runCatching {
-                    val startTime = LocalTime.parse(timeStr.take(5), DateTimeFormatter.ofPattern("HH:mm"))
-                    startTime.isAfter(LocalTime.now())
-                }.getOrDefault(true)
-            } ?: true
-        } ?: true
+        selectedSchedule?.let { isScheduleEditable(it) } ?: false
     }
 
     LaunchedEffect(showDeleteDialog) {
@@ -199,8 +196,9 @@ private fun ParentScheduleScreen(
                 state = scheduleState,
                 onDateChange = onDateChange,
                 onResetToday = onResetToToday,
-                onContentClick = { id ->
+                onContentClick = { id, date ->
                     selectedEventId = id
+                    selectedEventDate = date
                     showBottomSheet = true
                 }
             )
@@ -238,7 +236,7 @@ private fun ParentScheduleScreen(
             KieroDialog(
                 onDismiss = { showDeleteDialog = false },
                 title = snapshotSchedule?.name ?: "일정 삭제",
-                subDescription = "삭제하시겠습니까?",
+                subDescription = null,
                 cancelAction = KieroCancelAction(
                     text = "취소",
                     onClick = { showDeleteDialog = false }
@@ -290,23 +288,35 @@ private fun ScheduleDeleteDialogContent(
     } else {
         R.drawable.ic_parent_addschedule_check_off
     }
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .noRippleClickable(onClick = onContentClick),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.End
+    Column(
+        verticalArrangement = Arrangement.spacedBy(14.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Icon(
-            imageVector = ImageVector.vectorResource(id = iconRes),
-            contentDescription = null,
-            tint = Color.Unspecified
-        )
         Text(
-            text = "이후 반복되는 일정 포함",
-            color = KieroTheme.colors.gray400,
-            style = KieroTheme.typography.regular.body4
+            text = "삭제하시겠습니까?",
+            color = KieroTheme.colors.gray100,
+            style = KieroTheme.typography.regular.body3,
+            textAlign = TextAlign.Center,
         )
+
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .noRippleClickable(onClick = onContentClick),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
+        ) {
+            Icon(
+                imageVector = ImageVector.vectorResource(id = iconRes),
+                contentDescription = null,
+                tint = Color.Unspecified
+            )
+            Text(
+                text = "이후 반복되는 일정 포함",
+                color = KieroTheme.colors.gray400,
+                style = KieroTheme.typography.regular.body4
+            )
+        }
     }
 }
 
@@ -368,7 +378,8 @@ private fun ParentScheduleScreenPreview() {
                 onDeleteConfirm = { _, _, _ -> },
                 onEditClick = {},
                 navigateToScheduleAdd = {},
-                navigateToAlarm = {}
+                navigateToAlarm = {},
+                isScheduleEditable = { false }
             )
         }
     }
