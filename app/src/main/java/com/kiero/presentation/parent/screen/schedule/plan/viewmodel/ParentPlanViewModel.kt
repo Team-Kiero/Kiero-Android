@@ -124,35 +124,19 @@ class ParentPlanViewModel @Inject constructor(
 
                 val isTodayOnly = selectedDates.size == 1 && selectedDates.first() == today
                 if (isTodayOnly) {
-                    val startTime = s.startTime?.let {
-                        runCatching {
-                            LocalTime.parse(it.take(5), java.time.format.DateTimeFormatter.ofPattern("HH:mm"))
-                        }.getOrNull()
-                    }
+                    val startTime = runCatching { s.parseLocalTime(s.displayStartTime) }.getOrNull()
 
                     if (startTime != null && startTime.isBefore(now)) {
                         _sideEffect.emit(ShowSnackBar("이미 지난 시간에는 일정을 등록할 수 없어요"))
-                        return@launch
-                    }
-
-                    if (s.isFireLit) {
-                        _sideEffect.emit(ShowSnackBar("오늘 일정이 마감되어, 일정을 추가할 수 없어요"))
                         return@launch
                     }
                 }
             }
 
             val isTodayIncluded = s.isTodayIncluded(today)
-            val isClosedToday = isTodayIncluded &&
-                    (s.parseLocalTime(s.displayStartTime).isBefore(now) || s.isFireLit)
-
-            if (!s.isRecurring && isClosedToday) {
-                _sideEffect.emit(ShowSnackBar("일정이 등록되었어요. (오늘 일정은 마감되어 다음부터 적용돼요!)"))
-                delay(500)
-                _sideEffect.emit(navigateUp)
-                return@launch
-            }
-
+            val isClosedToday = isTodayIncluded && (
+                    s.parseLocalTime(s.displayStartTime).isBefore(now) ||
+                            s.isFireLit)
             val childId = getChildIdOrReturn() ?: return@launch
 
             planRepository.postPlan(
@@ -165,13 +149,14 @@ class ParentPlanViewModel @Inject constructor(
                 dayOfWeek     = s.formattedDays.takeIf { s.isRecurring },
                 dates         = s.selectedDate.takeUnless { s.isRecurring },
             ).onSuccess {
-                val msg = if (isClosedToday) "일정이 등록되었어요. (오늘 일정은 마감되어 다음부터 적용돼요!)"
-                else "일정이 등록되었습니다"
+                val msg = if (isClosedToday) "일정이 등록되었어요. 오늘은 마감되어 다음부터 적용돼요."
+                else "일정이 등록되었어요."
+
                 _sideEffect.emit(ShowSnackBar(msg))
                 delay(200)
                 _sideEffect.emit(navigateUp)
             }.onFailure {
-                _sideEffect.emit(ShowSnackBar("해당 시간에 이미 등록된 일정이 있습니다"))
+                _sideEffect.emit(ShowSnackBar("일정 저장에 실패했어요. 잠시 후 다시 시도해주세요."))
                 _state.update { it.copy(isLoading = false) }
             }
         }
@@ -228,7 +213,7 @@ class ParentPlanViewModel @Inject constructor(
         ).count { it }
 
         return when {
-            missing >= 2           -> "일정 저장에 실패했어요. 잠시 후 다시 시도해주세요"
+            missing >= 2           -> "일정 저장에 실패했어요."
             name.isBlank()         -> "일정 이름을 입력해주세요"
             state.selectedDays.isEmpty() -> "요일을 선택해주세요"
             state.startTime == null || state.endTime == null -> "시간을 선택해주세요"
