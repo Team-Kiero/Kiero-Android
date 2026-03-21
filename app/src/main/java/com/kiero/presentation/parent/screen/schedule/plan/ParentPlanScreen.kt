@@ -31,7 +31,7 @@ import com.kiero.presentation.parent.screen.schedule.plan.state.ParentScheduleSt
 fun ParentPlanScreen(
     state: ParentScheduleState,
     onResetToday: () -> Unit,
-    onContentClick: (String) -> Unit,
+    onContentClick: (String, String) -> Unit,
     onDateChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -106,7 +106,7 @@ private fun ParentPlanScreenPreview() {
             ParentPlanScreen(
                 state = ParentScheduleState(),
                 onResetToday = {},
-                onContentClick = {},
+                onContentClick = { _, _ -> },
                 onDateChange = {}
             )
         }
