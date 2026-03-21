@@ -13,6 +13,7 @@ data class ScheduleEvent(
     val scheduleColor: String,
     val dayOfWeek: String?,
     val date: String?,
+    val scheduleStatus: String? = null,
 ){
     companion object {
         fun empty(): List<ScheduleEvent> = emptyList()
