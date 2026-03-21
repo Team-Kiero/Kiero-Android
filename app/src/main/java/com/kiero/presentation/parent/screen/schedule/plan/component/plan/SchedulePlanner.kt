@@ -14,19 +14,13 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.kiero.R
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.component.emptyview.KieroEmptyView
 import com.kiero.core.designsystem.theme.KieroTheme
@@ -38,7 +32,7 @@ import com.kiero.presentation.parent.screen.schedule.plan.state.ParentScheduleSt
 fun ScheduleTimeTable(
     state: ParentScheduleState,
     events: List<ScheduleEvent>,
-    onContentClick: (String) -> Unit,
+    onContentClick: (String, String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -66,7 +60,7 @@ fun ScheduleTimeTable(
 fun SchedulePlanner(
     events: List<ScheduleEvent>,
     state: ParentScheduleState,
-    onContentClick: (String) -> Unit,
+    onContentClick: (String, String) -> Unit,
     modifier: Modifier = Modifier,
     daysCount: Int = 7,
 ) {
@@ -82,7 +76,9 @@ fun SchedulePlanner(
         val indices = state.run { event.getIndices() }
 
         indices.flatMap { index ->
-            event.toScheduleBlocks(index)
+            event.toScheduleBlocks(index).map { block ->
+                block to event
+            }
         }
     }
 
@@ -98,7 +94,7 @@ fun SchedulePlanner(
         if (events.isEmpty()) {
             KieroEmptyView()
         } else {
-            allBlocks.forEach { block ->
+            allBlocks.forEach { (block, event) ->
                 val hourOffset = hourHeight * (block.startHour - 8)
                 val minuteOffset = slotHeight * (block.startMinute / 15)
                 val topOffset = hourOffset + minuteOffset
@@ -109,7 +105,7 @@ fun SchedulePlanner(
                         .offset(x = dayWidth * block.dayIndex, y = topOffset)
                         .width(dayWidth)
                         .height(blockHeight)
-                        .noRippleClickable(onClick = { onContentClick(block.id) })
+                        .noRippleClickable(onClick = { onContentClick(block.id, event.date ?: "") })
                         .padding(horizontal = 3.dp)
                 ) {
                     ScheduleEventBlock(block = block)
@@ -130,7 +126,7 @@ private fun ScheduleTimeTablePreview() {
             ScheduleTimeTable(
                 state = ParentScheduleState(),
                 events = mockEvents,
-                onContentClick = {}
+                onContentClick = {_, _ -> }
             )
         }
     }
