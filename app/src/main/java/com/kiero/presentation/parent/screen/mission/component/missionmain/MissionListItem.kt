@@ -85,6 +85,13 @@ fun MissionInfo(
             }
         }
     }
+
+    val dayTextColor = if (dayOfWeek == "오늘") {
+        KieroTheme.colors.main
+    } else {
+        KieroTheme.colors.schedule1
+    }
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -94,7 +101,7 @@ fun MissionInfo(
     ) {
         Text(
             text = dayOfWeek ?: " ",
-            color = KieroTheme.colors.main,
+            color = dayTextColor,
             style = KieroTheme.typography.semiBold.title4
         )
 
