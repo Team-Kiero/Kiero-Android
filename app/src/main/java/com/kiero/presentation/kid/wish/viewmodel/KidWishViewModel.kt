@@ -134,6 +134,7 @@ class KidWishViewModel @Inject constructor(
                         )
                     }
                     fetchCoin()
+                    fetchWish()
                 }
                 .onFailure {
                     _sideEffect.emit(KidWishSideEffect.ShowSnackBar(it.message.toString()))

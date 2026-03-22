@@ -136,6 +136,7 @@ class KidMissionViewModel @Inject constructor(
                         )
                     }
                     fetchCoin()
+                    fetchMissions()
                 }
                 .onFailure { exception ->
                     _sideEffect.emit(KidMissionSideEffect.ShowSnackbar(exception.message.toString()))
