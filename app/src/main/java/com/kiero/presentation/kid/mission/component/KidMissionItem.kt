@@ -92,9 +92,6 @@ fun KidMissionItem(
                     .padding(
                         horizontal = 22.dp,
                         vertical = 10.dp
-                    )
-                    .noRippleClickable(
-                        onClick = onClickButton
                     ),
                 contentAlignment = Alignment.Center
             ) {
