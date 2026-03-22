@@ -57,6 +57,7 @@ import com.kiero.presentation.kid.component.KidProfileChip
 import com.kiero.presentation.kid.component.KidSpeechField
 import com.kiero.presentation.kid.mission.component.KidMissionItem
 import com.kiero.presentation.kid.mission.state.KidMissionState
+import com.kiero.presentation.kid.mission.viewmodel.KidMissionViewModel
 import com.kiero.presentation.main.navigation.KidMainTab
 
 @Composable

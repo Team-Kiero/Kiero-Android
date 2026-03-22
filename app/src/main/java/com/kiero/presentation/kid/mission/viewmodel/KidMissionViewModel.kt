@@ -1,4 +1,4 @@
-package com.kiero.presentation.kid.mission
+package com.kiero.presentation.kid.mission.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -40,7 +40,7 @@ class KidMissionViewModel @Inject constructor(
     ) { uiState, coinData ->
         when (uiState) {
             is UiState.Success -> {
-                Timber.e("combine $coinData")
+                Timber.Forest.e("combine $coinData")
                 UiState.Success(
                     uiState.data.copy(
                         coinUiModel = coinData.toUiModel()
@@ -54,7 +54,7 @@ class KidMissionViewModel @Inject constructor(
         }
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
+        started = SharingStarted.Companion.WhileSubscribed(5_000),
         initialValue = UiState.Loading
     )
 
@@ -71,7 +71,7 @@ class KidMissionViewModel @Inject constructor(
     fun collectChildMissionEvents() {
         viewModelScope.launch {
             sseManager.childMissionEvents.collect { event ->
-                Timber.e("collectChildMissionEvents $event")
+                Timber.Forest.e("collectChildMissionEvents $event")
                 fetchMissions()
             }
         }
@@ -81,7 +81,7 @@ class KidMissionViewModel @Inject constructor(
         viewModelScope.launch {
             if (isRefreshing) {
                 _state.updateSuccess { it.copy(isRefreshing = true) }
-                Timber.e("fetchMissions $isRefreshing")
+                Timber.Forest.e("fetchMissions $isRefreshing")
             }
             val minLoadingTime = launch {
                 if (isRefreshing) delay(1000)
@@ -89,7 +89,7 @@ class KidMissionViewModel @Inject constructor(
 
             missionRepository.getMissions()
                 .onSuccess { result ->
-                    Timber.e("fetchMissions $result")
+                    Timber.Forest.e("fetchMissions $result")
                     minLoadingTime.join()
                     _state.update {
                         UiState.Success(
@@ -147,10 +147,10 @@ class KidMissionViewModel @Inject constructor(
         viewModelScope.launch {
             repository.getCurrentCoin()
                 .onSuccess {
-                    Timber.d("fetchCoin: $it")
+                    Timber.Forest.d("fetchCoin: $it")
                 }
                 .onFailure {
-                    Timber.e("fetchCoin fail: $it")
+                    Timber.Forest.e("fetchCoin fail: $it")
                 }
         }
     }
