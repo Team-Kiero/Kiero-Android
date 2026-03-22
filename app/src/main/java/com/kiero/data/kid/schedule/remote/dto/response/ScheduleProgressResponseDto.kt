@@ -7,6 +7,8 @@ import kotlinx.serialization.Serializable
 data class ScheduleProgressResponseDto(
     @SerialName("scheduleCount")
     val scheduleCount: Int,
+    @SerialName("isFireLitToday")
+    val isFireLitToday: Boolean,
     @SerialName("schedules")
     val schedules: List<ScheduleProgressItemDto>
 )

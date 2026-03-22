@@ -16,10 +16,10 @@ data class KidMapItemUiModel(
     val status: KidMapScheduleStatus = KidMapScheduleStatus.PENDING
 )
 
-fun ScheduleProgressItemModel.toUiModel(): KidMapItemUiModel {
+fun ScheduleProgressItemModel.toUiModel(isFireLitToday: Boolean): KidMapItemUiModel {
     val mappedStatus = KidMapScheduleStatus.from(this.status)
 
-    val validIsOngoing = this.isOngoing &&
+    val validIsOngoing = this.isOngoing && !isFireLitToday &&
             (mappedStatus == KidMapScheduleStatus.PENDING || mappedStatus == KidMapScheduleStatus.VERIFIED)
 
     return KidMapItemUiModel(
@@ -32,8 +32,8 @@ fun ScheduleProgressItemModel.toUiModel(): KidMapItemUiModel {
     )
 }
 
-fun List<ScheduleProgressItemModel>.toUiModelList(): List<KidMapItemUiModel> {
-    val mappedList = this.map { it.toUiModel() }.toMutableList()
+fun List<ScheduleProgressItemModel>.toUiModelList(isFireLitToday: Boolean): List<KidMapItemUiModel> {
+    val mappedList = this.map { it.toUiModel(isFireLitToday) }.toMutableList()
 
     val hasOngoing = mappedList.any { it.isOngoing }
 

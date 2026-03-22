@@ -49,8 +49,7 @@ class KidMapViewModel @Inject constructor(
                         KidMapState(
                             date = map.date,
                             scheduleCount = scheduleData.scheduleCount,
-                            schedules = scheduleData.schedules.toUiModelList().toPersistentList()
-                        )
+                            schedules = scheduleData.schedules.toUiModelList(scheduleData.isFireLitToday).toPersistentList()                        )
                     )
                     Timber.d("fetchScheduleProgress success: $scheduleData")
                 }
