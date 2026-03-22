@@ -24,6 +24,7 @@ import com.kiero.R
 import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.component.KieroTopbar
+import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
@@ -71,12 +72,7 @@ fun ParentAddMissionRoute(
     }
 
     if (state.isLoading) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
-        ) {
-            CircularProgressIndicator(color = KieroTheme.colors.main)
-        }
+        KieroLoadingIndicator()
     } else {
         ParentAddMissionScreen(
             paddingValues = paddingValues,
