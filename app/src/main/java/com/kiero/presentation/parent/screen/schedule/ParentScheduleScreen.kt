@@ -262,7 +262,8 @@ private fun ParentScheduleScreen(
                 content = {
                     ScheduleDeleteDialogContent(
                         isIncludeFollowing = isDeleteIncludeFollowing,
-                        onContentClick = { isDeleteIncludeFollowing = !isDeleteIncludeFollowing }
+                        onContentClick = { isDeleteIncludeFollowing = !isDeleteIncludeFollowing },
+                        isRecurring = snapshotSchedule is RecurringScheduleModel
                     )
                 }
             )
@@ -281,6 +282,7 @@ private fun ParentScheduleScreen(
 private fun ScheduleDeleteDialogContent(
     isIncludeFollowing: Boolean,
     onContentClick: () -> Unit,
+    isRecurring: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val iconRes = if (isIncludeFollowing) {
@@ -289,9 +291,13 @@ private fun ScheduleDeleteDialogContent(
         R.drawable.ic_parent_addschedule_check_off
     }
     Column(
+        modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(14.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
+        Spacer(modifier = Modifier.height(8.dp))
+
         Text(
             text = "삭제하시겠습니까?",
             color = KieroTheme.colors.gray100,
@@ -299,23 +305,25 @@ private fun ScheduleDeleteDialogContent(
             textAlign = TextAlign.Center,
         )
 
-        Row(
-            modifier = modifier
-                .fillMaxWidth()
-                .noRippleClickable(onClick = onContentClick),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.End
-        ) {
-            Icon(
-                imageVector = ImageVector.vectorResource(id = iconRes),
-                contentDescription = null,
-                tint = Color.Unspecified
-            )
-            Text(
-                text = "이후 반복되는 일정 포함",
-                color = KieroTheme.colors.gray400,
-                style = KieroTheme.typography.regular.body4
-            )
+        if (isRecurring) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .noRippleClickable(onClick = onContentClick),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = iconRes),
+                    contentDescription = null,
+                    tint = Color.Unspecified
+                )
+                Text(
+                    text = "이후 반복되는 일정 포함",
+                    color = KieroTheme.colors.gray400,
+                    style = KieroTheme.typography.regular.body4
+                )
+            }
         }
     }
 }
