@@ -8,6 +8,7 @@ import com.kiero.core.common.util.successData
 import com.kiero.core.model.UiState
 import com.kiero.data.kid.coin.repository.CoinRepository
 import com.kiero.data.kid.wish.repository.WishRepository
+import com.kiero.data.sse.manager.SseManager
 import com.kiero.presentation.kid.model.toUiModel
 import com.kiero.presentation.kid.wish.model.toUiModel
 import com.kiero.presentation.kid.wish.state.KidWishSideEffect
@@ -30,7 +31,8 @@ import javax.inject.Inject
 @HiltViewModel
 class KidWishViewModel @Inject constructor(
     private val repository: CoinRepository,
-    private val wishRepository: WishRepository
+    private val wishRepository: WishRepository,
+    private val sseManager: SseManager
 ) : ViewModel() {
     private val _state = MutableStateFlow<UiState<KidWishState>>(UiState.Loading)
     val state: StateFlow<UiState<KidWishState>> = combine(
@@ -62,6 +64,10 @@ class KidWishViewModel @Inject constructor(
 
     init {
         fetchWish()
+        fetchCoin()
+
+        sseManager.startChildSubscription()
+        collectCouponEvents()
     }
 
     fun fetchCoin() {
@@ -171,4 +177,15 @@ class KidWishViewModel @Inject constructor(
         }
     }
 
+    private fun collectCouponEvents() {
+        viewModelScope.launch {
+            sseManager.childCouponEvents.collect { event ->
+                Timber.d("쿠폰 이벤트 수신: ${event.data.eventType}")
+
+                if (event.data.eventType == "COUPON_CREATED") {
+                    fetchWish()
+                }
+            }
+        }
+    }
 }

@@ -29,6 +29,19 @@ data class ScheduleDataDto(
     val childId: Long? = null
 )
 
+// Coupon 이벤트 (COUPON_CREATED)
+@Serializable
+data class CouponDataDto(
+    @SerialName("eventType")
+    val eventType: String,  // "COUPON_CREATED"
+
+    @SerialName("couponName")
+    val couponName: String,
+
+    @SerialName("price")
+    val price: Int
+)
+
 // Date 이벤트 (DATE_CHANGED)
 @Serializable
 data class DateDataDto(

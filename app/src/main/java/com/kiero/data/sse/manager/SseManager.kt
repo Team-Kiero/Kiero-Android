@@ -67,6 +67,12 @@ class SseManager @Inject constructor(
     )
     val childScheduleEvents: SharedFlow<SseEvent.Kid.Schedule> = _childScheduleEvents.asSharedFlow()
 
+    private val _childCouponEvents = MutableSharedFlow<SseEvent.Kid.Coupon>(
+        replay = 0,
+        extraBufferCapacity = 1
+    )
+    val childCouponEvents: SharedFlow<SseEvent.Kid.Coupon> = _childCouponEvents.asSharedFlow()
+
     private val _childDateEvents = MutableSharedFlow<SseEvent.Kid.Date>(
         replay = 0,
         extraBufferCapacity = 1
@@ -216,6 +222,7 @@ class SseManager @Inject constructor(
             is SseEvent.Connected -> Timber.d("아이 SSE Connected")
             is SseEvent.Kid.Mission -> _childMissionEvents.emit(event)
             is SseEvent.Kid.Schedule -> _childScheduleEvents.emit(event)
+            is SseEvent.Kid.Coupon -> _childCouponEvents.emit(event)
             is SseEvent.Kid.Date -> _childDateEvents.emit(event)
             else -> Timber.w("자녀 모드에서 알 수 없는 이벤트: $event")
         }
