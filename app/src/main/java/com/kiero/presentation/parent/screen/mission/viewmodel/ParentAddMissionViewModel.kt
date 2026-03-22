@@ -45,13 +45,17 @@ class ParentAddMissionViewModel @Inject constructor(
         initialText = editArgs?.name.orEmpty()
     )
     val awardTextFieldState = TextFieldState(
-        initialText = if (editArgs != null && editArgs.reward > 0) editArgs.reward.toString() else ""
+        initialText = editArgs?.reward?.takeIf { it > 0 }?.toString() ?: "20"
     )
 
     private val _selectedDate = MutableStateFlow<LocalDate?>(
-        editArgs?.dueAt
-            ?.takeIf { it.isNotBlank() }
-            ?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+        if (editArgs != null) {
+            editArgs.dueAt
+                .takeIf { it.isNotBlank() }
+                ?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+        } else {
+            LocalDate.now()
+        }
     )
     val selectedDate = _selectedDate.asStateFlow()
 
