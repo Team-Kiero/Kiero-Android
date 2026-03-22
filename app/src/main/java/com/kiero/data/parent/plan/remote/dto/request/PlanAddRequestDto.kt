@@ -19,4 +19,6 @@ data class PlanAddRequestDto(
     val dayOfWeek: String?,
     @SerialName("dates")
     val dates: String?,
+    @SerialName("firstOrderDate")
+    val firstOrderDate: String? = null
 )

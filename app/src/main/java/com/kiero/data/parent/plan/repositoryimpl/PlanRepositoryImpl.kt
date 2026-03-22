@@ -28,6 +28,7 @@ class PlanRepositoryImpl @Inject constructor(
         scheduleColor: String,
         dayOfWeek: String?,
         dates: String?,
+        firstOrderDate: String?,
     ): Result<Unit> = suspendRunCatching {
         dataSource.postPlan(
             childId, PlanAddRequestDto(
@@ -37,7 +38,8 @@ class PlanRepositoryImpl @Inject constructor(
                 endTime = endTime,
                 scheduleColor = scheduleColor,
                 dayOfWeek = dayOfWeek,
-                dates = dates
+                dates = dates,
+                firstOrderDate = firstOrderDate
             )
         )
         Unit

@@ -15,6 +15,7 @@ interface PlanRepository {
         scheduleColor: String,
         dayOfWeek: String?,
         dates: String?,
+        firstOrderDate: String?,
     ): Result<Unit>
 
     suspend fun getPlanAll(
