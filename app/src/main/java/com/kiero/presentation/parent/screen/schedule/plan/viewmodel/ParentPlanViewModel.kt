@@ -138,6 +138,11 @@ class ParentPlanViewModel @Inject constructor(
                     s.parseLocalTime(s.displayStartTime).isBefore(now) ||
                             s.isFireLit)
             val childId = getChildIdOrReturn() ?: return@launch
+            val firstOrderDateStr = if (s.isRecurring && s.selectedDays.isNotEmpty()) {
+                val minDayIndex = s.selectedDays.minOrNull() ?: 0
+                val monday = s.currentReferenceDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+                monday.plusDays(minDayIndex.toLong()).toString()
+            } else null
 
             planRepository.postPlan(
                 childId       = childId,
@@ -148,6 +153,7 @@ class ParentPlanViewModel @Inject constructor(
                 scheduleColor = s.selectedColorType.name,
                 dayOfWeek     = s.formattedDays.takeIf { s.isRecurring },
                 dates         = s.selectedDate.takeUnless { s.isRecurring },
+                firstOrderDate = firstOrderDateStr
             ).onSuccess {
                 val msg = if (isClosedToday) "일정이 등록되었어요. 오늘은 마감되어 다음부터 적용돼요."
                 else "일정이 등록되었어요."
