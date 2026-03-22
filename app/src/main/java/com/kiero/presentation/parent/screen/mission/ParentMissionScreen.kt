@@ -46,6 +46,7 @@ import com.kiero.core.designsystem.component.chip.action.KieroCoinAction
 import com.kiero.core.designsystem.component.dialog.KieroDialog
 import com.kiero.core.designsystem.component.dialog.action.KieroCancelAction
 import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
+import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
 import com.kiero.core.model.trigger.SnackbarState
@@ -108,10 +109,7 @@ fun ParentMissionRoute(
             navigateToAutoMission = navigateToAutoMission,
         )
 
-        is UiState.Loading -> Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
-        ) { CircularProgressIndicator(color = KieroTheme.colors.main) }
+        is UiState.Loading -> KieroLoadingIndicator()
 
         else -> Unit
     }
