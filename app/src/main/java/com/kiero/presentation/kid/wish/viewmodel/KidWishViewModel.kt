@@ -127,7 +127,7 @@ class KidWishViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             wishRepository.patchCoupon(couponId)
-                .onSuccess { result ->
+                .onSuccess {
                     _state.updateSuccess { state ->
                         state.copy(
                             isCompletedWish = true

@@ -40,7 +40,7 @@ class KidMissionViewModel @Inject constructor(
     ) { uiState, coinData ->
         when (uiState) {
             is UiState.Success -> {
-                Timber.Forest.e("combine $coinData")
+                Timber.e("combine $coinData")
                 UiState.Success(
                     uiState.data.copy(
                         coinUiModel = coinData.toUiModel()
@@ -81,7 +81,7 @@ class KidMissionViewModel @Inject constructor(
         viewModelScope.launch {
             if (isRefreshing) {
                 _state.updateSuccess { it.copy(isRefreshing = true) }
-                Timber.Forest.e("fetchMissions $isRefreshing")
+                Timber.e("fetchMissions $isRefreshing")
             }
             val minLoadingTime = launch {
                 if (isRefreshing) delay(1000)
@@ -89,7 +89,7 @@ class KidMissionViewModel @Inject constructor(
 
             missionRepository.getMissions()
                 .onSuccess { result ->
-                    Timber.Forest.e("fetchMissions $result")
+                    Timber.e("fetchMissions $result")
                     minLoadingTime.join()
                     _state.update {
                         UiState.Success(
@@ -148,10 +148,10 @@ class KidMissionViewModel @Inject constructor(
         viewModelScope.launch {
             repository.getCurrentCoin()
                 .onSuccess {
-                    Timber.Forest.d("fetchCoin: $it")
+                    Timber.d("fetchCoin: $it")
                 }
                 .onFailure {
-                    Timber.Forest.e("fetchCoin fail: $it")
+                    Timber.e("fetchCoin fail: $it")
                 }
         }
     }
