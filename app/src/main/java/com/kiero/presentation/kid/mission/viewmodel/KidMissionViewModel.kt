@@ -54,7 +54,7 @@ class KidMissionViewModel @Inject constructor(
         }
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.Companion.WhileSubscribed(5_000),
+        started = SharingStarted.WhileSubscribed(5_000),
         initialValue = UiState.Loading
     )
 
@@ -71,7 +71,7 @@ class KidMissionViewModel @Inject constructor(
     fun collectChildMissionEvents() {
         viewModelScope.launch {
             sseManager.childMissionEvents.collect { event ->
-                Timber.Forest.e("collectChildMissionEvents $event")
+                Timber.e("collectChildMissionEvents $event")
                 fetchMissions()
             }
         }
