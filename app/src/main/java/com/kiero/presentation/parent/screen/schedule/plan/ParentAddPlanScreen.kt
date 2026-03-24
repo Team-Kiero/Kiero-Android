@@ -2,6 +2,7 @@ package com.kiero.presentation.parent.screen.schedule.plan
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -22,8 +23,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -94,7 +97,7 @@ fun ParentScheduleAddRoute(
         onNextWeek = viewModel::onNextWeek,
         onColorClick = { viewModel.toggleColorPicker(true) },
         onCreatePlan = {
-            if (viewModel.isEditMode && viewModel.isEditRecurring) {
+            if (viewModel.shouldShowEditDialog()) {
                 editRepeatOption = EditRepeatOption.THIS_ONLY
                 showEditDialog = true
             } else {
@@ -117,7 +120,7 @@ fun ParentScheduleAddRoute(
         KieroDialog(
             onDismiss = { showEditDialog = false },
             title = viewModel.textState.text.toString(),
-            subDescription = "저장하시겠습니까?",
+            subDescription = null,
             cancelAction = KieroCancelAction(
                 text = "취소",
                 onClick = { showEditDialog = false }
@@ -126,16 +129,31 @@ fun ParentScheduleAddRoute(
                 text = "확인",
                 onClick = {
                     showEditDialog = false
-                    viewModel.onCreatePlanClick(
-                        isIncludeFollowing = editRepeatOption == EditRepeatOption.INCLUDE_FOLLOWING
-                    )
+                    val includeFollowing = if (viewModel.isEditRecurring) {
+                        editRepeatOption == EditRepeatOption.INCLUDE_FOLLOWING
+                    } else null
+
+                    viewModel.onCreatePlanClick(isIncludeFollowing = includeFollowing)
                 }
             ),
             content = {
-                ScheduleEditDialogContent(
-                    selectedOption = editRepeatOption,
-                    onOptionClick = { editRepeatOption = it }
-                )
+                Box(
+                    modifier = Modifier.layout { measurable, constraints ->
+                        val placeable = measurable.measure(constraints)
+                        val pullUpHeight = 35.dp.roundToPx()
+
+                        layout(placeable.width, (placeable.height - pullUpHeight).coerceAtLeast(0)) {
+                            placeable.placeRelative(0, 0)
+                        }
+                    }
+                ) {
+                    ScheduleEditDialogContent(
+                        selectedOption = editRepeatOption,
+                        onOptionClick = { editRepeatOption = it },
+                        isRecurring = viewModel.isEditRecurring,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
             }
         )
     }
@@ -145,53 +163,75 @@ fun ParentScheduleAddRoute(
 private fun ScheduleEditDialogContent(
     selectedOption: EditRepeatOption,
     onOptionClick: (EditRepeatOption) -> Unit,
+    isRecurring: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    Row(
+    Column(
         modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.End)
+        verticalArrangement = Arrangement.spacedBy(14.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
-            modifier = Modifier.noRippleClickable { onOptionClick(EditRepeatOption.THIS_ONLY) },
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            val iconResThis = if (selectedOption == EditRepeatOption.THIS_ONLY) {
-                R.drawable.ic_parent_addschedule_check_on
-            } else {
-                R.drawable.ic_parent_addschedule_check_off
-            }
-            Icon(
-                imageVector = ImageVector.vectorResource(id = iconResThis),
-                contentDescription = null,
-                tint = Color.Unspecified
-            )
-            Text(
-                text = "이번 일정만 포함",
-                color = KieroTheme.colors.gray400,
-                style = KieroTheme.typography.regular.body4
-            )
-        }
+        Text(
+            text = "저장하시겠습니까?",
+            color = KieroTheme.colors.gray100,
+            style = KieroTheme.typography.regular.body3,
+            textAlign = TextAlign.Center,
+        )
 
-        Row(
-            modifier = Modifier.noRippleClickable { onOptionClick(EditRepeatOption.INCLUDE_FOLLOWING) },
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            val iconResFollowing = if (selectedOption == EditRepeatOption.INCLUDE_FOLLOWING) {
-                R.drawable.ic_parent_addschedule_check_on
-            } else {
-                R.drawable.ic_parent_addschedule_check_off
+        if (isRecurring) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    modifier = Modifier
+                        .noRippleClickable { onOptionClick(EditRepeatOption.THIS_ONLY) }
+                        .weight(1f),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    val iconResThis = if (selectedOption == EditRepeatOption.THIS_ONLY) {
+                        R.drawable.ic_parent_addschedule_check_on
+                    } else {
+                        R.drawable.ic_parent_addschedule_check_off
+                    }
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = iconResThis),
+                        contentDescription = null,
+                        tint = Color.Unspecified
+                    )
+                    Text(
+                        text = "이번 일정만 포함",
+                        color = KieroTheme.colors.gray400,
+                        style = KieroTheme.typography.regular.body4
+                    )
+                }
+
+                Row(
+                    modifier = Modifier
+                        .noRippleClickable { onOptionClick(EditRepeatOption.INCLUDE_FOLLOWING) }
+                        .weight(1f),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    val iconResFollowing = if (selectedOption == EditRepeatOption.INCLUDE_FOLLOWING) {
+                        R.drawable.ic_parent_addschedule_check_on
+                    } else {
+                        R.drawable.ic_parent_addschedule_check_off
+                    }
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = iconResFollowing),
+                        contentDescription = null,
+                        tint = Color.Unspecified
+                    )
+                    Text(
+                        text = "이후 일정 포함",
+                        color = KieroTheme.colors.gray400,
+                        style = KieroTheme.typography.regular.body4
+                    )
+                }
             }
-            Icon(
-                imageVector = ImageVector.vectorResource(id = iconResFollowing),
-                contentDescription = null,
-                tint = Color.Unspecified
-            )
-            Text(
-                text = "이후 일정 포함",
-                color = KieroTheme.colors.gray400,
-                style = KieroTheme.typography.regular.body4
-            )
         }
     }
 }
