@@ -87,6 +87,17 @@ class ParentPlanViewModel @Inject constructor(
         }
     }
 
+    fun shouldShowEditDialog(): Boolean {
+        if (!isEditMode) return false
+        val s = state.value
+        val originalIsRecurring = editArgs?.isRecurring ?: false
+        val currentIsRecurring = s.isRecurring
+        val originalDays = editArgs?.dayOfWeek.toDayIndices() ?: emptySet()
+        val currentDays = s.selectedDays
+
+        return originalIsRecurring && currentIsRecurring && (originalDays == currentDays)
+    }
+
     fun onCreatePlanClick(isIncludeFollowing: Boolean? = null) {
         if (isEditMode) onUpdatePlanClick(isIncludeFollowing) else onAddPlanClick()
     }
@@ -189,17 +200,51 @@ class ParentPlanViewModel @Inject constructor(
 
             _state.update { it.copy(isLoading = true) }
 
+            val originalIsRecurring = editArgs.isRecurring
+            val currentIsRecurring = s.isRecurring
+
+            val finalDayOfWeek: String?
+            val finalDates: String?
+            val finalIsIncludeFollowing: Boolean?
+
+            if (originalIsRecurring && currentIsRecurring) {
+                val originalDayIndices = editArgs.dayOfWeek.toDayIndices()
+                val currentDayIndices = s.selectedDays
+
+                if (originalDayIndices != currentDayIndices) {
+                    finalDayOfWeek = s.formattedDays
+                    finalDates = null
+                    finalIsIncludeFollowing = null
+                } else {
+                    finalDayOfWeek = s.formattedDays
+                    finalDates = null
+                    finalIsIncludeFollowing = isIncludeFollowing
+                }
+            } else if (originalIsRecurring && !currentIsRecurring) {
+                finalDayOfWeek = null
+                finalDates = s.selectedDays.toDateString(s.currentReferenceDate)
+                finalIsIncludeFollowing = null
+            } else if (!originalIsRecurring && currentIsRecurring) {
+                finalDayOfWeek = s.formattedDays
+                finalDates = null
+                finalIsIncludeFollowing = null
+            } else {
+                finalDayOfWeek = null
+                finalDates = s.selectedDays.toDateString(s.currentReferenceDate)
+                finalIsIncludeFollowing = null
+            }
+
             planRepository.updateSchedule(
                 scheduleId         = scheduleId,
                 selectedDate       = selectedDate,
                 name               = name,
-                isRecurring        = s.isRecurring,
+                isRecurring        = currentIsRecurring,
                 startTime          = s.formatTimeForServer(s.startTime),
                 endTime            = s.formatTimeForServer(s.endTime),
                 scheduleColor      = s.selectedColorType.name,
-                dayOfWeek          = s.formattedDays.takeIf { s.isRecurring },
-                dates              = s.selectedDate.takeUnless { s.isRecurring },
-                isIncludeFollowing = isIncludeFollowing,
+                dayOfWeek          = finalDayOfWeek,
+                dates              = finalDates,
+                isIncludeFollowing = finalIsIncludeFollowing,
             ).onSuccess {
                 _sideEffect.emit(ShowSnackBar("일정이 수정되었습니다"))
                 delay(200)
