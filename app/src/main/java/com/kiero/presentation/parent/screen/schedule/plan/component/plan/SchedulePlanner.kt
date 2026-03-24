@@ -82,6 +82,12 @@ fun SchedulePlanner(
         }
     }
 
+    val uniqueBlocks = allBlocks
+        .sortedBy { (_, event) -> if (event.isRecurring) 1 else 0 }
+        .distinctBy { (block, _) ->
+            "${block.dayIndex}-${block.startHour}-${block.startMinute}"
+        }
+
     BoxWithConstraints(
         modifier = modifier
             .fillMaxWidth()
@@ -91,10 +97,10 @@ fun SchedulePlanner(
             .padding(innerPadding)
     ) {
         val dayWidth = maxWidth / daysCount
-        if (events.isEmpty()) {
+        if (uniqueBlocks.isEmpty()) {
             KieroEmptyView()
         } else {
-            allBlocks.forEach { (block, event) ->
+            uniqueBlocks.forEach { (block, event) ->
                 val hourOffset = hourHeight * (block.startHour - 8)
                 val minuteOffset = slotHeight * (block.startMinute / 15)
                 val topOffset = hourOffset + minuteOffset
