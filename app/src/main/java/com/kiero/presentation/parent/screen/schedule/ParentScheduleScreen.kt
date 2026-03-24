@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -51,11 +52,11 @@ import com.kiero.core.trigger.LocalRefreshState
 import com.kiero.data.parent.plan.model.NormalScheduleModel
 import com.kiero.data.parent.plan.model.RecurringScheduleModel
 import com.kiero.data.parent.plan.model.ScheduleModel
+import com.kiero.data.parent.plan.model.toScheduleEditArgs
+import com.kiero.data.parent.plan.model.toSelectedDate
 import com.kiero.presentation.parent.component.ParentContentBottomSheet
 import com.kiero.presentation.parent.component.ParentTopbar
 import com.kiero.presentation.parent.component.PlanTabFab
-import com.kiero.data.parent.plan.model.toScheduleEditArgs
-import com.kiero.data.parent.plan.model.toSelectedDate
 import com.kiero.presentation.parent.screen.schedule.plan.ParentPlanScreen
 import com.kiero.presentation.parent.screen.schedule.plan.navigation.ScheduleEdit
 import com.kiero.presentation.parent.screen.schedule.plan.state.ParentScheduleSideEffect
@@ -63,9 +64,6 @@ import com.kiero.presentation.parent.screen.schedule.plan.state.ParentScheduleSt
 import com.kiero.presentation.parent.screen.schedule.plan.state.ParentScheduleState.Companion.formatRepeatText
 import com.kiero.presentation.parent.screen.schedule.viewmodel.ParentScheduleViewModel
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun ParentScheduleRoute(
@@ -260,11 +258,21 @@ private fun ParentScheduleScreen(
                     }
                 ),
                 content = {
-                    ScheduleDeleteDialogContent(
-                        isIncludeFollowing = isDeleteIncludeFollowing,
-                        onContentClick = { isDeleteIncludeFollowing = !isDeleteIncludeFollowing },
-                        isRecurring = snapshotSchedule is RecurringScheduleModel
-                    )
+                    Box(
+                        modifier = Modifier.layout { measurable, constraints ->
+                            val placeable = measurable.measure(constraints)
+                            val pullUpHeight = 35.dp.roundToPx()
+                            layout(placeable.width, (placeable.height - pullUpHeight).coerceAtLeast(0)) {
+                                placeable.placeRelative(0, 0)
+                            }
+                        }
+                    ) {
+                        ScheduleDeleteDialogContent(
+                            isIncludeFollowing = isDeleteIncludeFollowing,
+                            onContentClick = { isDeleteIncludeFollowing = !isDeleteIncludeFollowing },
+                            isRecurring = snapshotSchedule is RecurringScheduleModel
+                        )
+                    }
                 }
             )
         }
