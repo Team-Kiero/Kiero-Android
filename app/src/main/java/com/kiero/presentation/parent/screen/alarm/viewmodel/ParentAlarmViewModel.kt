@@ -3,11 +3,8 @@ package com.kiero.presentation.parent.screen.alarm.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.common.extension.toHandleErrorMessage
-import com.kiero.core.common.util.suspendRunCatching
-import com.kiero.core.localstorage.TokenManager
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.parent.alarm.repository.AlarmRepository
-import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.data.sse.manager.SseManager
 import com.kiero.presentation.parent.screen.alarm.model.toUiModel
 import com.kiero.presentation.parent.screen.alarm.state.AlarmFeedState
@@ -16,7 +13,6 @@ import com.kiero.presentation.signup.parent.state.ParentSignUpState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,8 +33,6 @@ class ParentAlarmViewModel @Inject constructor(
     private val repository: AlarmRepository,
     private val userInfoManager: UserInfoManager,
     private val sseManager: SseManager,
-    private val authRepository: AuthRepository,
-    private val tokenManager: TokenManager,
 ) : ViewModel() {
 
     private val _localState = MutableStateFlow(LocalState())
@@ -92,53 +86,6 @@ class ParentAlarmViewModel @Inject constructor(
                     )
                 )
             }
-        }
-    }
-
-    fun onProfileClick() {
-        _authState.update {
-            it.copy(isLogoutDialogVisible = true)
-        }
-    }
-
-    fun onLogoutCancel() {
-        _authState.update {
-            it.copy(isLogoutDialogVisible = false)
-        }
-    }
-
-    fun onLogoutConfirm() {
-        _authState.update {
-            it.copy(
-                isLogoutDialogVisible = false,
-                isLoading = true
-            )
-        }
-
-        logOut()
-    }
-
-    fun logOut() {
-        sseManager.stopSubscription()
-
-        Timber.e("로그아웃 되었습니다")
-        viewModelScope.launch {
-            val networkJobs = listOf(
-                async { suspendRunCatching { authRepository.postLogout() } },
-            )
-            networkJobs.awaitAll()
-            sseManager.stopSubscription()
-
-            suspendRunCatching {
-                tokenManager.clearTokens()
-                userInfoManager.clearParentInfo()
-            }
-
-            _authState.update {
-                it.copy(isLoading = false)
-            }
-
-            _sideEffect.emit(ParentSignUpSideEffect.NavigateToSelection)
         }
     }
 

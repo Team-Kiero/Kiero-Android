@@ -127,6 +127,21 @@ fun Modifier.disableNestedScroll(): Modifier = composed {
     this.nestedScroll(connection)
 }
 
+// 위로 드래그 막는 함수
+fun Modifier.disableUpScroll(): Modifier = composed {
+    val connection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(
+                available: Offset,
+                source: NestedScrollSource
+            ): Offset {
+                return if (available.y < 0) available else Offset.Zero
+            }
+        }
+    }
+    this.nestedScroll(connection)
+}
+
 @Composable
 fun Modifier.verticalScrollbar(
     state: LazyListState,

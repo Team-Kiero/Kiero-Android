@@ -130,10 +130,10 @@ class ParentPlanViewModel @Inject constructor(
                         }.getOrNull()
                     }
 
-                    if (startTime != null && startTime.isBefore(now)) {
+                    /*if (startTime != null && startTime.isBefore(now)) {
                         _sideEffect.emit(ShowSnackBar("이미 지난 시간에는 일정을 등록할 수 없어요"))
                         return@launch
-                    }
+                    }*/
 
                     if (s.isFireLit) {
                         _sideEffect.emit(ShowSnackBar("오늘 일정이 마감되어, 일정을 추가할 수 없어요"))
@@ -164,6 +164,7 @@ class ParentPlanViewModel @Inject constructor(
                 scheduleColor = s.selectedColorType.name,
                 dayOfWeek     = s.formattedDays.takeIf { s.isRecurring },
                 dates         = s.selectedDate.takeUnless { s.isRecurring },
+                firstOrderDate = if (s.isRecurring) s.selectedDate else null,
             ).onSuccess {
                 val msg = if (isClosedToday) "일정이 등록되었어요. (오늘 일정은 마감되어 다음부터 적용돼요!)"
                 else "일정이 등록되었습니다"
@@ -269,12 +270,25 @@ class ParentPlanViewModel @Inject constructor(
     fun onRecurringToggle() {
         _state.update { s ->
             if (s.isRecurring) {
+                // 반복 → 비반복
                 s.copy(
                     isRecurring  = false,
                     selectedDate = s.selectedDays.toDateString(s.currentReferenceDate),
                 )
             } else {
-                s.copy(isRecurring = true, selectedDate = "")
+                // 비반복 → 반복
+                val monday = s.currentReferenceDate
+                    .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+
+                val firstOrderDate = s.selectedDays
+                    .minOrNull()
+                    ?.let { monday.plusDays(it.toLong()).toString() }
+                    ?: monday.toString()
+
+                s.copy(
+                    isRecurring  = true,
+                    selectedDate = firstOrderDate
+                )
             }
         }
     }

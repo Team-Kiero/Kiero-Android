@@ -57,7 +57,8 @@ fun AuthParentRoute(
             is AuthSideEffect.ShowSnackbar -> {
                 globalTrigger.showSnackbar(
                     SnackbarState(
-                        message = it.message
+                        message = it.message,
+                        bottomPadding = 110
                     )
                 )
             }
