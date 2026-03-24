@@ -50,13 +50,11 @@ fun ParentPlanScreen(
     val events = remember(state.planAllModel) {
         state.planAllModel?.let { model ->
             buildList {
-                addAll(model.recurringSchedules.map { it.toUiModel() })
-                addAll(model.normalSchedules.map { it.toUiModel() })
+                addAll(model.recurringSchedules.filter { it.scheduleStatus != "SKIPPED" }.map { it.toUiModel() })
+                addAll(model.normalSchedules.filter { it.scheduleStatus != "SKIPPED" }.map { it.toUiModel() })
             }
         } ?: emptyList()
     }
-
-
     Column(
         modifier = modifier
             .fillMaxSize()
