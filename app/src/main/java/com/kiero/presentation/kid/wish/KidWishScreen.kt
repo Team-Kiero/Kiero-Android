@@ -76,6 +76,8 @@ fun KidWishRoute(
     var isFirstEntry by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
+        viewModel.fetchWish()
+
         refreshState.refreshEvent.flowWithLifecycle(lifeCycleOwner.lifecycle, Lifecycle.State.STARTED)
             .collect {
                 if (it == KidMainTab.WISH) {

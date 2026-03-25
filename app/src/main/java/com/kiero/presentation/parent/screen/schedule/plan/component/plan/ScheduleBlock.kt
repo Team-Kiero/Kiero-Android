@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -77,7 +78,7 @@ fun ScheduleEventBlock(
 
                 if (duration > 1) {
                     Row(
-                        verticalAlignment = Alignment.CenterVertically,
+                        verticalAlignment = Alignment.Top,
                         horizontalArrangement = Arrangement.Center,
                         modifier = Modifier
                             .fillMaxSize()
@@ -85,6 +86,7 @@ fun ScheduleEventBlock(
                     ) {
                         Box(
                             modifier = Modifier
+                                .padding(top = 5.dp)
                                 .size(5.dp)
                                 .drawBehind {
                                     drawIntoCanvas { canvas ->
@@ -116,6 +118,7 @@ fun ScheduleEventBlock(
                         Text(
                             text = textToDisplay,
                             color = KieroTheme.colors.white,
+                            textAlign = TextAlign.Start,
                             style = KieroTheme.typography.regular.body5.copy(
                                 platformStyle = PlatformTextStyle(
                                     includeFontPadding = false
@@ -151,7 +154,7 @@ private fun ScheduleEventBlockPreview() {
         ScheduleEventBlock(
             block = ScheduleBlock(
                 id = "1",
-                title = "수영",
+                title = "수영입수",
                 color = Color(0xFF4A5F7A),
                 startHour = 16,
                 startMinute = 0,

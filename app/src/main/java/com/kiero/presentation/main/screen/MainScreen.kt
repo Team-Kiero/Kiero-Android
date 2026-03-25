@@ -3,12 +3,12 @@ package com.kiero.presentation.main.screen
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -28,10 +28,12 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.core.designsystem.component.KieroSnackbar
 import com.kiero.core.designsystem.component.dialog.KieroDialog
 import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
+import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.trigger.DialogTrigger
 import com.kiero.core.model.trigger.GlobalUiEventHolder
 import com.kiero.core.model.trigger.RefreshState
@@ -45,8 +47,10 @@ import com.kiero.presentation.main.navigation.MainAppState
 import com.kiero.presentation.main.navigation.ParentMainTab
 import com.kiero.presentation.main.navigation.component.BottomBarTab
 import com.kiero.presentation.main.navigation.component.MainBottomBar
+import com.kiero.presentation.main.state.MainState
 import com.kiero.presentation.main.state.rememberDialogStateHolder
-import com.kiero.presentation.parent.component.ParentTopbar
+import com.kiero.presentation.main.viewmodel.MainViewModel
+import com.kiero.presentation.main.component.ParentTopbar
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.delay
@@ -58,19 +62,26 @@ import timber.log.Timber
 @Composable
 fun MainRoute(
     appState: MainAppState,
+    viewModel: MainViewModel = hiltViewModel()
 ) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
     val snackBarHostState = remember { SnackbarHostState() }
 
     MainScreen(
         appState = appState,
+        state = state,
         snackBarHostState = snackBarHostState,
+        onAlarmClick = viewModel::onAlarmRead
     )
 }
 
 @Composable
 fun MainScreen(
     appState: MainAppState,
+    state: MainState,
     snackBarHostState: SnackbarHostState,
+    onAlarmClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -193,9 +204,15 @@ fun MainScreen(
         Box(
             modifier = modifier
                 .fillMaxSize()
+                .background(when (currentTab) {
+                    ParentMainTab.JOURNEY -> KieroTheme.colors.gray900
+                    else -> KieroTheme.colors.black
+                })
                 .navigationBarsPadding()
+                .statusBarsPadding()
         ) {
             Scaffold(
+                containerColor = KieroTheme.colors.black,
                 snackbarHost = {
                     SnackbarHost(hostState = snackBarHostState) { data ->
                         KieroSnackbar(
@@ -207,19 +224,27 @@ fun MainScreen(
                     }
                 },
                 topBar = {
-                    when (tabs) {
-                        ParentMainTab -> {
+                    when (showParentBottomBar) {
+                        true -> {
                             ParentTopbar(
                                 title = when (currentTab) {
                                     ParentMainTab.JOURNEY -> ""
                                     null -> ""
                                     else -> stringResource(currentTab.contentDescription)
                                 },
-                                onAlarmClick = {}
+                                backgroundColor = when (currentTab) {
+                                    ParentMainTab.JOURNEY -> KieroTheme.colors.gray900
+                                    else -> KieroTheme.colors.black
+                                },
+                                isAlarmActive = state.unreadAlarm.hasUnread,
+                                onAlarmClick = {
+                                    onAlarmClick()
+                                    appState.navigateToAlarm()
+                                }
                             )
                         }
 
-                        KidMainTab -> {
+                        false -> {
 
                         }
                     }

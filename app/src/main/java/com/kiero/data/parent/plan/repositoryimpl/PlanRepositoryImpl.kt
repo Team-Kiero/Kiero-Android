@@ -22,16 +22,18 @@ class PlanRepositoryImpl @Inject constructor(
     override suspend fun postPlan(
         childId: Long,
         name: String,
+        firstOrderDate: String?,
         isRecurring: Boolean,
         startTime: String,
         endTime: String,
         scheduleColor: String,
         dayOfWeek: String?,
-        dates: String?,
+        dates: String?
     ): Result<Unit> = suspendRunCatching {
         dataSource.postPlan(
             childId, PlanAddRequestDto(
                 name = name,
+                firstOrderDate = firstOrderDate,
                 isRecurring = isRecurring,
                 startTime = startTime,
                 endTime = endTime,

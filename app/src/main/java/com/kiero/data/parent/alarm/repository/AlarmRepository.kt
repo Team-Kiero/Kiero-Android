@@ -2,6 +2,7 @@ package com.kiero.data.parent.alarm.repository
 
 import com.kiero.data.parent.alarm.model.AlarmFeedModel
 import com.kiero.data.parent.alarm.model.AlarmItemModel
+import com.kiero.data.parent.alarm.model.UnreadAlarmFeedModel
 import kotlinx.coroutines.flow.StateFlow
 
 interface AlarmRepository {
@@ -22,4 +23,6 @@ interface AlarmRepository {
     ): Result<AlarmFeedModel>
 
     fun clearCache()
+
+    suspend fun getUnreadAlarm(): Result<UnreadAlarmFeedModel>
 }

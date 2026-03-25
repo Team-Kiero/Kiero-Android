@@ -1,11 +1,15 @@
 package com.kiero.presentation.parent.screen.journey
 
+import com.kiero.data.parent.journey.model.ParentJourneyScheduleModel
+import com.kiero.presentation.parent.screen.journey.extension.toLocalTime
 import com.kiero.presentation.parent.screen.journey.model.JourneyMissionUiModel
 import com.kiero.presentation.parent.screen.journey.model.KidInfo
 import com.kiero.presentation.parent.screen.journey.model.TodayJourneyUiModel
 import com.kiero.presentation.parent.screen.journey.model.TodayStatus
+import com.kiero.presentation.parent.screen.journey.model.toUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import java.time.LocalTime
 
 data class ParentJourneyState(
     val kidInfo: KidInfo = KidInfo(),
@@ -49,6 +53,21 @@ data class ParentJourneyState(
                 todayMission = "아침 먹고 스스로 양치하기",
                 todayStatus = TodayStatus.TODAY_COMPLETED
             ),
+        )
+    }
+}
+
+fun List<ParentJourneyScheduleModel>.toUiModels(currentTime: LocalTime): List<TodayJourneyUiModel> {
+    // PENDING 중 현재 시간 이후 가장 빠른 일정 id 찾기
+    val nextUpcomingId = filter { it.status == "PENDING" }
+        .filter { it.startTime.toLocalTime()?.isAfter(currentTime) == true }
+        .minByOrNull { it.startTime }
+        ?.scheduleDetailId
+
+    return map { schedule ->
+        schedule.toUiModel(
+            currentTime = currentTime,
+            isNextUpcoming = schedule.scheduleDetailId == nextUpcomingId
         )
     }
 }

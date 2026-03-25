@@ -1,24 +1,18 @@
 package com.kiero.presentation.parent.screen.reward
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,15 +21,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.kiero.R
 import com.kiero.core.common.extension.collectSideEffect
+import com.kiero.core.designsystem.component.emptyview.KieroEntireEmptyScreen
 import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
@@ -44,7 +35,6 @@ import com.kiero.core.trigger.LocalRefreshState
 import com.kiero.presentation.main.navigation.ParentMainTab
 import com.kiero.presentation.main.navigation.component.BottomBarTab
 import com.kiero.presentation.parent.component.ParentFloatingButton
-import com.kiero.presentation.parent.component.ParentTopbar
 import com.kiero.presentation.parent.navigation.ParentReward
 import com.kiero.presentation.parent.screen.reward.component.ParentRewardBottomSheet
 import com.kiero.presentation.parent.screen.reward.component.ParentRewardCard
@@ -166,11 +156,13 @@ private fun ParentRewardScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
-            ParentTopbar(title = "보상", onAlarmClick = {})
-
             if (state.rewards.isEmpty()) {
-                EmptyRewardContent()
+                KieroEntireEmptyScreen(
+                    text = "등록된 보상이 없어요.\n우측 하단 버튼을 눌러 보상을 추가해보세요!",
+                    modifier = Modifier
+                        .weight(1f)
+                        .align(Alignment.CenterHorizontally)
+                )
             } else {
                 RewardGridContent(
                     gridState = gridState,
@@ -185,7 +177,7 @@ private fun ParentRewardScreen(
             onActiveClick = onAddClick,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(end = 31.dp, bottom = 19.dp + paddingValues.calculateBottomPadding())
+                .padding(end = 27.dp, bottom = 24.dp + paddingValues.calculateBottomPadding())
         )
 
         RewardOverlays(
@@ -197,33 +189,6 @@ private fun ParentRewardScreen(
             onDeleteClick = onDeleteClick,
             onDeleteDialogDismiss = onDeleteDialogDismiss,
             onDeleteConfirm = onDeleteConfirm
-        )
-    }
-}
-
-@Composable
-private fun EmptyRewardContent() {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-
-        Spacer(modifier = Modifier.height(161.dp))
-
-        Text(
-            text = "등록된 보상 쿠폰이 없어요!\n우측 하단 버튼을 눌러 보상을 추가해보세요!",
-            style = KieroTheme.typography.semiBold.title3,
-            color = KieroTheme.colors.gray400,
-            textAlign = TextAlign.Center,
-        )
-        Image(
-            painter = painterResource(id = R.drawable.img_parent_no_alarm),
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxWidth(0.7f)
-                .aspectRatio(154f / 186f),
-            contentScale = ContentScale.FillWidth,
         )
     }
 }

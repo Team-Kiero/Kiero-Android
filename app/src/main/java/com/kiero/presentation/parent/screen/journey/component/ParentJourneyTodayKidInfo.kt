@@ -69,7 +69,7 @@ fun ParentJourneyTodayKidInfo(
             modifier = Modifier
                 .fillMaxHeight()
                 .padding(end = 10.dp)
-                .aspectRatio(0.975f)
+                .aspectRatio(84f/96f)
         )
     }
 }

@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,10 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -46,6 +42,7 @@ import com.kiero.core.designsystem.component.chip.action.KieroCoinAction
 import com.kiero.core.designsystem.component.dialog.KieroDialog
 import com.kiero.core.designsystem.component.dialog.action.KieroCancelAction
 import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
+import com.kiero.core.designsystem.component.emptyview.KieroEntireEmptyScreen
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
 import com.kiero.core.model.trigger.SnackbarState
@@ -55,7 +52,6 @@ import com.kiero.core.trigger.LocalRefreshState
 import com.kiero.presentation.main.navigation.ParentMainTab
 import com.kiero.presentation.parent.component.MissionTabFab
 import com.kiero.presentation.parent.component.ParentContentBottomSheet
-import com.kiero.presentation.parent.component.ParentTopbar
 import com.kiero.presentation.parent.screen.mission.component.missionmain.MissionInfo
 import com.kiero.presentation.parent.screen.mission.component.missionmain.MissionListItem
 import com.kiero.presentation.parent.screen.mission.navigation.MissionEdit
@@ -156,20 +152,13 @@ private fun ParentMissionScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            ParentTopbar(title = "미션", onAlarmClick = { })
-
             if (isEmpty) {
-                Box(
+                KieroEntireEmptyScreen(
+                    text = "등록된 미션이 없어요.\n우측 하단 버튼을 눌러 미션을 추가해보세요!",
                     modifier = Modifier
-                        .fillMaxSize()
-                        .background(color = KieroTheme.colors.black),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.img_mission_empty_view),
-                        contentDescription = null,
-                    )
-                }
+                        .weight(1f)
+                        .align(Alignment.CenterHorizontally)
+                )
             } else {
                 LazyColumn(
                     state = listState,
@@ -201,7 +190,9 @@ private fun ParentMissionScreen(
                                         selectedName = mission.name
                                         selectedReward = mission.reward
                                         selectedDueAt = missionsByDate.dueAt
-                                        showBottomSheet = true
+                                        if (!mission.isCompleted) {
+                                            showBottomSheet = true
+                                        }
                                     }
                             ) {
                                 MissionListItem(
@@ -220,9 +211,10 @@ private fun ParentMissionScreen(
             onExpandedChange = { isFabExpanded = it },
             onMissionAdd = navigateToAddMission,
             onMissionRecommend = navigateToAutoMission,
+            bottomPadding = paddingValues.calculateBottomPadding(),
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(16.dp),
+                .padding(end = 27.dp, bottom = 24.dp + paddingValues.calculateBottomPadding())
         )
 
         if (showBottomSheet) {
@@ -302,7 +294,6 @@ private fun MissionBottomSheetContent(
 ) {
     Column(
         modifier = modifier.padding(vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(0.dp),
     ) {
         Text(
             text = ParentFormatters.formatDateWithDayOfWeek(dueAt),
@@ -331,10 +322,12 @@ private fun MissionBottomSheetContent(
 @Composable
 private fun ParentMissionScreenPreview() {
     KieroTheme {
-        ParentMissionRoute(
+        ParentMissionScreen(
             paddingValues = PaddingValues(),
-            navigateUp = {},
+            state = ParentMissionState(),
+            isEmpty = false,
             navigateToMissionEdit = {},
+            onDeleteConfirm = {},
             navigateToAddMission = {},
             navigateToAutoMission = {},
         )

@@ -2,14 +2,12 @@ package com.kiero.presentation.parent.screen.mission
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,6 +22,7 @@ import com.kiero.R
 import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.component.KieroTopbar
+import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
@@ -71,12 +70,7 @@ fun ParentAddMissionRoute(
     }
 
     if (state.isLoading) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
-        ) {
-            CircularProgressIndicator(color = KieroTheme.colors.main)
-        }
+        KieroLoadingIndicator()
     } else {
         ParentAddMissionScreen(
             paddingValues = paddingValues,
@@ -85,6 +79,7 @@ fun ParentAddMissionRoute(
             showBottomSheet = showBottomSheet,
             selectedDate = dateText,
             state = state,
+            onMaxLengthReached = viewModel::onMissionNameMaxLength
         )
     }
 }
@@ -97,6 +92,7 @@ fun ParentAddMissionScreen(
     showBottomSheet: Boolean,
     selectedDate: String?,
     state: ParentAddMissionState,
+    onMaxLengthReached: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val focusManager = LocalFocusManager.current
@@ -127,6 +123,7 @@ fun ParentAddMissionScreen(
             state = viewModel.missionNameState,
             placeholder = "미션 이름을 입력해주세요.",
             maxLength = 15,
+            onMaxLengthReached = onMaxLengthReached
         )
 
         MissionCalendar(

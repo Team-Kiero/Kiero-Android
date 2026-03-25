@@ -89,12 +89,13 @@ private fun ParentMyPageScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .background(color = KieroTheme.colors.black)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
-                    color = KieroTheme.colors.gray900
+                    color = KieroTheme.colors.black
                 )
                 .padding(paddingValues)
         ) {
@@ -112,7 +113,8 @@ private fun ParentMyPageScreen(
                 SettingItem(
                     text = "자녀 관리",
                     onClick = onClickChildCare,
-                    connectChildren = state.connectedChildren
+                    connectChildren = state.connectedChildren,
+                    hasConnectChildren = true
                 )
 
                 SettingItem(

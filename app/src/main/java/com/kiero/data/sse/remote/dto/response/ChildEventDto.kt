@@ -7,13 +7,16 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class MissionDataDto(
     @SerialName("eventType")
-    val eventType: String,  // "MISSION_CREATED"
+    val eventType: String,
+
+    @SerialName("childId")
+    val childId: Long? = null,
 
     @SerialName("missionName")
-    val missionName: String,
+    val missionName: String? = null,
 
     @SerialName("reward")
-    val reward: Int
+    val reward: Int? = null
 )
 
 // Schedule 이벤트 (SCHEDULE_CREATED)

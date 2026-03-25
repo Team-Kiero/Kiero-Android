@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
@@ -59,6 +60,7 @@ fun MissionTabFab(
     onMissionAdd: () -> Unit,
     onMissionRecommend: () -> Unit,
     modifier: Modifier = Modifier,
+    bottomPadding: Dp = 0.dp,
 ) {
     Box(modifier = modifier.zIndex(1f)) {
         if (isExpanded) {
@@ -85,7 +87,7 @@ fun MissionTabFab(
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
-                            .padding(end = 16.dp, bottom = 52.dp)
+                            .padding(end = 27.dp, bottom = 24.dp + bottomPadding)
                     ) {
                         AnimatedVisibility(
                             visible = isExpanded,
@@ -120,7 +122,6 @@ fun MissionTabFab(
                         ParentFloatingButton(
                             buttonColor = KieroTheme.colors.white,
                             onActiveClick = { onExpandedChange(false) },
-                            modifier = Modifier.padding(end = 16.dp, bottom = 51.dp)
                         )
                     }
                 }
@@ -133,7 +134,6 @@ fun MissionTabFab(
                 onActiveClick = { onExpandedChange(true) },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(end = 16.dp, bottom = 87.dp)
             )
         }
     }
@@ -148,15 +148,16 @@ fun PlanTabFab(
         buttonColor = KieroTheme.colors.white,
         onActiveClick = onScheduleAdd,
         modifier = modifier
-            .padding(end = 16.dp, bottom = 87.dp)
     )
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun ParentFloatingButtonPreview() {
-    ParentFloatingButton(
-        buttonColor = KieroTheme.colors.white,
-        onActiveClick = {}
+    MissionTabFab(
+        isExpanded = true,
+        onExpandedChange = {},
+        onMissionAdd = {},
+        onMissionRecommend = {}
     )
 }

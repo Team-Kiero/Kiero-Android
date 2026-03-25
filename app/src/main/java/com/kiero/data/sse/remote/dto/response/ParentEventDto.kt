@@ -27,10 +27,10 @@ data class FeedDataDto(
     val childId: Long,
 
     @SerialName("occurredAt")
-    val occurredAt: String,
+    val occurredAt: String? = null,
 
     @SerialName("metadata")
-    val metadata: EventMetadataDto
+    val metadata: EventMetadataDto? = null
 )
 
 @Serializable
@@ -50,5 +50,5 @@ data class ParentScheduleDataDto(
     @SerialName("eventType")
     val eventType: String,
     @SerialName("childId")
-    val childId: String
+    val childId: Long
 )

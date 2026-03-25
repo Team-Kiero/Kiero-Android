@@ -264,7 +264,7 @@ private fun KidMissionScreen(
                 title = if (!state.isCompletedMission) "[${state.selectedMissionItem!!.name}]" else null,
                 subDescription = if (!state.isCompletedMission) "미션을 완료했다면\n" +
                         "아래 버튼을 눌러줘!" else "금 나와라 뚝딱!\n" +
-                        "금화 ${state.selectedMissionItem?.reward}를 만들었어!",
+                        "금화 ${state.selectedMissionItem?.reward}개를 만들었어!",
                 cancelAction = if (state.isCompletedMission) {
                     null
                 } else {
