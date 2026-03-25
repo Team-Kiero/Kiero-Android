@@ -44,7 +44,9 @@ class ParentPlanViewModel @Inject constructor(
     private val _state = MutableStateFlow(
         ParentPlanState(
             currentReferenceDate = LocalDate.parse(
-                editArgs?.selectedDate ?: addArgs?.initialDate ?: LocalDate.now().toString()
+                editArgs?.selectedDate?.takeIf { it.isNotBlank() }
+                    ?: addArgs?.initialDate?.takeIf { it.isNotBlank() }
+                    ?: LocalDate.now().toString()
             ),
             isFireLit = addArgs?.isFireLit ?: false,
         )
@@ -63,7 +65,6 @@ class ParentPlanViewModel @Inject constructor(
     private fun initEditMode() {
         val args = editArgs ?: return
         val state = _state.value
-
         val selectedDays = when {
             args.isRecurring -> args.dayOfWeek.toDayIndices()
             else -> args.dates
@@ -72,17 +73,15 @@ class ParentPlanViewModel @Inject constructor(
                 ?.let { setOf(it.dayOfWeek.value - 1) }
                 ?: emptySet()
         }
-
         textState.edit { replace(0, length, args.name) }
-
         _state.update {
             it.copy(
-                isRecurring       = args.isRecurring,
-                startTime         = state.serverTimeToDisplayTime(args.startTime),
-                endTime           = state.serverTimeToDisplayTime(args.endTime),
+                isRecurring = args.isRecurring,
+                startTime = state.serverTimeToDisplayTime(args.startTime),
+                endTime = state.serverTimeToDisplayTime(args.endTime),
                 selectedColorType = ColorType.fromHexCode(args.scheduleColor),
-                selectedDays      = selectedDays,
-                selectedDate      = args.dates.orEmpty(),
+                selectedDays = selectedDays,
+                selectedDate = args.dates.orEmpty(),
             )
         }
     }
@@ -104,7 +103,6 @@ class ParentPlanViewModel @Inject constructor(
 
     private fun onAddPlanClick() {
         if (_state.value.isLoading) return
-
         viewModelScope.launch {
             val name = textState.text.toString().trim()
             val s = _state.value
@@ -126,17 +124,14 @@ class ParentPlanViewModel @Inject constructor(
                 val selectedDates = s.selectedDate
                     .split(",")
                     .mapNotNull { dateStr -> runCatching { LocalDate.parse(dateStr.trim()) }.getOrNull() }
-
                 val hasPastDate = selectedDates.any { it.isBefore(today) }
                 if (hasPastDate) {
                     _sideEffect.emit(ShowSnackBar("과거 날짜에는 일정을 등록할 수 없습니다"))
                     return@launch
                 }
-
                 val isTodayOnly = selectedDates.size == 1 && selectedDates.first() == today
                 if (isTodayOnly) {
                     val startTime = runCatching { s.parseLocalTime(s.displayStartTime) }.getOrNull()
-
                     if (startTime != null && startTime.isBefore(now)) {
                         _sideEffect.emit(ShowSnackBar("이미 지난 시간에는 일정을 등록할 수 없어요"))
                         return@launch
@@ -145,9 +140,7 @@ class ParentPlanViewModel @Inject constructor(
             }
 
             val isTodayIncluded = s.isTodayIncluded(today)
-            val isClosedToday = isTodayIncluded && (
-                    s.parseLocalTime(s.displayStartTime).isBefore(now) ||
-                            s.isFireLit)
+            val isClosedToday = isTodayIncluded && (s.parseLocalTime(s.displayStartTime).isBefore(now) || s.isFireLit)
             val childId = getChildIdOrReturn() ?: return@launch
             val firstOrderDateStr = if (s.isRecurring && s.selectedDays.isNotEmpty()) {
                 val minDayIndex = s.selectedDays.minOrNull() ?: 0
@@ -156,19 +149,17 @@ class ParentPlanViewModel @Inject constructor(
             } else null
 
             planRepository.postPlan(
-                childId       = childId,
-                name          = name,
-                isRecurring   = s.isRecurring,
-                startTime     = s.formatTimeForServer(s.startTime),
-                endTime       = s.formatTimeForServer(s.endTime),
+                childId = childId,
+                name = name,
+                isRecurring = s.isRecurring,
+                startTime = s.formatTimeForServer(s.startTime),
+                endTime = s.formatTimeForServer(s.endTime),
                 scheduleColor = s.selectedColorType.name,
-                dayOfWeek     = s.formattedDays.takeIf { s.isRecurring },
-                dates         = s.selectedDate.takeUnless { s.isRecurring },
+                dayOfWeek = s.formattedDays.takeIf { s.isRecurring },
+                dates = s.selectedDate.takeUnless { s.isRecurring },
                 firstOrderDate = firstOrderDateStr
             ).onSuccess {
-                val msg = if (isClosedToday) "일정이 등록되었어요. 오늘은 마감되어 다음부터 적용돼요."
-                else "일정이 등록되었어요."
-
+                val msg = if (isClosedToday) "일정이 등록되었어요. 오늘은 마감되어 다음부터 적용돼요." else "일정이 등록되었어요."
                 _sideEffect.emit(ShowSnackBar(msg))
                 delay(200)
                 _sideEffect.emit(navigateUp)
@@ -181,7 +172,7 @@ class ParentPlanViewModel @Inject constructor(
 
     private fun onUpdatePlanClick(isIncludeFollowing: Boolean?) {
         if (_state.value.isLoading) return
-        val scheduleId   = editArgs?.scheduleId ?: return
+        val scheduleId = editArgs?.scheduleId ?: return
         val selectedDate = editArgs?.selectedDate ?: return
 
         viewModelScope.launch {
@@ -202,7 +193,6 @@ class ParentPlanViewModel @Inject constructor(
 
             val originalIsRecurring = editArgs.isRecurring
             val currentIsRecurring = s.isRecurring
-
             val finalDayOfWeek: String?
             val finalDates: String?
             val finalIsIncludeFollowing: Boolean?
@@ -210,7 +200,6 @@ class ParentPlanViewModel @Inject constructor(
             if (originalIsRecurring && currentIsRecurring) {
                 val originalDayIndices = editArgs.dayOfWeek.toDayIndices()
                 val currentDayIndices = s.selectedDays
-
                 if (originalDayIndices != currentDayIndices) {
                     finalDayOfWeek = s.formattedDays
                     finalDates = null
@@ -235,15 +224,15 @@ class ParentPlanViewModel @Inject constructor(
             }
 
             planRepository.updateSchedule(
-                scheduleId         = scheduleId,
-                selectedDate       = selectedDate,
-                name               = name,
-                isRecurring        = currentIsRecurring,
-                startTime          = s.formatTimeForServer(s.startTime),
-                endTime            = s.formatTimeForServer(s.endTime),
-                scheduleColor      = s.selectedColorType.name,
-                dayOfWeek          = finalDayOfWeek,
-                dates              = finalDates,
+                scheduleId = scheduleId,
+                selectedDate = selectedDate,
+                name = name,
+                isRecurring = currentIsRecurring,
+                startTime = s.formatTimeForServer(s.startTime),
+                endTime = s.formatTimeForServer(s.endTime),
+                scheduleColor = s.selectedColorType.name,
+                dayOfWeek = finalDayOfWeek,
+                dates = finalDates,
                 isIncludeFollowing = finalIsIncludeFollowing,
             ).onSuccess {
                 _sideEffect.emit(ShowSnackBar("일정이 수정되었습니다"))
@@ -264,11 +253,11 @@ class ParentPlanViewModel @Inject constructor(
         ).count { it }
 
         return when {
-            missing >= 2           -> "일정 저장에 실패했어요."
-            name.isBlank()         -> "일정 이름을 입력해주세요"
+            missing >= 2 -> "일정 저장에 실패했어요."
+            name.isBlank() -> "일정 이름을 입력해주세요"
             state.selectedDays.isEmpty() -> "요일을 선택해주세요"
             state.startTime == null || state.endTime == null -> "시간을 선택해주세요"
-            else                   -> null
+            else -> null
         }
     }
 
@@ -289,8 +278,7 @@ class ParentPlanViewModel @Inject constructor(
 
     fun onDayClick(dayIndex: Int) {
         _state.update { s ->
-            val newDays = if (dayIndex in s.selectedDays) s.selectedDays - dayIndex
-            else s.selectedDays + dayIndex
+            val newDays = if (dayIndex in s.selectedDays) s.selectedDays - dayIndex else s.selectedDays + dayIndex
             s.withUpdatedDays(newDays)
         }
     }
@@ -306,7 +294,7 @@ class ParentPlanViewModel @Inject constructor(
         _state.update { s ->
             if (s.isRecurring) {
                 s.copy(
-                    isRecurring  = false,
+                    isRecurring = false,
                     selectedDate = s.selectedDays.toDateString(s.currentReferenceDate),
                 )
             } else {
