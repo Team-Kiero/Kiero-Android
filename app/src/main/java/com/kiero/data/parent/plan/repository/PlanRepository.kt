@@ -9,7 +9,6 @@ interface PlanRepository {
     suspend fun postPlan(
         childId: Long,
         name: String,
-        firstOrderDate: String?,
         isRecurring: Boolean,
         startTime: String,
         endTime: String,
