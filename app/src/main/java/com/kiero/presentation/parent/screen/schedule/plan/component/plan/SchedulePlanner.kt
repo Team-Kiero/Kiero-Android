@@ -22,7 +22,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.core.common.extension.noRippleClickable
-import com.kiero.core.designsystem.component.emptyview.KieroEmptyView
+import com.kiero.core.designsystem.component.emptyview.KieroContentEmptyScreen
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.screen.schedule.model.ScheduleEvent
 import com.kiero.presentation.parent.screen.schedule.model.toScheduleBlocks
@@ -98,7 +98,7 @@ fun SchedulePlanner(
     ) {
         val dayWidth = maxWidth / daysCount
         if (uniqueBlocks.isEmpty()) {
-            KieroEmptyView()
+            KieroContentEmptyScreen()
         } else {
             uniqueBlocks.forEach { (block, event) ->
                 val hourOffset = hourHeight * (block.startHour - 8)

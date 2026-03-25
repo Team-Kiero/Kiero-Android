@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.presentation.parent.screen.mission.util.maxLengthWithCallback
 
 @Composable
 fun ScheduleTextField(
@@ -40,6 +41,7 @@ fun ScheduleTextField(
     lineLimits: TextFieldLineLimits = TextFieldLineLimits.SingleLine,
     textColor: Color = KieroTheme.colors.white,
     maxLength: Int = 8,
+    onMaxLengthReached: (() -> Unit)? = null,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
 
@@ -47,7 +49,11 @@ fun ScheduleTextField(
         state = state,
         enabled = enabled,
         readOnly = readOnly,
-        inputTransformation = inputTransformation ?: InputTransformation.maxLength(maxLength),
+        inputTransformation = inputTransformation ?: if (onMaxLengthReached != null) {
+            maxLengthWithCallback(maxLength, onMaxLengthReached)
+        } else {
+            InputTransformation.maxLength(maxLength)
+        },
         outputTransformation = outputTransformation,
         keyboardOptions = keyboardOptions,
         onKeyboardAction = onKeyboardAction,

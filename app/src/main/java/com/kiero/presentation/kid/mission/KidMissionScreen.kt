@@ -47,6 +47,7 @@ import com.kiero.core.designsystem.component.chip.action.KieroCoinAction
 import com.kiero.core.designsystem.component.dialog.KieroDialog
 import com.kiero.core.designsystem.component.dialog.action.KieroCancelAction
 import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
+import com.kiero.core.designsystem.component.emptyview.KieroEmptyView
 import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.component.pulltorefresh.KieroPullToRefresh
 import com.kiero.core.designsystem.theme.KieroTheme
@@ -56,6 +57,7 @@ import com.kiero.presentation.kid.component.KidProfileChip
 import com.kiero.presentation.kid.component.KidSpeechField
 import com.kiero.presentation.kid.mission.component.KidMissionItem
 import com.kiero.presentation.kid.mission.state.KidMissionState
+import com.kiero.presentation.kid.mission.viewmodel.KidMissionViewModel
 import com.kiero.presentation.main.navigation.KidMainTab
 
 @Composable
@@ -163,7 +165,7 @@ private fun KidMissionScreen(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(5.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
 
                     Box(
                         contentAlignment = Alignment.Center
@@ -213,14 +215,12 @@ private fun KidMissionScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .fillParentMaxHeight(0.6f),
+                            .fillParentMaxHeight(0.8f),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = "아직 등록된 미션이 없어!",
-                            style = KieroTheme.typography.semiBold.title3,
-                            color = KieroTheme.colors.gray400,
-                            textAlign = TextAlign.Center
+                        KieroEmptyView(
+                            title = "아직 등록된 미션이 없어!",
+                            description = "부모님과 함께 나만의 미션을 정해볼까?",
                         )
                     }
                 }
@@ -264,7 +264,7 @@ private fun KidMissionScreen(
                 title = if (!state.isCompletedMission) "[${state.selectedMissionItem!!.name}]" else null,
                 subDescription = if (!state.isCompletedMission) "미션을 완료했다면\n" +
                         "아래 버튼을 눌러줘!" else "금 나와라 뚝딱!\n" +
-                        "금화 ${state.selectedMissionItem?.reward}를 만들었어!",
+                        "금화 ${state.selectedMissionItem?.reward}개를 만들었어!",
                 cancelAction = if (state.isCompletedMission) {
                     null
                 } else {

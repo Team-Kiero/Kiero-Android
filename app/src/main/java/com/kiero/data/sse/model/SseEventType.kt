@@ -7,6 +7,7 @@ enum class SseEventType(val value: String) {
     FEED("feed"),
     MISSION("mission"),
     SCHEDULE("schedule"),
+    COUPON("coupon"),
     DATE("date"),
     UNKNOWN("unknown");
 

@@ -21,7 +21,7 @@ fun KidOnboardingMessage(
     when (step) {
         OnboardingUiModel.STORY1 -> {
             Text(
-                text = "드디어 만났다! 나의 짝궁 $kidName",
+                text = "드디어 만났다! 나의 짝꿍 $kidName",
                 color = defaultColor,
                 style = textStyle
             )

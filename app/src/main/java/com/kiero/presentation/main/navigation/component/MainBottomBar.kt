@@ -28,7 +28,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
@@ -63,6 +65,7 @@ fun MainBottomBar(
                                 shadow = Shadow(
                                     radius = 10.dp,
                                     color = KieroTheme.colors.gray800,
+                                    offset = DpOffset(x = 0.dp, y = 4.dp)
                                 )
                             )
                     } else {
@@ -78,9 +81,9 @@ fun MainBottomBar(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                        .padding(horizontal = 26.dp, vertical = 34.dp)
                         .selectableGroup(),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     tabs.forEach { tab ->
@@ -112,8 +115,7 @@ private fun MainNavigationBarItem(
 
     Column(
         modifier = modifier
-            .noRippleClickable(onClick)
-            .padding(vertical = 8.dp),
+            .noRippleClickable(onClick),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -129,7 +131,11 @@ private fun MainNavigationBarItem(
             text = stringResource(tab.labelRes),
             color = textColor,
             style = KieroTheme.typography.regular.body5,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
+            softWrap = false,
+            overflow = TextOverflow.Visible,
+            maxLines = 1
         )
     }
 }

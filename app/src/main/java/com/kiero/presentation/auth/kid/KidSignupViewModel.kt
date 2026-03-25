@@ -39,7 +39,7 @@ class KidSignupViewModel @Inject constructor(
                 currentState.lastName.text.isBlank() ||
                 currentState.inviteCode.text.isBlank()) {
 
-                _sideEffect.emit(KidSignupSideEffect.ShowSnackbar("이름이나 초대 코드를 다시 확인해줘."))
+                _sideEffect.emit(KidSignupSideEffect.ShowSnackbar("이름이나 초대코드를 다시 확인해줘!"))
                 return@launch
             }
 
@@ -63,7 +63,7 @@ class KidSignupViewModel @Inject constructor(
 
                 _sideEffect.emit(KidSignupSideEffect.NavigateToKidOnboarding)
             }.onFailure {
-                _sideEffect.emit(KidSignupSideEffect.ShowSnackbar("이름이나 초대코드를 다시 확인해줘"))
+                _sideEffect.emit(KidSignupSideEffect.ShowSnackbar("이름이나 초대코드를 다시 확인해줘!"))
             }
         }
     }

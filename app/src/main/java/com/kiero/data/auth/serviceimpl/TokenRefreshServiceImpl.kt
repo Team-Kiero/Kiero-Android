@@ -18,7 +18,7 @@ class TokenRefreshServiceImpl @Inject constructor(
     override suspend fun refresh(refreshToken: String, role: UserRole): Result<Pair<AccessToken, RefreshToken>> = suspendRunCatching {
         val response = when (role) {
             UserRole.PARENT -> reissueService.reissueAccessToken("refreshToken=$refreshToken")
-            UserRole.KID -> reissueService.reissueToken("refreshToken=$refreshToken")
+            UserRole.KID -> reissueService.reissueAccessToken("refreshToken=$refreshToken")
         }
 
         if (!response.isSuccessful) {

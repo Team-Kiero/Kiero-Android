@@ -59,12 +59,14 @@ fun KieroDialog(
             modifier = modifier
                 .fillMaxSize()
                 .background(color = KieroTheme.colors.black.copy(alpha = 0.75f))
+                .noRippleClickable(onClick = onDismiss)
                 .padding(horizontal = 16.dp),
             contentAlignment = Alignment.Center
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .noRippleClickable(onClick = {})
                     .background(
                         color = KieroTheme.colors.gray900,
                         shape = RoundedCornerShape(16.dp)

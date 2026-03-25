@@ -1,7 +1,8 @@
 package com.kiero.presentation.main.navigation
 
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -13,6 +14,7 @@ import com.kiero.presentation.auth.navigation.AuthGraph
 import com.kiero.presentation.auth.navigation.authNavGraph
 import com.kiero.presentation.kid.navigation.kidNavGraph
 import com.kiero.presentation.parent.navigation.parentNavGraph
+import com.kiero.presentation.parent.screen.alarm.navigation.parentAlarmNavGraph
 import com.kiero.presentation.signup.parent.navigation.parentSignUpNavGraph
 import com.kiero.presentation.splash.navigation.splashNavGraph
 
@@ -35,10 +37,30 @@ fun KieroNavHost(
     NavHost(
         navController = appState.navController,
         startDestination = startDestination,
-        enterTransition = { EnterTransition.None },
-        exitTransition = { ExitTransition.None },
-        popEnterTransition = { EnterTransition.None },
-        popExitTransition = { ExitTransition.None },
+        enterTransition = {
+            slideInHorizontally(
+                initialOffsetX = { fullWidth -> fullWidth },
+                animationSpec = tween(durationMillis = 300)
+            )
+        },
+        exitTransition = {
+            slideOutHorizontally(
+                targetOffsetX = { fullWidth -> -fullWidth },
+                animationSpec = tween(durationMillis = 300)
+            )
+        },
+        popEnterTransition = {
+            slideInHorizontally(
+                initialOffsetX = { fullWidth -> -fullWidth },
+                animationSpec = tween(durationMillis = 300)
+            )
+        },
+        popExitTransition = {
+            slideOutHorizontally(
+                targetOffsetX = { fullWidth -> fullWidth },
+                animationSpec = tween(durationMillis = 300)
+            )
+        },
         modifier = modifier
     ) {
         splashNavGraph(
@@ -46,7 +68,7 @@ fun KieroNavHost(
                 appState.navigateToAuth(clearStackNavOptions)
             },
             navigateToParentHome = {
-                appState.navigateToSchedule(clearStackNavOptions)
+                appState.navigateToParentJourney(clearStackNavOptions)
             },
             navigateToKidHome = {
                 appState.navigateToJourney(clearStackNavOptions)
@@ -79,6 +101,12 @@ fun KieroNavHost(
                 appState.navigateToClearParentGraph()
             },
             navigateToSelection = appState::navigateToSelection
+        )
+
+        parentAlarmNavGraph(
+            paddingValues = paddingValues,
+            navigateUp = appState::navigateUp,
+            navigateToSelection = appState::navigateToSelection,
         )
 
         parentNavGraph(

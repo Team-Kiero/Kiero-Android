@@ -58,7 +58,7 @@ data class ParentScheduleState(
 
     fun ScheduleEvent.getIndices(): List<Int> {
         return if (isRecurring) {
-            this.dayOfWeek?.split(",")?.mapNotNull { day ->
+            this.dayOfWeek?.split(",")?.map { day ->
                 day.trim().toDayIndex()
             } ?: listOf(0)
         } else {

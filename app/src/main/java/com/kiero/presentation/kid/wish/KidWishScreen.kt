@@ -42,6 +42,7 @@ import com.kiero.core.designsystem.component.chip.action.KieroCoinAction
 import com.kiero.core.designsystem.component.dialog.KieroDialog
 import com.kiero.core.designsystem.component.dialog.action.KieroCancelAction
 import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
+import com.kiero.core.designsystem.component.emptyview.KieroEmptyView
 import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.component.pulltorefresh.KieroPullToRefresh
 import com.kiero.core.designsystem.theme.KieroTheme
@@ -75,6 +76,8 @@ fun KidWishRoute(
     var isFirstEntry by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
+        viewModel.fetchWish()
+
         refreshState.refreshEvent.flowWithLifecycle(lifeCycleOwner.lifecycle, Lifecycle.State.STARTED)
             .collect {
                 if (it == KidMainTab.WISH) {
@@ -245,11 +248,19 @@ private fun KidWishScreen(
 
         Spacer(modifier = Modifier.height(17.dp))
 
-        KidWishGridList(
-            modifier = Modifier.fillMaxSize(),
-            wishList = state.kidWishList,
-            onClickWish = onClickWish
-        )
+        if (state.kidWishList.isEmpty()) {
+            KieroEmptyView(
+                title = "아직 등록된 보상이 없어!",
+                description = "부모님과 함께 나만의 보상을 정해볼까?",
+                modifier = Modifier.weight(1f)
+            )
+        } else {
+            KidWishGridList(
+                modifier = Modifier.fillMaxSize(),
+                wishList = state.kidWishList,
+                onClickWish = onClickWish
+            )
+        }
     }
 }
 

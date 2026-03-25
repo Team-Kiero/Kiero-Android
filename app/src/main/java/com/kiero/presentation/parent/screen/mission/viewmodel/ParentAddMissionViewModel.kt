@@ -48,6 +48,12 @@ class ParentAddMissionViewModel @Inject constructor(
         initialText = editArgs?.reward?.takeIf { it > 0 }?.toString() ?: "20"
     )
 
+    fun onMissionNameMaxLength() {
+        viewModelScope.launch {
+            _sideEffect.emit(ParentAddMissionSideEffect.ShowSnackbar("미션이 최대 글자수 15자를 초과하였습니다"))
+        }
+    }
+
     private val _selectedDate = MutableStateFlow<LocalDate?>(
         if (editArgs != null) {
             editArgs.dueAt
@@ -83,7 +89,21 @@ class ParentAddMissionViewModel @Inject constructor(
     fun onAwardClick(reward: Int) {
         val current = awardTextFieldState.text.toString().toIntOrNull() ?: 0
         val newValue = current + reward
-        awardTextFieldState.edit { replace(0, length, newValue.toString()) }
+
+        viewModelScope.launch {
+            when {
+                newValue > 500 -> {
+                    awardTextFieldState.edit { replace(0, length, "500") }
+                    _sideEffect.emit(ParentAddMissionSideEffect.ShowSnackbar("보상은 500개까지 설정할 수 있어요."))
+                }
+                newValue < 0 -> {
+                    awardTextFieldState.edit { replace(0, length, "0") }
+                }
+                else -> {
+                    awardTextFieldState.edit { replace(0, length, newValue.toString()) }
+                }
+            }
+        }
     }
 
     fun createMission() {

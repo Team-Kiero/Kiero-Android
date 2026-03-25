@@ -5,6 +5,7 @@ import com.kiero.data.kid.schedule.remote.dto.response.ScheduleProgressResponseD
 
 data class ScheduleProgressModel(
     val scheduleCount: Int,
+    val isFireLitToday: Boolean,
     val schedules: List<ScheduleProgressItemModel>
 )
 
@@ -19,6 +20,7 @@ data class ScheduleProgressItemModel(
 
 fun ScheduleProgressResponseDto.toModel() = ScheduleProgressModel(
     scheduleCount = this.scheduleCount,
+    isFireLitToday = this.isFireLitToday,
     schedules = this.schedules.map { it.toModel() }
 )
 
