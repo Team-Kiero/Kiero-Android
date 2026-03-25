@@ -50,7 +50,10 @@ fun AuthKidSignupRoute(
         when (sideEffect) {
             is KidSignupSideEffect.ShowSnackbar -> {
                 eventTrigger.showSnackbar(
-                    SnackbarState(message = sideEffect.message)
+                    SnackbarState(
+                        message = sideEffect.message,
+                        bottomPadding = 130
+                    )
                 )
             }
 

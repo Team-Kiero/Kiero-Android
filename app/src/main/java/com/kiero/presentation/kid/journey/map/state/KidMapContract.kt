@@ -20,64 +20,64 @@ data class KidMapState(
             schedules = persistentListOf(
                 KidMapItemUiModel(
                     name = "꾸비 성수팝업 가기",
-                    startTime = "오후 04:00",
-                    endTime = "오후 05:00",
+                    startTime = "오후 04 : 00",
+                    endTime = "오후 05 : 00",
                     isOngoing = false,
                     stoneType = KidJourneyStoneType.COURAGE,
                     status = KidMapScheduleStatus.COMPLETED
                 ),
                 KidMapItemUiModel(
                     name = "꾸비 성수팝업 가기",
-                    startTime = "오후 04:00",
-                    endTime = "오후 05:00",
+                    startTime = "오후 04 : 00",
+                    endTime = "오후 05 : 00",
                     isOngoing = true,
                     stoneType = KidJourneyStoneType.GRIT,
                     status = KidMapScheduleStatus.PENDING
                 ),
                 KidMapItemUiModel(
                     name = "꾸비 성수팝업 가기",
-                    startTime = "오후 04:00",
-                    endTime = "오후 05:00",
+                    startTime = "오후 04 : 00",
+                    endTime = "오후 05 : 00",
                     isOngoing = false,
                     stoneType = KidJourneyStoneType.WISDOM,
                     status = KidMapScheduleStatus.PENDING
                 ),
                 KidMapItemUiModel(
                     name = "꾸비 성수팝업 가기",
-                    startTime = "오후 04:00",
-                    endTime = "오후 05:00",
+                    startTime = "오후 04 : 00",
+                    endTime = "오후 05 : 00",
                     isOngoing = false,
                     stoneType = KidJourneyStoneType.COURAGE,
                     status = KidMapScheduleStatus.PENDING
                 ),
                 KidMapItemUiModel(
                     name = "꾸비 성수팝업 가기",
-                    startTime = "오후 04:00",
-                    endTime = "오후 05:00",
+                    startTime = "오후 04 : 00",
+                    endTime = "오후 05 : 00",
                     isOngoing = false,
                     stoneType = KidJourneyStoneType.COURAGE,
                     status = KidMapScheduleStatus.COMPLETED
                 ),
                 KidMapItemUiModel(
                     name = "꾸비 성수팝업 가기",
-                    startTime = "오후 04:00",
-                    endTime = "오후 05:00",
+                    startTime = "오후 04 : 00",
+                    endTime = "오후 05 : 00",
                     isOngoing = true,
                     stoneType = KidJourneyStoneType.GRIT,
                     status = KidMapScheduleStatus.PENDING
                 ),
                 KidMapItemUiModel(
                     name = "꾸비 성수팝업 가기",
-                    startTime = "오후 04:00",
-                    endTime = "오후 05:00",
+                    startTime = "오후 04 : 00",
+                    endTime = "오후 05 : 00",
                     isOngoing = false,
                     stoneType = KidJourneyStoneType.WISDOM,
                     status = KidMapScheduleStatus.PENDING
                 ),
                 KidMapItemUiModel(
                     name = "꾸비 성수팝업 가기",
-                    startTime = "오후 04:00",
-                    endTime = "오후 05:00",
+                    startTime = "오후 04 : 00",
+                    endTime = "오후 05 : 00",
                     isOngoing = false,
                     stoneType = KidJourneyStoneType.COURAGE,
                     status = KidMapScheduleStatus.PENDING

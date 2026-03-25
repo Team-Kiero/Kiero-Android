@@ -1,4 +1,4 @@
-package com.kiero.presentation.kid.mission
+package com.kiero.presentation.kid.mission.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -136,6 +136,7 @@ class KidMissionViewModel @Inject constructor(
                         )
                     }
                     fetchCoin()
+                    fetchMissions()
                 }
                 .onFailure { exception ->
                     _sideEffect.emit(KidMissionSideEffect.ShowSnackbar(exception.message.toString()))

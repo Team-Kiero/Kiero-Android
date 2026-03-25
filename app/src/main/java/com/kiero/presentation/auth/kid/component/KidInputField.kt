@@ -73,7 +73,6 @@ fun KidInputField(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 6.dp)
                 .alpha(if (isError) 1f else 0f),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -88,7 +87,7 @@ fun KidInputField(
             Spacer(modifier = Modifier.width(4.dp))
 
             Text(
-                text = "특수문자나 이모지를 포함하지 않은 이름을 입력해주세요",
+                text = "특수문자나 이모지를 포함하지 않은 이름을 입력해줘!",
                 style = KieroTheme.typography.regular.body5,
                 color = KieroTheme.colors.point,
             )

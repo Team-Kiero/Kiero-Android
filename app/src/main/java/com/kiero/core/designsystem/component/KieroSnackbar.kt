@@ -23,14 +23,12 @@ import com.kiero.core.designsystem.theme.KieroTheme
 fun KieroSnackbar(
     message: String,
     modifier: Modifier = Modifier,
-    contentPadding: Dp = 16.dp,
 ) {
     Box(
         modifier = modifier
-            .fillMaxWidth()
             .clip(RoundedCornerShape(999.dp))
             .background(KieroTheme.colors.gray800)
-            .padding(contentPadding),
+            .padding(horizontal = 16.dp, vertical = 10.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(

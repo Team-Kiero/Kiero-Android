@@ -3,7 +3,6 @@ package com.kiero.data.kid.wish.remote.api
 import com.kiero.core.network.model.BaseResponse
 import com.kiero.data.kid.wish.remote.dto.response.WishResponseDto
 import retrofit2.http.GET
-import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 
