@@ -78,7 +78,7 @@ fun ParentJourneyBottomSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = if (selectedTabIndex == 0) "완료 미션" else "미완료 미션",
+                    text = "오늘 미션",
                     style = KieroTheme.typography.bold.headLine3,
                     color = KieroTheme.colors.white,
                 )

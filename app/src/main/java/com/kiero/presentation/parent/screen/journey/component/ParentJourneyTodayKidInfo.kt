@@ -48,7 +48,7 @@ fun ParentJourneyTodayKidInfo(
                     ) {
                         append(kidInfo.kidName)
                     }
-                    append("의 오늘의 현황")
+                    append("의 오늘 현황")
                 },
                 style = KieroTheme.typography.bold.headLine3,
                 color = KieroTheme.colors.white

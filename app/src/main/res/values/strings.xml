@@ -4,7 +4,7 @@
     <!--Parent-->
     <string name="schedule_tab_content_description">일정</string>
     <string name="alarm_tab_content_description">알람 피드</string>
-    <string name="parent_journey_tab_content_description">오늘의 현황</string>
+    <string name="parent_journey_tab_content_description">오늘 현황</string>
     <string name="parent_mission_tab_content_description">미션</string>
     <string name="reward_tab_content_description">보상</string>
     <string name="mypage_tab_content_description">마이페이지</string>
