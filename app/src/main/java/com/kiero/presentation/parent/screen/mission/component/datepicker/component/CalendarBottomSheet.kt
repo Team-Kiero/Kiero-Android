@@ -1,23 +1,23 @@
 package com.kiero.presentation.parent.screen.mission.component.datepicker.component
 
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
+import com.kiero.core.common.extension.disableUpScroll
+import com.kiero.core.designsystem.component.bottomsheet.KieroBottomSheet
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.screen.mission.component.datepicker.model.CalendarDisplayMode
 import com.kiero.presentation.parent.screen.schedule.plan.component.picker.PickerTopbar
@@ -31,24 +31,18 @@ fun CalendarBottomSheet(
     onDismissRequest: () -> Unit,
     onDateSelected: (LocalDate) -> Unit,
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var yearMonth by remember { mutableStateOf(YearMonth.now()) }
     var selectedDate by remember { mutableStateOf<LocalDate?>(LocalDate.now()) }
     val today = LocalDate.now()
 
-    ModalBottomSheet(
-        onDismissRequest = onDismissRequest,
-        sheetState = sheetState,
-        containerColor = KieroTheme.colors.gray900,
+    KieroBottomSheet (
+        onDismiss = onDismissRequest,
         dragHandle = null,
-        modifier = modifier
-            .pointerInput(Unit) {
-                detectTapGestures {
-                }
-            }
     ) {
         Column(
             modifier = Modifier
+                .disableUpScroll()
+                .verticalScroll(rememberScrollState())
                 .fillMaxWidth()
                 .fillMaxHeight(0.5f)
                 .padding(vertical = 20.dp, horizontal = 30.dp)
