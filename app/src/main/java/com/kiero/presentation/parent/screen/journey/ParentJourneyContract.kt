@@ -8,6 +8,7 @@ import com.kiero.presentation.parent.screen.journey.model.TodayJourneyUiModel
 import com.kiero.presentation.parent.screen.journey.model.TodayStatus
 import com.kiero.presentation.parent.screen.journey.model.toUiModel
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import java.time.LocalTime
 
@@ -17,7 +18,7 @@ data class ParentJourneyState(
 
     val completeMissions: ImmutableList<JourneyMissionUiModel> = persistentListOf(),
     val incompleteMissions: ImmutableList<JourneyMissionUiModel> = persistentListOf(),
-    val todayMissionList: ImmutableList<TodayJourneyUiModel> = persistentListOf(),
+    val todayMissionList: PersistentList<TodayJourneyUiModel> = persistentListOf(),
 
     val selectedJourneyImageUrl: String = ""
 ) {
