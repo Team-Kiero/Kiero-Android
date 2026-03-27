@@ -105,6 +105,7 @@ fun Modifier.statusBarColor(backgroundColor: Color): Modifier = composed {
     }
 }
 
+// LazyColumn 같이 스크롤 후 더 이상 스크롤할 곳이 없을 때 바텀시트 움직임 막기
 fun Modifier.disableNestedScroll(): Modifier = composed {
     val connection = remember {
         object : NestedScrollConnection {
@@ -127,7 +128,7 @@ fun Modifier.disableNestedScroll(): Modifier = composed {
     this.nestedScroll(connection)
 }
 
-// 위로 드래그 막는 함수
+// 위로 드래그 막는 함수 - 스크롤이 발생하기 전에 위로 올리는 행동 자체를 사전에 차단
 fun Modifier.disableUpScroll(): Modifier = composed {
     val connection = remember {
         object : NestedScrollConnection {
