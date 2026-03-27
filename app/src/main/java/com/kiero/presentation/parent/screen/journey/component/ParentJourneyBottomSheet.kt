@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -29,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
 import com.kiero.core.common.extension.disableNestedScroll
+import com.kiero.core.common.extension.disableUpScroll
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.component.bottomsheet.KieroBottomSheet
 import com.kiero.core.designsystem.component.chip.KieroChip
@@ -124,7 +127,10 @@ fun ParentJourneyBottomSheet(
                     description = if (selectedTabIndex == 0) "아직 완료한 미션이 없어요." else "남은 미션이 없어요! 모두 완료했어요.",
                     modifier = Modifier
                         .weight(1f)
-                        .align(Alignment.CenterHorizontally),
+                        .fillMaxWidth()
+                        .align(Alignment.CenterHorizontally)
+                        .disableUpScroll()
+                        .verticalScroll(rememberScrollState()),
                     bottomHeight = 50.dp
                 )
             } else {
