@@ -7,6 +7,7 @@ import com.kiero.data.sse.manager.SseManager
 import com.kiero.presentation.main.model.toUiModel
 import com.kiero.presentation.main.state.MainState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -61,7 +62,7 @@ class MainViewModel @Inject constructor(
             it.copy(
                 unreadAlarm = it.unreadAlarm.copy(
                     hasUnread = false,
-                    unreadChildIds = emptyList()
+                    unreadChildIds = persistentListOf()
                 )
             )
         }

@@ -41,6 +41,7 @@ import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.navigation.Route
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
 import com.kiero.core.trigger.LocalRefreshState
+import com.kiero.presentation.main.component.ParentTopbar
 import com.kiero.presentation.main.navigation.KidMainTab
 import com.kiero.presentation.main.navigation.KieroNavHost
 import com.kiero.presentation.main.navigation.MainAppState
@@ -50,12 +51,10 @@ import com.kiero.presentation.main.navigation.component.MainBottomBar
 import com.kiero.presentation.main.state.MainState
 import com.kiero.presentation.main.state.rememberDialogStateHolder
 import com.kiero.presentation.main.viewmodel.MainViewModel
-import com.kiero.presentation.main.component.ParentTopbar
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -72,7 +71,7 @@ fun MainRoute(
         appState = appState,
         state = state,
         snackBarHostState = snackBarHostState,
-        onAlarmClick = viewModel::onAlarmRead
+        onAlarmClick = {} /*viewModel::onAlarmRead 알림 클릭 시 RED DOT 유지*/
     )
 }
 
