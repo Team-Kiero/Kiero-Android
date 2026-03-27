@@ -1,5 +1,6 @@
 package com.kiero.data.sse.remote.dto.response
 
+import com.kiero.data.sse.model.parent.SseScheduleEventType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -51,4 +52,7 @@ data class ParentScheduleDataDto(
     val eventType: String,
     @SerialName("childId")
     val childId: Long
-)
+) {
+    val scheduleEventType: SseScheduleEventType
+        get() = SseScheduleEventType.from(eventType)
+}
