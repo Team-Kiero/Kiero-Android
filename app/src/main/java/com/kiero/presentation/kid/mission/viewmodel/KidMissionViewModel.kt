@@ -91,9 +91,10 @@ class KidMissionViewModel @Inject constructor(
                 .onSuccess { result ->
                     Timber.e("fetchMissions $result")
                     minLoadingTime.join()
-                    _state.update {
+                    _state.update { currentState ->
+                        val currentData = currentState.successData ?: KidMissionState()
                         UiState.Success(
-                            KidMissionState(
+                            currentData.copy(
                                 kidMissionByDateList = result.toUiModel(),
                                 isRefreshing = false
                             )
@@ -136,7 +137,6 @@ class KidMissionViewModel @Inject constructor(
                         )
                     }
                     fetchCoin()
-                    fetchMissions()
                 }
                 .onFailure { exception ->
                     _sideEffect.emit(KidMissionSideEffect.ShowSnackbar(exception.message.toString()))
