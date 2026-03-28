@@ -101,10 +101,10 @@ class KidWishViewModel @Inject constructor(
             wishRepository.getCoupons()
                 .onSuccess { result ->
                     minLoadingTime.join()
-
-                    _state.update {
+                    _state.update { currentState ->
+                        val currentData = currentState.successData ?: KidWishState()
                         UiState.Success(
-                            data = KidWishState(
+                            currentData.copy(
                                 kidWishList = result.map { wish ->
                                     wish.toUiModel()
                                 }.toImmutableList(),
