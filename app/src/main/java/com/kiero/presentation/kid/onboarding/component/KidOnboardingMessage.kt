@@ -38,7 +38,7 @@ fun KidOnboardingMessage(
                 style = textStyle
             )
             Text(
-                text = "난 '영웅의 불씨'를 품고 태어난 특별한 도꺠비야!",
+                text = "난 '영웅의 불씨'를 품고 태어난 특별한 도깨비야!",
                 color = defaultColor,
                 style = textStyle
             )
