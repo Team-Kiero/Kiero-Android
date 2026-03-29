@@ -31,7 +31,7 @@ import com.kiero.presentation.parent.screen.schedule.plan.state.ParentScheduleSt
 fun ParentPlanScreen(
     state: ParentScheduleState,
     onResetToday: () -> Unit,
-    onContentClick: (String) -> Unit,
+    onContentClick: (String, String) -> Unit,
     onDateChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -50,13 +50,11 @@ fun ParentPlanScreen(
     val events = remember(state.planAllModel) {
         state.planAllModel?.let { model ->
             buildList {
-                addAll(model.recurringSchedules.map { it.toUiModel() })
-                addAll(model.normalSchedules.map { it.toUiModel() })
+                addAll(model.recurringSchedules.filter { it.scheduleStatus != "SKIPPED" }.map { it.toUiModel() })
+                addAll(model.normalSchedules.filter { it.scheduleStatus != "SKIPPED" }.map { it.toUiModel() })
             }
         } ?: emptyList()
     }
-
-
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -106,7 +104,7 @@ private fun ParentPlanScreenPreview() {
             ParentPlanScreen(
                 state = ParentScheduleState(),
                 onResetToday = {},
-                onContentClick = {},
+                onContentClick = { _, _ -> },
                 onDateChange = {}
             )
         }

@@ -32,7 +32,7 @@ import com.kiero.presentation.parent.screen.schedule.plan.state.ParentScheduleSt
 fun ScheduleTimeTable(
     state: ParentScheduleState,
     events: List<ScheduleEvent>,
-    onContentClick: (String) -> Unit,
+    onContentClick: (String, String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -60,7 +60,7 @@ fun ScheduleTimeTable(
 fun SchedulePlanner(
     events: List<ScheduleEvent>,
     state: ParentScheduleState,
-    onContentClick: (String) -> Unit,
+    onContentClick: (String, String) -> Unit,
     modifier: Modifier = Modifier,
     daysCount: Int = 7,
 ) {
@@ -76,9 +76,17 @@ fun SchedulePlanner(
         val indices = state.run { event.getIndices() }
 
         indices.flatMap { index ->
-            event.toScheduleBlocks(index)
+            event.toScheduleBlocks(index).map { block ->
+                block to event
+            }
         }
     }
+
+    val uniqueBlocks = allBlocks
+        .sortedBy { (_, event) -> if (event.isRecurring) 1 else 0 }
+        .distinctBy { (block, _) ->
+            "${block.dayIndex}-${block.startHour}-${block.startMinute}"
+        }
 
     BoxWithConstraints(
         modifier = modifier
@@ -89,12 +97,10 @@ fun SchedulePlanner(
             .padding(innerPadding)
     ) {
         val dayWidth = maxWidth / daysCount
-        if (events.isEmpty()) {
-            KieroContentEmptyScreen(
-                bottomHeight = 50.dp
-            )
+        if (uniqueBlocks.isEmpty()) {
+            KieroContentEmptyScreen()
         } else {
-            allBlocks.forEach { block ->
+            uniqueBlocks.forEach { (block, event) ->
                 val hourOffset = hourHeight * (block.startHour - 8)
                 val minuteOffset = slotHeight * (block.startMinute / 15)
                 val topOffset = hourOffset + minuteOffset
@@ -105,7 +111,7 @@ fun SchedulePlanner(
                         .offset(x = dayWidth * block.dayIndex, y = topOffset)
                         .width(dayWidth)
                         .height(blockHeight)
-                        .noRippleClickable(onClick = { onContentClick(block.id) })
+                        .noRippleClickable(onClick = { onContentClick(block.id, event.date ?: "") })
                         .padding(horizontal = 3.dp)
                 ) {
                     ScheduleEventBlock(block = block)
@@ -126,7 +132,7 @@ private fun ScheduleTimeTablePreview() {
             ScheduleTimeTable(
                 state = ParentScheduleState(),
                 events = mockEvents,
-                onContentClick = {}
+                onContentClick = {_, _ -> }
             )
         }
     }

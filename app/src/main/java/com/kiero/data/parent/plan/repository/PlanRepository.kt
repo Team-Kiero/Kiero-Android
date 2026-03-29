@@ -9,13 +9,13 @@ interface PlanRepository {
     suspend fun postPlan(
         childId: Long,
         name: String,
-        firstOrderDate: String?,
         isRecurring: Boolean,
         startTime: String,
         endTime: String,
         scheduleColor: String,
         dayOfWeek: String?,
         dates: String?,
+        firstOrderDate: String?,
     ): Result<Unit>
 
     suspend fun getPlanAll(

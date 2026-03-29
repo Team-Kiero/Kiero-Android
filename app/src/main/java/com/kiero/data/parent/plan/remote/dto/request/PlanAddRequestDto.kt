@@ -9,8 +9,6 @@ data class PlanAddRequestDto(
     val name: String,
     @SerialName("isRecurring")
     val isRecurring: Boolean,
-    @SerialName("firstOrderDate")
-    val firstOrderDate: String?,
     @SerialName("startTime")
     val startTime: String,
     @SerialName("endTime")
@@ -21,4 +19,6 @@ data class PlanAddRequestDto(
     val dayOfWeek: String?,
     @SerialName("dates")
     val dates: String?,
+    @SerialName("firstOrderDate")
+    val firstOrderDate: String? = null
 )
