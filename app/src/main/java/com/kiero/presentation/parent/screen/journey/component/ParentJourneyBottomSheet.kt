@@ -1,6 +1,7 @@
 package com.kiero.presentation.parent.screen.journey.component
 
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import com.kiero.R
 import com.kiero.core.common.extension.disableNestedScroll
 import com.kiero.core.common.extension.disableUpScroll
+import com.kiero.core.common.extension.disableUpSheetScroll
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.component.bottomsheet.KieroBottomSheet
 import com.kiero.core.designsystem.component.chip.KieroChip
@@ -41,6 +43,7 @@ import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.screen.journey.model.JourneyMissionUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,16 +63,22 @@ fun ParentJourneyBottomSheet(
         dragHandle = null,
         modifier = modifier
             .pointerInput(Unit) {
-                detectTapGestures {
+                detectDragGestures { change, dragAmount ->
+                    Timber.e("dragAmount: $dragAmount")
                 }
-            }
+            },
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(0.85f)
+                .disableUpSheetScroll()
                 .pointerInput(Unit) {
-                    detectTapGestures {
+                    detectVerticalDragGestures { change, dragAmount ->
+                        // dragAmount가 0보다 작다 = 손가락을 위로 올리고 있다
+                        if (dragAmount < 0) {
+                            change.consume()
+                        }
                     }
                 }
         ) {
@@ -136,6 +145,7 @@ fun ParentJourneyBottomSheet(
             } else {
                 LazyColumn(
                     modifier = Modifier
+                        .weight(1f)
                         .disableNestedScroll()
                         .fillMaxWidth(),
                 ) {
