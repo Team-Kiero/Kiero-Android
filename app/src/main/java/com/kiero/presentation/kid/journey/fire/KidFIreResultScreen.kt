@@ -115,8 +115,8 @@ private fun KidFIreResultScreen(
         ) {
             KieroTopbar(
                 title = state.date,
-                leftIconRes = R.drawable.ic_arrow_left,
-                leftIconClick = navigateUp,
+                leftIconRes = null,
+                leftIconClick = {},
                 modifier = Modifier
                     .padding(top = 20.dp)
                     .alpha(if (!isFinished) 1f else 0f),
