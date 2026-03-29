@@ -23,7 +23,7 @@ fun ParentJourneyScheduleModel.toUiModel(
     scheduleDetailId = scheduleDetailId,
     date = "${startTime.toShortTime()} - ${endTime.toShortTime()}",
     todayMission = name,
-    isAuthenticated = status == "VERIFIED",
+    isAuthenticated = status == "VERIFIED" || status == "COMPLETED",
     isOngoing = isOngoing,
     todayStatus = status.toTodayStatus(
         startTime = startTime,
