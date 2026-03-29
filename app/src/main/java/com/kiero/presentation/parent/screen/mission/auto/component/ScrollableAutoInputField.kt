@@ -1,7 +1,7 @@
 package com.kiero.presentation.parent.screen.mission.auto.component
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Spacer
@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.isImeVisible
-import androidx.compose.foundation.relocation.BringIntoViewRequester
-import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -80,10 +78,9 @@ fun ScrollableAutoInputField(
         }
     }
 
-    BoxWithConstraints(
-        modifier = modifier.fillMaxSize()
+    Box(
+        modifier = modifier
     ) {
-        val minHeight = maxHeight
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -103,13 +100,13 @@ fun ScrollableAutoInputField(
                 textColor = KieroTheme.colors.gray400,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = minHeight)
+                    .heightIn(min = 325.dp)
                     .onFocusChanged { focusState ->
                         isFocused.value = focusState.isFocused
                     }
             )
 
-            Spacer(Modifier.height(60.dp))
+            Spacer(Modifier.height(65.dp))
         }
     }
 }
