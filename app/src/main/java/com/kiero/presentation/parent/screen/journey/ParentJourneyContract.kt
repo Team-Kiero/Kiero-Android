@@ -59,9 +59,11 @@ data class ParentJourneyState(
 }
 
 fun List<ParentJourneyScheduleModel>.toUiModels(currentTime: LocalTime): List<TodayJourneyUiModel> {
-    // PENDING 중 현재 시간 이후 가장 빠른 일정 id 찾기
-    val nextUpcomingId = filter { it.status == "PENDING" }
-        .filter { it.startTime.toLocalTime()?.isAfter(currentTime) == true }
+    // 현재 시간 이후 가장 빠른 일정 id 찾기
+    val nextUpcomingId = filter { schedule ->
+        val start = schedule.startTime.toLocalTime()
+        start != null && start.isAfter(currentTime)
+    }
         .minByOrNull { it.startTime }
         ?.scheduleDetailId
 
