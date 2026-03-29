@@ -7,6 +7,9 @@ import com.kiero.core.common.util.successData
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.model.UiState
 import com.kiero.data.auth.repository.AuthRepository
+import com.kiero.data.parent.plan.model.NormalScheduleModel
+import com.kiero.data.parent.plan.model.RecurringScheduleModel
+import com.kiero.data.parent.plan.model.ScheduleModel
 import com.kiero.data.parent.plan.repository.PlanRepository
 import com.kiero.data.sse.manager.SseManager
 import com.kiero.presentation.parent.screen.schedule.plan.state.ParentScheduleSideEffect
@@ -23,6 +26,9 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
@@ -149,5 +155,30 @@ class ParentScheduleViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    fun isScheduleEditable(schedule: ScheduleModel): Boolean {
+        val isFuture = runCatching {
+            val dateStr = when (schedule) {
+                is NormalScheduleModel    -> schedule.date
+                is RecurringScheduleModel -> schedule.repeatStartDate
+                else                     -> LocalDate.now().toString()
+            }
+            val scheduleDateTime = LocalDate.parse(dateStr)
+                .atTime(LocalTime.parse(schedule.startTime.take(5), DateTimeFormatter.ofPattern("HH:mm")))
+
+            scheduleDateTime.isAfter(LocalDateTime.now())
+        }.getOrDefault(false)
+
+        if (!isFuture) {
+            return false
+        }
+
+        val hiddenStatuses = listOf("VERIFIED", "COMPLETED", "FAILED", "SKIPPED")
+        if (schedule.scheduleStatus in hiddenStatuses) {
+            return false
+        }
+
+        return true
     }
 }
