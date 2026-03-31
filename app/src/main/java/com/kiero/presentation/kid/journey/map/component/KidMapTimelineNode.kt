@@ -27,9 +27,10 @@ fun KidMapTimelineNode(
     isNext: Boolean = false
 ) {
     val showLine = isOngoing || isNext || status == KidMapScheduleStatus.PENDING
+            || status == KidMapScheduleStatus.VERIFIED
 
     val iconColor = when {
-        isOngoing || isNext -> KieroTheme.colors.main
+        isOngoing || isNext || status == KidMapScheduleStatus.VERIFIED -> KieroTheme.colors.main
         status == KidMapScheduleStatus.PENDING -> KieroTheme.colors.white
         else -> KieroTheme.colors.white.copy(alpha = 0.5f)
     }

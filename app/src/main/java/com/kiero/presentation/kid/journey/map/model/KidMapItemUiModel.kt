@@ -36,8 +36,9 @@ fun List<ScheduleProgressItemModel>.toUiModelList(isFireLitToday: Boolean): List
     val mappedList = this.map { it.toUiModel(isFireLitToday) }.toMutableList()
 
     val hasOngoing = mappedList.any { it.isOngoing }
+    val hasVerified = mappedList.any { it.status == KidMapScheduleStatus.VERIFIED }
 
-    if (!hasOngoing) {
+    if (!hasOngoing && !hasVerified) {
         val pendingIndex = mappedList.indexOfFirst { it.status == KidMapScheduleStatus.PENDING }
         if (pendingIndex != -1) {
             mappedList[pendingIndex] = mappedList[pendingIndex].copy(isNext = true)
