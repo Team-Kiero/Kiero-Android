@@ -1,5 +1,6 @@
 package com.kiero.presentation.kid.journey.fire
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -56,6 +57,8 @@ fun KidFireResultRoute(
     viewModel: KidFireResultVIewModel = hiltViewModel()
 ) {
     val state by viewModel.fireResultState.collectAsStateWithLifecycle()
+
+    BackHandler{}
 
     when (val state = state) {
         is UiState.Success -> {
