@@ -216,7 +216,7 @@ private fun KidJourneyScreen(
             state.header?.let { header ->
                 KidJourneyHeader(
                     header = header,
-                    isFireLit = state.content == KidJourneyContentUiModel.FireLit
+                    isFireLit = state.buttonType == KidJourneyButtonType.FIRE
                 )
             }
 

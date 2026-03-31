@@ -68,7 +68,7 @@ fun KidJourneyHeader(
                     onClick = {}
                 ),
                 isEnabled = true,
-                isCompleted = !isFireLit && header.earnedStones == header.totalScheduleCount
+                isCompleted = isFireLit || header.earnedStones == header.totalScheduleCount
                         && header.totalScheduleCount > 0
             )
         }
