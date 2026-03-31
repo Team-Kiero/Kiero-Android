@@ -7,12 +7,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -97,10 +100,29 @@ private fun KidMapScreen(
 
                     Spacer(modifier = Modifier.height(25.dp))
 
-                    KidMapScheduleList(
-                        schedules = state.schedules,
+                    Box(
                         modifier = Modifier.weight(1f)
-                    )
+                    ) {
+                        KidMapScheduleList(
+                            schedules = state.schedules,
+                            modifier = Modifier.fillMaxSize()
+                        )
+
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .fillMaxWidth()
+                                .height(54.dp)
+                                .background(
+                                    brush = Brush.verticalGradient(
+                                        colors = listOf(
+                                            Color(0x00232428),
+                                            Color(0xFF232428)
+                                        )
+                                    )
+                                )
+                        )
+                    }
                 } else {
                     KidMapEmptyView(
                         modifier = Modifier.weight(1f)
