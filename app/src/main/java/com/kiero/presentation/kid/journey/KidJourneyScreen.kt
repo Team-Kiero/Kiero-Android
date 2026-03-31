@@ -4,6 +4,12 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -99,6 +105,7 @@ fun KidJourneyRoute(
             is KidJourneySideEffect.ShowSnackbar -> globalTrigger.showSnackbar(
                 SnackbarState(message = sideEffect.message)
             )
+
             KidJourneySideEffect.ShowDialog -> globalTrigger.dialogTrigger.show {}
         }
     }
@@ -213,12 +220,22 @@ private fun KidJourneyScreen(
                 )
             }
 
-            if (state.shouldShowSchedule) {
-                Spacer(modifier = Modifier.height(21.dp))
+            AnimatedVisibility(
+                visible = state.shouldShowSchedule && state.currentScheduleInfo != null,
+                enter = expandVertically(
+                    animationSpec = tween(durationMillis = 300)
+                ) + fadeIn(),
+                exit = shrinkVertically() + fadeOut(),
+                label = "ScheduleItemAnimation"
+            ) {
+                Column {
+                    Spacer(modifier = Modifier.height(21.dp))
 
-                state.currentScheduleInfo?.let { schedule ->
-                    KidJourneyScheduleItem(item = schedule)
+                    state.currentScheduleInfo?.let { schedule ->
+                        KidJourneyScheduleItem(item = schedule)
+                    }
                 }
+
             }
 
             Spacer(modifier = Modifier.height(16.dp))
