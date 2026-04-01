@@ -22,26 +22,34 @@ fun ScheduleProgressItemModel.toUiModel(isFireLitToday: Boolean): KidMapItemUiMo
     val validIsOngoing = this.isOngoing && !isFireLitToday &&
             (mappedStatus == KidMapScheduleStatus.PENDING || mappedStatus == KidMapScheduleStatus.VERIFIED)
 
+    val finalStatus = if (isFireLitToday && mappedStatus == KidMapScheduleStatus.VERIFIED) {
+        KidMapScheduleStatus.COMPLETED
+    } else {
+        mappedStatus
+    }
+
     return KidMapItemUiModel(
         name = this.name,
         startTime = this.startTime.toKoreanTimeString(),
         endTime = this.endTime.toKoreanTimeString(),
         isOngoing = validIsOngoing,
         stoneType = KidJourneyStoneType.from(this.stoneType),
-        status = mappedStatus
+        status = finalStatus
     )
 }
 
 fun List<ScheduleProgressItemModel>.toUiModelList(isFireLitToday: Boolean): List<KidMapItemUiModel> {
     val mappedList = this.map { it.toUiModel(isFireLitToday) }.toMutableList()
 
-    val hasOngoing = mappedList.any { it.isOngoing }
-    val hasVerified = mappedList.any { it.status == KidMapScheduleStatus.VERIFIED }
+    if (!isFireLitToday) {
+        val hasOngoing = mappedList.any { it.isOngoing }
+        val hasVerified = mappedList.any { it.status == KidMapScheduleStatus.VERIFIED }
 
-    if (!hasOngoing && !hasVerified) {
-        val pendingIndex = mappedList.indexOfFirst { it.status == KidMapScheduleStatus.PENDING }
-        if (pendingIndex != -1) {
-            mappedList[pendingIndex] = mappedList[pendingIndex].copy(isNext = true)
+        if (!hasOngoing && !hasVerified) {
+            val pendingIndex = mappedList.indexOfFirst { it.status == KidMapScheduleStatus.PENDING }
+            if (pendingIndex != -1) {
+                mappedList[pendingIndex] = mappedList[pendingIndex].copy(isNext = true)
+            }
         }
     }
 
