@@ -65,6 +65,8 @@ fun KidCameraRoute(
                 fileName = "${System.currentTimeMillis()}.jpg",
                 contentType = "image/jpeg"
             )
+        } else {
+            navigateUp()
         }
     }
 
