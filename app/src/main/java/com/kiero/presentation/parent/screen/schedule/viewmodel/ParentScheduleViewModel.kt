@@ -137,9 +137,20 @@ class ParentScheduleViewModel @Inject constructor(
             planRepository.deleteSchedule(scheduleId, selectedDate, isIncludeFollowing)
                 .onSuccess {
                     _sideEffect.emit(ShowSnackBar("일정이 삭제되었습니다"))
-                    fetchSchedule()
+
+                    val currentState = currentScheduleState ?: return@onSuccess
+                    val currentPlan = currentState.planAllModel ?: return@onSuccess
+
+                    val newNormalSchedules = currentPlan.normalSchedules.filterNot { it.scheduleId == scheduleId }
+                    val newRecurringSchedules = currentPlan.recurringSchedules.filterNot { it.scheduleId == scheduleId }
+
+                    val updatedPlan = currentPlan.copy(
+                        normalSchedules = newNormalSchedules,
+                        recurringSchedules = newRecurringSchedules
+                    )
+
+                    _state.value = UiState.Success(currentState.copy(planAllModel = updatedPlan))
                 }
-                .onFailure { _sideEffect.emit(ShowSnackBar("일정 삭제에 실패했습니다")) }
         }
     }
 
