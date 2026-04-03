@@ -2,24 +2,20 @@ package com.kiero.presentation.parent.screen.mission.auto
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -32,6 +28,7 @@ import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.component.button.KieroButtonMedium
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
 import com.kiero.presentation.parent.screen.mission.auto.component.ScrollableAutoInputField
 import com.kiero.presentation.parent.screen.mission.auto.state.AutoMissionSideEffect
@@ -47,25 +44,25 @@ fun ParentAutoAddRoute(
 ) {
     val state by viewModel.state.collectAsState()
     val globalUiEventHolder = LocalGlobalUiEventTrigger.current
-    val snackbarHostState = remember { SnackbarHostState() }
+    val focusManager = LocalFocusManager.current
 
     viewModel.sideEffect.collectSideEffect { effect ->
         when (effect) {
             is AutoMissionSideEffect.ShowToast -> {
-                snackbarHostState.showSnackbar(effect.message)
+                focusManager.clearFocus()
+                globalUiEventHolder.showSnackbar(SnackbarState(message = effect.message))
             }
 
             is AutoMissionSideEffect.NavigateBack -> {
                 navigateUp()
             }
 
-            is AutoMissionSideEffect.ScrollToPage -> {
-                // 처리 안 함
-            }
+            is AutoMissionSideEffect.ScrollToPage -> Unit
 
             is AutoMissionSideEffect.ShowToastAndNavigate -> {
                 Timber.e("parent auto add")
-                snackbarHostState.showSnackbar(effect.message)
+                focusManager.clearFocus()
+                globalUiEventHolder.showSnackbar(SnackbarState(message = effect.message))
                 navigateUp()
             }
         }
@@ -73,10 +70,7 @@ fun ParentAutoAddRoute(
 
     when (state.currentScreen) {
         AutoMissionState.Screen.LOADING -> {
-            ParentAutoLoadingScreen(
-                paddingValues = paddingValues,
-                snackbarHostState = snackbarHostState
-            )
+            ParentAutoLoadingScreen(paddingValues = paddingValues)
         }
 
         AutoMissionState.Screen.RESULT -> {
@@ -111,7 +105,6 @@ fun ParentAutoAddScreen(
     modifier: Modifier = Modifier,
 ) {
     val focusManager = LocalFocusManager.current
-    val isImeVisible = WindowInsets.isImeVisible
 
     Column(
         modifier = modifier
@@ -124,7 +117,6 @@ fun ParentAutoAddScreen(
                     focusManager.clearFocus()
                 })
             },
-        verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(Modifier.height(20.dp))
@@ -139,32 +131,37 @@ fun ParentAutoAddScreen(
             text = "이곳에 알림장 내용을 붙여넣어 주세요.",
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 24.dp, start = 20.dp, end = 20.dp),
+                .padding(top = 24.dp, start = 20.dp, end = 20.dp, bottom = 12.dp),
             style = KieroTheme.typography.semiBold.title3,
             color = KieroTheme.colors.gray200
         )
 
-        ScrollableAutoInputField(
-            text = state.noticeText,
-            onTextChange = onTextChange,
+        Box(
             modifier = Modifier
                 .weight(1f)
-                .padding(horizontal = 20.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp),
+            contentAlignment = Alignment.TopCenter
+        ) {
+            ScrollableAutoInputField(
+                text = state.noticeText,
+                onTextChange = onTextChange,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        KieroButtonMedium(
+            text = "분석하고 미션 추가하기",
+            onClick = onAnalyzeClick,
+            isEnabled = state.isAnalyzeEnabled,
+            containerColor = KieroTheme.colors.main,
+            contentColor = KieroTheme.colors.black,
+            modifier = Modifier.padding(horizontal = 16.dp)
         )
 
-        if (!isImeVisible) {
-
-            KieroButtonMedium(
-                text = "분석하고 미션 추가하기",
-                onClick = onAnalyzeClick,
-                isEnabled = state.isAnalyzeEnabled,
-                containerColor = KieroTheme.colors.main,
-                contentColor = KieroTheme.colors.black,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-
-            Spacer(Modifier.height(28.dp))
-        }
+        Spacer(Modifier.height(28.dp))
     }
 }
 
