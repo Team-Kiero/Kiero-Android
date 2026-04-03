@@ -254,7 +254,6 @@ private fun KidWishScreen(
                 description = "부모님과 함께 나만의 보상을 정해볼까?",
                 modifier = Modifier
                     .weight(1f)
-                    .padding(bottom = 80.dp)
             )
         } else {
             KidWishGridList(

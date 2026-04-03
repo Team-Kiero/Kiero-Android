@@ -29,7 +29,7 @@ fun KieroTopbar(
     title: String,
     leftIconClick: () -> Unit,
     modifier: Modifier = Modifier,
-    @DrawableRes leftIconRes: Int = R.drawable.ic_arrow_left,
+    @DrawableRes leftIconRes: Int? = R.drawable.ic_arrow_left,
     rightIconRes: Int? = null,
     rightIconClick: () -> Unit = {},
     textStyle: TextStyle = KieroTheme.typography.bold.headLine2,
@@ -46,13 +46,15 @@ fun KieroTopbar(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Icon(
-            imageVector = ImageVector.vectorResource(id = leftIconRes),
-            contentDescription = null,
-            tint = KieroTheme.colors.white,
-            modifier = Modifier
-                .noRippleClickable(onClick = leftIconClick)
-        )
+        leftIconRes?.let {
+            Icon(
+                imageVector = ImageVector.vectorResource(id = it),
+                contentDescription = null,
+                tint = KieroTheme.colors.white,
+                modifier = Modifier
+                    .noRippleClickable(onClick = leftIconClick)
+            )
+        }
 
         Text(
             text = title,
