@@ -27,6 +27,7 @@ import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
 import com.kiero.presentation.parent.navigation.ParentReward
 import com.kiero.presentation.parent.screen.reward.component.RewardNameTextField
@@ -54,7 +55,7 @@ fun ParentRewardAddRoute(
         when (sideEffect) {
             is ParentRewardSideEffect.ShowSnackBar -> {
                 focusManager.clearFocus()
-                globalTrigger.showToast(sideEffect.message)
+                globalTrigger.showSnackbar(SnackbarState(message = sideEffect.message))
             }
             ParentRewardSideEffect.NavigateUp -> {
                 globalTrigger.onTabReselected(ParentReward)
