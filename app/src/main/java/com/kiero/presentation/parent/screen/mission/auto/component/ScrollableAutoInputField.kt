@@ -1,18 +1,14 @@
 package com.kiero.presentation.parent.screen.mission.auto.component
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.isImeVisible
-import androidx.compose.foundation.relocation.BringIntoViewRequester
-import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -80,36 +76,30 @@ fun ScrollableAutoInputField(
         }
     }
 
-    BoxWithConstraints(
-        modifier = modifier.fillMaxSize()
+    Column(
+        modifier = modifier
+            .verticalScroll(scrollState)
     ) {
-        val minHeight = maxHeight
-        Column(
+        ParentAutoInputField(
+            value = textFieldValue,
+            onValueChange = { newValue ->
+                textFieldValue = newValue
+                onTextChange(newValue.text)
+            },
+            placeholder = placeholder,
+            maxLength = maxLength,
+            maxLines = Int.MAX_VALUE,
+            singleLine = false,
+            textStyle = KieroTheme.typography.regular.body3,
+            textColor = KieroTheme.colors.gray400,
             modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
-        ) {
-            ParentAutoInputField(
-                value = textFieldValue,
-                onValueChange = { newValue ->
-                    textFieldValue = newValue
-                    onTextChange(newValue.text)
-                },
-                placeholder = placeholder,
-                maxLength = maxLength,
-                maxLines = Int.MAX_VALUE,
-                singleLine = false,
-                textStyle = KieroTheme.typography.regular.body3,
-                textColor = KieroTheme.colors.gray400,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = minHeight)
-                    .onFocusChanged { focusState ->
-                        isFocused.value = focusState.isFocused
-                    }
-            )
+                .fillMaxWidth()
+                .heightIn(min = 325.dp)
+                .onFocusChanged { focusState ->
+                    isFocused.value = focusState.isFocused
+                }
+        )
 
-            Spacer(Modifier.height(60.dp))
-        }
+        Spacer(Modifier.height(24.dp))
     }
 }
