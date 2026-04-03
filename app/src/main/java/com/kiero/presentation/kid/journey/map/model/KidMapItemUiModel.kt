@@ -4,6 +4,8 @@ import androidx.compose.runtime.Immutable
 import com.kiero.core.common.extension.toKoreanTimeString
 import com.kiero.data.kid.schedule.model.ScheduleProgressItemModel
 import com.kiero.presentation.kid.journey.model.KidJourneyStoneType
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 @Immutable
 data class KidMapItemUiModel(
@@ -38,7 +40,7 @@ fun ScheduleProgressItemModel.toUiModel(isFireLitToday: Boolean): KidMapItemUiMo
     )
 }
 
-fun List<ScheduleProgressItemModel>.toUiModelList(isFireLitToday: Boolean): List<KidMapItemUiModel> {
+fun List<ScheduleProgressItemModel>.toUiModelList(isFireLitToday: Boolean): ImmutableList<KidMapItemUiModel> {
     val mappedList = this.map { it.toUiModel(isFireLitToday) }.toMutableList()
 
     if (!isFireLitToday) {
@@ -53,5 +55,5 @@ fun List<ScheduleProgressItemModel>.toUiModelList(isFireLitToday: Boolean): List
         }
     }
 
-    return mappedList
+    return mappedList.toImmutableList()
 }
