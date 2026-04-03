@@ -72,23 +72,24 @@ fun ParentPlanScreen(
             modifier = Modifier.padding(horizontal = 20.dp),
         )
 
+        ScheduleWeekTopbar(
+            currentDate = state.currentDate
+        )
+
         LazyColumn(
             state = listState,
             modifier = Modifier.fillMaxSize()
         ) {
-            item {
-                ScheduleWeekTopbar(
-                    currentDate = state.currentDate
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-            }
             item {
                 ScheduleTimeTable(
                     state = state,
                     events = events,
                     onContentClick = onContentClick,
                 )
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(83.dp))
             }
         }
     }
