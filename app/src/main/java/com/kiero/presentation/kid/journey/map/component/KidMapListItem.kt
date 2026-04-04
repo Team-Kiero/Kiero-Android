@@ -26,18 +26,21 @@ fun KidMapListItem(
     modifier: Modifier = Modifier
 ) {
     val nameColor = when {
-        item.isOngoing || item.status == KidMapScheduleStatus.PENDING -> KieroTheme.colors.white
+        item.isOngoing || item.status == KidMapScheduleStatus.PENDING
+                || item.status == KidMapScheduleStatus.VERIFIED -> KieroTheme.colors.white
         else -> KieroTheme.colors.white.copy(alpha = 0.5f)
     }
 
     val timeColor = when {
-        item.isOngoing || item.isNext -> KieroTheme.colors.main
+        item.isOngoing || item.isNext
+                || item.status == KidMapScheduleStatus.VERIFIED -> KieroTheme.colors.main
         item.status == KidMapScheduleStatus.PENDING -> KieroTheme.colors.gray500
         else -> KieroTheme.colors.gray500.copy(alpha = 0.5f)
     }
 
     val dividerColor = when {
-        item.isOngoing || item.isNext || item.status == KidMapScheduleStatus.PENDING -> KieroTheme.colors.gray600
+        item.isOngoing || item.isNext || item.status == KidMapScheduleStatus.PENDING
+                || item.status == KidMapScheduleStatus.VERIFIED -> KieroTheme.colors.gray600
         else -> Color.Transparent
     }
 

@@ -4,6 +4,8 @@ import androidx.compose.runtime.Immutable
 import com.kiero.core.common.extension.toKoreanTimeString
 import com.kiero.data.kid.schedule.model.ScheduleProgressItemModel
 import com.kiero.presentation.kid.journey.model.KidJourneyStoneType
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 @Immutable
 data class KidMapItemUiModel(
@@ -22,27 +24,36 @@ fun ScheduleProgressItemModel.toUiModel(isFireLitToday: Boolean): KidMapItemUiMo
     val validIsOngoing = this.isOngoing && !isFireLitToday &&
             (mappedStatus == KidMapScheduleStatus.PENDING || mappedStatus == KidMapScheduleStatus.VERIFIED)
 
+    val finalStatus = if (isFireLitToday && mappedStatus == KidMapScheduleStatus.VERIFIED) {
+        KidMapScheduleStatus.COMPLETED
+    } else {
+        mappedStatus
+    }
+
     return KidMapItemUiModel(
         name = this.name,
         startTime = this.startTime.toKoreanTimeString(),
         endTime = this.endTime.toKoreanTimeString(),
         isOngoing = validIsOngoing,
         stoneType = KidJourneyStoneType.from(this.stoneType),
-        status = mappedStatus
+        status = finalStatus
     )
 }
 
-fun List<ScheduleProgressItemModel>.toUiModelList(isFireLitToday: Boolean): List<KidMapItemUiModel> {
+fun List<ScheduleProgressItemModel>.toUiModelList(isFireLitToday: Boolean): ImmutableList<KidMapItemUiModel> {
     val mappedList = this.map { it.toUiModel(isFireLitToday) }.toMutableList()
 
-    val hasOngoing = mappedList.any { it.isOngoing }
+    if (!isFireLitToday) {
+        val hasOngoing = mappedList.any { it.isOngoing }
+        val hasVerified = mappedList.any { it.status == KidMapScheduleStatus.VERIFIED }
 
-    if (!hasOngoing) {
-        val pendingIndex = mappedList.indexOfFirst { it.status == KidMapScheduleStatus.PENDING }
-        if (pendingIndex != -1) {
-            mappedList[pendingIndex] = mappedList[pendingIndex].copy(isNext = true)
+        if (!hasOngoing && !hasVerified) {
+            val pendingIndex = mappedList.indexOfFirst { it.status == KidMapScheduleStatus.PENDING }
+            if (pendingIndex != -1) {
+                mappedList[pendingIndex] = mappedList[pendingIndex].copy(isNext = true)
+            }
         }
     }
 
-    return mappedList
+    return mappedList.toImmutableList()
 }

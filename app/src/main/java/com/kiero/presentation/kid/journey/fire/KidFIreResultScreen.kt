@@ -1,5 +1,6 @@
 package com.kiero.presentation.kid.journey.fire
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -56,6 +57,8 @@ fun KidFireResultRoute(
     viewModel: KidFireResultVIewModel = hiltViewModel()
 ) {
     val state by viewModel.fireResultState.collectAsStateWithLifecycle()
+
+    BackHandler{}
 
     when (val state = state) {
         is UiState.Success -> {
@@ -115,8 +118,8 @@ private fun KidFIreResultScreen(
         ) {
             KieroTopbar(
                 title = state.date,
-                leftIconRes = R.drawable.ic_arrow_left,
-                leftIconClick = navigateUp,
+                leftIconRes = null,
+                leftIconClick = {},
                 modifier = Modifier
                     .padding(top = 20.dp)
                     .alpha(if (!isFinished) 1f else 0f),

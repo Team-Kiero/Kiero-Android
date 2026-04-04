@@ -133,23 +133,30 @@ class ParentScheduleViewModel @Inject constructor(
     }
 
     fun deleteSchedule(scheduleId: Long, selectedDate: String, isIncludeFollowing: Boolean?) {
+
+        val previousState = _state.value
+
+        _state.update { currentUiState ->
+            val currentState = (currentUiState as? UiState.Success)?.data ?: return@update currentUiState
+            val currentPlan = currentState.planAllModel ?: return@update currentUiState
+
+            val updatedPlan = currentPlan.copy(
+                normalSchedules = currentPlan.normalSchedules.filterNot { it.scheduleId == scheduleId },
+                recurringSchedules = currentPlan.recurringSchedules.filterNot { it.scheduleId == scheduleId }
+            )
+
+            UiState.Success(currentState.copy(planAllModel = updatedPlan))
+        }
+
         viewModelScope.launch {
             planRepository.deleteSchedule(scheduleId, selectedDate, isIncludeFollowing)
                 .onSuccess {
                     _sideEffect.emit(ShowSnackBar("일정이 삭제되었습니다"))
 
-                    val currentState = currentScheduleState ?: return@onSuccess
-                    val currentPlan = currentState.planAllModel ?: return@onSuccess
-
-                    val newNormalSchedules = currentPlan.normalSchedules.filterNot { it.scheduleId == scheduleId }
-                    val newRecurringSchedules = currentPlan.recurringSchedules.filterNot { it.scheduleId == scheduleId }
-
-                    val updatedPlan = currentPlan.copy(
-                        normalSchedules = newNormalSchedules,
-                        recurringSchedules = newRecurringSchedules
-                    )
-
-                    _state.value = UiState.Success(currentState.copy(planAllModel = updatedPlan))
+                }
+                .onFailure {
+                    _state.value = previousState
+                    _sideEffect.emit(ShowSnackBar("일정 삭제에 실패했습니다"))
                 }
         }
     }
