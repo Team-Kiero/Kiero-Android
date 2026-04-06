@@ -215,7 +215,7 @@ private fun KidMissionScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .fillParentMaxHeight(0.6f),
+                            .fillParentMaxHeight(0.7f),
                         contentAlignment = Alignment.Center
                     ) {
                         KieroContentEmptyScreen(
