@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -35,7 +36,7 @@ class ParentAddRewardViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            snapshotFlow { priceState.text.toString() }.collect { text ->
+            snapshotFlow { priceState.text.toString() }.collectLatest{ text ->
                 val num = text.toIntOrNull()
                 if (num != null) {
                     if (num > RewardPriceDefaults.MAX_PRICE) {
