@@ -14,12 +14,17 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -106,6 +111,18 @@ fun ParentAutoAddScreen(
 ) {
     val focusManager = LocalFocusManager.current
 
+    // 🌟 커서 위치를 기억하는 TextFieldValue 상태 생성
+    var noticeTextFieldValue by remember {
+        mutableStateOf(TextFieldValue(text = state.noticeText))
+    }
+
+    // ViewModel의 상태와 UI의 TextFieldValue 동기화 (외부에서 텍스트가 강제로 변경될 때 대비)
+    LaunchedEffect(state.noticeText) {
+        if (state.noticeText != noticeTextFieldValue.text) {
+            noticeTextFieldValue = noticeTextFieldValue.copy(text = state.noticeText)
+        }
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -144,8 +161,11 @@ fun ParentAutoAddScreen(
             contentAlignment = Alignment.TopCenter
         ) {
             ScrollableAutoInputField(
-                text = state.noticeText,
-                onTextChange = onTextChange,
+                value = noticeTextFieldValue,
+                onValueChange = { newValue ->
+                    noticeTextFieldValue = newValue
+                    onTextChange(newValue.text)
+                },
                 modifier = Modifier.fillMaxWidth()
             )
         }
