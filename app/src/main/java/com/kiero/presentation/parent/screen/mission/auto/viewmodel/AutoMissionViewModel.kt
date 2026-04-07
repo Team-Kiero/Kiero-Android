@@ -1,6 +1,7 @@
 package com.kiero.presentation.parent.screen.mission.auto.viewmodel
 
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -19,13 +20,12 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
 import javax.inject.Inject
-import kotlin.collections.indexOfFirst
-import kotlin.collections.toMutableList
 
 @HiltViewModel
 class AutoMissionViewModel @Inject constructor(
@@ -48,24 +48,31 @@ class AutoMissionViewModel @Inject constructor(
     private fun observeAwardTextFieldChanges() {
         viewModelScope.launch {
             snapshotFlow { awardTextFieldState.text.toString() }
-                .collect { text ->
+                .collectLatest{ text ->
                     val num = text.toIntOrNull()
+
                     if (num != null) {
                         if (num > 500) {
-                            awardTextFieldState.edit { replace(0, length, "500") }
+                            awardTextFieldState.setTextAndPlaceCursorAtEnd("500")
                             _sideEffect.emit(AutoMissionSideEffect.ShowToast("최대 보상은 500개입니다."))
                             updateMissionReward(500)
                         } else if (num == 0) {
-                            awardTextFieldState.edit { replace(0, length, "1") }
+                            awardTextFieldState.setTextAndPlaceCursorAtEnd("1")
                             updateMissionReward(1)
                         } else {
                             updateMissionReward(num)
+                        }
+                    } else {
+                        if (text.isEmpty()) {
+                            updateMissionReward(0)
+                        } else {
+                            awardTextFieldState.setTextAndPlaceCursorAtEnd("1")
+                            updateMissionReward(1)
                         }
                     }
                 }
         }
     }
-
     private fun updateMissionReward(value: Int) {
         _state.update { state ->
             val updatedMissions = state.missions.toMutableList().apply {
@@ -78,15 +85,15 @@ class AutoMissionViewModel @Inject constructor(
         }
     }
 
-    fun onKeypadClosed() {
+    fun validateAndFixReward() {
         val currentText = awardTextFieldState.text.toString()
         val current = currentText.toIntOrNull()
 
         if (current == null || current < 1) {
-            awardTextFieldState.edit { replace(0, length, "1") }
+            awardTextFieldState.setTextAndPlaceCursorAtEnd("1")
             updateMissionReward(1)
         } else if (current > 500) {
-            awardTextFieldState.edit { replace(0, length, "500") }
+            awardTextFieldState.setTextAndPlaceCursorAtEnd("500")
             updateMissionReward(500)
         }
     }
@@ -98,18 +105,18 @@ class AutoMissionViewModel @Inject constructor(
 
         when {
             newValue > 500 -> {
-                awardTextFieldState.edit { replace(0, length, "500") }
+                awardTextFieldState.setTextAndPlaceCursorAtEnd("500")
                 viewModelScope.launch {
                     _sideEffect.emit(AutoMissionSideEffect.ShowToast("최대 보상은 500개입니다."))
                 }
                 updateMissionReward(500)
             }
             newValue < 1 -> {
-                awardTextFieldState.edit { replace(0, length, "1") }
+                awardTextFieldState.setTextAndPlaceCursorAtEnd("1")
                 updateMissionReward(1)
             }
             else -> {
-                awardTextFieldState.edit { replace(0, length, newValue.toString()) }
+                awardTextFieldState.setTextAndPlaceCursorAtEnd(newValue.toString())
                 updateMissionReward(newValue)
             }
         }
@@ -207,7 +214,7 @@ class AutoMissionViewModel @Inject constructor(
     }
 
     fun updateCurrentIndex(index: Int) {
-        onKeypadClosed()
+        validateAndFixReward()
 
         _state.update { currentState ->
             val newHasViewedLastPage = if (index == currentState.missions.size - 1) {
@@ -224,14 +231,12 @@ class AutoMissionViewModel @Inject constructor(
 
         _state.value.currentMission?.let { mission ->
             _state.update { it.copy(selectedDate = mission.dueAt) }
-            awardTextFieldState.edit {
-                replace(0, length, mission.reward.toString())
-            }
+            awardTextFieldState.setTextAndPlaceCursorAtEnd(mission.reward.toString())
         }
     }
 
     fun saveAllMissions() {
-        onKeypadClosed()
+        validateAndFixReward()
 
         viewModelScope.launch {
             val childId = userInfoManager.getChildIdInfo() ?: return@launch
