@@ -2,6 +2,7 @@ package com.kiero.presentation.parent.screen.reward.viewmodel
 
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.localstorage.info.UserInfoManager
@@ -14,9 +15,10 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
-import javax.inject.Inject
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class ParentAddRewardViewModel @Inject constructor(
@@ -32,7 +34,24 @@ class ParentAddRewardViewModel @Inject constructor(
     private val _sideEffect = MutableSharedFlow<ParentRewardSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
 
+    init {
+        viewModelScope.launch {
+            snapshotFlow { priceState.text.toString() }.collectLatest{ text ->
+                val num = text.toIntOrNull()
+                if (num != null) {
+                    if (num > RewardPriceDefaults.MAX_PRICE) {
+                        priceState.edit { replace(0, length, RewardPriceDefaults.MAX_PRICE.toString()) }
+                        _sideEffect.emit(ParentRewardSideEffect.ShowSnackBar("최대 보상은 ${RewardPriceDefaults.MAX_PRICE}개입니다"))
+                    } else if (num == 0) {
+                        priceState.edit { replace(0, length, RewardPriceDefaults.MIN_PRICE.toString()) }
+                    }
+                }
+            }
+        }
+    }
+
     fun createReward() {
+        validateAndFixPrice()
         val name = nameState.text.toString().trim()
         val price = priceState.text.toString().toIntOrNull() ?: 0
 
@@ -41,8 +60,8 @@ class ParentAddRewardViewModel @Inject constructor(
                 _sideEffect.emit(ParentRewardSideEffect.ShowSnackBar("보상 이름을 입력해주세요."))
                 return@launch
             }
-            if (price <= 0) {
-                _sideEffect.emit(ParentRewardSideEffect.ShowSnackBar("보상을 입력해주세요."))
+            if (price < RewardPriceDefaults.MIN_PRICE) {
+                _sideEffect.emit(ParentRewardSideEffect.ShowSnackBar("보상을 올바르게 입력해주세요."))
                 return@launch
             }
 
@@ -59,14 +78,12 @@ class ParentAddRewardViewModel @Inject constructor(
 
     fun validateAndFixPrice() {
         val text = priceState.text.toString()
-        val currentPrice = text.toIntOrNull() ?: 0
-        if (currentPrice > RewardPriceDefaults.MAX_PRICE) {
-            priceState.setTextAndPlaceCursorAtEnd(RewardPriceDefaults.MAX_PRICE.toString())
-            viewModelScope.launch {
-                _sideEffect.emit(ParentRewardSideEffect.ShowSnackBar("최대 보상은 ${RewardPriceDefaults.MAX_PRICE}개입니다"))
-            }
-        } else if (text.isEmpty() || currentPrice < RewardPriceDefaults.MIN_PRICE) {
+        val currentPrice = text.toIntOrNull()
+
+        if (currentPrice == null || currentPrice < RewardPriceDefaults.MIN_PRICE) {
             priceState.setTextAndPlaceCursorAtEnd(RewardPriceDefaults.MIN_PRICE.toString())
+        } else if (currentPrice > RewardPriceDefaults.MAX_PRICE) {
+            priceState.setTextAndPlaceCursorAtEnd(RewardPriceDefaults.MAX_PRICE.toString())
         }
     }
 }

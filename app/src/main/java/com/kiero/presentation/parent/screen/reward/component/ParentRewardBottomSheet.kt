@@ -16,6 +16,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -53,11 +54,9 @@ fun ParentRewardBottomSheet(
                 .padding(vertical = 20.dp, horizontal = 16.dp)
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = reward.name,
-                    style = KieroTheme.typography.bold.headLine3,
-                    color = KieroTheme.colors.white,
-                    modifier = Modifier.padding(vertical = 11.dp)
+                BottomSheetTopbar(
+                    title = reward.name,
+                    onCancelClick = onDismissRequest
                 )
 
                 KieroChip(
@@ -118,6 +117,35 @@ private fun ParentRewardActionItem(
         )
     }
 }
+
+@Composable
+private fun BottomSheetTopbar(
+    title: String,
+    onCancelClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 11.dp)
+    ) {
+        Text(
+            text = title,
+            style = KieroTheme.typography.bold.headLine3,
+            color = KieroTheme.colors.white,
+        )
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Icon(
+            imageVector = ImageVector.vectorResource(id = R.drawable.ic_close),
+            contentDescription = null,
+            tint = Color.Unspecified,
+            modifier = Modifier.noRippleClickable(onClick = onCancelClick)
+        )
+    }
+}
+
 @Preview
 @Composable
 private fun ParentRewardBottomSheetPreview() {

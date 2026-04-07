@@ -1,6 +1,7 @@
 package com.kiero.presentation.parent.screen.mission.auto.viewmodel
 
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,7 +11,6 @@ import com.kiero.data.parent.mission.repository.AutoMissionRepository
 import com.kiero.presentation.parent.screen.mission.auto.model.MissionUiModel
 import com.kiero.presentation.parent.screen.mission.auto.state.AutoMissionSideEffect
 import com.kiero.presentation.parent.screen.mission.auto.state.AutoMissionState
-import com.kiero.presentation.parent.screen.mission.component.model.MissionAwardDefaults
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
@@ -20,13 +20,12 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
 import javax.inject.Inject
-import kotlin.collections.indexOfFirst
-import kotlin.collections.toMutableList
 
 @HiltViewModel
 class AutoMissionViewModel @Inject constructor(
@@ -44,6 +43,83 @@ class AutoMissionViewModel @Inject constructor(
 
     init {
         observeAwardTextFieldChanges()
+    }
+
+    private fun observeAwardTextFieldChanges() {
+        viewModelScope.launch {
+            snapshotFlow { awardTextFieldState.text.toString() }
+                .collectLatest{ text ->
+                    val num = text.toIntOrNull()
+
+                    if (num != null) {
+                        if (num > 500) {
+                            awardTextFieldState.setTextAndPlaceCursorAtEnd("500")
+                            _sideEffect.emit(AutoMissionSideEffect.ShowToast("최대 보상은 500개입니다."))
+                            updateMissionReward(500)
+                        } else if (num == 0) {
+                            awardTextFieldState.setTextAndPlaceCursorAtEnd("1")
+                            updateMissionReward(1)
+                        } else {
+                            updateMissionReward(num)
+                        }
+                    } else {
+                        if (text.isEmpty()) {
+                            updateMissionReward(0)
+                        } else {
+                            awardTextFieldState.setTextAndPlaceCursorAtEnd("1")
+                            updateMissionReward(1)
+                        }
+                    }
+                }
+        }
+    }
+    private fun updateMissionReward(value: Int) {
+        _state.update { state ->
+            val updatedMissions = state.missions.toMutableList().apply {
+                val index = state.currentIndex
+                if (index in indices) {
+                    this[index] = this[index].copy(reward = value)
+                }
+            }
+            state.copy(missions = updatedMissions)
+        }
+    }
+
+    fun validateAndFixReward() {
+        val currentText = awardTextFieldState.text.toString()
+        val current = currentText.toIntOrNull()
+
+        if (current == null || current < 1) {
+            awardTextFieldState.setTextAndPlaceCursorAtEnd("1")
+            updateMissionReward(1)
+        } else if (current > 500) {
+            awardTextFieldState.setTextAndPlaceCursorAtEnd("500")
+            updateMissionReward(500)
+        }
+    }
+
+    fun onAwardClick(change: Int) {
+        val currentText = awardTextFieldState.text.toString()
+        val current = if (currentText.isBlank()) 0 else currentText.toIntOrNull() ?: 0
+        val newValue = current + change
+
+        when {
+            newValue > 500 -> {
+                awardTextFieldState.setTextAndPlaceCursorAtEnd("500")
+                viewModelScope.launch {
+                    _sideEffect.emit(AutoMissionSideEffect.ShowToast("최대 보상은 500개입니다."))
+                }
+                updateMissionReward(500)
+            }
+            newValue < 1 -> {
+                awardTextFieldState.setTextAndPlaceCursorAtEnd("1")
+                updateMissionReward(1)
+            }
+            else -> {
+                awardTextFieldState.setTextAndPlaceCursorAtEnd(newValue.toString())
+                updateMissionReward(newValue)
+            }
+        }
     }
 
     fun updateNoticeText(text: String) {
@@ -137,47 +213,9 @@ class AutoMissionViewModel @Inject constructor(
         }
     }
 
-    fun onAwardClick(change: Int) {
-        val currentState = _state.value
-        val currentReward = currentState.currentReward
-        val newReward = MissionAwardDefaults.applyChange(currentReward, change)
-
-        viewModelScope.launch {
-            when {
-                currentReward + change < MissionAwardDefaults.MIN_AWARD -> {
-                    _sideEffect.emit(
-                        AutoMissionSideEffect.ShowToast(
-                            "최소 보상은 ${MissionAwardDefaults.MIN_AWARD}개입니다."
-                        )
-                    )
-                }
-
-                currentReward + change > MissionAwardDefaults.MAX_AWARD -> {
-                    _sideEffect.emit(
-                        AutoMissionSideEffect.ShowToast(
-                            "최대 보상은 ${MissionAwardDefaults.MAX_AWARD}개입니다."
-                        )
-                    )
-                }
-            }
-        }
-
-        _state.update { currentState ->
-            val updatedMissions = currentState.missions.toMutableList().apply {
-                val index = currentState.currentIndex
-                if (index in indices) {
-                    this[index] = this[index].copy(reward = newReward)
-                }
-            }
-            currentState.copy(missions = updatedMissions)
-        }
-
-        awardTextFieldState.edit {
-            replace(0, length, newReward.toString())
-        }
-    }
-
     fun updateCurrentIndex(index: Int) {
+        validateAndFixReward()
+
         _state.update { currentState ->
             val newHasViewedLastPage = if (index == currentState.missions.size - 1) {
                 true
@@ -193,13 +231,13 @@ class AutoMissionViewModel @Inject constructor(
 
         _state.value.currentMission?.let { mission ->
             _state.update { it.copy(selectedDate = mission.dueAt) }
-            awardTextFieldState.edit {
-                replace(0, length, mission.reward.toString())
-            }
+            awardTextFieldState.setTextAndPlaceCursorAtEnd(mission.reward.toString())
         }
     }
 
     fun saveAllMissions() {
+        validateAndFixReward()
+
         viewModelScope.launch {
             val childId = userInfoManager.getChildIdInfo() ?: return@launch
             val currentState = _state.value
@@ -281,54 +319,6 @@ class AutoMissionViewModel @Inject constructor(
 
     fun onDateSelected(date: LocalDate) {
         updateMissionDate(date)
-    }
-
-    private fun observeAwardTextFieldChanges() {
-        viewModelScope.launch {
-            snapshotFlow { awardTextFieldState.text.toString() }
-                .collect { text ->
-                    if (text.isEmpty()) {
-                        return@collect
-                    }
-                    val value = text.toIntOrNull() ?: return@collect
-                    val currentState = _state.value
-
-                    when {
-                        value > 500 -> {
-                            awardTextFieldState.edit {
-                                replace(0, length, "500")
-                            }
-                            _sideEffect.emit(
-                                AutoMissionSideEffect.ShowToast("최대 보상은 500개입니다.")
-                            )
-                            updateMissionReward(500)
-                        }
-
-                        value < 1 -> {
-                            awardTextFieldState.edit {
-                                replace(0, length, "1")
-                            }
-                            updateMissionReward(1)
-                        }
-
-                        value != currentState.currentReward -> {
-                            updateMissionReward(value)
-                        }
-                    }
-                }
-        }
-    }
-
-    private fun updateMissionReward(value: Int) {
-        _state.update { state ->
-            val updatedMissions = state.missions.toMutableList().apply {
-                val index = state.currentIndex
-                if (index in indices) {
-                    this[index] = this[index].copy(reward = value)
-                }
-            }
-            state.copy(missions = updatedMissions)
-        }
     }
 
     private fun getErrorMessage(mission: MissionUiModel): String = when {

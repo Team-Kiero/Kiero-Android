@@ -12,11 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -31,13 +28,10 @@ import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.screen.mission.auto.component.ParentAutoMissionEditForm
 import com.kiero.presentation.parent.screen.mission.auto.component.ParentMissionNavigator
 import com.kiero.presentation.parent.screen.mission.auto.model.MissionUiModel
-import com.kiero.presentation.parent.screen.mission.auto.state.AutoMissionSideEffect
 import com.kiero.presentation.parent.screen.mission.auto.state.AutoMissionState
 import com.kiero.presentation.parent.screen.mission.auto.viewmodel.AutoMissionViewModel
 import com.kiero.presentation.parent.screen.mission.component.datepicker.component.CalendarBottomSheet
-import timber.log.Timber
 import java.time.LocalDate
-
 
 @Composable
 fun ParentAutoResultRoute(
@@ -46,36 +40,14 @@ fun ParentAutoResultRoute(
     navigateUp: () -> Unit,
     viewModel: AutoMissionViewModel = hiltViewModel(),
 ) {
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-
     LaunchedEffect(state.missions) {
         if (state.missions.isNotEmpty() && state.currentIndex == 0) {
             viewModel.updateCurrentIndex(0)
         }
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.sideEffect.collect { effect ->
-            when (effect) {
-                is AutoMissionSideEffect.ShowToast -> {
-                    snackbarHostState.currentSnackbarData?.dismiss()
-                    snackbarHostState.showSnackbar(effect.message)
-                }
 
-                is AutoMissionSideEffect.ShowToastAndNavigate -> {
-                    Timber.e("parent Auto result")
 
-                    snackbarHostState.currentSnackbarData?.dismiss()
-                    snackbarHostState.showSnackbar(effect.message)
-
-                    navigateUp()
-                }
-
-                else -> {}
-            }
-        }
-    }
     ParentAutoResultScreen(
         state = state,
         onMissionNameChange = viewModel::updateMissionName,
@@ -88,7 +60,6 @@ fun ParentAutoResultRoute(
         onDismissDatePicker = viewModel::dismissDatePicker,
         awardTextFieldState = viewModel.awardTextFieldState,
         paddingValues = paddingValues,
-        snackbarHostState = snackbarHostState
     )
 }
 
@@ -105,10 +76,8 @@ fun ParentAutoResultScreen(
     onDismissDatePicker: () -> Unit,
     awardTextFieldState: androidx.compose.foundation.text.input.TextFieldState,
     paddingValues: PaddingValues,
-    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
-
     val focusManager = LocalFocusManager.current
 
     val pagerState = rememberPagerState(
@@ -176,7 +145,6 @@ fun ParentAutoResultScreen(
                         onDateClick = onShowDatePicker,
                         onRewardClick = onRewardClick,
                         awardTextFieldState = awardTextFieldState,
-                        snackbarHostState = snackbarHostState  // 추가
                     )
                 }
             }
@@ -211,12 +179,7 @@ fun ParentAutoResultScreen(
 )
 @Composable
 private fun ParentAutoResultScreenPreview() {
-    val snackbarHostState = remember { SnackbarHostState() }
     val awardTextFieldState = rememberTextFieldState("20")
-
-    LaunchedEffect(Unit) {
-        snackbarHostState.showSnackbar("보상은 500개까지 설정할 수 있어요.")
-    }
 
     KieroTheme {
         ParentAutoResultScreen(
@@ -248,7 +211,6 @@ private fun ParentAutoResultScreenPreview() {
             onDismissDatePicker = {},
             awardTextFieldState = awardTextFieldState,
             paddingValues = PaddingValues(0.dp),
-            snackbarHostState = snackbarHostState
         )
     }
 }
