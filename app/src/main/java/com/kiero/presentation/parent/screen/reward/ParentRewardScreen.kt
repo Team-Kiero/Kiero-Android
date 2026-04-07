@@ -32,6 +32,7 @@ import com.kiero.core.designsystem.component.emptyview.KieroEntireEmptyScreen
 import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
+import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
 import com.kiero.core.trigger.LocalRefreshState
 import com.kiero.presentation.main.navigation.ParentMainTab
@@ -88,8 +89,9 @@ fun ParentRewardRoute(
 
     // 사이드 이펙트 처리
     viewModel.sideEffect.collectSideEffect { sideEffect ->
-        if (sideEffect is ParentRewardSideEffect.ShowSnackBar) {
-            globalTrigger.showToast(sideEffect.message)
+        if (sideEffect is ParentRewardSideEffect.ShowSnackBar) {globalTrigger.showSnackbar(
+            SnackbarState(message = sideEffect.message)
+        )
         }
     }
 

@@ -164,7 +164,10 @@ private fun ParentMissionScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(color = KieroTheme.colors.black),
-                    contentPadding = PaddingValues(16.dp),
+                    contentPadding = PaddingValues( start = 16.dp,
+                        end = 16.dp,
+                        top = 16.dp,
+                        bottom = 83.dp ),
                 ) {
                     state.kidMissionByDateList.missionsByDate.forEach { missionsByDate ->
                         stickyHeader {
@@ -198,10 +201,6 @@ private fun ParentMissionScreen(
                                     reward = mission.reward
                                 )
                             }
-                        }
-
-                        item{
-                            Spacer(modifier = Modifier.height(83.dp))
                         }
                     }
                 }
