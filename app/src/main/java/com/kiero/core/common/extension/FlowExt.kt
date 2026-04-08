@@ -1,5 +1,6 @@
 package com.kiero.core.common.extension
 
+import android.os.SystemClock
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,7 +38,7 @@ fun <T> Flow<T>.collectSingleEvent(
 
     LaunchedEffect(this, lifecycle) {
         flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect { value ->
-            val currentTime = System.currentTimeMillis()
+            val currentTime = SystemClock.uptimeMillis()
             if (currentTime - lastEmitTime > throttleTime) {
                 lastEmitTime = currentTime
                 action(value)
