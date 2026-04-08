@@ -70,7 +70,8 @@ fun MainRoute(
         appState = appState,
         state = state,
         snackBarHostState = snackBarHostState,
-        onAlarmClick = {} /*viewModel::onAlarmRead 알림 클릭 시 RED DOT 유지*/
+        onAlarmClick = viewModel::onAlarmRead,
+        onRefreshUnreadAlarm = viewModel::fetchUnreadAlarmStatus
     )
 }
 
@@ -80,6 +81,7 @@ fun MainScreen(
     state: MainState,
     snackBarHostState: SnackbarHostState,
     onAlarmClick: () -> Unit,
+    onRefreshUnreadAlarm: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -299,7 +301,8 @@ fun MainScreen(
                 KieroNavHost(
                     appState = appState,
                     paddingValues = paddingValues,
-                    startDestination = appState.startDestination
+                    startDestination = appState.startDestination,
+                    onRefreshUnreadAlarm = onRefreshUnreadAlarm
                 )
             }
         }

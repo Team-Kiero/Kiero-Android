@@ -29,7 +29,7 @@ class MainViewModel @Inject constructor(
         observeFeedEvent()
     }
 
-    private fun fetchUnreadAlarmStatus() {
+    fun fetchUnreadAlarmStatus() {
         viewModelScope.launch {
             alarmRepository.getUnreadAlarm()
                 .onSuccess { result ->
@@ -58,13 +58,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun onAlarmRead() {
-        _state.update {
-            it.copy(
-                unreadAlarm = it.unreadAlarm.copy(
-                    hasUnread = false,
-                    unreadChildIds = persistentListOf()
-                )
-            )
-        }
+        if (!_state.value.unreadAlarm.hasUnread) return
+        fetchUnreadAlarmStatus()
     }
 }
