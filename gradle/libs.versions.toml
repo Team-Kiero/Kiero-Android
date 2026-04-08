@@ -67,6 +67,9 @@ profileinstaller = "1.3.1"
 # Open Source
 aboutLibraries = "13.2.1"
 
+# Wheel Picker
+wheelPicker = "0.0.1"
+
 [libraries]
 # Test
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -136,6 +139,9 @@ androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profi
 
 # AboutLibraries
 aboutlibraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "aboutLibraries" }
+
+# WheelPicker
+wheelpicker = { group = "io.github.sonms", name = "wheelpicker", version.ref = "wheelPicker" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
