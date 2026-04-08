@@ -5,8 +5,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -30,6 +32,7 @@ import com.kiero.core.designsystem.component.emptyview.KieroEntireEmptyScreen
 import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
+import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
 import com.kiero.core.trigger.LocalRefreshState
 import com.kiero.presentation.main.navigation.ParentMainTab
@@ -86,8 +89,9 @@ fun ParentRewardRoute(
 
     // 사이드 이펙트 처리
     viewModel.sideEffect.collectSideEffect { sideEffect ->
-        if (sideEffect is ParentRewardSideEffect.ShowSnackBar) {
-            globalTrigger.showToast(sideEffect.message)
+        if (sideEffect is ParentRewardSideEffect.ShowSnackBar) {globalTrigger.showSnackbar(
+            SnackbarState(message = sideEffect.message)
+        )
         }
     }
 
@@ -213,6 +217,10 @@ private fun RewardGridContent(
                 price = reward.price,
                 onClick = { onRewardClick(reward) },
             )
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(83.dp))
         }
     }
 }

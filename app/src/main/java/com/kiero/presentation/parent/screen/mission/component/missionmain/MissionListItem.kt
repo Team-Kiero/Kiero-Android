@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,10 +47,12 @@ fun MissionListItem(
         Text(
             text = missionTitle,
             style = KieroTheme.typography.semiBold.title3,
-            color = KieroTheme.colors.white
+            color = KieroTheme.colors.white,
+            modifier = Modifier.weight(1f),
+            maxLines = 1,
         )
 
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.width(16.dp))
 
         /*
             TODO : pull 받고 수정
@@ -119,7 +122,7 @@ private fun MissionListItemPreview() {
     KieroTheme {
         Column {
             MissionListItem(
-                missionTitle = "테스트 미션",
+                missionTitle = "테스트 미션 테스트 미션 테스트 미션 테스트 미션 테스트미션 미션미션",
                 reward = 150,
             )
 

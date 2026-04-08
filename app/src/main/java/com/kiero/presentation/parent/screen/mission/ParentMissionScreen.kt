@@ -133,6 +133,7 @@ private fun ParentMissionScreen(
     var selectedName by remember { mutableStateOf("") }
     var selectedReward by remember { mutableStateOf(0) }
     var selectedDueAt by remember { mutableStateOf("") }
+    var selectedIsCompleted by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         refreshState.refreshEvent.collect { tab ->
@@ -163,7 +164,10 @@ private fun ParentMissionScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(color = KieroTheme.colors.black),
-                    contentPadding = PaddingValues(16.dp),
+                    contentPadding = PaddingValues( start = 16.dp,
+                        end = 16.dp,
+                        top = 16.dp,
+                        bottom = 83.dp ),
                 ) {
                     state.kidMissionByDateList.missionsByDate.forEach { missionsByDate ->
                         stickyHeader {
@@ -188,9 +192,8 @@ private fun ParentMissionScreen(
                                         selectedName = mission.name
                                         selectedReward = mission.reward
                                         selectedDueAt = missionsByDate.dueAt
-                                        if (!mission.isCompleted) {
-                                            showBottomSheet = true
-                                        }
+                                        selectedIsCompleted = mission.isCompleted
+                                        showBottomSheet = true
                                     }
                             ) {
                                 MissionListItem(
@@ -219,21 +222,25 @@ private fun ParentMissionScreen(
             ParentContentBottomSheet(
                 topTitle = selectedName,
                 onDismissRequest = { showBottomSheet = false },
-                onEditClick = {
-                    showBottomSheet = false
-                    navigateToMissionEdit(
-                        MissionEdit(
-                            missionId = selectedId,
-                            name = selectedName,
-                            reward = selectedReward,
-                            dueAt = selectedDueAt,
+                onEditClick = if (!selectedIsCompleted) {
+                    {
+                        showBottomSheet = false
+                        navigateToMissionEdit(
+                            MissionEdit(
+                                missionId = selectedId,
+                                name = selectedName,
+                                reward = selectedReward,
+                                dueAt = selectedDueAt,
+                            )
                         )
-                    )
-                },
-                onDeleteClick = {
-                    showBottomSheet = false
-                    showDeleteDialog = true
-                },
+                    }
+                } else null,
+                onDeleteClick = if (!selectedIsCompleted) {
+                    {
+                        showBottomSheet = false
+                        showDeleteDialog = true
+                    }
+                } else null,
                 content = {
                     MissionBottomSheetContent(
                         reward = selectedReward,

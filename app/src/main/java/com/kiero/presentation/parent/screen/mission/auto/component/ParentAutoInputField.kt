@@ -35,7 +35,6 @@ fun ParentAutoInputField(
         value = value,
         onValueChange = { newTextFieldValue ->
             if (newTextFieldValue.text.length <= maxLength) {
-                // 값 변경을 상위로 즉시 전달
                 onValueChange(newTextFieldValue)
             }
         },

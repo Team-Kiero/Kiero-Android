@@ -1,6 +1,8 @@
 package com.kiero.presentation.parent.screen.mission.viewmodel
 
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,6 +18,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -47,6 +50,22 @@ class ParentAddMissionViewModel @Inject constructor(
     val awardTextFieldState = TextFieldState(
         initialText = editArgs?.reward?.takeIf { it > 0 }?.toString() ?: "20"
     )
+
+    init {
+        viewModelScope.launch {
+            snapshotFlow { awardTextFieldState.text.toString() }.collectLatest { text ->
+                val num = text.toIntOrNull()
+                if (num != null) {
+                    if (num > 500) {
+                        awardTextFieldState.setTextAndPlaceCursorAtEnd("500")
+                        _sideEffect.emit(ParentAddMissionSideEffect.ShowSnackbar("최대 보상은 500개입니다"))
+                    } else if (num == 0) {
+                        awardTextFieldState.setTextAndPlaceCursorAtEnd("1")
+                    }
+                }
+            }
+        }
+    }
 
     fun onMissionNameMaxLength() {
         viewModelScope.launch {
@@ -86,27 +105,41 @@ class ParentAddMissionViewModel @Inject constructor(
         _showBottomSheet.update { false }
     }
 
+    fun validateAndFixReward() {
+        val currentText = awardTextFieldState.text.toString()
+        val current = currentText.toIntOrNull()
+
+        if (current == null || current < 1) {
+            awardTextFieldState.setTextAndPlaceCursorAtEnd("1")
+        } else if (current > 500) {
+            awardTextFieldState.setTextAndPlaceCursorAtEnd("500")
+        }
+    }
+
     fun onAwardClick(reward: Int) {
-        val current = awardTextFieldState.text.toString().toIntOrNull() ?: 0
+        val currentText = awardTextFieldState.text.toString()
+        val current = if (currentText.isBlank()) 0 else currentText.toIntOrNull() ?: 0
         val newValue = current + reward
 
-        viewModelScope.launch {
-            when {
-                newValue > 500 -> {
-                    awardTextFieldState.edit { replace(0, length, "500") }
-                    _sideEffect.emit(ParentAddMissionSideEffect.ShowSnackbar("보상은 500개까지 설정할 수 있어요."))
+        when {
+            newValue > 500 -> {
+                awardTextFieldState.setTextAndPlaceCursorAtEnd("500")
+                viewModelScope.launch {
+                    _sideEffect.emit(ParentAddMissionSideEffect.ShowSnackbar("최대 보상은 500개입니다"))
                 }
-                newValue < 0 -> {
-                    awardTextFieldState.edit { replace(0, length, "0") }
-                }
-                else -> {
-                    awardTextFieldState.edit { replace(0, length, newValue.toString()) }
-                }
+            }
+            newValue < 1 -> {
+                awardTextFieldState.setTextAndPlaceCursorAtEnd("1")
+            }
+            else -> {
+                awardTextFieldState.setTextAndPlaceCursorAtEnd(newValue.toString())
             }
         }
     }
 
+
     fun createMission() {
+        validateAndFixReward()
         if (isEditMode) updateMission() else addMission()
     }
 
