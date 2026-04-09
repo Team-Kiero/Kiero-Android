@@ -48,7 +48,7 @@ fun ParentJourneyTodayKidInfo(
                     ) {
                         append(kidInfo.kidName)
                     }
-                    append("의 오늘의 현황")
+                    append("의 오늘 현황")
                 },
                 style = KieroTheme.typography.bold.headLine3,
                 color = KieroTheme.colors.white
@@ -69,7 +69,7 @@ fun ParentJourneyTodayKidInfo(
             modifier = Modifier
                 .fillMaxHeight()
                 .padding(end = 10.dp)
-                .aspectRatio(84f/96f)
+                .aspectRatio(84f/100f)
         )
     }
 }

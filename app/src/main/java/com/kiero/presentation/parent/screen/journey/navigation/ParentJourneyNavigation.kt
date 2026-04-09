@@ -17,11 +17,13 @@ fun NavController.navigateToParentJourney(
 fun NavGraphBuilder.parentJourneyNavGraph(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
+    onRefreshUnreadAlarm: () -> Unit
 ) {
     composable<ParentJourney> {
         ParentJourneyRoute(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
+            onRefreshUnreadAlarm = onRefreshUnreadAlarm
         )
     }
 }

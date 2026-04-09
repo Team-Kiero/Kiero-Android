@@ -41,6 +41,7 @@ import java.time.LocalDate
 fun ParentJourneyRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
+    onRefreshUnreadAlarm: () -> Unit,
     viewModel: ParentJourneyViewModel = hiltViewModel()
 ) {
     val globalUiEventHolder = LocalGlobalUiEventTrigger.current
@@ -65,8 +66,8 @@ fun ParentJourneyRoute(
 
     ParentJourneyScreen(
         paddingValues = paddingValues,
-        navigateUp = navigateUp,
         onClickJourneyItem = viewModel::fetchScheduleImage,
+        onJourneyDialogDismiss = onRefreshUnreadAlarm,
         state = state
     )
 }
@@ -75,8 +76,8 @@ fun ParentJourneyRoute(
 private fun ParentJourneyScreen(
     paddingValues: PaddingValues,
     state: ParentJourneyState,
-    navigateUp: () -> Unit,
-    onClickJourneyItem: (Long) -> Unit = {}
+    onClickJourneyItem: (Long) -> Unit = {},
+    onJourneyDialogDismiss: () -> Unit = {}
 ) {
     var initialTab by remember { mutableIntStateOf(0) }
 
@@ -169,6 +170,7 @@ private fun ParentJourneyScreen(
             imageUrl = state.selectedJourneyImageUrl,
             onDismiss = {
                 isTodayJourneyVisible = false
+                onJourneyDialogDismiss()
             }
         )
     }
@@ -180,7 +182,6 @@ private fun ParentJourneyScreenPreview() {
     KieroTheme {
         ParentJourneyScreen(
             paddingValues = PaddingValues(),
-            navigateUp = {},
             state = ParentJourneyState(
                 kidInfo = KidInfo(
                     kidId = "1",

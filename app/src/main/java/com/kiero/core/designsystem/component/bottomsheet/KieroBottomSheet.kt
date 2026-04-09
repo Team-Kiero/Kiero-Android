@@ -28,7 +28,9 @@ fun KieroBottomSheet(
         dragHandle = dragHandle,
         modifier = modifier
             .pointerInput(Unit) {
-                detectTapGestures { }
+                detectTapGestures(
+                    onTap = { onDismiss() }
+                )
             }
     ) {
         content()

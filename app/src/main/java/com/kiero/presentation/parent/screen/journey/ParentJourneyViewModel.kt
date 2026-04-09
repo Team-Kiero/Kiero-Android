@@ -5,9 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.data.parent.journey.repository.ParentJourneyRepository
 import com.kiero.data.sse.manager.SseManager
+import com.kiero.data.sse.model.parent.SseScheduleEventType
+import com.kiero.presentation.parent.screen.journey.model.TodayJourneyUiModel
+import com.kiero.presentation.parent.screen.journey.model.TodayStatus
 import com.kiero.presentation.parent.screen.journey.model.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -38,8 +42,20 @@ class ParentJourneyViewModel @Inject constructor(
     fun collectParentJourneyScheduleEvents() {
         viewModelScope.launch {
             sseManager.parentScheduleEvents.collect { event ->
-                Timber.e("parentScheduleEvents $event")
-                fetchParentJourney(_state.value.kidInfo.kidId.toLong())
+                val childId = _state.value.kidInfo.kidId.toLong()
+
+                when (event.data.scheduleEventType) {
+                    SseScheduleEventType.SCHEDULE_STATUS_UPDATED, SseScheduleEventType.TODAY_MISSION_COMPLETED -> {
+                        fetchParentJourney(childId)
+                    }
+                    SseScheduleEventType.FIRE_LIT -> {
+                        _state.update { it.copy(isFireLitToday = true) }
+                        fetchParentJourney(childId)
+                    }
+                    SseScheduleEventType.UNKNOWN -> {
+                        Timber.w("알 수 없는 schedule 이벤트: ${event.data.eventType}")
+                    }
+                }
             }
         }
     }
@@ -77,9 +93,16 @@ class ParentJourneyViewModel @Inject constructor(
 
                 _state.update { currentState ->
                     currentState.copy(
+                        isFireLitToday = result.isFireLitToday,
                         completeMissions = result.completeMissions.map { it.toUiModel() }.toImmutableList(),
                         incompleteMissions = result.incompleteMissions.map { it.toUiModel() }.toImmutableList(),
-                        todayMissionList = result.schedules.toUiModels(currentTime).toImmutableList()
+                        todayMissionList = if (result.isFireLitToday) {
+                            result.schedules.toUiModels(currentTime).toPersistentList().add(
+                                TodayJourneyUiModel(todayStatus = TodayStatus.TODAY_COMPLETED)
+                            )
+                        } else {
+                            result.schedules.toUiModels(currentTime).toPersistentList()
+                        }
                     )
                 }
             }.onFailure {

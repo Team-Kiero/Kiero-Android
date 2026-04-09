@@ -5,14 +5,11 @@ import kotlinx.collections.immutable.toImmutableList
 
 object TimePickerConstants {
     val hours: ImmutableList<String> =
-        (listOf("", "") + (1..12).map { it.toString() } + listOf("", "")).toImmutableList()
+        (1..12).map { it.toString().padStart(2, '0') }.toImmutableList()
 
     val minutes: ImmutableList<String> =
-        (listOf("", "") + (0..59).map { it.toString().padStart(2, '0') } + listOf(
-            "",
-            ""
-        )).toImmutableList()
+        (0..59).map { it.toString().padStart(2, '0') }.toImmutableList()
 
     val amPmList: ImmutableList<String> =
-        (listOf("", "") + listOf("AM", "PM") + listOf("", "")).toImmutableList()
+        listOf("AM", "PM").toImmutableList()
 }

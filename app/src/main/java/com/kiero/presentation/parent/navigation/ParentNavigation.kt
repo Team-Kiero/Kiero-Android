@@ -58,6 +58,7 @@ fun NavGraphBuilder.parentNavGraph(
     navigateUp: () -> Unit,
     navigateToSelection: () -> Unit,
     navigateToAlarm: () -> Unit,
+    onRefreshUnreadAlarm: () -> Unit
 ) {
     navigation<ParentGraph>(
         startDestination = ParentJourney
@@ -110,6 +111,7 @@ fun NavGraphBuilder.parentNavGraph(
         parentJourneyNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
+            onRefreshUnreadAlarm = onRefreshUnreadAlarm
         )
 
         parentRewardNavGraph(

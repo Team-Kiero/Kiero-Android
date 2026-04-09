@@ -148,4 +148,5 @@ dependencies {
     implementation(libs.tink.android)
 
     implementation(libs.aboutlibraries.compose.m3)
+    implementation(libs.wheelpicker)
 }

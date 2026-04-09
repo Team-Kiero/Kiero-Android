@@ -4,39 +4,32 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
-import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,7 +37,9 @@ import androidx.compose.ui.unit.dp
 import com.kiero.R
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
-import kotlinx.collections.immutable.ImmutableList
+import com.sonms.wheelpicker.VerticalWheelPicker
+import com.sonms.wheelpicker.state.rememberWheelPickerState
+import com.sonms.wheelpicker.style.WheelPickerDefaults
 
 @Composable
 fun TimePicker(
@@ -161,8 +156,6 @@ fun TimePickerBottomSheet(
                 }
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
-
             TimePickerUI(
                 chosenHour = chosenHour,
                 chosenMinute = chosenMinute,
@@ -190,7 +183,7 @@ fun TimePickerUI(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(vertical = 16.dp, horizontal = 8.dp),
+                .padding(horizontal = 8.dp),
     ) {
         TimeSelectionSection(
             chosenHour = chosenHour,
@@ -213,113 +206,121 @@ fun TimeSelectionSection(
     onAmPmChosen: (String) -> Unit,
 ) {
     val hourIndex = remember(chosenHour) {
-        val formatted = String.format("%02d", chosenHour)
-        val raw = chosenHour.toString()
-        val index = TimePickerConstants.hours.indexOf(formatted)
-        if (index != -1) index else TimePickerConstants.hours.indexOf(raw)
+        TimePickerConstants.hours.indexOfFirst {
+            it == String.format("%02d", chosenHour)
+        }.coerceAtLeast(0)
     }
     val minuteIndex = remember(chosenMinute) {
-        TimePickerConstants.minutes.indexOf(String.format("%02d", chosenMinute))
+        TimePickerConstants.minutes.indexOfFirst {
+            it == String.format("%02d", chosenMinute)
+        }.coerceAtLeast(0)
     }
     val amPmIndex = remember(chosenAmPm) {
-        TimePickerConstants.amPmList.indexOf(chosenAmPm)
+        TimePickerConstants.amPmList.indexOf(chosenAmPm).coerceAtLeast(0)
     }
+
+    val hourState = rememberWheelPickerState(initialIndex = hourIndex)
+    val minuteState = rememberWheelPickerState(initialIndex = minuteIndex)
+    val amPmState = rememberWheelPickerState(initialIndex = amPmIndex)
+
+    val itemHeight = 44.dp
 
     Box(
         modifier = Modifier.fillMaxWidth(),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(44.dp)
+                .padding(horizontal = 8.dp)
+                .height(itemHeight)
                 .background(
                     color = KieroTheme.colors.gray800,
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(8.dp),
                 )
         )
 
         Row(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth(),
         ) {
-            TimeItemsPicker(
+            // 시
+            VerticalWheelPicker(
                 items = TimePickerConstants.hours,
-                firstIndex = (hourIndex).coerceAtLeast(0),
-                onItemSelected = onHourChosen,
-            )
+                state = hourState,
+                modifier = Modifier.width(70.dp),
+                itemHeight = itemHeight,
+                visibleItemCount = 7,
+                infinite = true,
+                style = WheelPickerDefaults.style(
+                    selector = WheelPickerDefaults.selectorStyle(
+                        background = Color.Transparent,
+                        showDivider = false,
+                    ),
+                ),
+                onItemSelected = { _, item -> onHourChosen(item) },
+            ) { item, isSelected ->
+                TimePickerItem(text = item, isSelected = isSelected)
+            }
+
             Spacer(modifier = Modifier.width(16.dp))
-            TimeItemsPicker(
+
+            // 분
+            VerticalWheelPicker(
                 items = TimePickerConstants.minutes,
-                firstIndex = (minuteIndex).coerceAtLeast(0),
-                onItemSelected = onMinuteChosen,
-            )
+                state = minuteState,
+                modifier = Modifier.width(70.dp),
+                itemHeight = itemHeight,
+                visibleItemCount = 7,
+                infinite = true,
+                style = WheelPickerDefaults.style(
+                    selector = WheelPickerDefaults.selectorStyle(
+                        background = Color.Transparent,
+                        showDivider = false,
+                    ),
+                ),
+                onItemSelected = { _, item -> onMinuteChosen(item) },
+            ) { item, isSelected ->
+                TimePickerItem(text = item, isSelected = isSelected)
+            }
+
             Spacer(modifier = Modifier.width(16.dp))
-            TimeItemsPicker(
+
+            // AM/PM
+            VerticalWheelPicker(
                 items = TimePickerConstants.amPmList,
-                firstIndex = (amPmIndex).coerceAtLeast(0),
-                onItemSelected = onAmPmChosen,
-            )
+                state = amPmState,
+                modifier = Modifier.width(70.dp),
+                itemHeight = itemHeight,
+                visibleItemCount = 2,
+                infinite = false,
+                style = WheelPickerDefaults.style(
+                    selector = WheelPickerDefaults.selectorStyle(
+                        background = Color.Transparent,
+                        showDivider = false,
+                    ),
+                ),
+                onItemSelected = { _, item -> onAmPmChosen(item) },
+            ) { item, isSelected ->
+                TimePickerItem(text = item, isSelected = isSelected)
+            }
         }
     }
 }
 
 @Composable
-fun TimeItemsPicker(
-    items: ImmutableList<String>,
-    firstIndex: Int,
-    onItemSelected: (String) -> Unit,
-    modifier: Modifier = Modifier,
+private fun TimePickerItem(
+    text: String,
+    isSelected: Boolean,
 ) {
-    val listState = rememberLazyListState(initialFirstVisibleItemIndex = firstIndex)
-
-    LaunchedEffect(firstIndex) {
-        listState.scrollToItem(firstIndex)
-    }
-
-    LaunchedEffect(listState) {
-        snapshotFlow { listState.firstVisibleItemIndex }
-            .collect { index ->
-                if (index in items.indices) {
-                    onItemSelected(items[index])
-                }
-            }
-    }
-
-    Box(
-        modifier = modifier
-            .height(180.dp)
-            .width(70.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        LazyColumn(
-            modifier = Modifier.fillMaxHeight(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            state = listState,
-            contentPadding = PaddingValues(vertical = 72.dp),
-            flingBehavior = rememberSnapFlingBehavior(lazyListState = listState)
-        ) {
-            items(items.size) { i ->
-                val isSelected = i == listState.firstVisibleItemIndex
-
-                Box(
-                    modifier = Modifier
-                        .height(36.dp)
-                        .fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = items[i],
-                        color = if (isSelected) KieroTheme.colors.white else KieroTheme.colors.gray600,
-                        modifier = Modifier.alpha(if (isSelected) 1f else 0.5f),
-                        style = KieroTheme.typography.semiBold.title2,
-                        textAlign = TextAlign.Center,
-                    )
-                }
-            }
-        }
-    }
+    Text(
+        text = text,
+        color = if (isSelected) KieroTheme.colors.white else KieroTheme.colors.gray600,
+        style = KieroTheme.typography.semiBold.title2,
+        textAlign = TextAlign.Center,
+    )
 }
 
 @Preview(showBackground = true)

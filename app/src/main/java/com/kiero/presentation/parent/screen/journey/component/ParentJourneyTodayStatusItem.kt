@@ -87,7 +87,7 @@ private fun ParentJourneyToday(
     }
 
     val statusTextColor = when {
-        item.todayStatus == TodayStatus.CURRENT_COMPLETED -> KieroTheme.colors.white
+        item.todayStatus == TodayStatus.CURRENT_COMPLETED -> KieroTheme.colors.main
         isUpcoming -> KieroTheme.colors.gray800
         else -> KieroTheme.colors.gray400
     }
@@ -105,7 +105,7 @@ private fun ParentJourneyToday(
     }
 
     val showImageIcon = when (item.todayStatus) {
-        TodayStatus.PAST_COMPLETED -> true
+        TodayStatus.PAST_COMPLETED -> item.isAuthenticated
         TodayStatus.CURRENT_COMPLETED -> item.isAuthenticated
         else -> false
     }

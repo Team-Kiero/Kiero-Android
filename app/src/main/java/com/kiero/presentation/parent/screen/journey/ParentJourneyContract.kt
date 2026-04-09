@@ -8,6 +8,7 @@ import com.kiero.presentation.parent.screen.journey.model.TodayJourneyUiModel
 import com.kiero.presentation.parent.screen.journey.model.TodayStatus
 import com.kiero.presentation.parent.screen.journey.model.toUiModel
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import java.time.LocalTime
 
@@ -17,7 +18,7 @@ data class ParentJourneyState(
 
     val completeMissions: ImmutableList<JourneyMissionUiModel> = persistentListOf(),
     val incompleteMissions: ImmutableList<JourneyMissionUiModel> = persistentListOf(),
-    val todayMissionList: ImmutableList<TodayJourneyUiModel> = persistentListOf(),
+    val todayMissionList: PersistentList<TodayJourneyUiModel> = persistentListOf(),
 
     val selectedJourneyImageUrl: String = ""
 ) {
@@ -58,11 +59,24 @@ data class ParentJourneyState(
 }
 
 fun List<ParentJourneyScheduleModel>.toUiModels(currentTime: LocalTime): List<TodayJourneyUiModel> {
-    // PENDING 중 현재 시간 이후 가장 빠른 일정 id 찾기
-    val nextUpcomingId = filter { it.status == "PENDING" }
-        .filter { it.startTime.toLocalTime()?.isAfter(currentTime) == true }
-        .minByOrNull { it.startTime }
-        ?.scheduleDetailId
+    // 현재 진행 중인 일정이 있는지 확인
+    val hasOngoingSchedule = any { schedule ->
+        val start = schedule.startTime.toLocalTime()
+        val end = schedule.endTime.toLocalTime()
+        start != null && end != null && currentTime >= start && currentTime < end
+    }
+
+    // 진행 중인 일정이 없을 때만 다음 일정 id 찾기
+    val nextUpcomingId = if (hasOngoingSchedule) {
+        null
+    } else {
+        filter { schedule ->
+            val start = schedule.startTime.toLocalTime()
+            start != null && start.isAfter(currentTime)
+        }
+            .minByOrNull { it.startTime }
+            ?.scheduleDetailId
+    }
 
     return map { schedule ->
         schedule.toUiModel(

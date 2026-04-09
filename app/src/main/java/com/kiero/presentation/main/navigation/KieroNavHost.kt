@@ -23,6 +23,7 @@ fun KieroNavHost(
     appState: MainAppState,
     paddingValues: PaddingValues,
     modifier: Modifier = Modifier,
+    onRefreshUnreadAlarm: () -> Unit = {},
     startDestination: Route = AuthGraph,
 ) {
     val clearStackNavOptions = remember {
@@ -114,7 +115,8 @@ fun KieroNavHost(
             paddingValues = paddingValues,
             navigateUp = appState::navigateUp,
             navigateToSelection = appState::navigateToSelection,
-            navigateToAlarm = appState::navigateToAlarm
+            navigateToAlarm = appState::navigateToAlarm,
+            onRefreshUnreadAlarm = onRefreshUnreadAlarm
         )
 
         kidNavGraph(

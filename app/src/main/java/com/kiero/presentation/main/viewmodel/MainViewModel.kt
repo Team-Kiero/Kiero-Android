@@ -7,6 +7,7 @@ import com.kiero.data.sse.manager.SseManager
 import com.kiero.presentation.main.model.toUiModel
 import com.kiero.presentation.main.state.MainState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,7 +29,7 @@ class MainViewModel @Inject constructor(
         observeFeedEvent()
     }
 
-    private fun fetchUnreadAlarmStatus() {
+    fun fetchUnreadAlarmStatus() {
         viewModelScope.launch {
             alarmRepository.getUnreadAlarm()
                 .onSuccess { result ->
@@ -57,13 +58,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun onAlarmRead() {
-        _state.update {
-            it.copy(
-                unreadAlarm = it.unreadAlarm.copy(
-                    hasUnread = false,
-                    unreadChildIds = emptyList()
-                )
-            )
-        }
+        if (!_state.value.unreadAlarm.hasUnread) return
+        fetchUnreadAlarmStatus()
     }
 }

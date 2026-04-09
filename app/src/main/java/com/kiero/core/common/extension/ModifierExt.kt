@@ -30,6 +30,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import com.kiero.core.designsystem.theme.KieroTheme
@@ -105,21 +106,19 @@ fun Modifier.statusBarColor(backgroundColor: Color): Modifier = composed {
     }
 }
 
+// LazyColumn 같이 스크롤 후 더 이상 스크롤할 곳이 없을 때 바텀시트 움직임 막기
 fun Modifier.disableNestedScroll(): Modifier = composed {
     val connection = remember {
         object : NestedScrollConnection {
-            override fun onPreScroll(
-                available: Offset,
-                source: NestedScrollSource
-            ): Offset {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                 return Offset.Zero
             }
 
-            override fun onPostScroll(
-                consumed: Offset,
-                available: Offset,
-                source: NestedScrollSource
-            ): Offset {
+            override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
+                return available
+            }
+
+            override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
                 return available
             }
         }
@@ -127,7 +126,7 @@ fun Modifier.disableNestedScroll(): Modifier = composed {
     this.nestedScroll(connection)
 }
 
-// 위로 드래그 막는 함수
+// 위로 드래그 막는 함수 - 스크롤이 발생하기 전에 위로 올리는 행동 자체를 사전에 차단
 fun Modifier.disableUpScroll(): Modifier = composed {
     val connection = remember {
         object : NestedScrollConnection {
@@ -137,10 +136,58 @@ fun Modifier.disableUpScroll(): Modifier = composed {
             ): Offset {
                 return if (available.y < 0) available else Offset.Zero
             }
+
+            override suspend fun onPreFling(available: Velocity): Velocity {
+                return if (available.y < 0) {
+                    val maxUpwardVelocity = -1000f
+
+                    // 위로 튕기는 속도가 너무 강할 때
+                    if (available.y < maxUpwardVelocity) {
+                        Velocity(x = 0f, y = available.y - maxUpwardVelocity)
+                    } else {
+                        Velocity.Zero
+                    }
+                } else {
+                    Velocity.Zero
+                }
+            }
         }
     }
     this.nestedScroll(connection)
 }
+
+// 자식에 LazyColumn 과 같은 스크롤 컴포넌트가 존재하는 경우 바텀시트가 튕기는 현상 방지
+fun Modifier.disableUpSheetScroll(): Modifier = composed {
+    val connection = remember {
+        object : NestedScrollConnection {
+            override fun onPostScroll(
+                consumed: Offset,
+                available: Offset,
+                source: NestedScrollSource
+            ): Offset {
+                return if (available.y < 0) available else Offset.Zero
+            }
+
+            override suspend fun onPostFling(
+                consumed: Velocity,
+                available: Velocity
+            ): Velocity {
+                return if (available.y < 0) {
+                    val maxUpwardVelocity = -500f
+                    if (available.y < maxUpwardVelocity) {
+                        Velocity(x = 0f, y = available.y - maxUpwardVelocity)
+                    } else {
+                        Velocity.Zero
+                    }
+                } else {
+                    Velocity.Zero
+                }
+            }
+        }
+    }
+    this.nestedScroll(connection)
+}
+
 
 @Composable
 fun Modifier.verticalScrollbar(

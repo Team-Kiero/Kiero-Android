@@ -81,9 +81,8 @@ class ParentScheduleViewModel @Inject constructor(
     }
 
     fun fetchSchedule() {
-        val today = LocalDate.now()
-
         viewModelScope.launch {
+            val today = LocalDate.now()
             val childId = userInfoManager.getChildIdInfo() ?: return@launch
             val s = currentScheduleState ?: ParentScheduleState()
             if (_state.value is UiState.Success) {
@@ -96,11 +95,8 @@ class ParentScheduleViewModel @Inject constructor(
             planRepository.getPlanAll(childId, monday, sunday)
                 .onSuccess { model ->
                     val todayDow = today.dayOfWeek.name.take(3)
-                    val recurringSchedules = model.recurringSchedules.let { list ->
-                        if (s.currentDate == today && model.isFireLit)
-                            list.filterNot { it.dayOfWeek.contains(todayDow) }
-                        else list
-                    }
+                    // Todo : isFireLit = true일 때 반복일정일 시 안보이는 현상 수정 주완 확인 바람
+                    val recurringSchedules = model.recurringSchedules
 
                     val newData = s.copy(
                         planAllModel = model.copy(recurringSchedules = recurringSchedules),
