@@ -36,7 +36,7 @@ fun RewardNameTextField(
 
     BasicTextField(
         state = state,
-        inputTransformation = InputTransformation.maxLength(15),
+        inputTransformation = InputTransformation.maxLength(13),
         lineLimits = TextFieldLineLimits.SingleLine,
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Done,
