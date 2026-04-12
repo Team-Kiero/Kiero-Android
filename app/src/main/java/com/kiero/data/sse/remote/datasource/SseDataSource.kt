@@ -8,5 +8,5 @@ import kotlinx.coroutines.flow.Flow
 interface SseDataSource {
     suspend fun issueSubscribeToken(): BaseResponse<SseTokenResponseDto>
 
-    suspend fun subscribeEvents(accessToken: String): Flow<RawSseEvent>
+    suspend fun subscribeEvents(accessToken: String, lastEventId: String? = null): Flow<RawSseEvent>
 }
