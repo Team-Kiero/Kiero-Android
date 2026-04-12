@@ -7,6 +7,7 @@ interface SseRepository {
     suspend fun issueSubscribeToken(): Result<String>
 
     suspend fun subscribeEvents(
-        accessToken: String
+        accessToken: String,
+        lastEventId: String? = null
     ): Flow<SseEvent>
 }
