@@ -20,10 +20,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.component.emptyview.KieroContentEmptyScreen
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.presentation.parent.screen.schedule.model.BlockPosition
 import com.kiero.presentation.parent.screen.schedule.model.ScheduleEvent
 import com.kiero.presentation.parent.screen.schedule.model.toScheduleBlocks
 import com.kiero.presentation.parent.screen.schedule.plan.state.ParentScheduleState
@@ -35,23 +37,31 @@ fun ScheduleTimeTable(
     onContentClick: (String, String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(11.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-        ) {
-            ScheduleTimeColumn()
+    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+        val innerPadding = 8.dp
+        val bottomBuffer = 4.dp
+        val extraSpacing = 16.dp + innerPadding + bottomBuffer
+        val hourHeight = (maxHeight - extraSpacing) / 14
 
-            SchedulePlanner(
-                events = events,
-                state = state,
-                onContentClick = onContentClick,
-            )
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(11.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            ) {
+                ScheduleTimeColumn(hourHeight = hourHeight)
+
+                SchedulePlanner(
+                    events = events,
+                    state = state,
+                    onContentClick = onContentClick,
+                    hourHeight = hourHeight
+                )
+            }
         }
     }
 }
@@ -60,14 +70,12 @@ fun ScheduleTimeTable(
 fun SchedulePlanner(
     events: List<ScheduleEvent>,
     state: ParentScheduleState,
+    hourHeight: Dp,
     onContentClick: (String, String) -> Unit,
     modifier: Modifier = Modifier,
     daysCount: Int = 7,
 ) {
-    val density = LocalDensity.current
-    val hourHeight = with(density) { 38.dp.roundToPx().toDp() }
     val slotHeight = hourHeight / 4
-
     val innerPadding = 4.dp
     val bottomBuffer = 4.dp
     val totalHeight = (hourHeight * 14) + (innerPadding * 2) + bottomBuffer
@@ -88,6 +96,17 @@ fun SchedulePlanner(
             "${block.dayIndex}-${block.startHour}-${block.startMinute}"
         }
 
+    // 같은 이벤트 이면서 같은 요일인 조각 묶기
+    val mergedBlocks = uniqueBlocks
+        .groupBy { (block, event) -> "${event.id}-${block.dayIndex}" }
+        .map { (_, group) ->
+            val event = group.first().second
+            val firstBlock = group.minByOrNull { it.first.startHour * 60 + it.first.startMinute }!!.first
+            val totalDurationInSlots = group.sumOf { it.first.durationInSlots }
+
+            Triple(firstBlock, totalDurationInSlots, event)
+        }
+
     BoxWithConstraints(
         modifier = modifier
             .fillMaxWidth()
@@ -97,24 +116,25 @@ fun SchedulePlanner(
             .padding(innerPadding)
     ) {
         val dayWidth = maxWidth / daysCount
-        if (uniqueBlocks.isEmpty()) {
+        if (mergedBlocks.isEmpty()) {
             KieroContentEmptyScreen()
         } else {
-            uniqueBlocks.forEach { (block, event) ->
-                val hourOffset = hourHeight * (block.startHour - 8)
-                val minuteOffset = slotHeight * (block.startMinute / 15)
+            mergedBlocks.forEach { (firstBlock, totalDuration, event) ->
+                val hourOffset = hourHeight * (firstBlock.startHour - 8)
+                val minuteOffset = slotHeight * (firstBlock.startMinute / 15)
                 val topOffset = hourOffset + minuteOffset
 
-                val blockHeight = slotHeight * block.durationInSlots
+                val blockHeight = slotHeight * totalDuration
+
                 Box(
                     modifier = Modifier
-                        .offset(x = dayWidth * block.dayIndex, y = topOffset)
+                        .offset(x = dayWidth * firstBlock.dayIndex, y = topOffset)
                         .width(dayWidth)
                         .height(blockHeight)
-                        .noRippleClickable(onClick = { onContentClick(block.id, event.date ?: "") })
+                        .noRippleClickable(onClick = { onContentClick(event.id, event.date ?: "") })
                         .padding(horizontal = 3.dp)
                 ) {
-                    ScheduleEventBlock(block = block)
+                    ScheduleEventBlock(block = firstBlock.copy(blockPosition = BlockPosition.SINGLE), modifier = Modifier.fillMaxSize())
                 }
             }
         }
