@@ -59,7 +59,8 @@ fun ScheduleTimeTable(
                     events = events,
                     state = state,
                     onContentClick = onContentClick,
-                    hourHeight = hourHeight
+                    hourHeight = hourHeight,
+                    modifier = Modifier.weight(1f)
                 )
             }
         }
