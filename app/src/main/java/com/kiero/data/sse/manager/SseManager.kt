@@ -32,6 +32,7 @@ class SseManager @Inject constructor(
     private var cachedAccessToken: String? = null
     private var lastEventId: String? = null
 
+    private val recentEventHashes = ArrayDeque<Int>(10)
     private val mutex = Mutex()
 
     // 부모 이벤트
@@ -139,6 +140,20 @@ class SseManager @Inject constructor(
 
                 sseRepository.subscribeEvents(token, lastEventId)
                     .collect { event ->
+                        if (event !is SseEvent.Connected) {
+                            val eventHash = event.hashCode()
+                            if (recentEventHashes.contains(eventHash)) {
+                                Timber.d("내용이 중복된 이벤트로 수시됨: $eventHash")
+                                return@collect
+                            }
+
+                            if (recentEventHashes.size >= 10) {
+                                recentEventHashes.removeFirst()
+                            }
+
+                            recentEventHashes.addLast(eventHash)
+                        }
+
                         event.eventId?.let { id ->
                             lastEventId = id
                             Timber.d("Last-Event-ID 갱신: $lastEventId")
@@ -153,6 +168,7 @@ class SseManager @Inject constructor(
                             }
                             _connectionState.emit(true)
                         }
+
                         if (isParent) handleParentEvent(event)
                         else handleChildEvent(event)
                     }
