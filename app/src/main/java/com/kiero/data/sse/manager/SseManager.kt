@@ -145,9 +145,13 @@ class SseManager @Inject constructor(
                         }
                         // 새 연결이 성공적으로 맺어졌을 때만 기존 연결을 종료
                         if (event is SseEvent.Connected) {
-                            oldJobToCancel?.cancel()
+                            if (oldJobToCancel != null) {
+                                oldJobToCancel.cancel()
+                                Timber.d("무중단 재연결 성공, 기존 연결 종료")
+                            } else {
+                                Timber.d("SSE 연결 성공")
+                            }
                             _connectionState.emit(true)
-                            Timber.d("새 SSE 연결 성공, 기존 연결 종료 완료")
                         }
                         if (isParent) handleParentEvent(event)
                         else handleChildEvent(event)

@@ -75,7 +75,12 @@ class SseDataSourceImpl @Inject constructor(
                     t: Throwable?,
                     response: Response?
                 ) {
-                    Timber.e(t, "SSE 연결 실패 - response: ${response?.code}")
+                    if (t is java.io.IOException && (t.message == "canceled" || t.message == "Canceled")) {
+                        Timber.d("SSE 연결이 취소되었습니다 (정상적인 재연결 교체 또는 코루틴 종료)")
+                    } else {
+                        Timber.e(t, "SSE 연결 실패 - response: ${response?.code}")
+                    }
+
                     close(t)
                 }
             })
