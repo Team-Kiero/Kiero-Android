@@ -43,9 +43,10 @@ class SseRepositoryImpl @Inject constructor(
     }
 
     override suspend fun subscribeEvents(
-        accessToken: String
+        accessToken: String,
+        lastEventId: String?
     ): Flow<SseEvent> {
-        return sseDataSource.subscribeEvents(accessToken)
+        return sseDataSource.subscribeEvents(accessToken, lastEventId)
             .mapNotNull { rawEvent ->
                 parseEvent(rawEvent)
             }
@@ -68,7 +69,7 @@ class SseRepositoryImpl @Inject constructor(
                 try {
                     val data = json.decodeFromString<InviteDataDto>(raw.data)
                     Timber.d("Invite 이벤트 파싱 성공: childId=${data.childId}")
-                    SseEvent.Parent.Invite(data)
+                    SseEvent.Parent.Invite(data, eventId = raw.id)
                 } catch (e: Exception) {
                     Timber.e(e, "Invite 파싱 실패: ${raw.data}")
                     null
@@ -79,7 +80,7 @@ class SseRepositoryImpl @Inject constructor(
                 try {
                     val data = json.decodeFromString<FeedDataDto>(raw.data)
                     Timber.d("📢 Feed 이벤트 파싱 성공: ${data.eventType}")
-                    SseEvent.Parent.Feed(data)
+                    SseEvent.Parent.Feed(data, eventId = raw.id)
                 } catch (e: Exception) {
                     Timber.e(e, "Feed 파싱 실패: ${raw.data}")
                     null
@@ -91,7 +92,7 @@ class SseRepositoryImpl @Inject constructor(
                 try {
                     val data = json.decodeFromString<MissionDataDto>(raw.data)
                     Timber.d("📋 Mission 이벤트 파싱 성공: ${data.missionName}")
-                    SseEvent.Kid.Mission(data)
+                    SseEvent.Kid.Mission(data, eventId = raw.id)
                 } catch (e: Exception) {
                     Timber.e(e, "Mission 파싱 실패: ${raw.data}")
                     null
@@ -104,11 +105,11 @@ class SseRepositoryImpl @Inject constructor(
                     if (userRole == UserRole.PARENT) {
                         val data = json.decodeFromString<ParentScheduleDataDto>(raw.data)
                         Timber.d("📅 Parent Schedule 이벤트 파싱 성공: ${data.childId}")
-                        SseEvent.Parent.Schedule(data)
+                        SseEvent.Parent.Schedule(data, eventId = raw.id)
                     } else {
                         val data = json.decodeFromString<ScheduleDataDto>(raw.data)
                         Timber.d("📅 Schedule 이벤트 파싱 성공: ${data.scheduleName}")
-                        SseEvent.Kid.Schedule(data)
+                        SseEvent.Kid.Schedule(data, eventId = raw.id)
                     }
                 } catch (e: Exception) {
                     Timber.e(e, "Schedule 파싱 실패: ${raw.data}")
@@ -120,7 +121,7 @@ class SseRepositoryImpl @Inject constructor(
                 try {
                     val data = json.decodeFromString<CouponDataDto>(raw.data)
                     Timber.d("🎟️ Coupon 이벤트 파싱 성공: ${data.couponName}")
-                    SseEvent.Kid.Coupon(data)
+                    SseEvent.Kid.Coupon(data, eventId = raw.id)
                 } catch (e: Exception) {
                     Timber.e(e, "Coupon 파싱 실패: ${raw.data}")
                     null
@@ -131,7 +132,7 @@ class SseRepositoryImpl @Inject constructor(
                 try {
                     val data = json.decodeFromString<DateDataDto>(raw.data)
                     Timber.d("Date 이벤트 파싱 성공: ${data.date}")
-                    SseEvent.Kid.Date(data)
+                    SseEvent.Kid.Date(data, eventId = raw.id)
                 } catch (e: Exception) {
                     Timber.e(e, "Date 파싱 실패: ${raw.data}")
                     null
