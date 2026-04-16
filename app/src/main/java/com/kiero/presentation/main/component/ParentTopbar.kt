@@ -43,6 +43,7 @@ fun ParentTopbar(
                 color = backgroundColor
             )
             .padding(top = 24.dp, bottom = 9.dp)
+            .padding(top = 16.dp)
             .padding(horizontal = 16.dp)
             .height(IntrinsicSize.Min),
         verticalAlignment = Alignment.CenterVertically,
