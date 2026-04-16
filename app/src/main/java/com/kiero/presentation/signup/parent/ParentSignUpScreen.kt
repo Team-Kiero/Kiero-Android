@@ -92,7 +92,7 @@ fun ParentSignUpRoute(
                 globalTrigger.showSnackbar(
                     SnackbarState(
                         message = "자녀 연동이 완료되었습니다!",
-                        bottomPadding = 30
+                        bottomPadding = 110
                     )
                 )
             }
