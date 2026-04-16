@@ -14,9 +14,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -35,6 +38,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
+import com.kiero.core.common.extension.disableNestedScroll
+import com.kiero.core.common.extension.disableUpScroll
+import com.kiero.core.common.extension.disableUpSheetScroll
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.sonms.wheelpicker.VerticalWheelPicker
@@ -104,7 +110,9 @@ fun TimePickerBottomSheet(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
 
     val initialValues = remember(initialTime) {
         try {
@@ -128,16 +136,15 @@ fun TimePickerBottomSheet(
         modifier = modifier
             .pointerInput(Unit) {
                 detectTapGestures {
+                    onDismissRequest()
                 }
             }
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .pointerInput(Unit) {
-                    detectVerticalDragGestures { _, _ -> }
-                }
                 .padding(vertical = 16.dp)
+                .disableNestedScroll()
         ) {
             PickerTopbar(
                 title = pickerTitle,
@@ -164,7 +171,6 @@ fun TimePickerBottomSheet(
                 onMinuteChosen = { chosenMinute = it },
                 onAmPmChosen = { chosenAmPm = it },
             )
-
         }
     }
 }
