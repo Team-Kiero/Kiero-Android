@@ -91,7 +91,8 @@ fun ParentSignUpRoute(
             is ParentSignUpSideEffect.OnChildJoined -> {
                 globalTrigger.showSnackbar(
                     SnackbarState(
-                        message = "자녀 연동이 완료되었습니다!"
+                        message = "자녀 연동이 완료되었습니다!",
+                        bottomPadding = 30
                     )
                 )
             }

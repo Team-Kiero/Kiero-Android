@@ -6,8 +6,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.kiero.R
 import com.kiero.core.common.extension.disableNestedScroll
@@ -51,6 +52,7 @@ fun ParentJourneyBottomSheet(
     completeMissions: ImmutableList<JourneyMissionUiModel>,
     incompleteMissions: ImmutableList<JourneyMissionUiModel>,
     onDismiss: () -> Unit,
+    sheetHeight: Dp,
     modifier: Modifier = Modifier,
     initialTab: Int = 0, // 0 완료, 1 미완료
 ) {
@@ -71,7 +73,7 @@ fun ParentJourneyBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.85f)
+                .height(sheetHeight)
                 .disableUpSheetScroll()
                 .pointerInput(Unit) {
                     detectVerticalDragGestures { change, dragAmount ->
@@ -133,7 +135,8 @@ fun ParentJourneyBottomSheet(
 
             if (currentList.isEmpty()) {
                 KieroContentEmptyScreen(
-                    description = if (selectedTabIndex == 0) "아직 완료한 미션이 없어요." else "남은 미션이 없어요! 모두 완료했어요.",
+                    title = if (selectedTabIndex == 0) "아직 완료한 미션이 없어요." else "남은 미션이 없어요! 모두 완료했어요.",
+                    description = "",
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth()
@@ -210,7 +213,8 @@ private fun ParentJourneyBottomSheetPreview() {
             completeMissions = persistentListOf(),
             incompleteMissions = persistentListOf(),
             onDismiss = {},
-            initialTab = 0
+            initialTab = 0,
+            sheetHeight = 30.dp
         )
     }
 }

@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -85,6 +86,11 @@ private fun ParentJourneyScreen(
     var isTodayJourneyVisible by remember { mutableStateOf(false) }
 
     var selectedJourneyItem by remember { mutableStateOf<TodayJourneyUiModel?>(null) }
+
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+    val topBarHeight = paddingValues.calculateTopPadding()
+    val targetSheetHeight = screenHeight - topBarHeight
 
 
     Column (
@@ -160,6 +166,7 @@ private fun ParentJourneyScreen(
             completeMissions = state.completeMissions,
             incompleteMissions = state.incompleteMissions,
             initialTab = initialTab,
+            sheetHeight = targetSheetHeight,
             onDismiss = { isBottomSheetVisible = false }
         )
     }
