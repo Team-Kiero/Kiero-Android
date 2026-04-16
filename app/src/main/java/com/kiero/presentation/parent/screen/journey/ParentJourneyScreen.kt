@@ -2,6 +2,7 @@ package com.kiero.presentation.parent.screen.journey
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,7 +19,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -87,99 +87,100 @@ private fun ParentJourneyScreen(
 
     var selectedJourneyItem by remember { mutableStateOf<TodayJourneyUiModel?>(null) }
 
-    val configuration = LocalConfiguration.current
-    val screenHeight = configuration.screenHeightDp.dp
-    val topBarHeight = paddingValues.calculateTopPadding()
-    val targetSheetHeight = screenHeight - topBarHeight
-
-
-    Column (
-        modifier = Modifier
-            .fillMaxSize()
-            .background(KieroTheme.colors.black)
-            .padding(paddingValues)
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxSize()
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(KieroTheme.colors.gray900)
-                    .padding(start = 16.dp, end = 16.dp, top = 16.dp)
-            ) {
-                ParentJourneyTodayKidInfo(kidInfo = state.kidInfo)
-            }
+        val topBarHeight = paddingValues.calculateTopPadding()
+        val targetSheetHeight = this.maxHeight - topBarHeight
 
-            Box(
+        Column (
+            modifier = Modifier
+                .fillMaxSize()
+                .background(KieroTheme.colors.black)
+                .padding(paddingValues)
+        ) {
+            Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Column(modifier = Modifier.matchParentSize()) {
-                    Box(modifier = Modifier.weight(1f).fillMaxWidth().background(KieroTheme.colors.gray900))
-                    Box(modifier = Modifier.weight(1f).fillMaxWidth().background(KieroTheme.colors.black))
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(KieroTheme.colors.gray900)
+                        .padding(start = 16.dp, end = 16.dp, top = 16.dp)
+                ) {
+                    ParentJourneyTodayKidInfo(kidInfo = state.kidInfo)
                 }
 
-                ParentJourneyTodayMissionStatus(
-                    completeMissions = state.completeMissions,
-                    incompleteMissions = state.incompleteMissions,
-                    modifier = Modifier.padding(horizontal = 20.dp),
-                    onClick = {
-                        initialTab = if (it) 0 else 1
-                        isBottomSheetVisible = true
+                Box(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.matchParentSize()) {
+                        Box(modifier = Modifier.weight(1f).fillMaxWidth().background(KieroTheme.colors.gray900))
+                        Box(modifier = Modifier.weight(1f).fillMaxWidth().background(KieroTheme.colors.black))
                     }
-                )
-            }
-        }
 
-        if (state.todayMissionList.isEmpty()) {
-            KieroContentEmptyScreen(
-                description = "일정을 등록해주세요.",
-                modifier = Modifier
-                    .weight(1f)
-                    .align(Alignment.CenterHorizontally),
-                bottomHeight = 50.dp
-            )
-        } else {
-            LazyColumn (
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(vertical = 16.dp, horizontal = 24.dp),
-            ) {
-                itemsIndexed(
-                    items = state.todayMissionList,
-                ) { index, item ->
-                    ParentJourneyTodayStatusItem(
-                        item = item,
-                        onItemClick = {
-                            selectedJourneyItem = it
-                            onClickJourneyItem(it.scheduleDetailId)
-                            isTodayJourneyVisible = true
+                    ParentJourneyTodayMissionStatus(
+                        completeMissions = state.completeMissions,
+                        incompleteMissions = state.incompleteMissions,
+                        modifier = Modifier.padding(horizontal = 20.dp),
+                        onClick = {
+                            initialTab = if (it) 0 else 1
+                            isBottomSheetVisible = true
                         }
                     )
                 }
             }
-        }
-    }
 
-    if (isBottomSheetVisible) {
-        ParentJourneyBottomSheet(
-            completeMissions = state.completeMissions,
-            incompleteMissions = state.incompleteMissions,
-            initialTab = initialTab,
-            sheetHeight = targetSheetHeight,
-            onDismiss = { isBottomSheetVisible = false }
-        )
-    }
-
-    if (isTodayJourneyVisible) {
-        TodayJourneyDialog(
-            missionTitle = selectedJourneyItem?.todayMission.orEmpty(),
-            imageUrl = state.selectedJourneyImageUrl,
-            onDismiss = {
-                isTodayJourneyVisible = false
-                onJourneyDialogDismiss()
+            if (state.todayMissionList.isEmpty()) {
+                KieroContentEmptyScreen(
+                    description = "일정을 등록해주세요.",
+                    modifier = Modifier
+                        .weight(1f)
+                        .align(Alignment.CenterHorizontally),
+                    bottomHeight = 50.dp
+                )
+            } else {
+                LazyColumn (
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(vertical = 16.dp, horizontal = 24.dp),
+                ) {
+                    itemsIndexed(
+                        items = state.todayMissionList,
+                    ) { index, item ->
+                        ParentJourneyTodayStatusItem(
+                            item = item,
+                            onItemClick = {
+                                selectedJourneyItem = it
+                                onClickJourneyItem(it.scheduleDetailId)
+                                isTodayJourneyVisible = true
+                            }
+                        )
+                    }
+                }
             }
-        )
+        }
+
+        if (isBottomSheetVisible) {
+            ParentJourneyBottomSheet(
+                completeMissions = state.completeMissions,
+                incompleteMissions = state.incompleteMissions,
+                initialTab = initialTab,
+                sheetHeight = targetSheetHeight,
+                onDismiss = { isBottomSheetVisible = false }
+            )
+        }
+
+        if (isTodayJourneyVisible) {
+            TodayJourneyDialog(
+                missionTitle = selectedJourneyItem?.todayMission.orEmpty(),
+                imageUrl = state.selectedJourneyImageUrl,
+                onDismiss = {
+                    isTodayJourneyVisible = false
+                    onJourneyDialogDismiss()
+                }
+            )
+        }
     }
 }
 

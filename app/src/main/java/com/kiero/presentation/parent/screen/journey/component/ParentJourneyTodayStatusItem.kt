@@ -82,18 +82,21 @@ private fun ParentJourneyToday(
             if (item.isAuthenticated) R.drawable.ic_parent_addschedule_check_on
             else R.drawable.ic_parent_addschedule_check_off
         }
+        TodayStatus.NEXT_UPCOMING -> R.drawable.ic_parent_addschedule_check_off
         TodayStatus.UPCOMING -> R.drawable.ic_parent_addschedule_check_off
         TodayStatus.TODAY_COMPLETED -> null
     }
 
     val statusTextColor = when {
         item.todayStatus == TodayStatus.CURRENT_COMPLETED -> KieroTheme.colors.main
+        item.todayStatus == TodayStatus.NEXT_UPCOMING -> KieroTheme.colors.main
         isUpcoming -> KieroTheme.colors.gray800
         else -> KieroTheme.colors.gray400
     }
 
     val statusDateColor = when {
         item.todayStatus == TodayStatus.CURRENT_COMPLETED -> KieroTheme.colors.main
+        item.todayStatus == TodayStatus.NEXT_UPCOMING -> KieroTheme.colors.main
         isUpcoming -> KieroTheme.colors.gray800
         else -> KieroTheme.colors.gray400
     }
@@ -218,6 +221,9 @@ private fun ParentJourneyLightDivider(
                     color = KieroTheme.colors.gray800,
                     endColor = KieroTheme.colors.black
                 )
+            }
+            TodayStatus.NEXT_UPCOMING -> {
+                KieroDashedVerticalDivider(modifier = Modifier.weight(1f))
             }
             TodayStatus.TODAY_COMPLETED -> { /* 라인 없음 */ }
             else -> {
