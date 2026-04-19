@@ -31,21 +31,23 @@ fun ScheduleDatebar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(
-                color = Color.Transparent
-            )
+            .background(color = Color.Transparent)
             .padding(horizontal = 50.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
-
     ) {
         Icon(
             imageVector = ImageVector.vectorResource(id = R.drawable.ic_arrow_left),
             contentDescription = null,
-
-            tint = if (isPreviousEnabled) KieroTheme.colors.white else KieroTheme.colors.gray600,
+            tint = if (isPreviousEnabled) {
+                KieroTheme.colors.white
+            } else {
+                KieroTheme.colors.gray600
+            },
             modifier = Modifier.noRippleClickable(
-                onClick = { if (isPreviousEnabled) onPreviousClick() }
+                onClick = {
+                    if (isPreviousEnabled) onPreviousClick()
+                }
             )
         )
 
@@ -58,9 +60,16 @@ fun ScheduleDatebar(
         Icon(
             imageVector = ImageVector.vectorResource(id = R.drawable.ic_arrow_right),
             contentDescription = null,
-            tint = if (isNextEnabled) KieroTheme.colors.white else KieroTheme.colors.gray600,
-            modifier = Modifier
-                .noRippleClickable(onClick = onNextClick)
+            tint = if (isNextEnabled) {
+                KieroTheme.colors.white
+            } else {
+                KieroTheme.colors.gray600
+            },
+            modifier = Modifier.noRippleClickable(
+                onClick = {
+                    if (isNextEnabled) onNextClick()
+                }
+            )
         )
     }
 }
@@ -70,9 +79,11 @@ fun ScheduleDatebar(
 private fun ScheduleDatebarPreview() {
     KieroTheme {
         ScheduleDatebar(
-            date = "12월  2주차",
+            date = "12월 2주차",
             onPreviousClick = {},
-            onNextClick = {}
+            onNextClick = {},
+            isPreviousEnabled = false,
+            isNextEnabled = false
         )
     }
 }
