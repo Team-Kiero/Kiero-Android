@@ -36,13 +36,13 @@ import kotlinx.collections.immutable.persistentListOf
 fun WeekSelectArea(
     selectedDays: Set<Int>,
     isRecurring: Boolean,
+    isEditMode: Boolean = false,
     onDayClick: (Int) -> Unit,
     onAllDaysSelect: (Boolean) -> Unit,
     onRecurringToggle: () -> Unit,
+    onShowToast: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
-
-
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -56,23 +56,28 @@ fun WeekSelectArea(
         verticalArrangement = Arrangement.spacedBy(18.dp)
     ) {
         DaySection(
-            onValidClick = onRecurringToggle,
+            onValidClick = {
+                if (isEditMode) onShowToast("요일 및 반복 여부는 수정할 수 없어요. 삭제 후 등록해주세요.")
+                else onRecurringToggle()
+            },
             isEnabled = isRecurring
         )
 
         DayPickSection(
             selectedDays = selectedDays,
+            isEditMode = isEditMode,
+            onShowToast = onShowToast,
             onDayClick = onDayClick
         )
+
         RepeatSection(
             onAbleClick = { isEnabled ->
-                onAllDaysSelect(isEnabled)
+                if (isEditMode) onShowToast("요일 및 반복 여부는 수정할 수 없어요. 삭제 후 등록해주세요.")
+                else onAllDaysSelect(isEnabled)
             },
             isEnabled = selectedDays.size == 7
         )
-
     }
-
 }
 
 @Composable
@@ -81,18 +86,27 @@ private fun DayBox(
     dayTitle: String,
     modifier: Modifier = Modifier,
     isEnabled: Boolean = false,
+    isEditMode: Boolean = false,
+    onShowToast: (String) -> Unit = {}
 ) {
-    val (borderColor, textColor) = when (isEnabled) {
-        true -> KieroTheme.colors.main to KieroTheme.colors.main
+    // 🔥 선택(isEnabled)된 요일이면서 수정 모드(isEditMode)일 경우 무조건 흰색(Color.White) 적용
+    val (borderColor, textColor) = when {
+        isEnabled && isEditMode -> KieroTheme.colors.white to KieroTheme.colors.white
+        isEnabled -> KieroTheme.colors.main to KieroTheme.colors.main
         else -> Color.Unspecified to KieroTheme.colors.gray700
     }
+
     Text(
         text = dayTitle,
         color = textColor,
         style = KieroTheme.typography.regular.body1,
         textAlign = TextAlign.Center,
         modifier = modifier
-            .noRippleClickable(onClick = isSelectClick)
+            .noRippleClickable(onClick = {
+                // 🔥 내부 클릭 막기
+                if (isEditMode) onShowToast("요일 및 반복 여부는 수정할 수 없어요. 삭제 후 등록해주세요.")
+                else isSelectClick()
+            })
             .background(
                 color = KieroTheme.colors.gray900,
                 shape = CircleShape
@@ -120,6 +134,8 @@ private fun DayBox(
 @Composable
 private fun DayPickSection(
     selectedDays: Set<Int>,
+    isEditMode: Boolean,
+    onShowToast: (String) -> Unit,
     onDayClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     dayList: ImmutableList<String> = persistentListOf("월", "화", "수", "목", "금", "토", "일"),
@@ -139,12 +155,13 @@ private fun DayPickSection(
                 isSelectClick = { onDayClick(index) },
                 dayTitle = day,
                 modifier = Modifier.weight(1f),
-                isEnabled = selectedDays.contains(index)
+                isEnabled = selectedDays.contains(index),
+                isEditMode = isEditMode,
+                onShowToast = onShowToast
             )
         }
     }
 }
-
 
 @Composable
 private fun RepeatSection(
@@ -181,7 +198,6 @@ private fun RepeatSection(
         )
     }
 }
-
 
 @Composable
 private fun DaySection(
@@ -244,7 +260,6 @@ private fun DayToggle(
                     .size(13.dp)
             )
         }
-
     )
 }
 
@@ -256,6 +271,7 @@ private fun PreviewDayBox() {
             DayBox(
                 isSelectClick = {},
                 dayTitle = "월",
+                isEditMode = false
             )
         }
     }

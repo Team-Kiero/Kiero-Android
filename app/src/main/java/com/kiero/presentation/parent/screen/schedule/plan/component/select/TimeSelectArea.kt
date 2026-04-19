@@ -33,6 +33,8 @@ fun TimeSelectArea(
     endTime: String,
     onTimeSelected: (Boolean, String) -> Unit,
     modifier: Modifier = Modifier,
+    isEditMode: Boolean = false,
+    onShowToast: (String) -> Unit = {},
 ) {
 
     var showStartTimePicker by remember { mutableStateOf(false) }
@@ -58,7 +60,13 @@ fun TimeSelectArea(
             horizontalArrangement = Arrangement.spacedBy(15.dp)
         ) {
             TimeBlock(
-                onClick = { showStartTimePicker = true },
+                onClick = {
+                    if (isEditMode) {
+                        onShowToast("시간은 수정할 수 없어요. 삭제 후 등록해주세요.")
+                    } else {
+                        showStartTimePicker = true
+                    }
+                },
                 selectTime = startTime,
                 label = "시작",
                 isEnabled = showStartTimePicker,
@@ -72,7 +80,13 @@ fun TimeSelectArea(
             )
 
             TimeBlock(
-                onClick = { showEndTimePicker = true },
+                onClick = {
+                    if (isEditMode) {
+                        onShowToast("시간은 수정할 수 없어요. 삭제 후 등록해주세요.")
+                    } else {
+                        showEndTimePicker = true
+                    }
+                },
                 selectTime = endTime,
                 label = "종료",
                 isEnabled = showEndTimePicker,
