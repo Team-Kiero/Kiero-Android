@@ -140,15 +140,10 @@ fun ScheduleAddScreen(
 
         ScheduleDatebar(
             date = dateRangeText,
-            onPreviousClick = {
-                if (isEditMode) onShowToast("날짜는 수정할 수 없어요. 삭제 후 등록해주세요.")
-                else onPreviousWeek()
-            },
-            onNextClick = {
-                if (isEditMode) onShowToast("날짜는 수정할 수 없어요. 삭제 후 등록해주세요.")
-                else onNextWeek()
-            },
-            isPreviousEnabled = isPreviousEnabled
+            onPreviousClick = onPreviousWeek,
+            onNextClick = onNextWeek,
+            isPreviousEnabled = !isEditMode && isPreviousEnabled,
+            isNextEnabled = !isEditMode
         )
 
         ScheduleTextField(
@@ -170,7 +165,7 @@ fun ScheduleAddScreen(
             startTime = startTime,
             endTime = endTime,
             onTimeSelected = onTimeSelected,
-            isEditMode = isEditMode,
+            isEditMode = false,
             onShowToast = onShowToast
         )
 
