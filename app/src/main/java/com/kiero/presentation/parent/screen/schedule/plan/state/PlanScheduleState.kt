@@ -20,21 +20,22 @@ data class ParentScheduleState(
     val isRefreshing: Boolean = false,
     val isLoading: Boolean = false,
 
-    ) {
+    val hiddenNormalScheduleKeys: Set<String> = emptySet(),
+    val hiddenRecurringScheduleIds: Set<Long> = emptySet(),
+    val hiddenRecurringOccurrenceKeys: Set<String> = emptySet(),
+) {
     val canGoNext: Boolean
         get() = ChronoUnit.WEEKS.between(LocalDate.now(), currentDate) < 12
 
     val canGoPrevious: Boolean
         get() = ChronoUnit.WEEKS.between(LocalDate.now(), currentDate) > -12
+
     val dateRangeText: String
         get() {
             val targetMonth = currentDate.monthValue
-
             val firstDayOfMonth = currentDate.with(TemporalAdjusters.firstDayOfMonth())
-
             val firstMondayOfTargetMonthWeek =
                 firstDayOfMonth.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-
             val currentMonday = currentDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
 
             val weekNum =
@@ -63,7 +64,7 @@ data class ParentScheduleState(
             } ?: listOf(0)
         } else {
             try {
-                val localDate = java.time.LocalDate.parse(this.date)
+                val localDate = LocalDate.parse(this.date)
                 listOf(localDate.dayOfWeek.value - 1)
             } catch (e: Exception) {
                 listOf(0)
@@ -94,6 +95,14 @@ data class ParentScheduleState(
             if (days.containsAll(dayMap.keys)) return "매일 반복"
             val sorted = dayMap.keys.filter { it in days }.mapNotNull { dayMap[it] }.joinToString("")
             return "매주 ${sorted} 반복"
+        }
+
+        fun normalScheduleKey(scheduleId: Long, date: LocalDate): String {
+            return "$scheduleId|$date"
+        }
+
+        fun recurringOccurrenceKey(scheduleId: Long, date: LocalDate): String {
+            return "$scheduleId|$date"
         }
     }
 }
