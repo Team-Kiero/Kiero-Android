@@ -39,7 +39,9 @@ interface PlanService {
     @PATCH("api/v1/schedules/{scheduleId}")
     suspend fun updateSchedule(
         @Path("scheduleId") scheduleId: Long,
-        @Query("selectedDate") selectedDate: String,
+        @Query("selectedDate") selectedDate: String?,
+        @Query("startDate") startDate: String?,
+        @Query("endDate") endDate: String?,
         @Body request: PlanUpdateRequestDto,
     ): BaseResponse<Unit>
 
@@ -47,7 +49,9 @@ interface PlanService {
     @HTTP(method = "DELETE", path = "api/v1/schedules/{scheduleId}", hasBody = true)
     suspend fun deleteSchedule(
         @Path("scheduleId") scheduleId: Long,
-        @Query("selectedDate") selectedDate: String,
+        @Query("selectedDate") selectedDate: String?,
+        @Query("startDate") startDate: String?,
+        @Query("endDate") endDate: String?,
         @Body request: PlanDeleteRequestDto,
     ): BaseResponse<Unit>
 }

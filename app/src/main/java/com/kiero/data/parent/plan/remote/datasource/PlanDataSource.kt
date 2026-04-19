@@ -18,13 +18,17 @@ interface PlanDataSource {
 
     suspend fun updateSchedule(
         scheduleId: Long,
-        selectedDate: String,
+        selectedDate: String?,
+        startDate: String?,
+        endDate: String?,
         requestDto: PlanUpdateRequestDto,
     ): BaseResponse<Unit>
 
     suspend fun deleteSchedule(
         scheduleId: Long,
-        selectedDate: String,
+        selectedDate: String?,
+        startDate: String?,
+        endDate: String?,
         requestDto: PlanDeleteRequestDto,
     ): BaseResponse<Unit>
 }
