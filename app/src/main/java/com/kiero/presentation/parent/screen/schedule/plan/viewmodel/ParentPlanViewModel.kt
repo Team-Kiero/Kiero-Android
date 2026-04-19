@@ -28,6 +28,11 @@ import java.time.LocalTime
 import java.time.temporal.TemporalAdjusters
 import javax.inject.Inject
 
+private data class RecurringStartInfo(
+    val firstOrderDate: String,
+    val hasClosedDateInThisWeek: Boolean,
+)
+
 @HiltViewModel
 class ParentPlanViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
@@ -64,7 +69,8 @@ class ParentPlanViewModel @Inject constructor(
 
     private fun initEditMode() {
         val args = editArgs ?: return
-        val state = _state.value
+        val currentState = _state.value
+
         val selectedDays = when {
             args.isRecurring -> args.dayOfWeek.toDayIndices()
             else -> args.dates
@@ -82,8 +88,8 @@ class ParentPlanViewModel @Inject constructor(
         _state.update {
             it.copy(
                 isRecurring = args.isRecurring,
-                startTime = state.serverTimeToDisplayTime(args.startTime),
-                endTime = state.serverTimeToDisplayTime(args.endTime),
+                startTime = currentState.serverTimeToDisplayTime(args.startTime),
+                endTime = currentState.serverTimeToDisplayTime(args.endTime),
                 selectedColorType = initialColor,
                 selectedDays = selectedDays,
                 selectedDate = args.dates.orEmpty(),
@@ -99,46 +105,69 @@ class ParentPlanViewModel @Inject constructor(
 
     fun onDayClick(dayIndex: Int) {
         if (isEditMode) return
-        _state.update { s ->
-            val newDays = if (dayIndex in s.selectedDays) s.selectedDays - dayIndex else s.selectedDays + dayIndex
-            s.withUpdatedDays(newDays)
+
+        _state.update { current ->
+            val newDays = if (dayIndex in current.selectedDays) {
+                current.selectedDays - dayIndex
+            } else {
+                current.selectedDays + dayIndex
+            }
+            current.withUpdatedDays(newDays)
         }
     }
 
     fun onAllDaysSelect(isCurrentlyAllSelected: Boolean) {
         if (isEditMode) return
-        _state.update { s ->
+
+        _state.update { current ->
             val newDays = if (isCurrentlyAllSelected) emptySet() else (0..6).toSet()
-            s.withUpdatedDays(newDays)
+            current.withUpdatedDays(newDays)
         }
     }
 
     fun onRecurringToggle() {
         if (isEditMode) return
-        _state.update { s ->
-            if (s.isRecurring) s.copy(isRecurring = false, selectedDate = s.selectedDays.toDateString(s.currentReferenceDate))
-            else s.copy(isRecurring = true, selectedDate = "")
+
+        _state.update { current ->
+            if (current.isRecurring) {
+                current.copy(
+                    isRecurring = false,
+                    selectedDate = current.selectedDays.toDateString(current.currentReferenceDate)
+                )
+            } else {
+                current.copy(
+                    isRecurring = true,
+                    selectedDate = ""
+                )
+            }
         }
     }
 
     fun onTimeSelected(isStart: Boolean, time: String) {
-        if (isEditMode) return
         viewModelScope.launch {
             val result = _state.value.validateAndTimeAdjustment(time)
+
             _state.update {
                 if (isStart) it.copy(startTime = result.adjustedTime)
                 else it.copy(endTime = result.adjustedTime)
             }
-            if (!result.isValid) _sideEffect.emit(ShowSnackBar(result.message.orEmpty()))
+
+            if (!result.isValid) {
+                _sideEffect.emit(ShowSnackBar(result.message.orEmpty()))
+            }
         }
     }
 
     fun onPreviousWeek() {
         if (isEditMode) return
-        _state.update { s ->
+
+        _state.update { current ->
             val thisMonday = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-            if (s.currentReferenceDate.isAfter(thisMonday)) s.copy(currentReferenceDate = s.currentReferenceDate.minusWeeks(1))
-            else s
+            if (current.currentReferenceDate.isAfter(thisMonday)) {
+                current.copy(currentReferenceDate = current.currentReferenceDate.minusWeeks(1))
+            } else {
+                current
+            }
         }
     }
 
@@ -147,17 +176,8 @@ class ParentPlanViewModel @Inject constructor(
         _state.update { it.copy(currentReferenceDate = it.currentReferenceDate.plusWeeks(1)) }
     }
 
-    private fun isChanged(): Boolean {
-        val args = editArgs ?: return true
-        val s = _state.value
-
-        val currentName = textState.text.toString().trim()
-        val originalName = args.name.trim()
-
-        val originalColor = runCatching { ColorType.valueOf(args.scheduleColor) }
-            .getOrElse { ColorType.fromHexCode(args.scheduleColor) }
-
-        return originalName != currentName || originalColor != s.selectedColorType
+    fun onCreatePlanClick() {
+        if (isEditMode) onUpdatePlanClick() else onAddPlanClick()
     }
 
     fun onUpdatePlanClick() {
@@ -172,38 +192,39 @@ class ParentPlanViewModel @Inject constructor(
 
         viewModelScope.launch {
             val name = textState.text.toString().trim()
-            val s = _state.value
-            val today = LocalDate.now()
-            val now = LocalTime.now()
+            val current = _state.value
 
-            val errors = validatePlanInputs(name, s, today, now)
+            val errors = validateEditInputs(name, current)
             if (errors.isNotEmpty()) {
-                val errorMsg = if (errors.size >= 2) "일정 저장에 실패했어요." else errors.first()
-                _sideEffect.emit(ShowSnackBar(errorMsg))
+                val errorMessage = if (errors.size >= 2) "일정 저장에 실패했어요." else errors.first()
+                _sideEffect.emit(ShowSnackBar(errorMessage))
                 return@launch
             }
 
             _state.update { it.copy(isLoading = true) }
 
-            val scheduleId = editArgs?.scheduleId ?: return@launch
-            val originalIsRecurring = editArgs.isRecurring
+            val scheduleId = editArgs?.scheduleId
+            if (scheduleId == null) {
+                _state.update { it.copy(isLoading = false) }
+                _sideEffect.emit(ShowSnackBar("일정 수정에 실패했습니다"))
+                return@launch
+            }
 
-            val selectedDateParam = if (!originalIsRecurring) editArgs.selectedDate else null
-            val startDateParam = if (originalIsRecurring) s.currentReferenceDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).toString() else null
-            val endDateParam = if (originalIsRecurring) s.currentReferenceDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY)).toString() else null
+            val originalIsRecurring = editArgs.isRecurring
+            val weekRange = if (originalIsRecurring) current.currentReferenceDate.toWeekRange() else null
 
             planRepository.updateSchedule(
                 scheduleId = scheduleId,
-                selectedDate = selectedDateParam,
-                startDate = startDateParam,
-                endDate = endDateParam,
+                selectedDate = if (originalIsRecurring) null else editArgs.selectedDate,
+                startDate = weekRange?.first,
+                endDate = weekRange?.second,
                 name = name,
-                isRecurring = s.isRecurring,
-                startTime = s.formatTimeForServer(s.startTime),
-                endTime = s.formatTimeForServer(s.endTime),
-                scheduleColor = s.selectedColorType.name,
-                dayOfWeek = s.formattedDays.takeIf { s.isRecurring },
-                dates = editArgs.dates.takeUnless { s.isRecurring },
+                isRecurring = current.isRecurring,
+                startTime = current.formatTimeForServer(current.startTime),
+                endTime = current.formatTimeForServer(current.endTime),
+                scheduleColor = current.selectedColorType.name,
+                dayOfWeek = current.formattedDays.takeIf { current.isRecurring },
+                dates = editArgs.dates.takeUnless { current.isRecurring },
                 isIncludeFollowing = true
             ).onSuccess {
                 _sideEffect.emit(ShowSnackBar("일정이 수정되었습니다"))
@@ -216,21 +237,18 @@ class ParentPlanViewModel @Inject constructor(
         }
     }
 
-    fun onCreatePlanClick() {
-        if (isEditMode) onUpdatePlanClick() else onAddPlanClick()
-    }
-
     private fun onAddPlanClick() {
         if (_state.value.isLoading) return
+
         viewModelScope.launch {
             val name = textState.text.toString().trim()
-            val s = _state.value
+            val current = _state.value
             val today = LocalDate.now()
             val now = LocalTime.now()
 
-            val errors = validatePlanInputs(name, s, today, now)
-            if (errors.isNotEmpty()) {
-                _sideEffect.emit(ShowSnackBar(errors.first()))
+            val validationErrors = validatePlanInputs(name, current, today, now)
+            if (validationErrors.isNotEmpty()) {
+                _sideEffect.emit(ShowSnackBar(validationErrors.first()))
                 return@launch
             }
 
@@ -238,66 +256,38 @@ class ParentPlanViewModel @Inject constructor(
 
             val childId = getChildIdOrReturn() ?: return@launch
 
-            val serverTime = s.formatTimeForServer(s.startTime)
-            val startTimeLocal = runCatching {
-                val timeParts = serverTime.split(":")
-                LocalTime.of(timeParts[0].toInt(), timeParts[1].toInt())
-            }.getOrNull()
+            val serverStartTime = current.formatTimeForServer(current.startTime)
+            val serverEndTime = current.formatTimeForServer(current.endTime)
+            val startTimeLocal = parseServerTime(serverStartTime)
 
-            val isPastTimeToday = startTimeLocal != null && startTimeLocal.isBefore(now)
-
-            var isDelayedStart = false
-            var firstOrderDateStr: String? = null
-
-            if (s.isRecurring) {
-                val referenceMonday = s.currentReferenceDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-                val selectedDatesInRefWeek = s.selectedDays.map { referenceMonday.plusDays(it.toLong()) }.sorted()
-
-                var firstValidDate: LocalDate? = null
-
-                for (date in selectedDatesInRefWeek) {
-                    if (date.isBefore(today)) {
-                        isDelayedStart = true
-                        continue
-                    }
-                    if (date.isEqual(today)) {
-                        if (isPastTimeToday || s.isFireLit) {
-                            isDelayedStart = true
-                            continue
-                        }
-                    }
-                    if (firstValidDate == null) {
-                        firstValidDate = date
-                    }
-                }
-
-                if (firstValidDate == null) {
-                    val nextWeekMonday = referenceMonday.plusWeeks(1)
-                    val firstSelectedDayOffset = s.selectedDays.minOrNull() ?: 0
-                    firstValidDate = nextWeekMonday.plusDays(firstSelectedDayOffset.toLong())
-                    isDelayedStart = true
-                }
-
-                firstOrderDateStr = firstValidDate.toString()
+            val recurringStartInfo = if (current.isRecurring && startTimeLocal != null) {
+                buildRecurringStartInfo(
+                    current = current,
+                    today = today,
+                    now = now,
+                    startTime = startTimeLocal,
+                )
+            } else {
+                null
             }
 
             planRepository.postPlan(
                 childId = childId,
                 name = name,
-                isRecurring = s.isRecurring,
-                startTime = s.formatTimeForServer(s.startTime),
-                endTime = s.formatTimeForServer(s.endTime),
-                scheduleColor = s.selectedColorType.name,
-                dayOfWeek = s.formattedDays.takeIf { s.isRecurring },
-                dates = s.selectedDate.takeUnless { s.isRecurring },
-                firstOrderDate = firstOrderDateStr
+                isRecurring = current.isRecurring,
+                startTime = serverStartTime,
+                endTime = serverEndTime,
+                scheduleColor = current.selectedColorType.name,
+                dayOfWeek = current.formattedDays.takeIf { current.isRecurring },
+                dates = current.selectedDate.takeUnless { current.isRecurring },
+                firstOrderDate = recurringStartInfo?.firstOrderDate
             ).onSuccess {
-                val msg = if (s.isRecurring && isDelayedStart) {
+                val message = if (current.isRecurring && recurringStartInfo?.hasClosedDateInThisWeek == true) {
                     "일정 등록이 마감된 날이 있어, 오늘 이후부터 적용돼요"
                 } else {
                     "일정이 등록되었어요."
                 }
-                _sideEffect.emit(ShowSnackBar(msg))
+                _sideEffect.emit(ShowSnackBar(message))
                 delay(200)
                 _sideEffect.emit(navigateUp)
             }.onFailure {
@@ -307,52 +297,170 @@ class ParentPlanViewModel @Inject constructor(
         }
     }
 
-    private fun validatePlanInputs(name: String, s: ParentPlanState, today: LocalDate, now: LocalTime): List<String> {
+    private fun isChanged(): Boolean {
+        val args = editArgs ?: return true
+        val current = _state.value
+
+        val currentName = textState.text.toString().trim()
+        val originalName = args.name.trim()
+
+        val originalColor = runCatching { ColorType.valueOf(args.scheduleColor) }
+            .getOrElse { ColorType.fromHexCode(args.scheduleColor) }
+
+        val originalStartTime = current.serverTimeToDisplayTime(args.startTime)
+        val originalEndTime = current.serverTimeToDisplayTime(args.endTime)
+
+        return originalName != currentName ||
+                originalColor != current.selectedColorType ||
+                originalStartTime != current.startTime ||
+                originalEndTime != current.endTime
+    }
+
+    private fun validateEditInputs(name: String, current: ParentPlanState): List<String> {
         val errors = mutableListOf<String>()
-        if (name.isBlank()) errors.add("일정 이름을 입력해주세요.")
-        if (s.selectedDays.isEmpty()) errors.add("요일을 선택해주세요.")
-        if (s.startTime.isNullOrBlank() || s.endTime.isNullOrBlank()) {
+
+        if (name.isBlank()) {
+            errors.add("일정 이름을 입력해주세요.")
+        }
+
+        if (current.startTime.isNullOrBlank() || current.endTime.isNullOrBlank()) {
             errors.add("시간을 선택해주세요.")
-        } else if (!s.isTimeValid) {
+        } else if (!current.isTimeValid) {
             errors.add("종료시간은 시작시간보다 늦어야 합니다.")
         }
 
-        val serverTime = s.formatTimeForServer(s.startTime)
-        val startTimeLocal = runCatching {
+        return errors
+    }
+
+    private fun validatePlanInputs(
+        name: String,
+        current: ParentPlanState,
+        today: LocalDate,
+        now: LocalTime,
+    ): List<String> {
+        val errors = mutableListOf<String>()
+
+        if (name.isBlank()) {
+            errors.add("일정 이름을 입력해주세요.")
+        }
+
+        if (current.selectedDays.isEmpty()) {
+            errors.add("요일을 선택해주세요.")
+        }
+
+        if (current.startTime.isNullOrBlank() || current.endTime.isNullOrBlank()) {
+            errors.add("시간을 선택해주세요.")
+        } else if (!current.isTimeValid) {
+            errors.add("종료시간은 시작시간보다 늦어야 합니다.")
+        }
+
+        if (errors.isNotEmpty()) return errors
+
+        if (!isEditMode && !current.isRecurring) {
+            val startTime = parseServerTime(current.formatTimeForServer(current.startTime))
+            val monday = current.currentReferenceDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+            val selectedDates = current.selectedDays.map { monday.plusDays(it.toLong()) }
+
+            if (selectedDates.any { date ->
+                    date.isBefore(today) || (date.isEqual(today) && startTime != null && startTime.isBefore(now))
+                }
+            ) {
+                errors.add("이미 지난 시간에는 일정을 등록할 수 없어요.")
+                return errors
+            }
+
+            if (selectedDates.any { it.isEqual(today) } && current.isFireLit) {
+                errors.add("오늘 일정이 마감되어, 일정을 추가할 수 없어요.")
+                return errors
+            }
+        }
+
+        return errors
+    }
+
+    private fun buildRecurringStartInfo(
+        current: ParentPlanState,
+        today: LocalDate,
+        now: LocalTime,
+        startTime: LocalTime,
+    ): RecurringStartInfo {
+        val referenceMonday = current.currentReferenceDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+
+        val selectedDatesInReferenceWeek = current.selectedDays
+            .sorted()
+            .map { referenceMonday.plusDays(it.toLong()) }
+
+        val firstOpenDate = selectedDatesInReferenceWeek.firstOrNull { date ->
+            !isClosedForRegistration(
+                targetDate = date,
+                startTime = startTime,
+                today = today,
+                now = now,
+                isTodayFireLit = current.isFireLit
+            )
+        }
+
+        val hasClosedDateInThisWeek = selectedDatesInReferenceWeek.any { date ->
+            isClosedForRegistration(
+                targetDate = date,
+                startTime = startTime,
+                today = today,
+                now = now,
+                isTodayFireLit = current.isFireLit
+            )
+        }
+
+        if (firstOpenDate != null) {
+            return RecurringStartInfo(
+                firstOrderDate = firstOpenDate.toString(),
+                hasClosedDateInThisWeek = hasClosedDateInThisWeek
+            )
+        }
+
+        val firstSelectedDayOffset = current.selectedDays.minOrNull() ?: 0
+        val nextWeekStartDate = referenceMonday
+            .plusWeeks(1)
+            .plusDays(firstSelectedDayOffset.toLong())
+
+        return RecurringStartInfo(
+            firstOrderDate = nextWeekStartDate.toString(),
+            hasClosedDateInThisWeek = true
+        )
+    }
+
+    private fun isClosedForRegistration(
+        targetDate: LocalDate,
+        startTime: LocalTime,
+        today: LocalDate,
+        now: LocalTime,
+        isTodayFireLit: Boolean,
+    ): Boolean {
+        return when {
+            targetDate.isBefore(today) -> true
+            targetDate.isEqual(today) && startTime.isBefore(now) -> true
+            targetDate.isEqual(today) && isTodayFireLit -> true
+            else -> false
+        }
+    }
+
+    private fun parseServerTime(serverTime: String): LocalTime? {
+        return runCatching {
             val parts = serverTime.split(":")
             LocalTime.of(parts[0].toInt(), parts[1].toInt())
         }.getOrNull()
-        val isPastTimeToday = startTimeLocal != null && startTimeLocal.isBefore(now)
+    }
 
-        if (!isEditMode && !s.isRecurring) {
-            val monday = s.currentReferenceDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-            val selectedDates = s.selectedDays.map { monday.plusDays(it.toLong()) }
-
-            for (date in selectedDates) {
-                when {
-                    date.isBefore(today) -> {
-                        errors.add("이미 지난 시간에는 일정을 등록할 수 없어요.")
-                        break
-                    }
-                    date.isEqual(today) -> {
-                        if (isPastTimeToday) {
-                            errors.add("이미 지난 시간에는 일정을 등록할 수 없어요.")
-                            break
-                        }
-                        if (s.isFireLit) {
-                            errors.add("오늘 일정이 마감되어, 일정을 추가할 수 없어요.")
-                            break
-                        }
-                    }
-                }
-            }
-        }
-        return errors
+    private fun LocalDate.toWeekRange(): Pair<String, String> {
+        val monday = this.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).toString()
+        val sunday = this.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY)).toString()
+        return monday to sunday
     }
 
     private suspend fun getChildIdOrReturn(): Long? {
         val childId = userInfoManager.getChildIdInfo()
-        if (childId == null) _state.update { it.copy(isLoading = false) }
+        if (childId == null) {
+            _state.update { it.copy(isLoading = false) }
+        }
         return childId
     }
 
@@ -374,8 +482,14 @@ class ParentPlanViewModel @Inject constructor(
     }
 
     private fun ParentPlanState.withUpdatedDays(newDays: Set<Int>): ParentPlanState =
-        if (isRecurring) copy(selectedDays = newDays)
-        else copy(selectedDays = newDays, selectedDate = newDays.toDateString(currentReferenceDate))
+        if (isRecurring) {
+            copy(selectedDays = newDays)
+        } else {
+            copy(
+                selectedDays = newDays,
+                selectedDate = newDays.toDateString(currentReferenceDate)
+            )
+        }
 
     private fun Set<Int>.toDateString(referenceDate: LocalDate): String {
         val monday = referenceDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
@@ -384,7 +498,19 @@ class ParentPlanViewModel @Inject constructor(
 
     private fun String?.toDayIndices(): Set<Int> {
         if (isNullOrBlank()) return emptySet()
-        val map = mapOf("MON" to 0, "TUE" to 1, "WED" to 2, "THU" to 3, "FRI" to 4, "SAT" to 5, "SUN" to 6)
-        return split(",").mapNotNull { map[it.trim()] }.toSet()
+
+        val dayMap = mapOf(
+            "MON" to 0,
+            "TUE" to 1,
+            "WED" to 2,
+            "THU" to 3,
+            "FRI" to 4,
+            "SAT" to 5,
+            "SUN" to 6
+        )
+
+        return split(",")
+            .mapNotNull { dayMap[it.trim()] }
+            .toSet()
     }
 }
