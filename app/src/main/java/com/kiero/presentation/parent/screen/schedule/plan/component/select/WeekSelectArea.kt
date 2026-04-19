@@ -57,7 +57,7 @@ fun WeekSelectArea(
     ) {
         DaySection(
             onValidClick = {
-                if (isEditMode) onShowToast("요일 및 반복 여부는 수정할 수 없어요. 삭제 후 등록해주세요.")
+                if (isEditMode) onShowToast("요일은 수정할 수 없어요. 삭제 후 등록해주세요.")
                 else onRecurringToggle()
             },
             isEnabled = isRecurring
@@ -72,7 +72,7 @@ fun WeekSelectArea(
 
         RepeatSection(
             onAbleClick = { isEnabled ->
-                if (isEditMode) onShowToast("요일 및 반복 여부는 수정할 수 없어요. 삭제 후 등록해주세요.")
+                if (isEditMode) onShowToast("요일은 수정할 수 없어요. 삭제 후 등록해주세요.")
                 else onAllDaysSelect(isEnabled)
             },
             isEnabled = selectedDays.size == 7
