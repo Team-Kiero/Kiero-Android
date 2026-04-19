@@ -165,6 +165,7 @@ fun ParentAutoResultScreen(
 
         if (state.showBottomSheet) {
             CalendarBottomSheet(
+                initialDate = state.selectedDate ?: LocalDate.now(),
                 onDismissRequest = onDismissDatePicker,
                 onDateSelected = onDateSelected
             )
