@@ -106,7 +106,10 @@ fun KieroNavHost(
 
         parentAlarmNavGraph(
             paddingValues = paddingValues,
-            navigateUp = appState::navigateUp,
+            navigateUp = {
+                onRefreshUnreadAlarm()
+                appState.navigateUp()
+            },
             navigateToSelection = appState::navigateToSelection,
         )
 

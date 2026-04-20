@@ -37,7 +37,7 @@ fun ParentJourneyScheduleModel.toUiModel(
         todayStatus = todayStatus,
         scheduleLabel = when {
             todayStatus == TodayStatus.CURRENT_COMPLETED -> "현재 일정"
-            isNextUpcoming -> "다음 일정"
+            isNextUpcoming -> "다음 일정" // PAST_COMPLETED + isNextUpcoming → "다음 일정"
             else -> ""
         }
     )
