@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.common.util.toDotSeparatedDate
@@ -62,6 +63,14 @@ fun ParentJourneyRoute(
     LaunchedEffect(state.kidInfo.kidId) {
         if (state.kidInfo.kidId.isNotEmpty()) {
             viewModel.fetchParentJourney(state.kidInfo.kidId.toLong())
+        }
+    }
+
+    LifecycleResumeEffect(Unit) {
+        viewModel.fetchParentJourney(state.kidInfo.kidId.toLong())
+
+        onPauseOrDispose {
+
         }
     }
 
