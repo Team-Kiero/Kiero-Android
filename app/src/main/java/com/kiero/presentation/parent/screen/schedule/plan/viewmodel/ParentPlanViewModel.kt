@@ -6,6 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.kiero.core.localstorage.info.UserInfoManager
+import com.kiero.data.parent.plan.model.PlanAllModel
+import com.kiero.data.parent.plan.model.RecurringScheduleModel
+import com.kiero.data.parent.plan.model.ScheduleModel
 import com.kiero.data.parent.plan.repository.PlanRepository
 import com.kiero.presentation.parent.screen.schedule.plan.model.ColorType
 import com.kiero.presentation.parent.screen.schedule.plan.navigation.ScheduleAdd
@@ -246,15 +249,34 @@ class ParentPlanViewModel @Inject constructor(
             val today = LocalDate.now()
             val now = LocalTime.now()
 
-            val validationErrors = validatePlanInputs(name, current, today, now)
+            val childId = getChildIdOrReturn() ?: return@launch
+
+            val weekPlanForValidation = if (!current.isRecurring) {
+                fetchWeekPlanForValidation(
+                    childId = childId,
+                    referenceDate = current.currentReferenceDate
+                ).getOrElse {
+                    _sideEffect.emit(ShowSnackBar("일정 저장에 실패했어요. 잠시 후 다시 시도해주세요."))
+                    return@launch
+                }
+            } else {
+                null
+            }
+
+            val validationErrors = validatePlanInputs(
+                name = name,
+                current = current,
+                today = today,
+                now = now,
+                weekPlan = weekPlanForValidation
+            )
+
             if (validationErrors.isNotEmpty()) {
                 _sideEffect.emit(ShowSnackBar(validationErrors.first()))
                 return@launch
             }
 
             _state.update { it.copy(isLoading = true) }
-
-            val childId = getChildIdOrReturn() ?: return@launch
 
             val serverStartTime = current.formatTimeForServer(current.startTime)
             val serverEndTime = current.formatTimeForServer(current.endTime)
@@ -290,8 +312,18 @@ class ParentPlanViewModel @Inject constructor(
                 _sideEffect.emit(ShowSnackBar(message))
                 delay(200)
                 _sideEffect.emit(navigateUp)
-            }.onFailure {
-                _sideEffect.emit(ShowSnackBar("일정 저장에 실패했어요. 잠시 후 다시 시도해주세요."))
+            }.onFailure { throwable ->
+                val serverMessage = throwable.message.orEmpty()
+
+                when {
+                    serverMessage.contains("기존의 일정과 시간이 중복되는 일정은 추가할 수 없습니다.") -> {
+                        _sideEffect.emit(ShowSnackBar("기존의 일정과 시간이 중복되는 일정은 추가할 수 없습니다."))
+                    }
+                    else -> {
+                        _sideEffect.emit(ShowSnackBar("일정 저장에 실패했어요. 잠시 후 다시 시도해주세요."))
+                    }
+                }
+
                 _state.update { it.copy(isLoading = false) }
             }
         }
@@ -337,6 +369,7 @@ class ParentPlanViewModel @Inject constructor(
         current: ParentPlanState,
         today: LocalDate,
         now: LocalTime,
+        weekPlan: PlanAllModel? = null,
     ): List<String> {
         val errors = mutableListOf<String>()
 
@@ -358,14 +391,25 @@ class ParentPlanViewModel @Inject constructor(
 
         if (!isEditMode && !current.isRecurring) {
             val startTime = parseServerTime(current.formatTimeForServer(current.startTime))
+            val endTime = parseServerTime(current.formatTimeForServer(current.endTime))
             val monday = current.currentReferenceDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
             val selectedDates = current.selectedDays.map { monday.plusDays(it.toLong()) }
 
             if (selectedDates.any { date ->
-                    date.isBefore(today) || (date.isEqual(today) && startTime != null && startTime.isBefore(now))
+                    date.isBefore(today) || (date.isEqual(today) && startTime != null && !startTime.isAfter(now))
                 }
             ) {
                 errors.add("이미 지난 시간에는 일정을 등록할 수 없어요.")
+                return errors
+            }
+
+            if (weekPlan != null && endTime != null && hasCompletedScheduleAfterEndTime(
+                    weekPlan = weekPlan,
+                    selectedDates = selectedDates,
+                    endTime = endTime
+                )
+            ) {
+                errors.add("이후의 일정이 이미 시작되어, 일정을 추가할 수 없어요.")
                 return errors
             }
 
@@ -376,6 +420,79 @@ class ParentPlanViewModel @Inject constructor(
         }
 
         return errors
+    }
+
+    private suspend fun fetchWeekPlanForValidation(
+        childId: Long,
+        referenceDate: LocalDate,
+    ): Result<PlanAllModel> {
+        val monday = referenceDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).toString()
+        val sunday = referenceDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY)).toString()
+        return planRepository.getPlanAll(childId, monday, sunday)
+    }
+
+    private fun hasCompletedScheduleAfterEndTime(
+        weekPlan: PlanAllModel,
+        selectedDates: List<LocalDate>,
+        endTime: LocalTime,
+    ): Boolean {
+        return selectedDates.any { targetDate ->
+            hasCompletedNormalScheduleAfterEndTime(weekPlan, targetDate, endTime) ||
+                    hasCompletedRecurringScheduleAfterEndTime(weekPlan, targetDate, endTime)
+        }
+    }
+
+    private fun hasCompletedNormalScheduleAfterEndTime(
+        weekPlan: PlanAllModel,
+        targetDate: LocalDate,
+        endTime: LocalTime,
+    ): Boolean {
+        return weekPlan.normalSchedules.any { schedule ->
+            schedule.date.take(10) == targetDate.toString() &&
+                    schedule.isCompletedSchedule() &&
+                    (schedule.startTime.toLocalTimeOrNull()?.let { !it.isBefore(endTime) } == true)
+        }
+    }
+
+    private fun hasCompletedRecurringScheduleAfterEndTime(
+        weekPlan: PlanAllModel,
+        targetDate: LocalDate,
+        endTime: LocalTime,
+    ): Boolean {
+        return weekPlan.recurringSchedules.any { schedule ->
+            recurringOccursOnDate(schedule, targetDate) &&
+                    schedule.isCompletedSchedule() &&
+                    (schedule.startTime.toLocalTimeOrNull()?.let { !it.isBefore(endTime) } == true)
+        }
+    }
+
+    private fun recurringOccursOnDate(
+        schedule: RecurringScheduleModel,
+        targetDate: LocalDate,
+    ): Boolean {
+        val repeatStartDate = runCatching {
+            LocalDate.parse(schedule.repeatStartDate.take(10))
+        }.getOrNull() ?: return false
+
+        if (targetDate.isBefore(repeatStartDate)) return false
+
+        val targetDayCode = targetDate.dayOfWeek.name.take(3)
+        return schedule.dayOfWeek
+            .split(",")
+            .map { it.trim().uppercase() }
+            .contains(targetDayCode)
+    }
+
+    private fun ScheduleModel.isCompletedSchedule(): Boolean {
+        val status = scheduleStatus?.uppercase()
+        return status == "VERIFIED" || status == "COMPLETED"
+    }
+
+    private fun String.toLocalTimeOrNull(): LocalTime? {
+        return runCatching {
+            val parts = split(":")
+            LocalTime.of(parts[0].toInt(), parts[1].toInt())
+        }.getOrNull()
     }
 
     private fun buildRecurringStartInfo(
