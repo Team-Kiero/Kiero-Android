@@ -131,7 +131,7 @@ fun ScheduleAddScreen(
         Spacer(modifier = Modifier.height(25.dp))
 
         KieroTopbar(
-            title = "일정 추가",
+            title = if (isEditMode) "일정 수정" else "일정 추가",
             leftIconRes = R.drawable.ic_close_light,
             rightIconRes = R.drawable.ic_check,
             leftIconClick = navigateUp,
