@@ -142,10 +142,10 @@ class SseManager @Inject constructor(
                     .collect { event ->
                         if (event !is SseEvent.Connected) {
                             val eventHash = event.hashCode()
-                            if (recentEventHashes.contains(eventHash)) {
+                            /*if (recentEventHashes.contains(eventHash)) {
                                 Timber.d("내용이 중복된 이벤트로 수시됨: $eventHash")
                                 return@collect
-                            }
+                            }*/
 
                             if (recentEventHashes.size >= 10) {
                                 recentEventHashes.removeFirst()
