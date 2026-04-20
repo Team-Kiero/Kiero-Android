@@ -19,6 +19,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -45,7 +46,10 @@ fun ParentContentBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
         dragHandle = null,
-        modifier = modifier
+        modifier = modifier,
+        containerColor = KieroTheme.colors.gray900,
+        contentColor = KieroTheme.colors.white,
+        scrimColor = Color.Black.copy(alpha = 0.6f),
     ) {
         Column(
             modifier = Modifier
@@ -62,29 +66,24 @@ fun ParentContentBottomSheet(
 
             content()
 
-            if (onEditClick != null || onDeleteClick != null) {
-                Spacer(modifier = Modifier.height(35.dp))
-            }
+            // 수정/삭제 영역은 항상 같은 높이만큼 차지
+            Spacer(modifier = Modifier.height(35.dp))
 
-            onEditClick?.let { editAction ->
-                BottomSheetActionArea(
-                    actionTitle = "수정하기",
-                    onActionClick = editAction,
-                    actionIcon = R.drawable.ic_parent_content_edit
-                )
-            }
+            BottomSheetActionArea(
+                actionTitle = "수정하기",
+                onActionClick = onEditClick,
+                actionIcon = R.drawable.ic_parent_content_edit,
+                isVisible = onEditClick != null
+            )
 
-            if (onEditClick != null && onDeleteClick != null) {
-                Spacer(modifier = Modifier.height(12.dp))
-            }
+            Spacer(modifier = Modifier.height(12.dp))
 
-            onDeleteClick?.let { deleteAction ->
-                BottomSheetActionArea(
-                    actionTitle = "삭제하기",
-                    onActionClick = deleteAction,
-                    actionIcon = R.drawable.ic_parent_content_delete
-                )
-            }
+            BottomSheetActionArea(
+                actionTitle = "삭제하기",
+                onActionClick = onDeleteClick,
+                actionIcon = R.drawable.ic_parent_content_delete,
+                isVisible = onDeleteClick != null
+            )
         }
     }
 }
@@ -120,15 +119,23 @@ private fun BottomSheetTopbar(
 @Composable
 private fun BottomSheetActionArea(
     actionTitle: String,
-    onActionClick: () -> Unit,
+    onActionClick: (() -> Unit)?,
     @DrawableRes actionIcon: Int,
+    isVisible: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
-            .noRippleClickable(onClick = onActionClick),
+            .alpha(if (isVisible) 1f else 0f)
+            .noRippleClickable(
+                onClick = {
+                    if (isVisible) {
+                        onActionClick?.invoke()
+                    }
+                }
+            ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -153,7 +160,7 @@ private fun PreviewParentContentBottomSheetFull() {
         ParentContentBottomSheet(
             topTitle = "피아노 학원",
             onDismissRequest = {},
-            onEditClick = {},    // 수정/삭제 모두 표시
+            onEditClick = {},
             onDeleteClick = {},
             content = {
                 Text(text = "테스트 텍스트", color = KieroTheme.colors.white)
@@ -166,7 +173,6 @@ private fun PreviewParentContentBottomSheetFull() {
 @Composable
 private fun PreviewParentContentBottomSheetReadOnly() {
     KieroTheme {
-        // 이미 시작된 일정 등 → 수정/삭제 버튼 없음
         ParentContentBottomSheet(
             topTitle = "피아노 학원",
             onDismissRequest = {},
