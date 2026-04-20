@@ -64,7 +64,6 @@ fun ParentPlanScreen(
 
             buildList<ScheduleEvent> {
                 model.recurringSchedules
-                    .filter { it.scheduleStatus != "SKIPPED" }
                     .forEach { recurring ->
                         if (state.hiddenRecurringScheduleIds.contains(recurring.scheduleId)) {
                             return@forEach
@@ -106,7 +105,6 @@ fun ParentPlanScreen(
                     }
 
                 model.normalSchedules
-                    .filter { it.scheduleStatus != "SKIPPED" }
                     .forEach { normal ->
                         val normalDate = runCatching {
                             LocalDate.parse(normal.date.take(10))
