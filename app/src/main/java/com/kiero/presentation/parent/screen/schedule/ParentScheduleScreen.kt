@@ -1,6 +1,5 @@
 package com.kiero.presentation.parent.screen.schedule
 
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -54,10 +53,10 @@ import com.kiero.core.trigger.LocalRefreshState
 import com.kiero.data.parent.plan.model.NormalScheduleModel
 import com.kiero.data.parent.plan.model.RecurringScheduleModel
 import com.kiero.data.parent.plan.model.ScheduleModel
-import com.kiero.presentation.parent.component.ParentContentBottomSheet
-import com.kiero.presentation.parent.component.PlanTabFab
 import com.kiero.data.parent.plan.model.toScheduleEditArgs
 import com.kiero.data.parent.plan.model.toSelectedDate
+import com.kiero.presentation.parent.component.ParentContentBottomSheet
+import com.kiero.presentation.parent.component.PlanTabFab
 import com.kiero.presentation.parent.screen.schedule.plan.ParentPlanScreen
 import com.kiero.presentation.parent.screen.schedule.plan.navigation.ScheduleEdit
 import com.kiero.presentation.parent.screen.schedule.plan.state.ParentScheduleSideEffect
@@ -88,7 +87,10 @@ fun ParentScheduleRoute(
         when (effect) {
             is ParentScheduleSideEffect.ShowSnackBar ->
                 globalTrigger.showSnackbar(SnackbarState(effect.message))
-            ParentScheduleSideEffect.ShowDialog -> globalTrigger.dialogTrigger.show {}
+
+            ParentScheduleSideEffect.ShowDialog ->
+                globalTrigger.dialogTrigger.show {}
+
             else -> {}
         }
     }
@@ -159,12 +161,16 @@ private fun ParentScheduleScreen(
     var deleteRepeatOption by remember { mutableStateOf(DeleteRepeatOption.THIS_WEEK_ONLY) }
     var snapshotSchedule by remember { mutableStateOf<ScheduleModel?>(null) }
 
-    val selectedSchedule: ScheduleModel? = remember(selectedEventId, selectedEventDate, scheduleState.planAllModel) {
+    val selectedSchedule: ScheduleModel? = remember(
+        selectedEventId,
+        selectedEventDate,
+        scheduleState.planAllModel
+    ) {
         val id = selectedEventId?.toLongOrNull() ?: return@remember null
         val date = selectedEventDate
         val model = scheduleState.planAllModel
 
-        model?.normalSchedules?.find { it.scheduleId == id && it.date == date }
+        model?.normalSchedules?.find { it.scheduleId == id && it.date.take(10) == date?.take(10) }
             ?: model?.recurringSchedules?.find { it.scheduleId == id }
     }
 
@@ -204,13 +210,25 @@ private fun ParentScheduleScreen(
                 onDismissRequest = {
                     showBottomSheet = false
                     selectedEventId = null
+                    selectedEventDate = null
                 },
                 onEditClick = if (canShowEditDelete) {
                     {
                         val captured = selectedSchedule
+                        val clickedDate = selectedEventDate
                         showBottomSheet = false
-                        captured?.let { onEditClick(it.toScheduleEditArgs()) }
+
+                        captured?.let { schedule ->
+                            val editArgs = schedule
+                                .toScheduleEditArgs()
+                                .copy(
+                                    selectedDate = clickedDate ?: schedule.toSelectedDate()
+                                )
+                            onEditClick(editArgs)
+                        }
+
                         selectedEventId = null
+                        selectedEventDate = null
                     }
                 } else null,
                 onDeleteClick = if (canShowEditDelete) {
@@ -221,7 +239,12 @@ private fun ParentScheduleScreen(
                     }
                 } else null,
                 content = {
-                    selectedSchedule?.let { ScheduleDetailContent(schedule = it) }
+                    selectedSchedule?.let { schedule ->
+                        ScheduleDetailContent(
+                            schedule = schedule,
+                            selectedDate = selectedEventDate
+                        )
+                    }
                 }
             )
         }
@@ -244,10 +267,13 @@ private fun ParentScheduleScreen(
                         val date = selectedEventDate ?: snapshotSchedule.toSelectedDate()
                         val includeFollowing = if (isSnapshotRecurring) {
                             deleteRepeatOption == DeleteRepeatOption.INCLUDE_FOLLOWING
-                        } else null
+                        } else {
+                            null
+                        }
 
                         showDeleteDialog = false
                         selectedEventId = null
+                        selectedEventDate = null
                         snapshotSchedule = null
 
                         if (id != null) {
@@ -305,12 +331,18 @@ private fun ScheduleDeleteDialogContent(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Row(
-                modifier = Modifier.noRippleClickable { onOptionClick(DeleteRepeatOption.THIS_WEEK_ONLY) },
+                modifier = Modifier.noRippleClickable {
+                    onOptionClick(DeleteRepeatOption.THIS_WEEK_ONLY)
+                },
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 val isSelected = selectedOption == DeleteRepeatOption.THIS_WEEK_ONLY
-                val iconRes = if (isSelected) R.drawable.ic_parent_addschedule_check_on else R.drawable.ic_parent_addschedule_check_off
-                val textColor = if (isSelected) KieroTheme.colors.main else KieroTheme.colors.gray400
+                val iconRes =
+                    if (isSelected) R.drawable.ic_parent_addschedule_check_on
+                    else R.drawable.ic_parent_addschedule_check_off
+                val textColor =
+                    if (isSelected) KieroTheme.colors.main
+                    else KieroTheme.colors.gray400
 
                 Icon(
                     imageVector = ImageVector.vectorResource(id = iconRes),
@@ -326,12 +358,18 @@ private fun ScheduleDeleteDialogContent(
             }
 
             Row(
-                modifier = Modifier.noRippleClickable { onOptionClick(DeleteRepeatOption.INCLUDE_FOLLOWING) },
+                modifier = Modifier.noRippleClickable {
+                    onOptionClick(DeleteRepeatOption.INCLUDE_FOLLOWING)
+                },
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 val isSelected = selectedOption == DeleteRepeatOption.INCLUDE_FOLLOWING
-                val iconRes = if (isSelected) R.drawable.ic_parent_addschedule_check_on else R.drawable.ic_parent_addschedule_check_off
-                val textColor = if (isSelected) KieroTheme.colors.main else KieroTheme.colors.gray400
+                val iconRes =
+                    if (isSelected) R.drawable.ic_parent_addschedule_check_on
+                    else R.drawable.ic_parent_addschedule_check_off
+                val textColor =
+                    if (isSelected) KieroTheme.colors.main
+                    else KieroTheme.colors.gray400
 
                 Icon(
                     imageVector = ImageVector.vectorResource(id = iconRes),
@@ -352,6 +390,7 @@ private fun ScheduleDeleteDialogContent(
 @Composable
 private fun ScheduleDetailContent(
     schedule: ScheduleModel,
+    selectedDate: String? = null,
     modifier: Modifier = Modifier,
     contentsColor: Color = KieroTheme.colors.gray400,
     contentsStyle: TextStyle = KieroTheme.typography.regular.body4,
@@ -373,9 +412,12 @@ private fun ScheduleDetailContent(
                     color = contentsColor
                 )
             }
+
             is RecurringScheduleModel -> {
+                val displayDate = selectedDate ?: schedule.repeatStartDate
+
                 Text(
-                    text = ParentFormatters.formatDateWithDayOfWeek(schedule.repeatStartDate),
+                    text = ParentFormatters.formatDateWithDayOfWeek(displayDate),
                     style = contentsStyle,
                     color = contentsColor
                 )

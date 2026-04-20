@@ -272,15 +272,30 @@ class ParentScheduleViewModel @Inject constructor(
             )
         }.getOrNull() ?: return false
 
+        // 1. 이미 시작 시간이 지났으면 무조건 수정/삭제 불가
         if (!scheduleDateTime.isAfter(nowDateTime)) return false
 
         val status = schedule.scheduleStatus?.uppercase()
 
-        if (status == "VERIFIED" || status == "COMPLETED") return false
+        return when (schedule) {
+            is NormalScheduleModel -> {
+                if (status == "VERIFIED" || status == "COMPLETED") return false
+                if (status == "SKIPPED" && scheduleDate == today) return false
+                true
+            }
 
-        if (status == "SKIPPED" && scheduleDate == today) return false
+            is RecurringScheduleModel -> {
+                // 반복 일정은 클릭한 occurrence 날짜 기준으로 판단
+                // 오늘 occurrence인 경우에만 완료/스킵 상태로 수정·삭제 제한
+                if (scheduleDate.isEqual(today)) {
+                    if (status == "VERIFIED" || status == "COMPLETED") return false
+                    if (status == "SKIPPED") return false
+                }
+                true
+            }
 
-        return true
+            else -> false
+        }
     }
 
     fun resetToday() {
@@ -295,7 +310,8 @@ class ParentScheduleViewModel @Inject constructor(
 
     fun onDateChange(isNext: Boolean) {
         val current = currentScheduleState ?: return
-        val newDate = if (isNext) current.currentDate.plusWeeks(1) else current.currentDate.minusWeeks(1)
+        val newDate =
+            if (isNext) current.currentDate.plusWeeks(1) else current.currentDate.minusWeeks(1)
         val weeksDiff = ChronoUnit.WEEKS.between(LocalDate.now(), newDate)
 
         if (weeksDiff !in -12..12) return
