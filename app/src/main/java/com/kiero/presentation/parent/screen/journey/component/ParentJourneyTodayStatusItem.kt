@@ -126,7 +126,11 @@ private fun ParentJourneyToday(
                 Text(
                     text = item.scheduleLabel,
                     style = KieroTheme.typography.regular.body6,
-                    color = if (item.isOngoing) KieroTheme.colors.gray600 else KieroTheme.colors.gray400
+                    color = when {
+                        item.isOngoing -> KieroTheme.colors.gray400
+                        isUpcoming -> KieroTheme.colors.gray800
+                        else -> KieroTheme.colors.gray400
+                    }
                 )
             }
 

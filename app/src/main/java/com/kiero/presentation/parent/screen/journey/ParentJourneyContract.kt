@@ -67,10 +67,9 @@ fun List<ParentJourneyScheduleModel>.toUiModels(currentTime: LocalTime): List<To
         start != null && end != null && currentTime >= start && currentTime < end
     }
 
-    // 진행 중 여부와 관계없이 항상 다음 일정 id 찾기
+    // 항상 다음 일정 id 찾기
     val nextUpcomingId = filter { schedule ->
         val start = schedule.startTime.toLocalTime()
-        // 현재 시간 이후 시작하는 PENDING 일정
         schedule.status == "PENDING" && start != null && start.isAfter(currentTime)
     }
         .minByOrNull { it.startTime }
@@ -79,7 +78,8 @@ fun List<ParentJourneyScheduleModel>.toUiModels(currentTime: LocalTime): List<To
     return map { schedule ->
         schedule.toUiModel(
             currentTime = currentTime,
-            isNextUpcoming = schedule.scheduleDetailId == nextUpcomingId
+            isNextUpcoming = schedule.scheduleDetailId == nextUpcomingId,
+            hasOngoingSchedule = hasOngoingSchedule
         )
     }
 }
