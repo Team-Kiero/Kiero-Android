@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -25,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -395,47 +395,52 @@ private fun ScheduleDetailContent(
     contentsColor: Color = KieroTheme.colors.gray400,
     contentsStyle: TextStyle = KieroTheme.typography.regular.body4,
 ) {
+    val isRecurring = schedule is RecurringScheduleModel
+
+    val displayDateText = when (schedule) {
+        is NormalScheduleModel -> ParentFormatters.formatDateWithDayOfWeek(schedule.date)
+        is RecurringScheduleModel -> {
+            val displayDate = selectedDate ?: schedule.repeatStartDate
+            ParentFormatters.formatDateWithDayOfWeek(displayDate)
+        }
+        else -> ""
+    }
+
+    val displayTimeText = when (schedule) {
+        is NormalScheduleModel -> "${schedule.startTime.take(5)}-${schedule.endTime.take(5)}"
+        is RecurringScheduleModel -> "${schedule.startTime.take(5)}-${schedule.endTime.take(5)}"
+        else -> ""
+    }
+
+    val repeatText = when (schedule) {
+        is RecurringScheduleModel -> formatRepeatText(schedule.dayOfWeek)
+        else -> "매주 반복"
+    }
+
     Column(
         modifier = modifier.padding(vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        when (schedule) {
-            is NormalScheduleModel -> {
-                Text(
-                    text = ParentFormatters.formatDateWithDayOfWeek(schedule.date),
-                    style = contentsStyle,
-                    color = contentsColor
-                )
-                Text(
-                    text = "${schedule.startTime.take(5)}-${schedule.endTime.take(5)}",
-                    style = contentsStyle,
-                    color = contentsColor
-                )
-            }
+        Text(
+            text = displayDateText,
+            style = contentsStyle,
+            color = contentsColor
+        )
 
-            is RecurringScheduleModel -> {
-                val displayDate = selectedDate ?: schedule.repeatStartDate
+        Text(
+            text = displayTimeText,
+            style = contentsStyle,
+            color = contentsColor
+        )
 
-                Text(
-                    text = ParentFormatters.formatDateWithDayOfWeek(displayDate),
-                    style = contentsStyle,
-                    color = contentsColor
-                )
-                Text(
-                    text = "${schedule.startTime.take(5)}-${schedule.endTime.take(5)}",
-                    style = contentsStyle,
-                    color = contentsColor
-                )
-                Text(
-                    text = formatRepeatText(schedule.dayOfWeek),
-                    style = contentsStyle,
-                    color = contentsColor
-                )
-            }
-        }
+        Text(
+            text = repeatText,
+            style = contentsStyle,
+            color = contentsColor,
+            modifier = Modifier.alpha(if (isRecurring) 1f else 0f)
+        )
     }
 }
-
 @Composable
 @Preview
 private fun ParentScheduleScreenPreview() {
