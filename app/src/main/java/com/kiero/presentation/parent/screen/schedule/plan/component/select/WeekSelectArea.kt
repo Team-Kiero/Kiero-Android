@@ -36,43 +36,43 @@ import kotlinx.collections.immutable.persistentListOf
 fun WeekSelectArea(
     selectedDays: Set<Int>,
     isRecurring: Boolean,
+    isEditMode: Boolean = false,
     onDayClick: (Int) -> Unit,
     onAllDaysSelect: (Boolean) -> Unit,
     onRecurringToggle: () -> Unit,
+    onShowToast: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
-
-
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(
-                color = Color.Unspecified
-            )
-            .padding(
-                horizontal = 16.dp
-            ),
+            .background(color = Color.Unspecified)
+            .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(18.dp)
     ) {
         DaySection(
             onValidClick = onRecurringToggle,
-            isEnabled = isRecurring
+            isEnabled = isRecurring,
+            isEditMode = isEditMode
         )
 
         DayPickSection(
             selectedDays = selectedDays,
+            isEditMode = isEditMode,
+            onShowToast = onShowToast,
             onDayClick = onDayClick
         )
-        RepeatSection(
-            onAbleClick = { isEnabled ->
-                onAllDaysSelect(isEnabled)
-            },
-            isEnabled = selectedDays.size == 7
-        )
 
+        if (!isEditMode) {
+            RepeatSection(
+                onAbleClick = { isEnabled ->
+                    onAllDaysSelect(isEnabled)
+                },
+                isEnabled = selectedDays.size == 7
+            )
+        }
     }
-
 }
 
 @Composable
@@ -81,18 +81,30 @@ private fun DayBox(
     dayTitle: String,
     modifier: Modifier = Modifier,
     isEnabled: Boolean = false,
+    isEditMode: Boolean = false,
+    onShowToast: (String) -> Unit = {}
 ) {
-    val (borderColor, textColor) = when (isEnabled) {
-        true -> KieroTheme.colors.main to KieroTheme.colors.main
+    val (borderColor, textColor) = when {
+        isEnabled && isEditMode -> KieroTheme.colors.white to KieroTheme.colors.white
+        isEnabled -> KieroTheme.colors.main to KieroTheme.colors.main
         else -> Color.Unspecified to KieroTheme.colors.gray700
     }
+
     Text(
         text = dayTitle,
         color = textColor,
         style = KieroTheme.typography.regular.body1,
         textAlign = TextAlign.Center,
         modifier = modifier
-            .noRippleClickable(onClick = isSelectClick)
+            .noRippleClickable(
+                onClick = {
+                    if (isEditMode) {
+                        onShowToast("요일은 수정할 수 없어요. 삭제 후 등록해주세요.")
+                    } else {
+                        isSelectClick()
+                    }
+                }
+            )
             .background(
                 color = KieroTheme.colors.gray900,
                 shape = CircleShape
@@ -120,6 +132,8 @@ private fun DayBox(
 @Composable
 private fun DayPickSection(
     selectedDays: Set<Int>,
+    isEditMode: Boolean,
+    onShowToast: (String) -> Unit,
     onDayClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     dayList: ImmutableList<String> = persistentListOf("월", "화", "수", "목", "금", "토", "일"),
@@ -127,9 +141,7 @@ private fun DayPickSection(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(
-                color = Color.Unspecified
-            )
+            .background(color = Color.Unspecified)
             .padding(horizontal = 3.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -139,12 +151,13 @@ private fun DayPickSection(
                 isSelectClick = { onDayClick(index) },
                 dayTitle = day,
                 modifier = Modifier.weight(1f),
-                isEnabled = selectedDays.contains(index)
+                isEnabled = selectedDays.contains(index),
+                isEditMode = isEditMode,
+                onShowToast = onShowToast
             )
         }
     }
 }
-
 
 @Composable
 private fun RepeatSection(
@@ -159,9 +172,7 @@ private fun RepeatSection(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(
-                color = Color.Unspecified,
-            ),
+            .background(color = Color.Unspecified),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
@@ -171,7 +182,9 @@ private fun RepeatSection(
             imageVector = ImageVector.vectorResource(id = iconRes),
             contentDescription = null,
             tint = Color.Unspecified,
-            modifier = Modifier.noRippleClickable(onClick = { onAbleClick(isEnabled) })
+            modifier = Modifier.noRippleClickable(
+                onClick = { onAbleClick(isEnabled) }
+            )
         )
 
         Text(
@@ -182,19 +195,17 @@ private fun RepeatSection(
     }
 }
 
-
 @Composable
 private fun DaySection(
     onValidClick: () -> Unit,
     modifier: Modifier = Modifier,
     isEnabled: Boolean = false,
+    isEditMode: Boolean = false,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(
-                color = Color.Unspecified
-            ),
+            .background(color = Color.Unspecified),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -206,16 +217,28 @@ private fun DaySection(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        Text(
-            text = "매주 반복",
-            color = KieroTheme.colors.white,
-            style = KieroTheme.typography.bold.headLine4
-        )
+        when {
+            isEditMode && isEnabled -> {
+                Text(
+                    text = "매주 반복",
+                    color = KieroTheme.colors.gray400,
+                    style = KieroTheme.typography.bold.headLine4
+                )
+            }
 
-        DayToggle(
-            onClick = onValidClick,
-            isChecked = isEnabled
-        )
+            !isEditMode -> {
+                Text(
+                    text = "매주 반복",
+                    color = KieroTheme.colors.white,
+                    style = KieroTheme.typography.bold.headLine4
+                )
+
+                DayToggle(
+                    onClick = onValidClick,
+                    isChecked = isEnabled
+                )
+            }
+        }
     }
 }
 
@@ -228,8 +251,7 @@ private fun DayToggle(
     Switch(
         checked = isChecked,
         onCheckedChange = { onClick() },
-        modifier = modifier
-            .scale(0.7f),
+        modifier = modifier.scale(0.7f),
         colors = SwitchDefaults.colors(
             uncheckedThumbColor = KieroTheme.colors.gray200,
             checkedThumbColor = KieroTheme.colors.white,
@@ -240,11 +262,9 @@ private fun DayToggle(
         ),
         thumbContent = {
             Box(
-                modifier = Modifier
-                    .size(13.dp)
+                modifier = Modifier.size(13.dp)
             )
         }
-
     )
 }
 
@@ -256,6 +276,7 @@ private fun PreviewDayBox() {
             DayBox(
                 isSelectClick = {},
                 dayTitle = "월",
+                isEditMode = false
             )
         }
     }

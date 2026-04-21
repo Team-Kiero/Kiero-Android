@@ -208,7 +208,6 @@ fun MainScreen(
                     ParentMainTab.JOURNEY -> KieroTheme.colors.gray900
                     else -> KieroTheme.colors.black
                 })
-                .navigationBarsPadding()
         ) {
             Scaffold(
                 containerColor = KieroTheme.colors.black,

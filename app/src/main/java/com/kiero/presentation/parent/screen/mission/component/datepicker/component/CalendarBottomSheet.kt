@@ -27,20 +27,23 @@ import java.time.YearMonth
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarBottomSheet(
-    modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit,
     onDateSelected: (LocalDate) -> Unit,
+    modifier: Modifier = Modifier,
+    initialDate: LocalDate = LocalDate.now(),
 ) {
-    var yearMonth by remember { mutableStateOf(YearMonth.now()) }
-    var selectedDate by remember { mutableStateOf<LocalDate?>(LocalDate.now()) }
-    val today = LocalDate.now()
+    var yearMonth by remember { mutableStateOf(YearMonth.from(initialDate)) }
+    var selectedDate by remember { mutableStateOf<LocalDate?>(initialDate) }
 
     KieroBottomSheet (
-        onDismiss = onDismissRequest,
+        onDismiss = {
+            selectedDate?.let { date -> onDateSelected(date) }
+            onDismissRequest()
+        },
         dragHandle = null,
     ) {
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .disableUpScroll()
                 .verticalScroll(rememberScrollState())
                 .fillMaxWidth()
@@ -50,12 +53,14 @@ fun CalendarBottomSheet(
             PickerTopbar(
                 title = "마감일",
                 leftIconRes = R.drawable.ic_close_light,
-                leftIconClick = onDismissRequest,
+                leftIconClick = {
+                    selectedDate?.let { date -> onDateSelected(date) }
+                    onDismissRequest()
+                },
                 rightIconRes = R.drawable.ic_check,
                 rightIconClick = {
-                    selectedDate?.let { date ->
-                        onDateSelected(date)
-                    }
+                    selectedDate?.let { date -> onDateSelected(date) }
+                    onDismissRequest()
                 }
             )
 
@@ -79,6 +84,7 @@ fun CalendarBottomSheet(
 private fun PreviewCalendarBottomSheet() {
     KieroTheme {
         CalendarBottomSheet(
+            initialDate = LocalDate.now(),
             onDismissRequest = {},
             onDateSelected = {}
         )

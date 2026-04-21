@@ -55,7 +55,9 @@ class PlanRepositoryImpl @Inject constructor(
 
     override suspend fun updateSchedule(
         scheduleId: Long,
-        selectedDate: String,
+        selectedDate: String?,
+        startDate: String?,
+        endDate: String?,
         name: String,
         isRecurring: Boolean,
         startTime: String,
@@ -66,7 +68,7 @@ class PlanRepositoryImpl @Inject constructor(
         isIncludeFollowing: Boolean?,
     ): Result<Unit> = suspendRunCatching {
         dataSource.updateSchedule(
-            scheduleId, selectedDate, PlanUpdateRequestDto(
+            scheduleId, selectedDate, startDate, endDate, PlanUpdateRequestDto(
                 name = name,
                 isRecurring = isRecurring,
                 startTime = startTime,
@@ -77,15 +79,19 @@ class PlanRepositoryImpl @Inject constructor(
                 isIncludeFollowing = isIncludeFollowing
             )
         )
+        Unit
     }
 
     override suspend fun deleteSchedule(
         scheduleId: Long,
-        selectedDate: String,
+        selectedDate: String?,
+        startDate: String?,
+        endDate: String?,
         isIncludeFollowing: Boolean?,
     ): Result<Unit> = suspendRunCatching {
         dataSource.deleteSchedule(
-            scheduleId, selectedDate, PlanDeleteRequestDto(isIncludeFollowing = isIncludeFollowing)
+            scheduleId, selectedDate, startDate, endDate, PlanDeleteRequestDto(isIncludeFollowing = isIncludeFollowing)
         )
+        Unit
     }
 }

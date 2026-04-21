@@ -55,7 +55,7 @@ fun ParentRewardEditRoute(
         when (sideEffect) {
             is ParentRewardSideEffect.ShowSnackBar -> {
                 focusManager.clearFocus()
-                globalTrigger.showToast(sideEffect.message)
+                globalTrigger.showSnackbar(SnackbarState(sideEffect.message))
             }
             ParentRewardSideEffect.NavigateUp -> {
                 globalTrigger.onTabReselected(ParentReward)

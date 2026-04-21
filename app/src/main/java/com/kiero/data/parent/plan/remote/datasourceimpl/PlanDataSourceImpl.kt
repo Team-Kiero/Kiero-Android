@@ -28,15 +28,19 @@ class PlanDataSourceImpl @Inject constructor(
 
     override suspend fun updateSchedule(
         scheduleId: Long,
-        selectedDate: String,
+        selectedDate: String?,
+        startDate: String?,
+        endDate: String?,
         requestDto: PlanUpdateRequestDto,
     ): BaseResponse<Unit> =
-        planService.updateSchedule(scheduleId, selectedDate, requestDto)
+        planService.updateSchedule(scheduleId, selectedDate, startDate, endDate, requestDto)
 
     override suspend fun deleteSchedule(
         scheduleId: Long,
-        selectedDate: String,
+        selectedDate: String?,
+        startDate: String?,
+        endDate: String?,
         requestDto: PlanDeleteRequestDto,
     ): BaseResponse<Unit> =
-        planService.deleteSchedule(scheduleId, selectedDate, requestDto)
+        planService.deleteSchedule(scheduleId, selectedDate, startDate, endDate, requestDto)
 }

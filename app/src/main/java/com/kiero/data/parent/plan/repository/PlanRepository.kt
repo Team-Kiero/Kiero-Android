@@ -26,7 +26,9 @@ interface PlanRepository {
 
     suspend fun updateSchedule(
         scheduleId: Long,
-        selectedDate: String,
+        selectedDate: String?,
+        startDate: String?,
+        endDate: String?,
         name: String,
         isRecurring: Boolean,
         startTime: String,
@@ -39,7 +41,9 @@ interface PlanRepository {
 
     suspend fun deleteSchedule(
         scheduleId: Long,
-        selectedDate: String,
+        selectedDate: String?,
+        startDate: String?,
+        endDate: String?,
         isIncludeFollowing: Boolean?,
     ): Result<Unit>
 }

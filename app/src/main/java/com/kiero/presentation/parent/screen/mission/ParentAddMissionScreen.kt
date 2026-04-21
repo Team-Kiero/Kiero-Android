@@ -34,6 +34,7 @@ import com.kiero.presentation.parent.screen.mission.state.ParentAddMissionSideEf
 import com.kiero.presentation.parent.screen.mission.state.ParentAddMissionState
 import com.kiero.presentation.parent.screen.mission.viewmodel.ParentAddMissionViewModel
 import com.kiero.presentation.parent.screen.schedule.plan.component.select.ScheduleTextField
+import java.time.LocalDate
 
 @Composable
 fun ParentAddMissionRoute(
@@ -43,6 +44,7 @@ fun ParentAddMissionRoute(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val showBottomSheet by viewModel.showBottomSheet.collectAsStateWithLifecycle()
+    val selectedDate by viewModel.selectedDate.collectAsStateWithLifecycle()
 
     val dateText = viewModel.displayDate
     val globalTrigger = LocalGlobalUiEventTrigger.current
@@ -77,7 +79,8 @@ fun ParentAddMissionRoute(
             navigateUp = navigateUp,
             viewModel = viewModel,
             showBottomSheet = showBottomSheet,
-            selectedDate = dateText,
+            selectedDateText = dateText,
+            selectedDate = selectedDate,
             state = state,
             onMaxLengthReached = viewModel::onMissionNameMaxLength
         )
@@ -90,7 +93,8 @@ fun ParentAddMissionScreen(
     navigateUp: () -> Unit,
     viewModel: ParentAddMissionViewModel,
     showBottomSheet: Boolean,
-    selectedDate: String?,
+    selectedDateText: String?,
+    selectedDate: LocalDate?,
     state: ParentAddMissionState,
     onMaxLengthReached: () -> Unit,
     modifier: Modifier = Modifier,
@@ -128,7 +132,7 @@ fun ParentAddMissionScreen(
 
         MissionCalendar(
             onDateClick = viewModel::onDateClick,
-            dateText = selectedDate ?: "마감일을 선택해주세요",
+            dateText = selectedDateText ?: "마감일을 선택해주세요",
         )
 
         MissionAwardInfo()
@@ -142,6 +146,7 @@ fun ParentAddMissionScreen(
 
         if (showBottomSheet) {
             CalendarBottomSheet(
+                initialDate = selectedDate ?: LocalDate.now(),
                 onDismissRequest = viewModel::onDismissBottomSheet,
                 onDateSelected = viewModel::onDateSelected,
             )

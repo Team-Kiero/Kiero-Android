@@ -2,31 +2,18 @@ package com.kiero.presentation.parent.screen.schedule.plan
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -35,9 +22,6 @@ import com.kiero.R
 import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.component.KieroTopbar
-import com.kiero.core.designsystem.component.dialog.KieroDialog
-import com.kiero.core.designsystem.component.dialog.action.KieroCancelAction
-import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
@@ -51,8 +35,6 @@ import com.kiero.presentation.parent.screen.schedule.plan.model.ColorType
 import com.kiero.presentation.parent.screen.schedule.plan.state.ParentPlanSideEffect
 import com.kiero.presentation.parent.screen.schedule.plan.viewmodel.ParentPlanViewModel
 
-private enum class EditRepeatOption { THIS_ONLY, INCLUDE_FOLLOWING }
-
 @Composable
 fun ParentScheduleAddRoute(
     paddingValues: PaddingValues,
@@ -62,9 +44,6 @@ fun ParentScheduleAddRoute(
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val globalTrigger = LocalGlobalUiEventTrigger.current
     val focusManager = LocalFocusManager.current
-
-    var showEditDialog by remember { mutableStateOf(false) }
-    var editRepeatOption by remember { mutableStateOf(EditRepeatOption.THIS_ONLY) }
 
     viewModel.sideEffect.collectSideEffect { effect ->
         when (effect) {
@@ -83,6 +62,7 @@ fun ParentScheduleAddRoute(
         navigateUp = navigateUp,
         textState = viewModel.textState,
         selectedDays = uiState.selectedDays,
+        isEditMode = viewModel.isEditMode,
         onDayClick = viewModel::onDayClick,
         onAllDaysSelect = viewModel::onAllDaysSelect,
         isRecurring = uiState.isRecurring,
@@ -96,14 +76,8 @@ fun ParentScheduleAddRoute(
         onPreviousWeek = viewModel::onPreviousWeek,
         onNextWeek = viewModel::onNextWeek,
         onColorClick = { viewModel.toggleColorPicker(true) },
-        onCreatePlan = {
-            if (viewModel.shouldShowEditDialog()) {
-                editRepeatOption = EditRepeatOption.THIS_ONLY
-                showEditDialog = true
-            } else {
-                viewModel.onCreatePlanClick()
-            }
-        }
+        onCreatePlan = viewModel::onCreatePlanClick,
+        onShowToast = viewModel::showToastMessage
     )
 
     if (uiState.showColorPicker) {
@@ -115,125 +89,6 @@ fun ParentScheduleAddRoute(
             onDismissRequest = { viewModel.toggleColorPicker(false) }
         )
     }
-
-    if (showEditDialog) {
-        KieroDialog(
-            onDismiss = { showEditDialog = false },
-            title = viewModel.textState.text.toString(),
-            subDescription = null,
-            cancelAction = KieroCancelAction(
-                text = "취소",
-                onClick = { showEditDialog = false }
-            ),
-            confirmAction = KieroConfirmAction(
-                text = "확인",
-                onClick = {
-                    showEditDialog = false
-                    val includeFollowing = if (viewModel.isEditRecurring) {
-                        editRepeatOption == EditRepeatOption.INCLUDE_FOLLOWING
-                    } else null
-
-                    viewModel.onCreatePlanClick(isIncludeFollowing = includeFollowing)
-                }
-            ),
-            content = {
-                Box(
-                    modifier = Modifier.layout { measurable, constraints ->
-                        val placeable = measurable.measure(constraints)
-                        val pullUpHeight = 35.dp.roundToPx()
-
-                        layout(placeable.width, (placeable.height - pullUpHeight).coerceAtLeast(0)) {
-                            placeable.placeRelative(0, 0)
-                        }
-                    }
-                ) {
-                    ScheduleEditDialogContent(
-                        selectedOption = editRepeatOption,
-                        onOptionClick = { editRepeatOption = it },
-                        isRecurring = viewModel.isEditRecurring,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                }
-            }
-        )
-    }
-}
-
-@Composable
-private fun ScheduleEditDialogContent(
-    selectedOption: EditRepeatOption,
-    onOptionClick: (EditRepeatOption) -> Unit,
-    isRecurring: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "저장하시겠습니까?",
-            color = KieroTheme.colors.gray100,
-            style = KieroTheme.typography.regular.body3,
-            textAlign = TextAlign.Center,
-        )
-
-        if (isRecurring) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(
-                    modifier = Modifier
-                        .noRippleClickable { onOptionClick(EditRepeatOption.THIS_ONLY) }
-                        .weight(1f),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    val iconResThis = if (selectedOption == EditRepeatOption.THIS_ONLY) {
-                        R.drawable.ic_parent_addschedule_check_on
-                    } else {
-                        R.drawable.ic_parent_addschedule_check_off
-                    }
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = iconResThis),
-                        contentDescription = null,
-                        tint = Color.Unspecified
-                    )
-                    Text(
-                        text = "이번 일정만 포함",
-                        color = KieroTheme.colors.gray400,
-                        style = KieroTheme.typography.regular.body4
-                    )
-                }
-
-                Row(
-                    modifier = Modifier
-                        .noRippleClickable { onOptionClick(EditRepeatOption.INCLUDE_FOLLOWING) }
-                        .weight(1f),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    val iconResFollowing = if (selectedOption == EditRepeatOption.INCLUDE_FOLLOWING) {
-                        R.drawable.ic_parent_addschedule_check_on
-                    } else {
-                        R.drawable.ic_parent_addschedule_check_off
-                    }
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = iconResFollowing),
-                        contentDescription = null,
-                        tint = Color.Unspecified
-                    )
-                    Text(
-                        text = "이후 일정 포함",
-                        color = KieroTheme.colors.gray400,
-                        style = KieroTheme.typography.regular.body4
-                    )
-                }
-            }
-        }
-    }
 }
 
 @Composable
@@ -242,6 +97,7 @@ fun ScheduleAddScreen(
     navigateUp: () -> Unit,
     textState: TextFieldState,
     selectedDays: Set<Int>,
+    isEditMode: Boolean,
     onAllDaysSelect: (Boolean) -> Unit,
     isRecurring: Boolean,
     onDayClick: (Int) -> Unit,
@@ -256,6 +112,7 @@ fun ScheduleAddScreen(
     onNextWeek: () -> Unit,
     onColorClick: () -> Unit,
     onCreatePlan: () -> Unit,
+    onShowToast: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val focusManager = LocalFocusManager.current
@@ -274,7 +131,7 @@ fun ScheduleAddScreen(
         Spacer(modifier = Modifier.height(25.dp))
 
         KieroTopbar(
-            title = "일정 추가",
+            title = if (isEditMode) "일정 수정" else "일정 추가",
             leftIconRes = R.drawable.ic_close_light,
             rightIconRes = R.drawable.ic_check,
             leftIconClick = navigateUp,
@@ -285,7 +142,8 @@ fun ScheduleAddScreen(
             date = dateRangeText,
             onPreviousClick = onPreviousWeek,
             onNextClick = onNextWeek,
-            isPreviousEnabled = isPreviousEnabled
+            isPreviousEnabled = !isEditMode && isPreviousEnabled,
+            isNextEnabled = !isEditMode
         )
 
         ScheduleTextField(
@@ -296,15 +154,19 @@ fun ScheduleAddScreen(
         WeekSelectArea(
             selectedDays = selectedDays,
             isRecurring = isRecurring,
+            isEditMode = isEditMode,
             onDayClick = onDayClick,
             onAllDaysSelect = onAllDaysSelect,
-            onRecurringToggle = onRecurringToggle
+            onRecurringToggle = onRecurringToggle,
+            onShowToast = onShowToast
         )
 
         TimeSelectArea(
             startTime = startTime,
             endTime = endTime,
-            onTimeSelected = onTimeSelected
+            onTimeSelected = onTimeSelected,
+            isEditMode = false,
+            onShowToast = onShowToast
         )
 
         Spacer(modifier = Modifier.height(8.dp))

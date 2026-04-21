@@ -17,19 +17,19 @@ import com.kiero.presentation.parent.screen.schedule.plan.state.ParentScheduleSi
 import com.kiero.presentation.parent.screen.schedule.plan.state.ParentScheduleState
 import com.kiero.presentation.signup.parent.state.ParentSignUpState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toPersistentSet
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.time.temporal.TemporalAdjusters
 import javax.inject.Inject
 
 @HiltViewModel
@@ -61,49 +61,48 @@ class ParentScheduleViewModel @Inject constructor(
             var childId = userInfoManager.getChildIdInfo()
 
             if (childId == null) {
-                Timber.d("📌 childId 없음 - 자녀 목록 조회")
-                authRepository.getChildren()
-                    .onSuccess { children ->
-                        if (children.isNotEmpty()) {
-                            childId = children.first().childId
-                            userInfoManager.saveChildIdInfo(childId!!)
-                            Timber.d("📌 childId 저장 완료: $childId")
-                        }
+                authRepository.getChildren().onSuccess { children ->
+                    if (children.isNotEmpty()) {
+                        childId = children.first().childId
+                        userInfoManager.saveChildIdInfo(childId!!)
                     }
-                    .onFailure {
-                        Timber.e(it, "📌 자녀 목록 조회 실패")
-                    }
+                }
             }
 
-            if (childId != null) fetchSchedule()
-            else _state.value = UiState.Empty
+            if (childId != null) {
+                fetchSchedule()
+            } else {
+                _state.value = UiState.Empty
+            }
         }
     }
 
     fun fetchSchedule() {
         viewModelScope.launch {
-            val today = LocalDate.now()
             val childId = userInfoManager.getChildIdInfo() ?: return@launch
-            val s = currentScheduleState ?: ParentScheduleState()
+            val current = currentScheduleState ?: ParentScheduleState()
+
             if (_state.value is UiState.Success) {
                 _state.updateSuccess { it.copy(isFetching = true) }
             }
 
-            val monday = s.currentDate.with(DayOfWeek.MONDAY).toString()
-            val sunday = s.currentDate.with(DayOfWeek.SUNDAY).toString()
+            val monday = current.currentDate
+                .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+                .toString()
+
+            val sunday = current.currentDate
+                .with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
+                .toString()
 
             planRepository.getPlanAll(childId, monday, sunday)
                 .onSuccess { model ->
-                    val todayDow = today.dayOfWeek.name.take(3)
-                    // Todo : isFireLit = true일 때 반복일정일 시 안보이는 현상 수정 주완 확인 바람
-                    val recurringSchedules = model.recurringSchedules
-
-                    val newData = s.copy(
-                        planAllModel = model.copy(recurringSchedules = recurringSchedules),
-                        isFireLit    = model.isFireLit,
-                        isFetching   = false,
+                    _state.value = UiState.Success(
+                        current.copy(
+                            planAllModel = model,
+                            isFireLit = model.isFireLit,
+                            isFetching = false
+                        )
                     )
-                    _state.value = UiState.Success(newData)
                 }
                 .onFailure {
                     _state.value = UiState.Failure(it.message ?: "데이터 로드 실패")
@@ -111,88 +110,233 @@ class ParentScheduleViewModel @Inject constructor(
         }
     }
 
-    fun resetToday() {
-        val s = currentScheduleState ?: return
+    fun deleteSchedule(
+        scheduleId: Long,
+        selectedDate: String,
+        isRecurring: Boolean,
+        isIncludeFollowing: Boolean?,
+    ) {
+        val previousState = _state.value
+
+        viewModelScope.launch {
+            val safeDate = runCatching { LocalDate.parse(selectedDate.take(10)) }
+                .getOrElse { LocalDate.now() }
+
+            val selectedDateParam = if (isRecurring) {
+                null
+            } else {
+                safeDate.toString()
+            }
+
+            val startDateParam = if (isRecurring) {
+                safeDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).toString()
+            } else {
+                null
+            }
+
+            val endDateParam = if (isRecurring) {
+                safeDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY)).toString()
+            } else {
+                null
+            }
+
+            planRepository.deleteSchedule(
+                scheduleId = scheduleId,
+                selectedDate = selectedDateParam,
+                startDate = startDateParam,
+                endDate = endDateParam,
+                isIncludeFollowing = if (isRecurring) isIncludeFollowing else null
+            ).onSuccess {
+                when {
+                    !isRecurring -> {
+                        hideNormalSchedule(scheduleId, safeDate)
+                    }
+
+                    isIncludeFollowing == true -> {
+                        hideRecurringSchedule(scheduleId)
+                    }
+
+                    else -> {
+                        hideRecurringOccurrencesForThisWeek(scheduleId, safeDate)
+                    }
+                }
+
+                _sideEffect.emit(ShowSnackBar("일정이 삭제되었습니다"))
+            }.onFailure {
+                _state.value = previousState
+                _sideEffect.emit(ShowSnackBar("일정 삭제에 실패했습니다"))
+            }
+        }
+    }
+
+    private fun hideNormalSchedule(
+        scheduleId: Long,
+        selectedDate: LocalDate,
+    ) {
+        _state.updateSuccess { current ->
+            current.copy(
+                hiddenNormalScheduleKeys = (current.hiddenNormalScheduleKeys +
+                        ParentScheduleState.normalScheduleKey(scheduleId, selectedDate)).toPersistentSet()
+            )
+        }
+    }
+
+    private fun hideRecurringSchedule(scheduleId: Long) {
+        _state.updateSuccess { current ->
+            current.copy(
+                hiddenRecurringScheduleIds = (current.hiddenRecurringScheduleIds + scheduleId).toPersistentSet()
+            )
+        }
+    }
+
+    private fun hideRecurringOccurrencesForThisWeek(
+        scheduleId: Long,
+        selectedDate: LocalDate,
+    ) {
+        val currentUiState = _state.value as? UiState.Success ?: return
+        val data = currentUiState.data
+        val recurring = data.planAllModel?.recurringSchedules
+            ?.find { it.scheduleId == scheduleId } ?: return
+
+        val monday = selectedDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+        val sunday = selectedDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
+        val repeatStartDate = runCatching {
+            LocalDate.parse(recurring.repeatStartDate.take(10))
+        }.getOrDefault(LocalDate.MIN)
+
+        val startTime = parseScheduleStartTime(recurring.startTime) ?: return
+        val now = LocalDateTime.now()
+
+        val keysToHide = recurring.dayOfWeek
+            .split(",")
+            .map { it.trim().uppercase() }
+            .mapNotNull { dayCode ->
+                val dayIndex = dayCode.toDayIndexOrNull() ?: return@mapNotNull null
+                val occurrenceDate = monday.plusDays(dayIndex.toLong())
+
+                if (occurrenceDate.isBefore(repeatStartDate)) return@mapNotNull null
+
+                if (occurrenceDate.isBefore(selectedDate)) return@mapNotNull null
+
+                if (occurrenceDate.isAfter(sunday)) return@mapNotNull null
+
+                val occurrenceDateTime = LocalDateTime.of(occurrenceDate, startTime)
+
+                if (!occurrenceDateTime.isAfter(now)) return@mapNotNull null
+
+                ParentScheduleState.recurringOccurrenceKey(scheduleId, occurrenceDate)
+            }
+            .toSet()
+
+        _state.updateSuccess { current ->
+            current.copy(
+                hiddenRecurringOccurrenceKeys =
+                    (current.hiddenRecurringOccurrenceKeys + keysToHide).toPersistentSet()
+            )
+        }
+    }
+
+    private fun parseScheduleStartTime(startTime: String): LocalTime? {
+        return runCatching {
+            val parts = startTime.split(":")
+            LocalTime.of(parts[0].toInt(), parts[1].toInt())
+        }.getOrNull()
+    }
+
+    private fun String.toDayIndexOrNull(): Int? {
+        return when (this.uppercase()) {
+            "MON" -> 0
+            "TUE" -> 1
+            "WED" -> 2
+            "THU" -> 3
+            "FRI" -> 4
+            "SAT" -> 5
+            "SUN" -> 6
+            else -> null
+        }
+    }
+
+    fun isScheduleEditable(schedule: ScheduleModel, targetDateStr: String?): Boolean {
         val today = LocalDate.now()
-        if (s.currentDate == today) return
-        _state.value = UiState.Success(s.copy(currentDate = today))
+        val nowDateTime = LocalDateTime.now()
+
+        val dateStr = when {
+            !targetDateStr.isNullOrBlank() -> targetDateStr.take(10)
+            schedule is NormalScheduleModel -> schedule.date.take(10)
+            schedule is RecurringScheduleModel -> schedule.repeatStartDate.take(10)
+            else -> return false
+        }
+
+        val scheduleDate = runCatching { LocalDate.parse(dateStr) }.getOrNull()
+            ?: return false
+
+        val scheduleDateTime = runCatching {
+            val parts = schedule.startTime.split(":")
+            LocalDateTime.of(
+                scheduleDate,
+                LocalTime.of(parts[0].toInt(), parts[1].toInt())
+            )
+        }.getOrNull() ?: return false
+
+        // 1. 이미 시작 시간이 지났으면 무조건 수정/삭제 불가
+        if (!scheduleDateTime.isAfter(nowDateTime)) return false
+
+        val status = schedule.scheduleStatus?.uppercase()
+
+        return when (schedule) {
+            is NormalScheduleModel -> {
+                if (status == "VERIFIED" || status == "COMPLETED") return false
+                if (status == "SKIPPED" && scheduleDate == today) return false
+                true
+            }
+
+            is RecurringScheduleModel -> {
+                // 반복 일정은 클릭한 occurrence 날짜 기준으로 판단
+                // 오늘 occurrence인 경우에만 완료/스킵 상태로 수정·삭제 제한
+                if (scheduleDate.isEqual(today)) {
+                    if (status == "VERIFIED" || status == "COMPLETED") return false
+                    if (status == "SKIPPED") return false
+                }
+                true
+            }
+
+            else -> false
+        }
+    }
+
+    fun resetToday() {
+        val current = currentScheduleState ?: return
+        val today = LocalDate.now()
+
+        if (current.currentDate == today) return
+
+        _state.value = UiState.Success(current.copy(currentDate = today))
         fetchSchedule()
     }
 
     fun onDateChange(isNext: Boolean) {
-        val s = currentScheduleState ?: return
-        val newDate = if (isNext) s.currentDate.plusWeeks(1) else s.currentDate.minusWeeks(1)
+        val current = currentScheduleState ?: return
+        val newDate =
+            if (isNext) current.currentDate.plusWeeks(1) else current.currentDate.minusWeeks(1)
         val weeksDiff = ChronoUnit.WEEKS.between(LocalDate.now(), newDate)
+
         if (weeksDiff !in -12..12) return
-        _state.value = UiState.Success(s.copy(currentDate = newDate))
+
+        _state.value = UiState.Success(current.copy(currentDate = newDate))
         fetchSchedule()
-    }
-
-    fun deleteSchedule(scheduleId: Long, selectedDate: String, isIncludeFollowing: Boolean?) {
-
-        val previousState = _state.value
-
-        _state.update { currentUiState ->
-            val currentState = (currentUiState as? UiState.Success)?.data ?: return@update currentUiState
-            val currentPlan = currentState.planAllModel ?: return@update currentUiState
-
-            val updatedPlan = currentPlan.copy(
-                normalSchedules = currentPlan.normalSchedules.filterNot { it.scheduleId == scheduleId },
-                recurringSchedules = currentPlan.recurringSchedules.filterNot { it.scheduleId == scheduleId }
-            )
-
-            UiState.Success(currentState.copy(planAllModel = updatedPlan))
-        }
-
-        viewModelScope.launch {
-            planRepository.deleteSchedule(scheduleId, selectedDate, isIncludeFollowing)
-                .onSuccess {
-                    _sideEffect.emit(ShowSnackBar("일정이 삭제되었습니다"))
-
-                }
-                .onFailure {
-                    _state.value = previousState
-                    _sideEffect.emit(ShowSnackBar("일정 삭제에 실패했습니다"))
-                }
-        }
     }
 
     private fun fetchParentInfo() {
         viewModelScope.launch {
             val info = userInfoManager.getParentInfo() ?: return@launch
-            _authState.update { s ->
-                s.copy(
-                    parentInfo = s.parentInfo.copy(
-                        parentName         = info.name,
-                        parentProfileImage = info.profileImage,
+            _authState.update { state ->
+                state.copy(
+                    parentInfo = state.parentInfo.copy(
+                        parentName = info.name,
+                        parentProfileImage = info.profileImage
                     )
                 )
             }
         }
-    }
-
-    fun isScheduleEditable(schedule: ScheduleModel): Boolean {
-        val isFuture = runCatching {
-            val dateStr = when (schedule) {
-                is NormalScheduleModel    -> schedule.date
-                is RecurringScheduleModel -> schedule.repeatStartDate
-                else                     -> LocalDate.now().toString()
-            }
-            val scheduleDateTime = LocalDate.parse(dateStr)
-                .atTime(LocalTime.parse(schedule.startTime.take(5), DateTimeFormatter.ofPattern("HH:mm")))
-
-            scheduleDateTime.isAfter(LocalDateTime.now())
-        }.getOrDefault(false)
-
-        if (!isFuture) {
-            return false
-        }
-
-        val hiddenStatuses = listOf("VERIFIED", "COMPLETED", "FAILED", "SKIPPED")
-        if (schedule.scheduleStatus in hiddenStatuses) {
-            return false
-        }
-
-        return true
     }
 }
