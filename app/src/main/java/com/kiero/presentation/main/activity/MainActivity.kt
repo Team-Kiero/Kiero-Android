@@ -2,12 +2,12 @@ package com.kiero.presentation.main.activity
 
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
+import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.kiero.R
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.network.monitor.NetworkMonitor
 import com.kiero.presentation.main.navigation.rememberMainAppState
@@ -26,10 +26,16 @@ class MainActivity : ComponentActivity() {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
         enableEdgeToEdge(
-            navigationBarStyle = SystemBarStyle.dark(
-                getColor(R.color.bottombar_color)
+            statusBarStyle = SystemBarStyle.auto(
+                Color.TRANSPARENT,
+                Color.TRANSPARENT
+            ),
+            navigationBarStyle = SystemBarStyle.auto(
+                Color.TRANSPARENT,
+                Color.TRANSPARENT
             )
         )
+
         setContent {
             KieroTheme {
                 val appState = rememberMainAppState(networkMonitor = networkMonitor)
