@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.trigger.RefreshState
@@ -85,6 +86,7 @@ fun ParentPlanScreen(
                     state = state,
                     events = events,
                     onContentClick = onContentClick,
+                    modifier = Modifier.fillParentMaxHeight()
                 )
             }
 
@@ -95,7 +97,7 @@ fun ParentPlanScreen(
     }
 }
 
-@Preview(showBackground = true)
+@PreviewScreenSizes
 @Composable
 private fun ParentPlanScreenPreview() {
     KieroTheme {

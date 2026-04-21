@@ -18,22 +18,27 @@ data class TodayJourneyUiModel(
 
 fun ParentJourneyScheduleModel.toUiModel(
     currentTime: LocalTime = LocalTime.now(),
-    isNextUpcoming: Boolean = false
-) = TodayJourneyUiModel(
-    scheduleDetailId = scheduleDetailId,
-    date = "${startTime.toShortTime()} - ${endTime.toShortTime()}",
-    todayMission = name,
-    isAuthenticated = status == "VERIFIED" || status == "COMPLETED",
-    isOngoing = isOngoing,
-    todayStatus = status.toTodayStatus(
+    isNextUpcoming: Boolean = false,
+    hasOngoingSchedule: Boolean = false
+): TodayJourneyUiModel {
+    val todayStatus = status.toTodayStatus(
         startTime = startTime,
         endTime = endTime,
         currentTime = currentTime,
-        isNextUpcoming = isNextUpcoming
-    ),
-    scheduleLabel = when {
-        isOngoing -> "현재 일정"
-        isNextUpcoming -> "다음 일정"
-        else -> ""
-    }
-)
+        isNextUpcoming = isNextUpcoming && !hasOngoingSchedule
+    )
+
+    return TodayJourneyUiModel(
+        scheduleDetailId = scheduleDetailId,
+        date = "${startTime.toShortTime()} - ${endTime.toShortTime()}",
+        todayMission = name,
+        isAuthenticated = status == "VERIFIED" || status == "COMPLETED",
+        isOngoing = isOngoing,
+        todayStatus = todayStatus,
+        scheduleLabel = when {
+            todayStatus == TodayStatus.CURRENT_COMPLETED -> "현재 일정"
+            isNextUpcoming -> "다음 일정" // PAST_COMPLETED + isNextUpcoming → "다음 일정"
+            else -> ""
+        }
+    )
+}

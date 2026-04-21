@@ -25,11 +25,14 @@ fun String.toTodayStatus(
                 TodayStatus.CURRENT_COMPLETED
             // 현재 시간이 시작 이전이고 바로 다음 일정 → 현재 일정으로 활성화
             start != null && currentTime < start && isNextUpcoming ->
-                TodayStatus.CURRENT_COMPLETED
+                TodayStatus.NEXT_UPCOMING
             else -> TodayStatus.UPCOMING
         }
-        "VERIFIED" -> TodayStatus.CURRENT_COMPLETED
-        "COMPLETED" -> TodayStatus.PAST_COMPLETED
+        "VERIFIED", "COMPLETED" -> when {
+            start != null && end != null && currentTime >= start && currentTime < end ->
+                TodayStatus.CURRENT_COMPLETED
+            else -> TodayStatus.PAST_COMPLETED
+        }
         "FAILED", "SKIPPED" -> TodayStatus.PAST_MISSED
         else -> TodayStatus.UPCOMING
     }

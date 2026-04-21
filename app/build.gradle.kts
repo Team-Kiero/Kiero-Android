@@ -123,8 +123,8 @@ dependencies {
 
     debugImplementation(libs.bundles.debug)
 
-    implementation(libs.bundles.androidx)
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.bundles.androidx)
 
     implementation(libs.kotlinx.immutable)
 
