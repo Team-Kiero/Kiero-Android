@@ -121,10 +121,10 @@ class ParentScheduleViewModel @Inject constructor(
             val safeDate = runCatching { LocalDate.parse(selectedDate.take(10)) }
                 .getOrElse { LocalDate.now() }
 
-            val selectedDateParam = if (!isRecurring) {
-                safeDate.toString()
-            } else {
+            val selectedDateParam = if (isRecurring) {
                 null
+            } else {
+                safeDate.toString()
             }
 
             val startDateParam = if (isRecurring) {
@@ -198,6 +198,7 @@ class ParentScheduleViewModel @Inject constructor(
             ?.find { it.scheduleId == scheduleId } ?: return
 
         val monday = selectedDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+        val sunday = selectedDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
         val repeatStartDate = runCatching {
             LocalDate.parse(recurring.repeatStartDate.take(10))
         }.getOrNull() ?: LocalDate.MIN
@@ -213,6 +214,10 @@ class ParentScheduleViewModel @Inject constructor(
                 val occurrenceDate = monday.plusDays(dayIndex.toLong())
 
                 if (occurrenceDate.isBefore(repeatStartDate)) return@mapNotNull null
+
+                if (occurrenceDate.isBefore(selectedDate)) return@mapNotNull null
+
+                if (occurrenceDate.isAfter(sunday)) return@mapNotNull null
 
                 val occurrenceDateTime = LocalDateTime.of(occurrenceDate, startTime)
 

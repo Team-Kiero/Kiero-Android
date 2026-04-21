@@ -215,10 +215,11 @@ class ParentPlanViewModel @Inject constructor(
 
             val originalIsRecurring = editArgs.isRecurring
             val weekRange = if (originalIsRecurring) current.currentReferenceDate.toWeekRange() else null
+            val selectedDateParam = editArgs.selectedDate.takeIf { it.isNotBlank() }
 
             planRepository.updateSchedule(
                 scheduleId = scheduleId,
-                selectedDate = if (originalIsRecurring) null else editArgs.selectedDate,
+                selectedDate = selectedDateParam,
                 startDate = weekRange?.first,
                 endDate = weekRange?.second,
                 name = name,
