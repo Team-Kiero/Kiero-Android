@@ -27,9 +27,12 @@ class SseManager @Inject constructor(
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    private var sseJob: Job? = null
+    private var activeSseJob: Job? = null
     private var tokenRefreshJob: Job? = null
     private var cachedAccessToken: String? = null
+    private var lastEventId: String? = null
+
+    private val recentEventHashes = ArrayDeque<Int>(10)
     private val mutex = Mutex()
 
     // 부모 이벤트
@@ -96,24 +99,22 @@ class SseManager @Inject constructor(
 
     private fun initSubscription(isParent: Boolean) {
         scope.launch {
-            mutex.withLock {
+            val jobToCancel = mutex.withLock {
                 if (isSubscribed && isParentMode == isParent) return@launch
-
                 stopSubscriptionInternal()
+            }
+            jobToCancel?.cancelAndJoin()
 
+            mutex.withLock {
                 isSubscribed = true
                 isParentMode = isParent
                 cachedAccessToken = null
-
-                sseJob = launch {
-                    subscriptionLoop(isParent)
-                }
-
+                activeSseJob = launch { subscriptionLoop(isParent) }
                 startTokenRefreshTimer()
             }
         }
     }
-    private suspend fun subscriptionLoop(isParent: Boolean) {
+    private suspend fun subscriptionLoop(isParent: Boolean, oldJobToCancel: Job? = null) {
         var retryCount = 0
         val maxRetry = 5
 
@@ -124,18 +125,50 @@ class SseManager @Inject constructor(
                     retryCount++
                     if (retryCount >= maxRetry) {
                         Timber.e("SSE 최대 재시도 초과 → 구독 중지")
-                        stopSubscriptionInternal()
+                        isSubscribed = false
+                        cachedAccessToken = null
+                        _connectionState.emit(false)
+                        tokenRefreshJob?.cancel()
+                        tokenRefreshJob = null
                         return
                     }
                     delay(3000L * (1 shl (retryCount - 1)).coerceAtMost(16))
                     continue
                 }
                 retryCount = 0
-                Timber.d("🔄 SSE 연결 시도")
+                Timber.d("🔄 SSE 연결 시도 (Last-Event-ID: $lastEventId)")
 
-                sseRepository.subscribeEvents(token)
+                sseRepository.subscribeEvents(token, lastEventId)
                     .collect { event ->
-                        _connectionState.emit(true)
+                        if (event !is SseEvent.Connected) {
+                            val eventHash = event.hashCode()
+                            /*if (recentEventHashes.contains(eventHash)) {
+                                Timber.d("내용이 중복된 이벤트로 수시됨: $eventHash")
+                                return@collect
+                            }*/
+
+                            if (recentEventHashes.size >= 10) {
+                                recentEventHashes.removeFirst()
+                            }
+
+                            recentEventHashes.addLast(eventHash)
+                        }
+
+                        event.eventId?.let { id ->
+                            lastEventId = id
+                            Timber.d("Last-Event-ID 갱신: $lastEventId")
+                        }
+                        // 새 연결이 성공적으로 맺어졌을 때만 기존 연결을 종료
+                        if (event is SseEvent.Connected) {
+                            if (oldJobToCancel != null) {
+                                oldJobToCancel.cancel()
+                                Timber.d("무중단 재연결 성공, 기존 연결 종료")
+                            } else {
+                                Timber.d("SSE 연결 성공")
+                            }
+                            _connectionState.emit(true)
+                        }
+
                         if (isParent) handleParentEvent(event)
                         else handleChildEvent(event)
                     }
@@ -149,7 +182,11 @@ class SseManager @Inject constructor(
 
                 if (retryCount >= maxRetry) {
                     Timber.e("SSE 최대 재시도 초과 → 구독 중지")
-                    stopSubscriptionInternal()
+                    isSubscribed = false
+                    cachedAccessToken = null
+                    _connectionState.emit(false)
+                    tokenRefreshJob?.cancel()
+                    tokenRefreshJob = null
                     return
                 }
 
@@ -167,18 +204,16 @@ class SseManager @Inject constructor(
         tokenRefreshJob?.cancel()
         tokenRefreshJob = scope.launch {
             while (isActive) {
-                delay(300_000L)
+                delay(270_000L)
                 Timber.d("⏰ SSE 토큰 갱신 주기 도래 (5분)")
 
                 mutex.withLock {
                     if (isSubscribed) {
                         cachedAccessToken = null
-
-                        // 현재 job 취소
-                        sseJob?.cancel()
-
-                        sseJob = launch {
-                            subscriptionLoop(isParentMode)
+                        val oldJob = activeSseJob
+                        activeSseJob = launch {
+                            Timber.e("새 SSE 연결 시작, 기존은 connected 수신 후 종료")
+                            subscriptionLoop(isParentMode, oldJob)
                         }
                     }
                 }
@@ -208,21 +243,24 @@ class SseManager @Inject constructor(
 
     fun stopSubscription() {
         scope.launch {
-            mutex.withLock {
+            val jobToCancel = mutex.withLock {
                 stopSubscriptionInternal()
             }
+            jobToCancel?.cancelAndJoin()
         }
     }
 
-    private suspend fun stopSubscriptionInternal() {
+    private fun stopSubscriptionInternal(): Job? {
         isSubscribed = false
         cachedAccessToken = null
-        sseJob?.cancelAndJoin()
         tokenRefreshJob?.cancel()
-        _connectionState.emit(false)
-        Timber.d("⛔ SSE 구독 완전 중지")
-    }
+        tokenRefreshJob = null
+        _connectionState.tryEmit(false)
 
+        val jobToCancel = activeSseJob
+        activeSseJob = null
+        return jobToCancel
+    }
     private suspend fun handleParentEvent(event: SseEvent) {
         when (event) {
             is SseEvent.Connected -> Timber.d("부모 SSE Connected")

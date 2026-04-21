@@ -39,6 +39,18 @@ class ParentJourneyViewModel @Inject constructor(
         sseManager.startParentSubscription()
     }
 
+    fun collectConnectionEvents() {
+        viewModelScope.launch {
+            sseManager.connectionState.collect { isConnected ->
+                if (isConnected) {
+                    val childId = _state.value.kidInfo.kidId.toLong()
+
+                    fetchParentJourney(childId)
+                }
+            }
+        }
+    }
+
     fun collectParentJourneyScheduleEvents() {
         viewModelScope.launch {
             sseManager.parentScheduleEvents.collect { event ->
@@ -74,6 +86,7 @@ class ParentJourneyViewModel @Inject constructor(
                         }
 
                         collectParentJourneyScheduleEvents()
+                        collectConnectionEvents()
                         fetchParentJourney(kidInfo.kidId.toLong())
                     }
                 }

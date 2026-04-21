@@ -8,21 +8,22 @@ import com.kiero.data.sse.remote.dto.response.MissionDataDto
 import com.kiero.data.sse.remote.dto.response.ParentScheduleDataDto
 import com.kiero.data.sse.remote.dto.response.ScheduleDataDto
 
-sealed interface SseEvent {
-    data object Connected : SseEvent
+sealed class SseEvent {
+    open val eventId : String? = null
+    data object Connected : SseEvent()
 
     // 부모 전용
-    sealed interface Parent : SseEvent {
-        data class Invite(val data: InviteDataDto) : Parent
-        data class Feed(val data: FeedDataDto) : Parent
-        data class Schedule(val data: ParentScheduleDataDto) : Parent
+    sealed class Parent : SseEvent() {
+        data class Invite(val data: InviteDataDto, override val eventId: String? = null) : Parent()
+        data class Feed(val data: FeedDataDto, override val eventId: String? = null) : Parent()
+        data class Schedule(val data: ParentScheduleDataDto, override val eventId: String? = null) : Parent()
     }
 
     // 자녀 전용
-    sealed interface Kid : SseEvent {
-        data class Mission(val data: MissionDataDto) : Kid
-        data class Schedule(val data: ScheduleDataDto) : Kid
-        data class Coupon(val data: CouponDataDto) : Kid
-        data class Date(val data: DateDataDto) : Kid
+    sealed class Kid : SseEvent() {
+        data class Mission(val data: MissionDataDto, override val eventId: String? = null) : Kid()
+        data class Schedule(val data: ScheduleDataDto, override val eventId: String? = null) : Kid()
+        data class Coupon(val data: CouponDataDto, override val eventId: String? = null) : Kid()
+        data class Date(val data: DateDataDto, override val eventId: String? = null) : Kid()
     }
 }

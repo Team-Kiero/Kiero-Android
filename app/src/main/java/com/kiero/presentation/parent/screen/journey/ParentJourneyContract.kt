@@ -58,7 +58,34 @@ data class ParentJourneyState(
     }
 }
 
+// 현재일정 , 다음일정 텍스트O
 fun List<ParentJourneyScheduleModel>.toUiModels(currentTime: LocalTime): List<TodayJourneyUiModel> {
+
+    val hasOngoingSchedule = any { schedule ->
+        val start = schedule.startTime.toLocalTime()
+        val end = schedule.endTime.toLocalTime()
+        start != null && end != null && currentTime >= start && currentTime < end
+    }
+
+    // 항상 다음 일정 id 찾기
+    val nextUpcomingId = filter { schedule ->
+        val start = schedule.startTime.toLocalTime()
+        schedule.status == "PENDING" && start != null && start.isAfter(currentTime)
+    }
+        .minByOrNull { it.startTime }
+        ?.scheduleDetailId
+
+    return map { schedule ->
+        schedule.toUiModel(
+            currentTime = currentTime,
+            isNextUpcoming = schedule.scheduleDetailId == nextUpcomingId,
+            hasOngoingSchedule = hasOngoingSchedule
+        )
+    }
+}
+
+// 현재일정 , 다음일정 텍스트x
+/*fun List<ParentJourneyScheduleModel>.toUiModels(currentTime: LocalTime): List<TodayJourneyUiModel> {
     // 현재 진행 중인 일정이 있는지 확인
     val hasOngoingSchedule = any { schedule ->
         val start = schedule.startTime.toLocalTime()
@@ -84,7 +111,7 @@ fun List<ParentJourneyScheduleModel>.toUiModels(currentTime: LocalTime): List<To
             isNextUpcoming = schedule.scheduleDetailId == nextUpcomingId
         )
     }
-}
+}*/
 
 sealed interface ParentJourneySideEffect {
     data object NavigateUp : ParentJourneySideEffect

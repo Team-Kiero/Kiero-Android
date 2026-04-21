@@ -28,13 +28,20 @@ class SseDataSourceImpl @Inject constructor(
     }
 
     override suspend fun subscribeEvents(
-        accessToken: String
+        accessToken: String,
+        lastEventId: String?
     ): Flow<RawSseEvent> = callbackFlow {
-        val request = Request.Builder()
+        val requestBuilder = Request.Builder()
             .url("${BuildConfig.BASE_URL}api/v1/subscribe")
             .header("Accept", "text/event-stream")
             .header("Authorization", "Bearer $accessToken")
-            .build()
+
+        if (!lastEventId.isNullOrEmpty()) {
+            requestBuilder.header("Last-Event-ID", lastEventId)
+            Timber.d("헤더에 Last-Event-ID 포함하여 요청: $lastEventId")
+        }
+
+        val request = requestBuilder.build()
 
         val sseClient = okHttpClient.newBuilder()
             .readTimeout(0, java.util.concurrent.TimeUnit.MILLISECONDS)
@@ -53,9 +60,9 @@ class SseDataSourceImpl @Inject constructor(
                     type: String?,
                     data: String
                 ) {
-                    Timber.d("SSE 원시 데이터 수신 - type: $type")
+                    Timber.d("SSE 원시 데이터 수신 - type: $type, id: $id")
 
-                    trySend(RawSseEvent(type, data))
+                    trySend(RawSseEvent(type, data, id = id))
                 }
 
                 override fun onClosed(eventSource: EventSource) {
@@ -68,7 +75,12 @@ class SseDataSourceImpl @Inject constructor(
                     t: Throwable?,
                     response: Response?
                 ) {
-                    Timber.e(t, "SSE 연결 실패 - response: ${response?.code}")
+                    if (t is java.io.IOException && (t.message == "canceled" || t.message == "Canceled")) {
+                        Timber.d("SSE 연결이 취소되었습니다 (정상적인 재연결 교체 또는 코루틴 종료)")
+                    } else {
+                        Timber.e(t, "SSE 연결 실패 - response: ${response?.code}")
+                    }
+
                     close(t)
                 }
             })
