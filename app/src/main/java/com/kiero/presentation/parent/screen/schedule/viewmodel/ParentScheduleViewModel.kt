@@ -17,6 +17,7 @@ import com.kiero.presentation.parent.screen.schedule.plan.state.ParentScheduleSi
 import com.kiero.presentation.parent.screen.schedule.plan.state.ParentScheduleState
 import com.kiero.presentation.signup.parent.state.ParentSignUpState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toPersistentSet
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -174,8 +175,8 @@ class ParentScheduleViewModel @Inject constructor(
     ) {
         _state.updateSuccess { current ->
             current.copy(
-                hiddenNormalScheduleKeys = current.hiddenNormalScheduleKeys +
-                        ParentScheduleState.normalScheduleKey(scheduleId, selectedDate)
+                hiddenNormalScheduleKeys = (current.hiddenNormalScheduleKeys +
+                        ParentScheduleState.normalScheduleKey(scheduleId, selectedDate)).toPersistentSet()
             )
         }
     }
@@ -183,7 +184,7 @@ class ParentScheduleViewModel @Inject constructor(
     private fun hideRecurringSchedule(scheduleId: Long) {
         _state.updateSuccess { current ->
             current.copy(
-                hiddenRecurringScheduleIds = current.hiddenRecurringScheduleIds + scheduleId
+                hiddenRecurringScheduleIds = (current.hiddenRecurringScheduleIds + scheduleId).toPersistentSet()
             )
         }
     }
@@ -201,7 +202,7 @@ class ParentScheduleViewModel @Inject constructor(
         val sunday = selectedDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
         val repeatStartDate = runCatching {
             LocalDate.parse(recurring.repeatStartDate.take(10))
-        }.getOrNull() ?: LocalDate.MIN
+        }.getOrDefault(LocalDate.MIN)
 
         val startTime = parseScheduleStartTime(recurring.startTime) ?: return
         val now = LocalDateTime.now()
@@ -230,7 +231,7 @@ class ParentScheduleViewModel @Inject constructor(
         _state.updateSuccess { current ->
             current.copy(
                 hiddenRecurringOccurrenceKeys =
-                    current.hiddenRecurringOccurrenceKeys + keysToHide
+                    (current.hiddenRecurringOccurrenceKeys + keysToHide).toPersistentSet()
             )
         }
     }

@@ -43,7 +43,7 @@ fun CalendarBottomSheet(
         dragHandle = null,
     ) {
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .disableUpScroll()
                 .verticalScroll(rememberScrollState())
                 .fillMaxWidth()

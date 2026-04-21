@@ -4,6 +4,8 @@ import androidx.compose.runtime.Immutable
 import com.kiero.data.parent.plan.model.PlanAllModel
 import com.kiero.presentation.parent.screen.schedule.model.ScheduleEvent
 import com.kiero.presentation.signup.parent.model.ParentInfoUiModel
+import kotlinx.collections.immutable.PersistentSet
+import kotlinx.collections.immutable.persistentSetOf
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -20,9 +22,9 @@ data class ParentScheduleState(
     val isRefreshing: Boolean = false,
     val isLoading: Boolean = false,
 
-    val hiddenNormalScheduleKeys: Set<String> = emptySet(),
-    val hiddenRecurringScheduleIds: Set<Long> = emptySet(),
-    val hiddenRecurringOccurrenceKeys: Set<String> = emptySet(),
+    val hiddenNormalScheduleKeys: PersistentSet<String> = persistentSetOf(),
+    val hiddenRecurringScheduleIds: PersistentSet<Long> = persistentSetOf(),
+    val hiddenRecurringOccurrenceKeys: PersistentSet<String> = persistentSetOf()
 ) {
     val canGoNext: Boolean
         get() = ChronoUnit.WEEKS.between(LocalDate.now(), currentDate) < 12

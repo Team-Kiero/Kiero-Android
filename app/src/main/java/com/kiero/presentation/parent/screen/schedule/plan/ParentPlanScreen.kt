@@ -63,17 +63,18 @@ fun ParentPlanScreen(
                 state.currentDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
 
             buildList<ScheduleEvent> {
-                model.recurringSchedules
-                    .forEach { recurring ->
-                        if (state.hiddenRecurringScheduleIds.contains(recurring.scheduleId)) {
-                            return@forEach
-                        }
+                model.recurringSchedules.forEach { recurring ->
+                    if (recurring.scheduleStatus == "SKIPPED" ||
+                        state.hiddenRecurringScheduleIds.contains(recurring.scheduleId)
+                    ) {
+                        return@forEach
+                    }
 
                         val baseEvent = recurring.toUiModel()
 
                         val repeatStartDate = runCatching {
                             LocalDate.parse(recurring.repeatStartDate.take(10))
-                        }.getOrNull() ?: LocalDate.MIN
+                        }.getOrDefault(LocalDate.MIN)
 
                         val dayCodes = recurring.dayOfWeek
                             .split(",")
