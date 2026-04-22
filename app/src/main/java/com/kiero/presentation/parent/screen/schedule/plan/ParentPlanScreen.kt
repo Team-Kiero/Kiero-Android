@@ -65,46 +65,44 @@ fun ParentPlanScreen(
 
             buildList<ScheduleEvent> {
                 model.recurringSchedules.forEach { recurring ->
-                    if (recurring.scheduleStatus == "SKIPPED" ||
-                        state.hiddenRecurringScheduleIds.contains(recurring.scheduleId)
-                    ) {
+                    if (state.hiddenRecurringScheduleIds.contains(recurring.scheduleId)) {
                         return@forEach
                     }
 
-                        val baseEvent = recurring.toUiModel()
+                    val baseEvent = recurring.toUiModel()
 
-                        val repeatStartDate = runCatching {
-                            LocalDate.parse(recurring.repeatStartDate.take(10))
-                        }.getOrDefault(LocalDate.MIN)
+                    val repeatStartDate = runCatching {
+                        LocalDate.parse(recurring.repeatStartDate.take(10))
+                    }.getOrDefault(LocalDate.MIN)
 
-                        val dayCodes = recurring.dayOfWeek
-                            .split(",")
-                            .map { it.trim().uppercase() }
-                            .filter { it.isNotBlank() }
+                    val dayCodes = recurring.dayOfWeek
+                        .split(",")
+                        .map { it.trim().uppercase() }
+                        .filter { it.isNotBlank() }
 
-                        dayCodes.forEach { dayCode ->
-                            val dayIndex = dayCode.toDayIndex()
-                            val occurrenceDate = currentWeekMonday.plusDays(dayIndex.toLong())
+                    dayCodes.forEach { dayCode ->
+                        val dayIndex = dayCode.toDayIndex()
+                        val occurrenceDate = currentWeekMonday.plusDays(dayIndex.toLong())
 
-                            if (occurrenceDate.isBefore(repeatStartDate)) return@forEach
+                        if (occurrenceDate.isBefore(repeatStartDate)) return@forEach
 
-                            val hiddenKey = ParentScheduleState.recurringOccurrenceKey(
-                                recurring.scheduleId,
-                                occurrenceDate
-                            )
+                        val hiddenKey = ParentScheduleState.recurringOccurrenceKey(
+                            recurring.scheduleId,
+                            occurrenceDate
+                        )
 
-                            if (state.hiddenRecurringOccurrenceKeys.contains(hiddenKey)) {
-                                return@forEach
-                            }
-
-                            add(
-                                baseEvent.copy(
-                                    dayOfWeek = dayCode,
-                                    date = occurrenceDate.toString(),
-                                )
-                            )
+                        if (state.hiddenRecurringOccurrenceKeys.contains(hiddenKey)) {
+                            return@forEach
                         }
+
+                        add(
+                            baseEvent.copy(
+                                dayOfWeek = dayCode,
+                                date = occurrenceDate.toString(),
+                            )
+                        )
                     }
+                }
 
                 model.normalSchedules
                     .forEach { normal ->
@@ -184,7 +182,6 @@ private fun String.toDayIndex(): Int {
         else -> 0
     }
 }
-
 
 @PreviewScreenSizes
 @Composable
