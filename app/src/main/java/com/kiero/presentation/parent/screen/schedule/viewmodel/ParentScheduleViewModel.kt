@@ -118,10 +118,20 @@ class ParentScheduleViewModel @Inject constructor(
     ) {
         val previousState = _state.value
 
-        viewModelScope.launch {
-            val safeDate = runCatching { LocalDate.parse(selectedDate.take(10)) }
-                .getOrElse { LocalDate.now() }
+        val safeDate = runCatching { LocalDate.parse(selectedDate.take(10)) }
+            .getOrElse { LocalDate.now() }
 
+        if (isRecurring) {
+            if (isIncludeFollowing == true) {
+                hideRecurringOccurrencesIncludingFollowing(scheduleId, safeDate)
+            } else {
+                hideRecurringOccurrencesForThisWeek(scheduleId, safeDate)
+            }
+        } else {
+            hideNormalSchedule(scheduleId, safeDate)
+        }
+
+        viewModelScope.launch {
             val selectedDateParam = if (isRecurring) {
                 null
             } else {
@@ -147,20 +157,6 @@ class ParentScheduleViewModel @Inject constructor(
                 endDate = endDateParam,
                 isIncludeFollowing = if (isRecurring) isIncludeFollowing else null
             ).onSuccess {
-                when {
-                    !isRecurring -> {
-                        hideNormalSchedule(scheduleId, safeDate)
-                    }
-
-                    isIncludeFollowing == true -> {
-                        hideRecurringSchedule(scheduleId)
-                    }
-
-                    else -> {
-                        hideRecurringOccurrencesForThisWeek(scheduleId, safeDate)
-                    }
-                }
-
                 _sideEffect.emit(ShowSnackBar("일정이 삭제되었습니다"))
             }.onFailure {
                 _state.value = previousState
@@ -175,16 +171,10 @@ class ParentScheduleViewModel @Inject constructor(
     ) {
         _state.updateSuccess { current ->
             current.copy(
-                hiddenNormalScheduleKeys = (current.hiddenNormalScheduleKeys +
-                        ParentScheduleState.normalScheduleKey(scheduleId, selectedDate)).toPersistentSet()
-            )
-        }
-    }
-
-    private fun hideRecurringSchedule(scheduleId: Long) {
-        _state.updateSuccess { current ->
-            current.copy(
-                hiddenRecurringScheduleIds = (current.hiddenRecurringScheduleIds + scheduleId).toPersistentSet()
+                hiddenNormalScheduleKeys = (
+                        current.hiddenNormalScheduleKeys +
+                                ParentScheduleState.normalScheduleKey(scheduleId, selectedDate)
+                        ).toPersistentSet()
             )
         }
     }
@@ -205,8 +195,6 @@ class ParentScheduleViewModel @Inject constructor(
         }.getOrDefault(LocalDate.MIN)
 
         val startTime = parseScheduleStartTime(recurring.startTime) ?: return
-        val now = LocalDateTime.now()
-
         val keysToHide = recurring.dayOfWeek
             .split(",")
             .map { it.trim().uppercase() }
@@ -215,14 +203,8 @@ class ParentScheduleViewModel @Inject constructor(
                 val occurrenceDate = monday.plusDays(dayIndex.toLong())
 
                 if (occurrenceDate.isBefore(repeatStartDate)) return@mapNotNull null
-
-                if (occurrenceDate.isBefore(selectedDate)) return@mapNotNull null
-
                 if (occurrenceDate.isAfter(sunday)) return@mapNotNull null
-
-                val occurrenceDateTime = LocalDateTime.of(occurrenceDate, startTime)
-
-                if (!occurrenceDateTime.isAfter(now)) return@mapNotNull null
+                if (!canOptimisticallyHideOccurrence(recurring, occurrenceDate, startTime)) return@mapNotNull null
 
                 ParentScheduleState.recurringOccurrenceKey(scheduleId, occurrenceDate)
             }
@@ -230,10 +212,76 @@ class ParentScheduleViewModel @Inject constructor(
 
         _state.updateSuccess { current ->
             current.copy(
-                hiddenRecurringOccurrenceKeys =
-                    (current.hiddenRecurringOccurrenceKeys + keysToHide).toPersistentSet()
+                hiddenRecurringOccurrenceKeys = (
+                        current.hiddenRecurringOccurrenceKeys + keysToHide
+                        ).toPersistentSet()
             )
         }
+    }
+
+    private fun hideRecurringOccurrencesIncludingFollowing(
+        scheduleId: Long,
+        selectedDate: LocalDate,
+    ) {
+        val currentUiState = _state.value as? UiState.Success ?: return
+        val data = currentUiState.data
+        val recurring = data.planAllModel?.recurringSchedules
+            ?.find { it.scheduleId == scheduleId } ?: return
+
+        val monday = selectedDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+        val sunday = selectedDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
+        val repeatStartDate = runCatching {
+            LocalDate.parse(recurring.repeatStartDate.take(10))
+        }.getOrDefault(LocalDate.MIN)
+
+        val startTime = parseScheduleStartTime(recurring.startTime) ?: return
+        val keysToHide = recurring.dayOfWeek
+            .split(",")
+            .map { it.trim().uppercase() }
+            .mapNotNull { dayCode ->
+                val dayIndex = dayCode.toDayIndexOrNull() ?: return@mapNotNull null
+                val occurrenceDate = monday.plusDays(dayIndex.toLong())
+
+                if (occurrenceDate.isBefore(repeatStartDate)) return@mapNotNull null
+                if (occurrenceDate.isBefore(selectedDate)) return@mapNotNull null
+                if (occurrenceDate.isAfter(sunday)) return@mapNotNull null
+                if (!canOptimisticallyHideOccurrence(recurring, occurrenceDate, startTime)) return@mapNotNull null
+
+                ParentScheduleState.recurringOccurrenceKey(scheduleId, occurrenceDate)
+            }
+            .toSet()
+
+        _state.updateSuccess { current ->
+            current.copy(
+                hiddenRecurringOccurrenceKeys = (
+                        current.hiddenRecurringOccurrenceKeys + keysToHide
+                        ).toPersistentSet()
+            )
+        }
+    }
+
+    private fun canOptimisticallyHideOccurrence(
+        schedule: RecurringScheduleModel,
+        occurrenceDate: LocalDate,
+        startTime: LocalTime,
+    ): Boolean {
+        val currentUiState = _state.value as? UiState.Success ?: return false
+        val current = currentUiState.data
+
+        val today = LocalDate.now()
+        val nowDateTime = LocalDateTime.now()
+        val occurrenceDateTime = LocalDateTime.of(occurrenceDate, startTime)
+        val status = schedule.scheduleStatus?.uppercase()
+
+        if (!occurrenceDateTime.isAfter(nowDateTime)) return false
+
+        if (status == "VERIFIED" || status == "COMPLETED") return false
+
+        if (occurrenceDate.isEqual(today) && status == "SKIPPED") return false
+
+        if (occurrenceDate.isEqual(today) && current.isFireLit) return false
+
+        return true
     }
 
     private fun parseScheduleStartTime(startTime: String): LocalTime? {
@@ -278,7 +326,6 @@ class ParentScheduleViewModel @Inject constructor(
             )
         }.getOrNull() ?: return false
 
-        // 1. 이미 시작 시간이 지났으면 무조건 수정/삭제 불가
         if (!scheduleDateTime.isAfter(nowDateTime)) return false
 
         val status = schedule.scheduleStatus?.uppercase()
@@ -291,8 +338,6 @@ class ParentScheduleViewModel @Inject constructor(
             }
 
             is RecurringScheduleModel -> {
-                // 반복 일정은 클릭한 occurrence 날짜 기준으로 판단
-                // 오늘 occurrence인 경우에만 완료/스킵 상태로 수정·삭제 제한
                 if (scheduleDate.isEqual(today)) {
                     if (status == "VERIFIED" || status == "COMPLETED") return false
                     if (status == "SKIPPED") return false
