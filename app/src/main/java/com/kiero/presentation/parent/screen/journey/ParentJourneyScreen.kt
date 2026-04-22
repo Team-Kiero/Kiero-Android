@@ -98,6 +98,7 @@ private fun ParentJourneyScreen(
 
     BoxWithConstraints(
         modifier = Modifier.fillMaxSize()
+            .background(KieroTheme.colors.black)
     ) {
         val topBarHeight = paddingValues.calculateTopPadding()
         val targetSheetHeight = this.maxHeight - topBarHeight
