@@ -71,7 +71,6 @@ fun AuthScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .navigationBarsPadding()
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Image(
