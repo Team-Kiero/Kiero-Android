@@ -25,6 +25,7 @@ fun ParentJourneyScheduleModel.toUiModel(
         startTime = startTime,
         endTime = endTime,
         currentTime = currentTime,
+        isOngoing = isOngoing,
         isNextUpcoming = isNextUpcoming && !hasOngoingSchedule
     )
 
@@ -35,9 +36,9 @@ fun ParentJourneyScheduleModel.toUiModel(
         isAuthenticated = status == "VERIFIED" || status == "COMPLETED",
         isOngoing = isOngoing,
         todayStatus = todayStatus,
-        scheduleLabel = when {
-            todayStatus == TodayStatus.CURRENT_COMPLETED -> "현재 일정"
-            isNextUpcoming -> "다음 일정" // PAST_COMPLETED + isNextUpcoming → "다음 일정"
+        scheduleLabel = when (todayStatus) {
+            TodayStatus.CURRENT_COMPLETED -> "현재 일정"
+            TodayStatus.NEXT_UPCOMING -> "다음 일정"
             else -> ""
         }
     )
