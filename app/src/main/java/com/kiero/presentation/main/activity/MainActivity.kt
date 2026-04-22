@@ -26,13 +26,11 @@ class MainActivity : ComponentActivity() {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
         enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.auto(
-                Color.TRANSPARENT,
-                Color.TRANSPARENT
+            statusBarStyle = SystemBarStyle.dark(
+                scrim = Color.TRANSPARENT
             ),
-            navigationBarStyle = SystemBarStyle.auto(
-                Color.TRANSPARENT,
-                Color.TRANSPARENT
+            navigationBarStyle = SystemBarStyle.dark(
+                scrim = Color.TRANSPARENT
             )
         )
 
