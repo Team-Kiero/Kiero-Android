@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,9 +43,9 @@ fun ParentTopbar(
             .background(
                 color = backgroundColor
             )
-            .padding(top = 24.dp, bottom = 9.dp)
+            .statusBarsPadding()
             .padding(top = 16.dp)
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 16.dp, vertical = 9.dp)
             .height(IntrinsicSize.Min),
         verticalAlignment = Alignment.CenterVertically,
     ) {
