@@ -46,7 +46,7 @@ fun ParentTopbar(
             .statusBarsPadding()
             .padding(top = 16.dp)
             .padding(horizontal = 16.dp, vertical = 9.dp)
-            .height(IntrinsicSize.Min),
+            .height(41.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (title.isEmpty()) {
