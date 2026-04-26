@@ -102,7 +102,8 @@ private fun ParentJourneyToday(
     }
 
     val cardBackground = when {
-        item.todayStatus == TodayStatus.CURRENT_COMPLETED && item.isAuthenticated ->
+        item.todayStatus == TodayStatus.CURRENT_COMPLETED ||
+                item.todayStatus == TodayStatus.NEXT_UPCOMING ->
             KieroTheme.colors.schedule1.copy(alpha = 0.1f)
         else -> KieroTheme.colors.black
     }

@@ -5,9 +5,14 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -204,11 +209,18 @@ fun MainScreen(
         Box(
             modifier = modifier
                 .fillMaxSize()
-                .background(when (currentTab) {
-                    ParentMainTab.JOURNEY -> KieroTheme.colors.gray900
-                    else -> KieroTheme.colors.black
-                })
+                .background(KieroTheme.colors.black)
+                .navigationBarsPadding()
         ) {
+            if (currentTab == ParentMainTab.JOURNEY) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .windowInsetsTopHeight(WindowInsets.statusBars)
+                        .background(KieroTheme.colors.gray900)
+                )
+            }
+
             Scaffold(
                 containerColor = KieroTheme.colors.black,
                 snackbarHost = {
