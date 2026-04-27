@@ -49,18 +49,34 @@ fun ParentAlarmRoute(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val authState by viewModel.authState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
+    val refreshState = LocalRefreshState.current
+
     val isAtTop by remember {
         derivedStateOf {
             listState.firstVisibleItemIndex == 0 && listState.firstVisibleItemScrollOffset == 0
         }
     }
 
-    val refreshState = LocalRefreshState.current
+    val isAtBottom by remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val totalItems = layoutInfo.totalItemsCount
+            val lastVisibleItemIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            val buffer = 2
+            totalItems > 0 && lastVisibleItemIndex >= totalItems - 1 - buffer
+        }
+    }
 
     LaunchedEffect(Unit) {
         refreshState.refreshEvent.collect {
             listState.animateScrollToItem(0)
             viewModel.refresh(isRefresh = true)
+        }
+    }
+
+    LaunchedEffect(isAtBottom) {
+        if (isAtBottom && !state.isLoadingMore) {
+            viewModel.loadMore()
         }
     }
 
