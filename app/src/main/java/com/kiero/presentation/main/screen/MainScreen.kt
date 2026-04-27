@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.core.designsystem.component.KieroSnackbar
 import com.kiero.core.designsystem.component.dialog.KieroDialog
@@ -70,6 +71,13 @@ fun MainRoute(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     val snackBarHostState = remember { SnackbarHostState() }
+
+    LifecycleResumeEffect(Unit) {
+        Timber.e("App resumed")
+        viewModel.resumeSse()
+
+        onPauseOrDispose {}
+    }
 
     MainScreen(
         appState = appState,
