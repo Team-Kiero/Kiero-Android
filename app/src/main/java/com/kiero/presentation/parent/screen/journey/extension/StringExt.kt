@@ -20,12 +20,11 @@ fun String.toTodayStatus(
             isNextUpcoming -> TodayStatus.NEXT_UPCOMING
             else -> TodayStatus.UPCOMING
         }
-        "VERIFIED", "COMPLETED" -> when {
-            isOngoing -> TodayStatus.CURRENT_COMPLETED
-            // isOngoing=false여도 아직 종료 시간이 안 됐으면 하이라이팅 유지
+        "VERIFIED" -> when {
             end != null && currentTime < end -> TodayStatus.CURRENT_COMPLETED
             else -> TodayStatus.PAST_COMPLETED
         }
+        "COMPLETED" -> TodayStatus.PAST_COMPLETED  // 스킵까지 완료 → 무조건 이전 완료
         "FAILED", "SKIPPED" -> TodayStatus.PAST_MISSED
         else -> TodayStatus.UPCOMING
     }

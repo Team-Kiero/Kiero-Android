@@ -60,43 +60,40 @@ data class ParentJourneyState(
 
 // 현재일정 , 다음일정 텍스트O
 fun List<ParentJourneyScheduleModel>.toUiModels(currentTime: LocalTime): List<TodayJourneyUiModel> {
-    // isOngoing 기준 진행 중
     val hasOngoingSchedule = any { schedule ->
         schedule.isOngoing && schedule.status != "SKIPPED" && schedule.status != "FAILED"
     }
 
-    // 조기 완료된 일정 (VERIFIED/COMPLETED이고 아직 종료 시간 전)
-    val earlyCompletedId = if (!hasOngoingSchedule) {
+    val hasVerifiedNotYetEnded = any { schedule ->
+        val end = schedule.endTime.toLocalTime()
+        schedule.status == "VERIFIED" && end != null && currentTime < end
+    }
+
+    val verifiedHighlightId = if (hasVerifiedNotYetEnded) {
         filter { schedule ->
             val end = schedule.endTime.toLocalTime()
-            (schedule.status == "VERIFIED" || schedule.status == "COMPLETED") &&
-                    end != null && currentTime < end
+            schedule.status == "VERIFIED" && end != null && currentTime < end
         }
             .minByOrNull { it.startTime }
             ?.scheduleDetailId
     } else null
 
-    // 다음 PENDING 일정
-    val nextUpcomingId = if (hasOngoingSchedule || earlyCompletedId != null) null
-    else filter { schedule ->
-        val start = schedule.startTime.toLocalTime()
-        schedule.status == "PENDING" && start != null && start.isAfter(currentTime)
-    }
+    // earlyCompletedId 완전 제거
+    val nextUpcomingId = if (hasOngoingSchedule || hasVerifiedNotYetEnded) null
+    else filter { it.status == "PENDING" }
         .minByOrNull { it.startTime }
         ?.scheduleDetailId
 
-    // 하이라이팅 대상: 조기완료 or 다음 PENDING
-    val highlightId = earlyCompletedId ?: nextUpcomingId
+    val highlightId = verifiedHighlightId ?: nextUpcomingId
 
     return map { schedule ->
         schedule.toUiModel(
             currentTime = currentTime,
             isNextUpcoming = schedule.scheduleDetailId == highlightId,
-            hasOngoingSchedule = hasOngoingSchedule
+            hasOngoingSchedule = hasOngoingSchedule || hasVerifiedNotYetEnded
         )
     }
 }
-
 // 현재일정 , 다음일정 텍스트x
 /*fun List<ParentJourneyScheduleModel>.toUiModels(currentTime: LocalTime): List<TodayJourneyUiModel> {
     // 현재 진행 중인 일정이 있는지 확인
