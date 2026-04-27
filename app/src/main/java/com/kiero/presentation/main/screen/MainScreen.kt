@@ -84,7 +84,8 @@ fun MainRoute(
         state = state,
         snackBarHostState = snackBarHostState,
         onAlarmClick = viewModel::onAlarmRead,
-        onRefreshUnreadAlarm = viewModel::fetchUnreadAlarmStatus
+        onRefreshUnreadAlarm = viewModel::fetchUnreadAlarmStatus,
+        refreshSse = viewModel::resumeSse
     )
 }
 
@@ -96,6 +97,7 @@ fun MainScreen(
     onAlarmClick: () -> Unit,
     onRefreshUnreadAlarm: () -> Unit,
     modifier: Modifier = Modifier,
+    refreshSse: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -304,6 +306,7 @@ fun MainScreen(
                             onClick = {
                                 if (!isOffline) {
                                     dialogState.dismissDialog()
+                                    refreshSse()
                                 } else {
                                     onShowToast("네트워크가 아직 연결되지 않았습니다.")
                                 }
