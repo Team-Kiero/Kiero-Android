@@ -1,6 +1,5 @@
 package com.kiero.presentation.parent.screen.journey
 
-import androidx.constraintlayout.compose.DesignElements.map
 import com.kiero.data.parent.journey.model.ParentJourneyScheduleModel
 import com.kiero.presentation.parent.screen.journey.extension.toLocalTime
 import com.kiero.presentation.parent.screen.journey.model.JourneyMissionUiModel
@@ -61,17 +60,24 @@ data class ParentJourneyState(
 
 // 현재일정 , 다음일정 텍스트O
 fun List<ParentJourneyScheduleModel>.toUiModels(currentTime: LocalTime): List<TodayJourneyUiModel> {
-    // isOngoing=true이면서 PENDING/VERIFIED/COMPLETED인 경우만 현재 진행 중으로 인정
-    // SKIPPED/FAILED는 isOngoing=true여도 종료된 것으로 처리
+    // isOngoing 기준 진행 중
     val hasOngoingSchedule = any { schedule ->
-        val end = schedule.endTime.toLocalTime()
-        (schedule.isOngoing && schedule.status != "SKIPPED" && schedule.status != "FAILED") ||
-                // isOngoing=false여도 VERIFIED/COMPLETED이고 아직 종료 시간 전이면 진행 중으로 처리
-                ((schedule.status == "VERIFIED" || schedule.status == "COMPLETED") &&
-                        end != null && currentTime < end)
+        schedule.isOngoing && schedule.status != "SKIPPED" && schedule.status != "FAILED"
     }
 
-    val nextUpcomingId = if (hasOngoingSchedule) null
+    // 조기 완료된 일정 (VERIFIED/COMPLETED이고 아직 종료 시간 전)
+    val earlyCompletedId = if (!hasOngoingSchedule) {
+        filter { schedule ->
+            val end = schedule.endTime.toLocalTime()
+            (schedule.status == "VERIFIED" || schedule.status == "COMPLETED") &&
+                    end != null && currentTime < end
+        }
+            .minByOrNull { it.startTime }
+            ?.scheduleDetailId
+    } else null
+
+    // 다음 PENDING 일정
+    val nextUpcomingId = if (hasOngoingSchedule || earlyCompletedId != null) null
     else filter { schedule ->
         val start = schedule.startTime.toLocalTime()
         schedule.status == "PENDING" && start != null && start.isAfter(currentTime)
@@ -79,10 +85,13 @@ fun List<ParentJourneyScheduleModel>.toUiModels(currentTime: LocalTime): List<To
         .minByOrNull { it.startTime }
         ?.scheduleDetailId
 
+    // 하이라이팅 대상: 조기완료 or 다음 PENDING
+    val highlightId = earlyCompletedId ?: nextUpcomingId
+
     return map { schedule ->
         schedule.toUiModel(
             currentTime = currentTime,
-            isNextUpcoming = schedule.scheduleDetailId == nextUpcomingId,
+            isNextUpcoming = schedule.scheduleDetailId == highlightId,
             hasOngoingSchedule = hasOngoingSchedule
         )
     }

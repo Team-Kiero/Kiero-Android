@@ -42,12 +42,8 @@ fun ParentJourneyScheduleModel.toUiModel(
             TodayStatus.CURRENT_COMPLETED -> {
                 val start = startTime.toLocalTime()
                 when {
-                    // 조기 완료했지만 원래 '다음 일정' 순서였던 경우 -> "다음 일정" 유지
-                    isNextUpcoming && !hasOngoingSchedule -> "다음 일정"
-                    // 조기 완료했는데 '다음 일정'조차 아닌 아주 먼 미래의 일정인 경우 -> 라벨 숨김
-                    start != null && currentTime < start -> ""
-                    // 정상적으로 시작 시간이 지났거나 현재 진행 중인 일정인 경우 -> "현재 일정"
-                    else -> "현재 일정"
+                    start != null && currentTime < start -> "다음 일정" // 시작 전 → 다음 일정
+                    else -> "현재 일정" // 시작 후 → 현재 일정
                 }
             }
             else -> ""
