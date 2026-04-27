@@ -2,9 +2,7 @@ package com.kiero.core.designsystem.component.pulltorefresh
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
-import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.pullToRefresh
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
@@ -17,6 +15,7 @@ fun KieroPullToRefresh(
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     content: @Composable BoxScope.() -> Unit
 ) {
     val refreshState = rememberPullToRefreshState()
@@ -26,6 +25,7 @@ fun KieroPullToRefresh(
             state = refreshState,
             isRefreshing = isRefreshing,
             onRefresh = onRefresh,
+            enabled = enabled,
             threshold = 100.dp
         ),
         contentAlignment = Alignment.Center,
