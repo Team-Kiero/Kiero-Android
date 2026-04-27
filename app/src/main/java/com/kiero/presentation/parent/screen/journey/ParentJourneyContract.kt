@@ -63,10 +63,13 @@ data class ParentJourneyState(
 fun List<ParentJourneyScheduleModel>.toUiModels(currentTime: LocalTime): List<TodayJourneyUiModel> {
     // isOngoing=true이면서 PENDING/VERIFIED/COMPLETED인 경우만 현재 진행 중으로 인정
     // SKIPPED/FAILED는 isOngoing=true여도 종료된 것으로 처리
-    val activeOngoing = find {
-        it.isOngoing && it.status != "SKIPPED" && it.status != "FAILED"
+    val hasOngoingSchedule = any { schedule ->
+        val end = schedule.endTime.toLocalTime()
+        (schedule.isOngoing && schedule.status != "SKIPPED" && schedule.status != "FAILED") ||
+                // isOngoing=false여도 VERIFIED/COMPLETED이고 아직 종료 시간 전이면 진행 중으로 처리
+                ((schedule.status == "VERIFIED" || schedule.status == "COMPLETED") &&
+                        end != null && currentTime < end)
     }
-    val hasOngoingSchedule = activeOngoing != null
 
     val nextUpcomingId = if (hasOngoingSchedule) null
     else filter { schedule ->
