@@ -27,7 +27,8 @@ fun NavGraphBuilder.parentAlarmNavGraph(
         ParentAlarmRoute(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
-            navigateToSelection = navigateToSelection
+            navigateToSelection = navigateToSelection,
+
         )
     }
 }

@@ -2,6 +2,7 @@ package com.kiero.presentation.parent.screen.journey.model
 
 import com.kiero.core.common.extension.toShortTime
 import com.kiero.data.parent.journey.model.ParentJourneyScheduleModel
+import com.kiero.presentation.parent.screen.journey.extension.toLocalTime
 import com.kiero.presentation.parent.screen.journey.extension.toTodayStatus
 import java.time.LocalTime
 
@@ -37,8 +38,14 @@ fun ParentJourneyScheduleModel.toUiModel(
         isOngoing = isOngoing,
         todayStatus = todayStatus,
         scheduleLabel = when (todayStatus) {
-            TodayStatus.CURRENT_COMPLETED -> "현재 일정"
             TodayStatus.NEXT_UPCOMING -> "다음 일정"
+            TodayStatus.CURRENT_COMPLETED -> {
+                val start = startTime.toLocalTime()
+                when {
+                    start != null && currentTime < start -> "다음 일정" // 시작 전 → 다음 일정
+                    else -> "현재 일정" // 시작 후 → 현재 일정
+                }
+            }
             else -> ""
         }
     )

@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.core.designsystem.component.KieroSnackbar
 import com.kiero.core.designsystem.component.dialog.KieroDialog
@@ -71,12 +72,20 @@ fun MainRoute(
 
     val snackBarHostState = remember { SnackbarHostState() }
 
+    LifecycleResumeEffect(Unit) {
+        Timber.e("App resumed")
+        viewModel.resumeSse()
+
+        onPauseOrDispose {}
+    }
+
     MainScreen(
         appState = appState,
         state = state,
         snackBarHostState = snackBarHostState,
         onAlarmClick = viewModel::onAlarmRead,
-        onRefreshUnreadAlarm = viewModel::fetchUnreadAlarmStatus
+        onRefreshUnreadAlarm = viewModel::fetchUnreadAlarmStatus,
+        refreshSse = viewModel::resumeSse
     )
 }
 
@@ -88,6 +97,7 @@ fun MainScreen(
     onAlarmClick: () -> Unit,
     onRefreshUnreadAlarm: () -> Unit,
     modifier: Modifier = Modifier,
+    refreshSse: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -296,6 +306,7 @@ fun MainScreen(
                             onClick = {
                                 if (!isOffline) {
                                     dialogState.dismissDialog()
+                                    refreshSse()
                                 } else {
                                     onShowToast("네트워크가 아직 연결되지 않았습니다.")
                                 }

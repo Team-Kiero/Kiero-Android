@@ -1,6 +1,7 @@
 package com.kiero.data.sse.manager
 
 import com.kiero.data.sse.model.SseEvent
+import com.kiero.data.sse.model.SseType
 import com.kiero.data.sse.repository.SseRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,11 +27,12 @@ class SseManager @Inject constructor(
     private val sseRepository: SseRepository
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-
     private var activeSseJob: Job? = null
     private var tokenRefreshJob: Job? = null
     private var cachedAccessToken: String? = null
     private var lastEventId: String? = null
+
+    private var lastSseType = SseType.NONE
 
     private val recentEventHashes = ArrayDeque<Int>(10)
     private val mutex = Mutex()
@@ -90,10 +92,12 @@ class SseManager @Inject constructor(
     private var isParentMode = true
 
     fun startParentSubscription() {
+        lastSseType = SseType.PARENT
         initSubscription(isParent = true)
     }
 
     fun startChildSubscription() {
+        lastSseType = SseType.CHILD
         initSubscription(isParent = false)
     }
 
@@ -247,6 +251,18 @@ class SseManager @Inject constructor(
                 stopSubscriptionInternal()
             }
             jobToCancel?.cancelAndJoin()
+        }
+    }
+
+    fun resumeSse() {
+        if (isSubscribed || lastSseType == SseType.NONE) return
+
+        Timber.e("SSE 재개 시도 - $lastSseType")
+
+        when (lastSseType) {
+            SseType.PARENT -> startParentSubscription()
+            SseType.CHILD -> startChildSubscription()
+            else -> Unit
         }
     }
 

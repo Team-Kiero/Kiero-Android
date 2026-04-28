@@ -1,6 +1,5 @@
 package com.kiero.presentation.parent.screen.journey
 
-import androidx.constraintlayout.compose.DesignElements.map
 import com.kiero.data.parent.journey.model.ParentJourneyScheduleModel
 import com.kiero.presentation.parent.screen.journey.extension.toLocalTime
 import com.kiero.presentation.parent.screen.journey.model.JourneyMissionUiModel
@@ -61,30 +60,40 @@ data class ParentJourneyState(
 
 // 현재일정 , 다음일정 텍스트O
 fun List<ParentJourneyScheduleModel>.toUiModels(currentTime: LocalTime): List<TodayJourneyUiModel> {
-    // isOngoing=true이면서 PENDING/VERIFIED/COMPLETED인 경우만 현재 진행 중으로 인정
-    // SKIPPED/FAILED는 isOngoing=true여도 종료된 것으로 처리
-    val activeOngoing = find {
-        it.isOngoing && it.status != "SKIPPED" && it.status != "FAILED"
+    val hasOngoingSchedule = any { schedule ->
+        schedule.isOngoing && schedule.status != "SKIPPED" && schedule.status != "FAILED"
     }
-    val hasOngoingSchedule = activeOngoing != null
 
-    val nextUpcomingId = if (hasOngoingSchedule) null
-    else filter { schedule ->
-        val start = schedule.startTime.toLocalTime()
-        schedule.status == "PENDING" && start != null && start.isAfter(currentTime)
+    val hasVerifiedNotYetEnded = any { schedule ->
+        val end = schedule.endTime.toLocalTime()
+        schedule.status == "VERIFIED" && end != null && currentTime < end
     }
+
+    val verifiedHighlightId = if (hasVerifiedNotYetEnded) {
+        filter { schedule ->
+            val end = schedule.endTime.toLocalTime()
+            schedule.status == "VERIFIED" && end != null && currentTime < end
+        }
+            .minByOrNull { it.startTime }
+            ?.scheduleDetailId
+    } else null
+
+    // earlyCompletedId 완전 제거
+    val nextUpcomingId = if (hasOngoingSchedule || hasVerifiedNotYetEnded) null
+    else filter { it.status == "PENDING" }
         .minByOrNull { it.startTime }
         ?.scheduleDetailId
+
+    val highlightId = verifiedHighlightId ?: nextUpcomingId
 
     return map { schedule ->
         schedule.toUiModel(
             currentTime = currentTime,
-            isNextUpcoming = schedule.scheduleDetailId == nextUpcomingId,
-            hasOngoingSchedule = hasOngoingSchedule
+            isNextUpcoming = schedule.scheduleDetailId == highlightId,
+            hasOngoingSchedule = hasOngoingSchedule || hasVerifiedNotYetEnded
         )
     }
 }
-
 // 현재일정 , 다음일정 텍스트x
 /*fun List<ParentJourneyScheduleModel>.toUiModels(currentTime: LocalTime): List<TodayJourneyUiModel> {
     // 현재 진행 중인 일정이 있는지 확인

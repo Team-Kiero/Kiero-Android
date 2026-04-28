@@ -61,4 +61,10 @@ class MainViewModel @Inject constructor(
         if (!_state.value.unreadAlarm.hasUnread) return
         fetchUnreadAlarmStatus()
     }
+
+    fun resumeSse() {
+        viewModelScope.launch {
+            sseManager.resumeSse()
+        }
+    }
 }

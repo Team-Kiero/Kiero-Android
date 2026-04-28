@@ -15,7 +15,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -47,13 +49,34 @@ fun ParentAlarmRoute(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val authState by viewModel.authState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
-
     val refreshState = LocalRefreshState.current
+
+    val isAtTop by remember {
+        derivedStateOf {
+            listState.firstVisibleItemIndex == 0 && listState.firstVisibleItemScrollOffset == 0
+        }
+    }
+
+    val isAtBottom by remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val totalItems = layoutInfo.totalItemsCount
+            val lastVisibleItemIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            val buffer = 2
+            totalItems > 0 && lastVisibleItemIndex >= totalItems - 1 - buffer
+        }
+    }
 
     LaunchedEffect(Unit) {
         refreshState.refreshEvent.collect {
             listState.animateScrollToItem(0)
             viewModel.refresh(isRefresh = true)
+        }
+    }
+
+    LaunchedEffect(isAtBottom) {
+        if (isAtBottom && !state.isLoadingMore) {
+            viewModel.loadMore()
         }
     }
 
@@ -66,6 +89,7 @@ fun ParentAlarmRoute(
 
     KieroPullToRefresh(
         isRefreshing = state.isRefreshing,
+        enabled = isAtTop,
         onRefresh = { viewModel.refresh(isRefresh = true) },
     ) {
         ParentAlarmScreen(

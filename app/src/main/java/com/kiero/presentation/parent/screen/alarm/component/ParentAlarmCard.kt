@@ -15,15 +15,19 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.imageLoader
+import coil.request.ImageRequest
 import com.kiero.R
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.common.extension.toHighlightedText
@@ -45,7 +49,17 @@ fun ParentAlarmCard(
     onExpandClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     val hasImage = imageUrl != null
+
+    LaunchedEffect(imageUrl) {
+        if (!imageUrl.isNullOrEmpty()) {
+            val request = ImageRequest.Builder(context)
+                .data(imageUrl)
+                .build()
+            context.imageLoader.enqueue(request)
+        }
+    }
 
     Card(
         modifier = modifier

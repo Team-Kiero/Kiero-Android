@@ -11,16 +11,20 @@ fun String.toTodayStatus(
     isOngoing: Boolean,
     isNextUpcoming: Boolean = false
 ): TodayStatus {
+    val start = startTime.toLocalTime()
+    val end = endTime.toLocalTime()
+
     return when (this) {
         "PENDING" -> when {
             isOngoing -> TodayStatus.CURRENT_COMPLETED
             isNextUpcoming -> TodayStatus.NEXT_UPCOMING
             else -> TodayStatus.UPCOMING
         }
-        "VERIFIED", "COMPLETED" -> when {
-            isOngoing -> TodayStatus.CURRENT_COMPLETED
+        "VERIFIED" -> when {
+            end != null && currentTime < end -> TodayStatus.CURRENT_COMPLETED
             else -> TodayStatus.PAST_COMPLETED
         }
+        "COMPLETED" -> TodayStatus.PAST_COMPLETED  // 스킵까지 완료 → 무조건 이전 완료
         "FAILED", "SKIPPED" -> TodayStatus.PAST_MISSED
         else -> TodayStatus.UPCOMING
     }
