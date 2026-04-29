@@ -56,13 +56,18 @@ fun PlanAllResponseDto.toModel(): PlanAllModel {
         .filter { it.dayOfWeek.isNotEmpty() }
         .map { item ->
             RecurringScheduleModel(
-                scheduleId    = item.scheduleId,
-                startTime     = item.startTime,
-                endTime       = item.endTime,
-                name          = item.name,
-                colorCode     = item.colorCode,
+                scheduleId      = item.scheduleId,
+                startTime       = item.startTime,
+                endTime         = item.endTime,
+                name            = item.name,
+                colorCode       = item.colorCode,
                 scheduleStatus  = item.scheduleStatus,
-                dayOfWeek     = item.dayOfWeek.joinToString(", "),
+                dayOfWeek       = item.dayOfWeek
+                    .map { it.uppercase() }
+                    .sortedBy { day ->
+                        listOf("MON","TUE","WED","THU","FRI","SAT","SUN").indexOf(day)
+                    }
+                    .joinToString(","),
                 repeatStartDate = item.date,
             )
         }
@@ -71,13 +76,13 @@ fun PlanAllResponseDto.toModel(): PlanAllModel {
         .filter { it.dayOfWeek.isEmpty() }
         .map { item ->
             NormalScheduleModel(
-                scheduleId = item.scheduleId,
-                startTime  = item.startTime,
-                endTime    = item.endTime,
-                name       = item.name,
-                colorCode  = item.colorCode,
-                scheduleStatus  = item.scheduleStatus,
-                date       = item.date,
+                scheduleId     = item.scheduleId,
+                startTime      = item.startTime,
+                endTime        = item.endTime,
+                name           = item.name,
+                colorCode      = item.colorCode,
+                scheduleStatus = item.scheduleStatus,
+                date           = item.date,
             )
         }
 
@@ -96,7 +101,7 @@ fun RecurringScheduleModel.toUiModel() = ScheduleEvent(
     endTime       = endTime,
     scheduleColor = colorCode,
     dayOfWeek     = dayOfWeek,
-    date          = null,
+    date          = repeatStartDate,
 )
 
 fun NormalScheduleModel.toUiModel() = ScheduleEvent(
