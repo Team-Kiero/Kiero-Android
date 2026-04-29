@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
 import com.kiero.core.common.extension.collectSideEffect
@@ -57,6 +58,7 @@ import com.kiero.data.parent.plan.model.toScheduleEditArgs
 import com.kiero.data.parent.plan.model.toSelectedDate
 import com.kiero.presentation.parent.component.ParentContentBottomSheet
 import com.kiero.presentation.parent.component.PlanTabFab
+import com.kiero.presentation.parent.screen.schedule.model.ScheduleEvent
 import com.kiero.presentation.parent.screen.schedule.plan.ParentPlanScreen
 import com.kiero.presentation.parent.screen.schedule.plan.navigation.ScheduleEdit
 import com.kiero.presentation.parent.screen.schedule.plan.state.ParentScheduleSideEffect
@@ -79,8 +81,20 @@ fun ParentScheduleRoute(
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val globalTrigger = LocalGlobalUiEventTrigger.current
 
+    var hasResumedOnce by remember { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
         viewModel.ensureChildIdAndStartSse()
+    }
+
+    LifecycleResumeEffect(Unit) {
+        if (hasResumedOnce) {
+            viewModel.fetchSchedule()
+        } else {
+            hasResumedOnce = true
+        }
+
+        onPauseOrDispose {}
     }
 
     viewModel.sideEffect.collectSideEffect { effect ->
@@ -103,19 +117,29 @@ fun ParentScheduleRoute(
         when (val state = uiState) {
             is UiState.Loading -> KieroLoadingIndicator()
 
-            is UiState.Success -> ParentScheduleScreen(
-                paddingValues = paddingValues,
-                scheduleState = state.data,
-                onDateChange = viewModel::onDateChange,
-                onResetToToday = viewModel::resetToday,
-                onDeleteConfirm = viewModel::deleteSchedule,
-                onEditClick = navigateToScheduleEdit,
-                navigateToScheduleAdd = {
-                    navigateToScheduleAdd(state.data.navInitialDate, state.data.isFireLit)
-                },
-                navigateToAlarm = navigateToAlarm,
-                isScheduleEditable = viewModel::isScheduleEditable
-            )
+            is UiState.Success -> {
+                val displayEvents = remember(
+                    state.data.planAllModel,
+                    state.data.currentDate,
+                ) {
+                    viewModel.buildDisplayEvents(state.data)
+                }
+
+                ParentScheduleScreen(
+                    paddingValues = paddingValues,
+                    scheduleState = state.data,
+                    displayEvents = displayEvents,
+                    onDateChange = viewModel::onDateChange,
+                    onResetToToday = viewModel::resetToday,
+                    onDeleteConfirm = viewModel::deleteSchedule,
+                    onEditClick = navigateToScheduleEdit,
+                    navigateToScheduleAdd = {
+                        navigateToScheduleAdd(state.data.navInitialDate, state.data.isFireLit)
+                    },
+                    navigateToAlarm = navigateToAlarm,
+                    isScheduleEditable = viewModel::isScheduleEditable
+                )
+            }
 
             is UiState.Failure -> Box(
                 modifier = Modifier.fillMaxSize(),
@@ -127,6 +151,7 @@ fun ParentScheduleRoute(
             is UiState.Empty -> ParentScheduleScreen(
                 paddingValues = paddingValues,
                 scheduleState = ParentScheduleState(),
+                displayEvents = emptyList(),
                 onResetToToday = viewModel::resetToday,
                 onDateChange = viewModel::onDateChange,
                 onDeleteConfirm = viewModel::deleteSchedule,
@@ -145,6 +170,7 @@ fun ParentScheduleRoute(
 private fun ParentScheduleScreen(
     paddingValues: PaddingValues,
     scheduleState: ParentScheduleState,
+    displayEvents: List<ScheduleEvent>,
     modifier: Modifier = Modifier,
     onResetToToday: () -> Unit,
     onDateChange: (Boolean) -> Unit,
@@ -167,13 +193,16 @@ private fun ParentScheduleScreen(
         scheduleState.planAllModel
     ) {
         val id = selectedEventId?.toLongOrNull() ?: return@remember null
-        val date = selectedEventDate
+        val date = selectedEventDate?.take(10)
         val model = scheduleState.planAllModel
 
-        model?.normalSchedules?.find { it.scheduleId == id && it.date.take(10) == date?.take(10) }
-            ?: model?.recurringSchedules?.find { it.scheduleId == id }
+        model?.normalSchedules?.find {
+            it.scheduleId == id && it.date.take(10) == date
+        }
+            ?: model?.recurringSchedules?.find {
+                it.scheduleId == id && it.repeatStartDate.take(10) == date
+            }
     }
-
     val canShowEditDelete = remember(selectedSchedule, selectedEventDate) {
         selectedSchedule?.let { isScheduleEditable(it, selectedEventDate) } ?: false
     }
@@ -194,6 +223,7 @@ private fun ParentScheduleScreen(
         ) {
             ParentPlanScreen(
                 state = scheduleState,
+                events = displayEvents,
                 onDateChange = onDateChange,
                 onResetToday = onResetToToday,
                 onContentClick = { id, date ->
@@ -441,22 +471,12 @@ private fun ScheduleDetailContent(
         )
     }
 }
+
 @Composable
 @Preview
 private fun ParentScheduleScreenPreview() {
     KieroTheme {
         CompositionLocalProvider(LocalRefreshState provides RefreshState()) {
-            ParentScheduleScreen(
-                paddingValues = PaddingValues(),
-                scheduleState = ParentScheduleState(),
-                onDateChange = {},
-                onResetToToday = {},
-                onDeleteConfirm = { _, _, _, _ -> },
-                onEditClick = {},
-                navigateToScheduleAdd = {},
-                navigateToAlarm = {},
-                isScheduleEditable = { _, _ -> false }
-            )
         }
     }
 }
