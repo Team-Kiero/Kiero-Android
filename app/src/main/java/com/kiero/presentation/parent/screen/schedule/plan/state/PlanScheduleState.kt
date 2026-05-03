@@ -60,20 +60,13 @@ data class ParentScheduleState(
         }
 
     fun ScheduleEvent.getIndices(): List<Int> {
-        return if (isRecurring) {
-            this.dayOfWeek?.split(",")?.map { day ->
-                day.trim().toDayIndex()
-            } ?: listOf(0)
-        } else {
-            try {
-                val localDate = LocalDate.parse(this.date)
-                listOf(localDate.dayOfWeek.value - 1)
-            } catch (e: Exception) {
-                listOf(0)
-            }
+        return try {
+            val localDate = LocalDate.parse(this.date ?: return listOf(0))
+            listOf(localDate.dayOfWeek.value - 1)
+        } catch (e: Exception) {
+            listOf(0)
         }
     }
-
     fun String.toDayIndex(): Int {
         return when (this.uppercase()) {
             "MON" -> 0
