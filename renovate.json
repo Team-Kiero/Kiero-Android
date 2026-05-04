@@ -1,6 +1,63 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended"
-  ]
+  "extends": ["config:base"],
+  "reviewers": ["sonms", "vvan2", "seungjae708"],
+  "schedule": ["after 9am every weekday"],
+  "timezone": "Asia/Seoul",
+  "labels": ["dependencies"],
+  "prHourlyLimit": 2,
+  "prConcurrentLimit": 5,
+  "packageRules": [
+    {
+      "description": "내부 패키지(com.kiero) 업데이트 무시. 외부 레지스트리에 동일한 이름의 패키지가 존재할 경우 의존성 혼동 공격(Dependency Confusion Attack)을 방지하기 위함.",
+      "matchPackagePrefixes": ["com.kiero"],
+      "enabled": false
+    },
+    {
+      "description": "카카오 SDK는 Maven Central이 아닌 카카오 자체 레포지토리에서 배포되어 Renovate가 최신 버전을 탐지할 수 없으므로 무시.",
+      "matchPackagePrefixes": ["com.kakao.sdk"],
+      "enabled": false
+    },
+    {
+      "description": "Major 업데이트는 API 변경, 동작 변경 등 breaking change를 포함할 가능성이 높아 자동 PR 생성 시 빌드 실패 또는 런타임 오류를 유발할 수 있음. 팀원이 직접 변경 내용을 검토한 후 수동으로 업데이트.",
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    },
+    {
+      "description": "Kotlin과 KSP(Kotlin Symbol Processing)는 버전 간 호환성이 엄격하게 요구됨. 예를 들어 Kotlin 2.0.x에는 KSP 2.0.x가 대응되며, 버전이 맞지 않으면 빌드 자체가 실패함. 두 패키지를 하나의 PR로 묶어 항상 함께 업데이트되도록 보장.",
+      "matchPackagePrefixes": ["org.jetbrains.kotlin", "com.google.devtools.ksp"],
+      "groupName": "Kotlin & KSP"
+    },
+    {
+      "description": "AndroidX 및 Compose 라이브러리는 BOM(Bill of Materials)으로 버전이 관리되며 상호 의존성이 높음. 개별 PR로 분산되면 버전 불일치로 인한 충돌 위험이 있어 하나의 PR로 묶어 일괄 검토.",
+      "matchPackagePrefixes": ["androidx."],
+      "groupName": "AndroidX & Compose Ecosystem"
+    },
+    {
+      "description": "Hilt는 런타임 라이브러리(hilt-android)와 컴파일 타임 어노테이션 프로세서(hilt-compiler)가 항상 동일한 버전이어야 함. 버전이 다를 경우 컴파일 에러 발생. 하나의 PR로 묶어 동시 업데이트 보장.",
+      "matchPackagePrefixes": ["com.google.dagger"],
+      "groupName": "Hilt Ecosystem"
+    },
+    {
+      "description": "OkHttp와 Retrofit은 네트워크 레이어에서 함께 동작하며 버전 간 호환성이 중요함. 개별 업데이트 시 인터페이스 불일치가 발생할 수 있어 하나의 PR로 묶어 함께 검증.",
+      "matchPackagePrefixes": ["com.squareup.okhttp3", "com.squareup.retrofit2"],
+      "groupName": "Network (OkHttp & Retrofit)"
+    },
+    {
+      "description": "Gradle Wrapper 업데이트는 프로젝트 전체 빌드 시스템에 영향을 미치므로 다른 의존성과 분리하여 별도 PR로 관리. AGP, Kotlin 등과의 호환성을 독립적으로 검증하기 위함.",
+      "matchManagers": ["gradle-wrapper"],
+      "groupName": "Gradle Wrapper"
+    },
+    {
+      "description": "AGP(Android Gradle Plugin)는 Gradle 버전, Kotlin 버전과 호환성 매트릭스가 존재함. 예를 들어 AGP 8.x는 특정 Gradle 버전 이상을 요구함. 다른 의존성과 분리하여 호환성을 별도로 검증.",
+      "matchPackageNames": ["com.android.tools.build:gradle"],
+      "groupName": "Android Gradle Plugin"
+    },
+    {
+      "description": "Ruby와 Fastlane은 CI 파이프라인에서 사용되며, 버전 변경 시 Gemfile.lock과의 충돌 또는 CI 스크립트 오류를 유발할 수 있음. postUpdateOptions의 bundler로 관리하므로 Renovate 자동 업데이트에서 제외.",
+      "matchPackagePatterns": ["^ruby", "^fastlane"],
+      "enabled": false
+    }
+  ],
+  "postUpdateOptions": ["bundler"]
 }
