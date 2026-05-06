@@ -26,6 +26,11 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v4
 
+      - name: Restore debug keystore
+        run: |
+          mkdir -p /home/runner/.android
+          echo "${{ secrets.DEBUG_KEYSTORE }}" | base64 --decode > /home/runner/.android/debug.keystore    
+
       # 빌드를 위해 gradle에 선언된 키들을 설정 , printf는 출력이 아닌 파일 생성용이라 안전
       - name: Create local.properties from secret
         env:
