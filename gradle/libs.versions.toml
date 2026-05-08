@@ -58,7 +58,7 @@ lottie = "6.4.0"
 
 # DataStore & Tink (여기 추가!)
 datastore = "1.0.0"
-tink = "1.15.0"
+tink = "1.21.0"
 uiautomator = "2.2.0"
 benchmarkMacroJunit4 = "1.2.4"
 baselineprofile = "1.2.4"
