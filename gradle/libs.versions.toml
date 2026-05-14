@@ -54,7 +54,7 @@ timber = "5.0.1"
 kakao = "2.20.6"
 
 #Lottie
-lottie = "6.4.0"
+lottie = "6.7.1"
 
 # DataStore & Tink (여기 추가!)
 datastore = "1.0.0"
