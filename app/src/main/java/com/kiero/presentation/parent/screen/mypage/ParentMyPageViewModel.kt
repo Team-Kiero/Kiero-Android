@@ -59,4 +59,12 @@ class ParentMyPageViewModel @Inject constructor(
                 }
         }
     }
+
+    fun updateIsAlarmChecked(checked: Boolean) {
+        _state.update {
+            it.copy(
+                isAlarmChecked = checked
+            )
+        }
+    }
 }

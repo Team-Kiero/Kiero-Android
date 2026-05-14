@@ -4,7 +4,8 @@ import com.kiero.core.model.parent.ParentInfo
 
 data class ParentMyPageState(
     val parentInfo : ParentInfo = ParentInfo(),
-    val connectedChildren: Int = 0
+    val connectedChildren: Int = 0,
+    val isAlarmChecked: Boolean = false
 )
 
 sealed interface ParentMyPageSideEffect {

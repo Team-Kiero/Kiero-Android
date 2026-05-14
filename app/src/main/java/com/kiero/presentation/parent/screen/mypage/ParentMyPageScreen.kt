@@ -26,6 +26,7 @@ import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.parent.ParentInfo
 import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
+import com.kiero.presentation.parent.screen.mypage.component.AlarmSettingItem
 import com.kiero.presentation.parent.screen.mypage.component.ParentMyPageUserInfo
 import com.kiero.presentation.parent.screen.mypage.component.SettingItem
 
@@ -70,7 +71,10 @@ fun ParentMyPageRoute(
         onClickLogOutCancel = {
             isLogOut = false
         },
-        onClickOss = navigateToOssLicenses
+        onClickOss = navigateToOssLicenses,
+        onCheckedChange = {
+            viewModel.updateIsAlarmChecked(it)
+        }
     )
 }
 
@@ -84,7 +88,8 @@ private fun ParentMyPageScreen(
     onClickLogOut: () -> Unit = {},
     onClickLogOutConfirm: () -> Unit = {},
     onClickLogOutCancel: () -> Unit = {},
-    onClickOss: () -> Unit = {}
+    onClickOss: () -> Unit = {},
+    onCheckedChange: (Boolean) -> Unit = {}
 ) {
     Box(
         modifier = Modifier
@@ -115,6 +120,13 @@ private fun ParentMyPageScreen(
                     onClick = onClickChildCare,
                     connectChildren = state.connectedChildren,
                     hasConnectChildren = true
+                )
+
+                AlarmSettingItem(
+                    text = "푸시 알림",
+                    checked = state.isAlarmChecked,
+                    enabled = true,
+                    onCheckedChange = onCheckedChange
                 )
 
                 SettingItem(
@@ -156,7 +168,7 @@ private fun ParentMyPageScreenPreview() {
             state = ParentMyPageState(
                 parentInfo = ParentInfo(name = "키어로")
             ),
-            isLogOut = true
+            isLogOut = false
         )
     }
 }
