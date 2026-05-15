@@ -1,4 +1,4 @@
-package com.kiero.presentation.parent.screen.mypage
+package com.kiero.presentation.parent.screen.mypage.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -65,6 +65,14 @@ class ParentMyPageViewModel @Inject constructor(
             it.copy(
                 isAlarmChecked = checked
             )
+        }
+    }
+
+    // 아이의 연결 유무를 판단하여 ui 업데이트 및 화면 이동
+    // Todo : 아이의 연결 여부 처리 확인하기
+    fun checkChildCare() {
+        viewModelScope.launch {
+
         }
     }
 }

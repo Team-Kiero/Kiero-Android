@@ -1,4 +1,4 @@
-package com.kiero.presentation.parent.screen.mypage.component
+package com.kiero.presentation.parent.screen.mypage.main.component
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer

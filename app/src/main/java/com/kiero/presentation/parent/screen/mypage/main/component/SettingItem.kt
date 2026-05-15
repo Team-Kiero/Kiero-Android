@@ -1,4 +1,4 @@
-package com.kiero.presentation.parent.screen.mypage.component
+package com.kiero.presentation.parent.screen.mypage.main.component
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -48,7 +48,7 @@ fun SettingItem(
                 isCompleted = connectChildren == 0,
                 isEnabled = connectChildren == 0,
                 action = KieroTextAction(
-                    text = if (connectChildren != 0) "$connectChildren 명 연결됨" else "연결 필요",
+                    text = if (connectChildren != 0) "$connectChildren 명 연결됨" else "연결 코드 재발급",
                     textColor = if (connectChildren == 0) KieroTextColor.MAIN else KieroTextColor.GRAY500,
                     onClick = { }
                 )

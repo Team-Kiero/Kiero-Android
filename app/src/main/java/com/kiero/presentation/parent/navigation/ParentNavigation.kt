@@ -16,7 +16,7 @@ import com.kiero.presentation.parent.screen.mission.navigation.MissionEdit
 import com.kiero.presentation.parent.screen.mission.navigation.navigateToMissionAdd
 import com.kiero.presentation.parent.screen.mission.navigation.parentMissionAddNavGraph
 import com.kiero.presentation.parent.screen.mission.navigation.parentMissionNavGraph
-import com.kiero.presentation.parent.screen.mypage.navigation.parentMypageNavGraph
+import com.kiero.presentation.parent.screen.mypage.main.navigation.parentMypageNavGraph
 import com.kiero.presentation.parent.screen.reward.navigation.navigateToRewardAdd
 import com.kiero.presentation.parent.screen.reward.navigation.navigateToRewardEdit
 import com.kiero.presentation.parent.screen.reward.navigation.parentRewardNavGraph

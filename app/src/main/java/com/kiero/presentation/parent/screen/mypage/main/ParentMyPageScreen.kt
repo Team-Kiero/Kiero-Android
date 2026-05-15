@@ -1,24 +1,30 @@
-package com.kiero.presentation.parent.screen.mypage
+package com.kiero.presentation.parent.screen.mypage.main
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kiero.BuildConfig
 import com.kiero.core.common.extension.collectSideEffect
+import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.component.dialog.KieroDialog
 import com.kiero.core.designsystem.component.dialog.action.KieroCancelAction
 import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
@@ -26,14 +32,13 @@ import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.parent.ParentInfo
 import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
-import com.kiero.presentation.parent.screen.mypage.component.AlarmSettingItem
-import com.kiero.presentation.parent.screen.mypage.component.ParentMyPageUserInfo
-import com.kiero.presentation.parent.screen.mypage.component.SettingItem
+import com.kiero.presentation.parent.screen.mypage.main.component.AlarmSettingItem
+import com.kiero.presentation.parent.screen.mypage.main.component.ParentMyPageUserInfo
+import com.kiero.presentation.parent.screen.mypage.main.component.SettingItem
 
 @Composable
 fun ParentMyPageRoute(
     paddingValues: PaddingValues,
-    navigateUp: () -> Unit,
     navigateToOssLicenses: () -> Unit,
     viewModel: ParentMyPageViewModel = hiltViewModel()
 ) {
@@ -59,8 +64,7 @@ fun ParentMyPageRoute(
         paddingValues = paddingValues,
         state = state,
         isLogOut = isLogOut,
-        navigateUp = navigateUp,
-        onClickChildCare = {}, // Todo: 2스에 구현될 예정,
+        onClickChildCare = viewModel::checkChildCare,
         onClickLogOut = {
             isLogOut = true
         },
@@ -83,7 +87,6 @@ private fun ParentMyPageScreen(
     paddingValues: PaddingValues,
     state: ParentMyPageState,
     isLogOut: Boolean,
-    navigateUp: () -> Unit,
     onClickChildCare: () -> Unit = {},
     onClickLogOut: () -> Unit = {},
     onClickLogOutConfirm: () -> Unit = {},
@@ -130,13 +133,77 @@ private fun ParentMyPageScreen(
                 )
 
                 SettingItem(
-                    text = "로그아웃",
-                    onClick = onClickLogOut
+                    text = "고객 지원",
+                    onClick = {}
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 16.dp)
+            ) {
+                Text(
+                    text = "약관 및 정책",
+                    style = KieroTheme.typography.regular.body4,
+                    color = KieroTheme.colors.gray400
+                )
+
+                Spacer(modifier = Modifier.height(11.dp))
+
+                SettingItem(
+                    text = "서비스 이용약관",
+                    onClick = {}, // Todo: 페이지 구현 시 반영
+                    connectChildren = state.connectedChildren,
+                    hasConnectChildren = true
+                )
+
+                SettingItem(
+                    text = "개인정보 처리방침",
+                    onClick = {} // Todo: 페이지 구현 시 반영
                 )
 
                 SettingItem(
                     text = "오픈소스 라이선스",
                     onClick = onClickOss
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Column (
+                modifier = Modifier
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(11.dp)
+            ) {
+                Text(
+                    text = "앱 버전 v${BuildConfig.VERSION_NAME}",
+                    style = KieroTheme.typography.regular.body4,
+                    color = KieroTheme.colors.gray400,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+
+                Text(
+                    text = "로그아웃",
+                    style = KieroTheme.typography.regular.body4,
+                    color = KieroTheme.colors.gray400,
+                    textDecoration = TextDecoration.Underline,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .noRippleClickable(onClick = onClickLogOut)
+                )
+
+                Text(
+                    text = "회원탈퇴",
+                    style = KieroTheme.typography.regular.body4,
+                    color = KieroTheme.colors.gray400,
+                    textDecoration = TextDecoration.Underline,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .noRippleClickable(onClick = {}) // Todo: API 구현 시 반영
                 )
             }
         }
@@ -164,7 +231,6 @@ private fun ParentMyPageScreenPreview() {
     KieroTheme {
         ParentMyPageScreen(
             paddingValues = PaddingValues(),
-            navigateUp = {},
             state = ParentMyPageState(
                 parentInfo = ParentInfo(name = "키어로")
             ),

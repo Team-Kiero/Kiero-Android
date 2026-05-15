@@ -1,4 +1,4 @@
-package com.kiero.presentation.parent.screen.mypage
+package com.kiero.presentation.parent.screen.mypage.main
 
 import com.kiero.core.model.parent.ParentInfo
 

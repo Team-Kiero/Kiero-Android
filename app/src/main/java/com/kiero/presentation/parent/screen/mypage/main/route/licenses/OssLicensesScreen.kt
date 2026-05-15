@@ -1,4 +1,4 @@
-package com.kiero.presentation.parent.screen.mypage.route.licenses
+package com.kiero.presentation.parent.screen.mypage.main.route.licenses
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
