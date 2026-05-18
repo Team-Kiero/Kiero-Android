@@ -115,14 +115,13 @@ private fun ParentMyPageScreen(
 
             Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 16.dp),
             ) {
                 SettingItem(
                     text = "자녀 관리",
                     onClick = onClickChildCare,
-                    connectChildren = state.connectedChildren,
-                    hasConnectChildren = true
+                    connectionStatus = state.connectionStatus,
+                    hasConnectChildren = true,
                 )
 
                 AlarmSettingItem(
@@ -142,22 +141,22 @@ private fun ParentMyPageScreen(
 
             Column(
                 modifier = Modifier
-                    .weight(1f)
                     .padding(horizontal = 16.dp)
             ) {
                 Text(
                     text = "약관 및 정책",
                     style = KieroTheme.typography.regular.body4,
-                    color = KieroTheme.colors.gray400
+                    color = KieroTheme.colors.gray400,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 8.dp)
                 )
 
-                Spacer(modifier = Modifier.height(11.dp))
+                Spacer(modifier = Modifier.height(13.dp))
 
                 SettingItem(
                     text = "서비스 이용약관",
                     onClick = {}, // Todo: 페이지 구현 시 반영
-                    connectChildren = state.connectedChildren,
-                    hasConnectChildren = true
                 )
 
                 SettingItem(
@@ -175,7 +174,8 @@ private fun ParentMyPageScreen(
 
             Column (
                 modifier = Modifier
-                    .padding(horizontal = 16.dp),
+                    .padding(horizontal = 16.dp)
+                    .padding(start = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(11.dp)
             ) {
                 Text(

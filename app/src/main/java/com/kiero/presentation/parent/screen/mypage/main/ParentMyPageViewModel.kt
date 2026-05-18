@@ -6,6 +6,7 @@ import com.kiero.core.app.AppRestarter
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.model.parent.ParentInfo
 import com.kiero.data.auth.repository.AuthRepository
+import com.kiero.presentation.parent.screen.mypage.model.ChildConnectionStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,7 +42,7 @@ class ParentMyPageViewModel @Inject constructor(
             _state.update {
                 it.copy(
                     parentInfo = userInfo ?: ParentInfo(),
-                    connectedChildren = if (kidInfo != null) 1 else 0
+                    connectionStatus = if (kidInfo != null) ChildConnectionStatus.CONNECTED else ChildConnectionStatus.PENDING
                 )
             }
         }

@@ -1,10 +1,11 @@
 package com.kiero.presentation.parent.screen.mypage.main
 
 import com.kiero.core.model.parent.ParentInfo
+import com.kiero.presentation.parent.screen.mypage.model.ChildConnectionStatus
 
 data class ParentMyPageState(
     val parentInfo : ParentInfo = ParentInfo(),
-    val connectedChildren: Int = 0,
+    val connectionStatus: ChildConnectionStatus = ChildConnectionStatus.CONNECTED,
     val isAlarmChecked: Boolean = false
 )
 

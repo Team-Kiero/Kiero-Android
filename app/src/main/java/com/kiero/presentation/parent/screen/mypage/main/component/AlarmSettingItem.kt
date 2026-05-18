@@ -21,8 +21,7 @@ fun AlarmSettingItem(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier
-            .padding(vertical = 14.dp),
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
