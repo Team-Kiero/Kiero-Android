@@ -1,4 +1,4 @@
-package com.kiero.core.designsystem.component.switch
+package com.kiero.core.designsystem.component.switches
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
@@ -37,7 +37,7 @@ fun KieroAlarmSwitch(
     val thumbOffset by animateFloatAsState(
         targetValue = if (checked) 1f else 0f,
         animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
+            dampingRatio = Spring.DampingRatioNoBouncy,
             stiffness = Spring.StiffnessMedium,
         ),
         label = "thumbOffset",
