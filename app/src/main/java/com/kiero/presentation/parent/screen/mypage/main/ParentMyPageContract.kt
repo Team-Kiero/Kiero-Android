@@ -12,4 +12,7 @@ data class ParentMyPageState(
 sealed interface ParentMyPageSideEffect {
     data class ShowToast(val message : String) : ParentMyPageSideEffect
     data class ShowSnackBar(val message : String) : ParentMyPageSideEffect
+
+    data object NavigateToChildCare: ParentMyPageSideEffect
+    data object NavigateToWithDraw : ParentMyPageSideEffect
 }

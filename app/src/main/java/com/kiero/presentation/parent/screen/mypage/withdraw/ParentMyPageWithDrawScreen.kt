@@ -31,6 +31,7 @@ import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.component.button.KieroButtonMedium
 import com.kiero.core.designsystem.theme.KieroTheme
 
+// Todo: API 구현 시 반영
 @Composable
 fun ParentMyPageWithDrawScreen(
     paddingValues: PaddingValues,

@@ -10,12 +10,14 @@ import com.kiero.core.navigation.Route
 import com.kiero.presentation.parent.navigation.Mypage
 import com.kiero.presentation.parent.screen.mypage.childcare.ParentMyPageChildCareScreen
 import com.kiero.presentation.parent.screen.mypage.childcare.navigation.MyPageChildCare
+import com.kiero.presentation.parent.screen.mypage.childcare.navigation.navigateToMyPageChildCare
 import com.kiero.presentation.parent.screen.mypage.main.ParentMyPageRoute
 import com.kiero.presentation.parent.screen.mypage.main.route.licenses.OssLicensesScreen
 import com.kiero.presentation.parent.screen.mypage.main.route.licenses.navigation.OssLicenses
 import com.kiero.presentation.parent.screen.mypage.main.route.licenses.navigation.navigateToOssLicenses
 import com.kiero.presentation.parent.screen.mypage.withdraw.ParentMyPageWithDrawScreen
 import com.kiero.presentation.parent.screen.mypage.withdraw.navigation.MyPageWithDraw
+import com.kiero.presentation.parent.screen.mypage.withdraw.navigation.navigateToMyPageWithDraw
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -38,7 +40,9 @@ fun NavGraphBuilder.parentMypageNavGraph(
         composable<Mypage> {
             ParentMyPageRoute(
                 paddingValues = paddingValues,
-                navigateToOssLicenses = navController::navigateToOssLicenses
+                navigateToOssLicenses = navController::navigateToOssLicenses,
+                navigateToParentChildCare = navController::navigateToMyPageChildCare,
+                navigateToWithDraw = navController::navigateToMyPageWithDraw
             )
         }
 

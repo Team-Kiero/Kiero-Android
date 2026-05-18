@@ -40,6 +40,8 @@ import com.kiero.presentation.parent.screen.mypage.main.component.SettingItem
 fun ParentMyPageRoute(
     paddingValues: PaddingValues,
     navigateToOssLicenses: () -> Unit,
+    navigateToParentChildCare: () -> Unit,
+    navigateToWithDraw: () -> Unit,
     viewModel: ParentMyPageViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -57,6 +59,9 @@ fun ParentMyPageRoute(
                     message = it.message,
                 )
             )
+
+            is ParentMyPageSideEffect.NavigateToChildCare -> navigateToParentChildCare()
+            is ParentMyPageSideEffect.NavigateToWithDraw -> navigateToWithDraw()
         }
     }
 
@@ -64,7 +69,7 @@ fun ParentMyPageRoute(
         paddingValues = paddingValues,
         state = state,
         isLogOut = isLogOut,
-        onClickChildCare = viewModel::checkChildCare,
+        onClickChildCare = navigateToParentChildCare, //viewModel::checkChildCare, Todo : 아이의 연결 여부 처리 확인하기
         onClickLogOut = {
             isLogOut = true
         },
@@ -75,6 +80,7 @@ fun ParentMyPageRoute(
         onClickLogOutCancel = {
             isLogOut = false
         },
+        onClickWithDraw = navigateToWithDraw,
         onClickOss = navigateToOssLicenses,
         onCheckedChange = {
             viewModel.updateIsAlarmChecked(it)
@@ -91,6 +97,7 @@ private fun ParentMyPageScreen(
     onClickLogOut: () -> Unit = {},
     onClickLogOutConfirm: () -> Unit = {},
     onClickLogOutCancel: () -> Unit = {},
+    onClickWithDraw: () -> Unit = {},
     onClickOss: () -> Unit = {},
     onCheckedChange: (Boolean) -> Unit = {}
 ) {
@@ -203,7 +210,7 @@ private fun ParentMyPageScreen(
                     textDecoration = TextDecoration.Underline,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .noRippleClickable(onClick = {}) // Todo: API 구현 시 반영
+                        .noRippleClickable(onClick = onClickWithDraw)
                 )
             }
         }
