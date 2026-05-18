@@ -1,0 +1,60 @@
+package com.kiero.presentation.parent.screen.mypage.childcare.screen
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.kiero.core.designsystem.component.button.KieroButtonMedium
+import com.kiero.core.designsystem.component.textfield.KieroTextField
+import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.presentation.signup.parent.component.ParentSignUpInviteHolder
+
+@Composable
+fun ParentMyPageChildInviteScreen(
+
+) {
+    Column {
+        Spacer(modifier = Modifier.height(38.dp))
+
+        KieroTextField(
+            state = TextFieldState("${state.childInfo.childLastName.text}${state.childInfo.childFirstName.text}"),
+            placeholder = "",
+            isError = false,
+            enabled = false,
+            containerColor = KieroTheme.colors.gray900,
+        )
+
+        Spacer(modifier = Modifier.height(28.dp))
+
+        ParentSignUpInviteHolder(
+            code = state.childInfo.code,
+            expiredTime = state.expiredTime,
+            isExpired = state.isExpired,
+            onCopyClick = onCopyClick,
+            onReIssueClick = onReIssueClick
+        )
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        KieroButtonMedium(
+            text = "시작하기",
+            onClick = onStartClick,
+            isEnabled = state.isChildJoined,
+            containerColor = KieroTheme.colors.main,
+            contentColor = KieroTheme.colors.black
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ParentMyPageChildInviteScreenPreview() {
+    KieroTheme {
+        ParentMyPageChildInviteScreen()
+
+    }
+}
