@@ -1,4 +1,4 @@
-package com.kiero.presentation.parent.screen.mypage.childcare.component
+package com.kiero.presentation.parent.screen.mypage.childcare.component.invite
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
 import com.kiero.core.common.extension.noRippleClickable
@@ -146,6 +147,20 @@ fun ParentMyPageChildInviteHolder(
             style = KieroTheme.typography.regular.body4,
             color = KieroTheme.colors.gray200,
             textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ParentMyPageChildInviteHolderPreview() {
+    KieroTheme {
+        ParentMyPageChildInviteHolder(
+            code = "",
+            expiredTime = "",
+            isExpired = false,
+            onCopyClick = {},
+            onReIssueClick = {}
         )
     }
 }
