@@ -31,6 +31,7 @@ fun SettingItem(
 ) {
     Row(
         modifier = modifier
+            .padding(vertical = 14.dp)
             .noRippleClickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -48,7 +49,7 @@ fun SettingItem(
 
             KieroChip(
                 isCompleted = !isPending,
-                isEnabled = true,
+                isEnabled = isPending,
                 isPoint = isPending,
                 action = KieroTextAction(
                     text = if (isPending) "연결 대기" else "연결 코드 재발급",
