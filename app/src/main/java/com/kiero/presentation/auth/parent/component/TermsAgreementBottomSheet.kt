@@ -1,7 +1,11 @@
 package com.kiero.presentation.auth.parent.component
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -10,7 +14,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,10 +24,10 @@ import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.kiero.R
 import com.kiero.core.common.extension.disableUpSheetScroll
+import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.component.bottomsheet.KieroBottomSheet
 import com.kiero.core.designsystem.component.button.KieroButtonMedium
 import com.kiero.core.designsystem.theme.KieroTheme
@@ -42,15 +45,40 @@ fun TermsAgreementBottomSheet(
 ) {
     KieroBottomSheet(
         onDismiss = onDismiss,
+        modifier = Modifier
+            .disableUpSheetScroll(),
+    ) {
+        TermsAgreementContent(
+            consentsItem = consentsItem,
+            onConfirm = onConfirm,
+            navigateToTerms = navigateToTerms,
+            navigateToPrivacyPolicy = navigateToPrivacyPolicy,
+            modifier = modifier
+        )
+    }
+}
+
+@Composable
+private fun TermsAgreementContent(
+    consentsItem: AuthParentConsentsUiModel,
+    onConfirm: () -> Unit,
+    navigateToTerms: () -> Unit,
+    navigateToPrivacyPolicy: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column (
         modifier = modifier
-            .disableUpSheetScroll()
+            .fillMaxWidth()
             .dropShadow(
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp),
                 shadow = Shadow(
                     radius = 8.dp,
                     color = KieroTheme.colors.gray900,
-                    offset = DpOffset(x = 0.dp, y = (-3).dp)
                 )
+            )
+            .background(
+                color = KieroTheme.colors.black,
+                shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp)
             )
     ) {
         Text(
@@ -89,7 +117,11 @@ fun TermsAgreementBottomSheet(
             text = "확인",
             isEnabled = consentsItem.isTermsAccepted && consentsItem.isPrivacyPolicyAccepted,
             onClick = onConfirm,
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
         )
+
+        Spacer(modifier = Modifier.height(37.dp))
     }
 }
 
@@ -106,15 +138,13 @@ private fun TermsItem(
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(
-            onClick = onClick
-        ) {
-            Icon(
-                imageVector = if (isSelected) ImageVector.vectorResource(R.drawable.ic_parent_addschedule_check_on) else ImageVector.vectorResource(R.drawable.ic_parent_addschedule_check_off),
-                contentDescription = null,
-                tint = Color.Unspecified
-            )
-        }
+        Icon(
+            imageVector = if (isSelected) ImageVector.vectorResource(R.drawable.ic_parent_addschedule_check_on) else ImageVector.vectorResource(R.drawable.ic_permission_check_off),
+            contentDescription = null,
+            tint = Color.Unspecified,
+            modifier = Modifier
+                .noRippleClickable(onClick = onClick)
+        )
 
         Spacer(modifier = Modifier.width(8.dp))
 
@@ -138,12 +168,22 @@ private fun TermsItem(
 @Composable
 private fun TermsAgreementBottomSheetPreview() {
     KieroTheme {
-        TermsAgreementBottomSheet(
-            consentsItem = AuthParentConsentsUiModel(),
-            onConfirm = {},
-            onDismiss = {},
-            navigateToTerms = {},
-            navigateToPrivacyPolicy = {}
-        )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Text(
+                text = "테스트"
+            )
+
+            TermsAgreementContent(
+                consentsItem = AuthParentConsentsUiModel(),
+                onConfirm = {},
+                navigateToTerms = {},
+                navigateToPrivacyPolicy = {},
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+            )
+        }
     }
 }

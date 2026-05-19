@@ -119,13 +119,23 @@ class AuthParentViewModel @Inject constructor(
         val isShowTermsAgreement = _state.value.isShowTermsAgreement
 
         _state.update {
-            it.copy(isShowTermsAgreement = !isShowTermsAgreement)
+            it.copy(
+                isShowTermsAgreement = !isShowTermsAgreement,
+                uiState = UiState.Empty
+            )
         }
     }
 
     fun successTermsAgreement() {
-        _state.update {
-            it.copy(isShowTermsAgreement = false)
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    isShowTermsAgreement = false,
+                    uiState = UiState.Empty
+                )
+            }
+
+            _sideEffect.emit(AuthSideEffect.NavigateToParentSignUp)
         }
     }
 
