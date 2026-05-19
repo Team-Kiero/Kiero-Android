@@ -43,6 +43,8 @@ fun ParentMyPageChildManagementScreen(
             color = KieroTheme.colors.gray300
         )
 
+        Spacer(modifier = Modifier.height(24.dp))
+
         KieroButtonMedium(
             text = "연결 코드 재발급",
             onClick = onReIssueClick,

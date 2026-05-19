@@ -68,7 +68,7 @@ fun ParentMyPageChildCareScreen(
                 )
             }
 
-            ParentMyPageChildCareSideEffect.NavigateToMyPage -> navigateToMyPage
+            ParentMyPageChildCareSideEffect.NavigateToMyPage -> navigateToMyPage()
         }
     }
 

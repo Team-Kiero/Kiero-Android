@@ -9,6 +9,7 @@ import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.domain.parent.invite.usecase.GetInviteCode
 import com.kiero.presentation.parent.screen.mypage.childcare.model.ParentChildCareStep
 import com.kiero.presentation.parent.screen.mypage.childcare.model.ParentMyPageChildInfoModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -20,6 +21,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModel
 class ParentMyPageChildCareViewModel @Inject constructor(
     private val getInviteCode: GetInviteCode,
     private val userInfoManager: UserInfoManager,
