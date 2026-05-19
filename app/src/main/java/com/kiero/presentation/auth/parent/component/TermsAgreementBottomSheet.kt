@@ -45,8 +45,6 @@ fun TermsAgreementBottomSheet(
 ) {
     KieroBottomSheet(
         onDismiss = onDismiss,
-        modifier = Modifier
-            .disableUpSheetScroll(),
     ) {
         TermsAgreementContent(
             consentsItem = consentsItem,
