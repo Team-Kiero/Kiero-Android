@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -105,6 +107,7 @@ private fun ParentMyPageScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(color = KieroTheme.colors.black)
+            .verticalScroll(rememberScrollState())
     ) {
         Column(
             modifier = Modifier
@@ -212,6 +215,8 @@ private fun ParentMyPageScreen(
                         .fillMaxWidth()
                         .noRippleClickable(onClick = onClickWithDraw)
                 )
+
+                Spacer(modifier = Modifier.height(70.dp))
             }
         }
 

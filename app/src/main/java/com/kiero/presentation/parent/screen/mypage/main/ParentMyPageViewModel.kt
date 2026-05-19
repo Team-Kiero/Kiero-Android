@@ -73,7 +73,7 @@ class ParentMyPageViewModel @Inject constructor(
     // Todo : 아이의 연결 여부 처리 확인하기
     fun checkChildCare() {
         viewModelScope.launch {
-            _sideEffect.emit(Parent)
+            _sideEffect.emit(ParentMyPageSideEffect.NavigateToChildCare)
         }
     }
 }

@@ -62,7 +62,6 @@ fun NavGraphBuilder.parentMypageNavGraph(
 
         composable<MyPageWithDraw> {
             ParentMyPageWithDrawScreen(
-                paddingValues = paddingValues,
                 onBackClick = navigateUp
             )
         }
