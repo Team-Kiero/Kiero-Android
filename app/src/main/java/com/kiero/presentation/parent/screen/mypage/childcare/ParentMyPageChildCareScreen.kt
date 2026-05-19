@@ -85,7 +85,7 @@ fun ParentMyPageChildCareScreen(
     ) {
         KieroTopbar(
             title = "자녀 관리",
-            leftIconClick = navigateToMyPage
+            leftIconClick = viewModel::onBackClick
         )
 
         when(state.currentStep) {
