@@ -3,13 +3,13 @@ package com.kiero.presentation.parent.screen.mypage.withdraw
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -34,7 +34,6 @@ import com.kiero.core.designsystem.theme.KieroTheme
 // Todo: API 구현 시 반영
 @Composable
 fun ParentMyPageWithDrawScreen(
-    paddingValues: PaddingValues,
     onBackClick: () -> Unit,
 ) {
     var isConfirmProcess by remember { mutableStateOf(false) }
@@ -43,8 +42,8 @@ fun ParentMyPageWithDrawScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(KieroTheme.colors.black)
-            .padding(paddingValues)
             .padding(horizontal = 16.dp, vertical = 13.dp)
+            .statusBarsPadding()
     ) {
         KieroTopbar(
             title = "회원 탈퇴",
@@ -96,8 +95,7 @@ fun ParentMyPageWithDrawScreen(
             )
 
             Text(
-                text = "위 내용을 모두 확인했으며, 탈퇴 후 데이터가 복구되지 \n" +
-                        "않는다는 점에 동의합니다.",
+                text = "위 내용을 모두 확인했으며, 탈퇴 후 데이터가 복구되지 않는다는 점에 동의합니다.",
                 style = KieroTheme.typography.regular.body3,
                 color = KieroTheme.colors.white,
                 modifier = Modifier
@@ -125,7 +123,6 @@ fun ParentMyPageWithDrawScreen(
 private fun ParentMyPageWithDrawScreenPreview() {
     KieroTheme {
         ParentMyPageWithDrawScreen(
-            paddingValues = PaddingValues(),
             onBackClick = {}
         )
     }
