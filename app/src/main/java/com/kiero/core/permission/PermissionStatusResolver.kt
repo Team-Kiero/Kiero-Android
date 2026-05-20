@@ -1,8 +1,6 @@
-package com.kiero.core.permission.ui
+package com.kiero.core.permission
 
 import android.app.Activity
-import com.kiero.core.permission.PermissionChecker
-import com.kiero.core.permission.PermissionStatus
 import com.kiero.core.permission.model.PermissionType
 
 object PermissionStatusResolver {

@@ -5,6 +5,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import com.kiero.core.permission.PermissionStatus
+import com.kiero.core.permission.PermissionStatusResolver
 import com.kiero.core.permission.model.PermissionType
 import timber.log.Timber
 
