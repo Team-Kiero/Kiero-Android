@@ -34,6 +34,7 @@ import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,6 +55,7 @@ import com.kiero.core.model.UiState
 import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.permission.model.PermissionType
 import com.kiero.core.permission.ui.rememberPermissionRequester
+import com.kiero.core.permission.util.navigateToSettings
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
 import com.kiero.core.trigger.LocalRefreshState
 import com.kiero.presentation.kid.component.KidSpeechField
@@ -80,6 +82,7 @@ fun KidJourneyRoute(
     viewModel: KidJourneyViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
     val globalTrigger = LocalGlobalUiEventTrigger.current
     val refreshState = LocalRefreshState.current
 
@@ -124,8 +127,9 @@ fun KidJourneyRoute(
                     // Todo : 퍼미션 거부됨 스낵바 등
                 },
                 onPermanentlyDenied = {
-                    // Todo : 퍼미션 거부 안내 UI 띄우기 - 2번 취소되었을 때
+                    // Todo : 퍼미션 거부 안내 UI 띄우기 - 2번 취소되었을 때 설정으로 이동
                     Timber.e("퍼미션 완전 거부")
+                    context.navigateToSettings(type = PermissionType.CAMERA)
                 },
                 onCountIncrease = viewModel::increaseDeniedCount,
             )
