@@ -129,7 +129,7 @@ fun KidJourneyRoute(
                 onPermanentlyDenied = {
                     // Todo : 퍼미션 거부 안내 UI 띄우기 - 2번 취소되었을 때 설정으로 이동
                     Timber.e("퍼미션 완전 거부")
-                    context.navigateToSettings(type = PermissionType.CAMERA)
+                    //context.navigateToSettings(type = PermissionType.CAMERA)
                 },
                 onCountIncrease = viewModel::increaseDeniedCount,
             )
