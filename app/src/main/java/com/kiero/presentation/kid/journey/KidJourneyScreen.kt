@@ -68,6 +68,7 @@ import com.kiero.presentation.kid.journey.state.KidJourneySideEffect
 import com.kiero.presentation.kid.journey.state.KidJourneyState
 import com.kiero.presentation.kid.journey.viewmodel.KidJourneyViewModel
 import com.kiero.presentation.main.navigation.KidMainTab
+import timber.log.Timber
 
 @Composable
 fun KidJourneyRoute(
@@ -123,7 +124,8 @@ fun KidJourneyRoute(
                     // Todo : 퍼미션 거부됨 스낵바 등
                 },
                 onPermanentlyDenied = {
-                    // Todo : 퍼미션 거부 안내 UI 띄우기
+                    // Todo : 퍼미션 거부 안내 UI 띄우기 - 2번 취소되었을 때
+                    Timber.e("퍼미션 완전 거부")
                 },
                 onCountIncrease = viewModel::increaseDeniedCount,
             )
