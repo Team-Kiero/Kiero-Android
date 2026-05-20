@@ -1,9 +1,5 @@
 package com.kiero.presentation.kid.journey
 
-import android.Manifest
-import android.content.pm.PackageManager
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
@@ -38,12 +34,10 @@ import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
@@ -58,6 +52,8 @@ import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
 import com.kiero.core.model.trigger.SnackbarState
+import com.kiero.core.permission.model.PermissionType
+import com.kiero.core.permission.ui.rememberPermissionRequester
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
 import com.kiero.core.trigger.LocalRefreshState
 import com.kiero.presentation.kid.component.KidSpeechField
@@ -84,7 +80,6 @@ fun KidJourneyRoute(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val globalTrigger = LocalGlobalUiEventTrigger.current
-    val context = LocalContext.current
     val refreshState = LocalRefreshState.current
 
     LaunchedEffect(Unit) {
@@ -120,13 +115,18 @@ fun KidJourneyRoute(
                 }
             }
 
-            val permissionLauncher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.RequestPermission()
-            ) { isGranted ->
-                if (isGranted) {
-                    onNavigateToCamera()
-                }
-            }
+            val requestCamera = rememberPermissionRequester(
+                type = PermissionType.CAMERA,
+                deniedCount = state.data.permissionCameraDeniedCount,
+                onGranted = onNavigateToCamera,
+                onDenied = {
+                    // Todo : 퍼미션 거부됨 스낵바 등
+                },
+                onPermanentlyDenied = {
+                    // Todo : 퍼미션 거부 안내 UI 띄우기
+                },
+                onCountIncrease = viewModel::increaseDeniedCount,
+            )
 
             KidJourneyScreen(
                 paddingValues = paddingValues,
@@ -134,16 +134,7 @@ fun KidJourneyRoute(
                 onButtonClick = {
                     when (state.data.buttonType) {
                         KidJourneyButtonType.AUTH -> {
-                            val hasPermission = ContextCompat.checkSelfPermission(
-                                context,
-                                Manifest.permission.CAMERA
-                            ) == PackageManager.PERMISSION_GRANTED
-
-                            if (hasPermission) {
-                                onNavigateToCamera()
-                            } else {
-                                permissionLauncher.launch(Manifest.permission.CAMERA)
-                            }
+                            requestCamera()
                         }
 
                         KidJourneyButtonType.FIRE -> {

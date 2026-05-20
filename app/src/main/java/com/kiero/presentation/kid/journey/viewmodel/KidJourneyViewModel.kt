@@ -3,7 +3,9 @@ package com.kiero.presentation.kid.journey.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.common.util.successData
+import com.kiero.core.localstorage.permission.PermissionInfoManager
 import com.kiero.core.model.UiState
+import com.kiero.core.permission.model.PermissionType
 import com.kiero.data.kid.coin.repository.CoinRepository
 import com.kiero.data.kid.schedule.model.ScheduleStatus
 import com.kiero.data.kid.schedule.repository.ScheduleRepository
@@ -33,7 +35,8 @@ import javax.inject.Inject
 class KidJourneyViewModel @Inject constructor(
     private val repository: ScheduleRepository,
     private val coinRepository: CoinRepository,
-    private val sseManager: SseManager
+    private val sseManager: SseManager,
+    private val permissionInfoManager: PermissionInfoManager
 ) : ViewModel() {
     private val coin = coinRepository.myCoin
 
@@ -199,6 +202,12 @@ class KidJourneyViewModel @Inject constructor(
                 .onFailure {
                     Timber.e("fetchCoin fail: $it")
                 }
+        }
+    }
+
+    fun increaseDeniedCount(type: PermissionType) {
+        viewModelScope.launch {
+            permissionInfoManager.increaseDeniedCount(type)
         }
     }
 }
