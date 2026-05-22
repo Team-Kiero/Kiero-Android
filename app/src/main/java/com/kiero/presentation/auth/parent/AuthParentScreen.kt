@@ -96,8 +96,8 @@ fun AuthParentRoute(
             TermsAgreementBottomSheet(
                 consentsItem = state.consents,
                 onDismiss = viewModel::showTermsAgreement,
-                navigateToTerms = viewModel::toggleTermsAccepted,
-                navigateToPrivacyPolicy = viewModel::togglePrivacyPolicyAccepted,
+                onClickTerms = viewModel::toggleTermsAccepted,
+                navigateToTerms = viewModel::navigateToTerms,
                 onConfirm = viewModel::successTermsAgreement
             )
         }

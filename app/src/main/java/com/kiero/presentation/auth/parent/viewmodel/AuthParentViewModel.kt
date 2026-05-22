@@ -10,6 +10,7 @@ import com.kiero.core.model.UiState
 import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.domain.login.HandleKakaoLoginResultUseCase
 import com.kiero.presentation.auth.parent.model.KakaoLoginResult
+import com.kiero.presentation.auth.parent.model.TermsType
 import com.kiero.presentation.auth.parent.state.AuthParentState
 import com.kiero.presentation.auth.state.AuthSideEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -47,7 +48,6 @@ class AuthParentViewModel @Inject constructor(
                         is KakaoLoginResult.HasChildren ->
                             _sideEffect.emit(AuthSideEffect.NavigateToParentGraph)
                         is KakaoLoginResult.NoChildren ->
-                            //_sideEffect.emit(AuthSideEffect.NavigateToParentSignUp)
                             showTermsAgreement()
                     }
                 }.onFailure { throwable ->
@@ -73,28 +73,29 @@ class AuthParentViewModel @Inject constructor(
     }
 
     /**
-     * 이용약관 동의 상태를 토글합니다.
+     * 이용약관 동의, 개인정보 상태를 토글합니다.
      */
-    fun toggleTermsAccepted() {
-        _state.update { currentState ->
-            currentState.copy(
-                consents = currentState.consents.copy(
-                    isTermsAccepted = !currentState.consents.isTermsAccepted
-                )
-            )
-        }
-    }
+    fun toggleTermsAccepted(termsType: TermsType) {
+        when (termsType) {
+            TermsType.SERVICE_AGREEMENT -> {
+                _state.update { currentState ->
+                    currentState.copy(
+                        consents = currentState.consents.copy(
+                            isTermsAccepted = !currentState.consents.isTermsAccepted
+                        )
+                    )
+                }
+            }
 
-    /**
-     * 개인정보 처리방침 동의 상태를 토글합니다.
-     */
-    fun togglePrivacyPolicyAccepted() {
-        _state.update { currentState ->
-            currentState.copy(
-                consents = currentState.consents.copy(
-                    isPrivacyPolicyAccepted = !currentState.consents.isPrivacyPolicyAccepted
-                )
-            )
+            TermsType.PRIVACY_POLICY -> {
+                _state.update { currentState ->
+                    currentState.copy(
+                        consents = currentState.consents.copy(
+                            isPrivacyPolicyAccepted = !currentState.consents.isPrivacyPolicyAccepted
+                        )
+                    )
+                }
+            }
         }
     }
 
@@ -136,6 +137,23 @@ class AuthParentViewModel @Inject constructor(
             }
 
             _sideEffect.emit(AuthSideEffect.NavigateToParentSignUp)
+        }
+    }
+
+    // Todo: 나중에 약관들 보여주는 화면으로 이동
+    fun navigateToTerms(termsType: TermsType) {
+        when (termsType) {
+            TermsType.SERVICE_AGREEMENT -> {
+                viewModelScope.launch {
+                    //_sideEffect.emit(AuthSideEffect.NavigateToTerms)
+                }
+            }
+
+            TermsType.PRIVACY_POLICY -> {
+                viewModelScope.launch {
+                    //_sideEffect.emit(AuthSideEffect.NavigateToPrivacyPolicy)
+                }
+            }
         }
     }
 
