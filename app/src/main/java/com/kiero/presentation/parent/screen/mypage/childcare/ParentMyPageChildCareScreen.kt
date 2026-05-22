@@ -91,7 +91,6 @@ fun ParentMyPageChildCareScreen(
         when(state.currentStep) {
             ParentChildCareStep.MANAGEMENT -> {
                 ParentMyPageChildManagementScreen(
-                    paddingValues = paddingValues,
                     state = state.childInfo,
                     onReIssueClick = viewModel::onReIssueClick
                 )
@@ -99,7 +98,6 @@ fun ParentMyPageChildCareScreen(
 
             ParentChildCareStep.INVITE -> {
                 ParentMyPageChildInviteScreen(
-                    paddingValues = paddingValues,
                     state = state,
                     onCopyClick = viewModel::onCopyClick,
                     onReIssueClick = viewModel::onReIssueClick

@@ -1,10 +1,8 @@
 package com.kiero.presentation.parent.screen.mypage.childcare.screen
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -16,15 +14,11 @@ import com.kiero.presentation.signup.parent.component.ParentSignUpInviteHolder
 
 @Composable
 fun ParentMyPageChildInviteScreen(
-    paddingValues: PaddingValues,
     state: ParentMyPageChildCareState,
     onCopyClick: () -> Unit,
     onReIssueClick: () -> Unit,
 ) {
-    Column (
-        modifier = Modifier
-            .padding(paddingValues)
-    ) {
+    Column {
         ParentMyPageChildNameHolder(
             childInfo = state.childInfo
         )
@@ -46,7 +40,6 @@ fun ParentMyPageChildInviteScreen(
 private fun ParentMyPageChildInviteScreenPreview() {
     KieroTheme {
         ParentMyPageChildInviteScreen(
-            paddingValues = PaddingValues(),
             state = ParentMyPageChildCareState(),
             onCopyClick = {},
             onReIssueClick = {}

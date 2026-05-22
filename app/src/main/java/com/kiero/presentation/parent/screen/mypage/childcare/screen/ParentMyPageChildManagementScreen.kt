@@ -2,11 +2,9 @@ package com.kiero.presentation.parent.screen.mypage.childcare.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,15 +18,13 @@ import com.kiero.presentation.parent.screen.mypage.childcare.model.ParentMyPageC
 
 @Composable
 fun ParentMyPageChildManagementScreen(
-    paddingValues: PaddingValues,
     state: ParentMyPageChildInfoModel,
     onReIssueClick: () -> Unit,
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(KieroTheme.colors.black)
-            .padding(paddingValues),
+            .background(KieroTheme.colors.black),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         ParentMyPageChildNameHolder(
@@ -61,7 +57,6 @@ fun ParentMyPageChildManagementScreen(
 private fun ParentMyPageChildManagementScreenPreview() {
     KieroTheme {
         ParentMyPageChildManagementScreen(
-            paddingValues = PaddingValues(),
             state = ParentMyPageChildInfoModel(),
             onReIssueClick = {}
         )

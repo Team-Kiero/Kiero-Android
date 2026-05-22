@@ -80,7 +80,10 @@ fun ParentMyPageWithDrawScreen(
 
         Row (
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .noRippleClickable(onClick = {
+                    isConfirmProcess = !isConfirmProcess
+                }),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -88,10 +91,6 @@ fun ParentMyPageWithDrawScreen(
                 imageVector = if (isConfirmProcess) ImageVector.vectorResource(R.drawable.ic_parent_addschedule_check_on) else ImageVector.vectorResource(R.drawable.ic_parent_addschedule_check_off),
                 contentDescription = null,
                 tint = Color.Unspecified,
-                modifier = Modifier
-                    .noRippleClickable(onClick = {
-                        isConfirmProcess = !isConfirmProcess
-                    })
             )
 
             Text(
