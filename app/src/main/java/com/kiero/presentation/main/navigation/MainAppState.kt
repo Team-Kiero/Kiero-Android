@@ -20,9 +20,11 @@ import com.kiero.presentation.kid.journey.map.navigation.navigateToMap
 import com.kiero.presentation.kid.journey.model.KidJourneyStoneType
 import com.kiero.presentation.kid.journey.navigation.navigateToJourney
 import com.kiero.presentation.kid.mission.navigation.navigateToMission
+import com.kiero.presentation.kid.myspace.navigation.navigateToMySpace
 import com.kiero.presentation.kid.navigation.KidGraph
 import com.kiero.presentation.kid.navigation.KidJourney
 import com.kiero.presentation.kid.navigation.KidMission
+import com.kiero.presentation.kid.navigation.KidMySpace
 import com.kiero.presentation.kid.navigation.KidWish
 import com.kiero.presentation.kid.onboarding.navigation.navigateToKidOnboarding
 import com.kiero.presentation.kid.wish.navigation.navigateToWish
@@ -188,6 +190,7 @@ class MainAppState(
             KidMainTab.JOURNEY -> navController.navigate(KidJourney, navOptions)
             KidMainTab.MISSION -> navController.navigate(KidMission, navOptions)
             KidMainTab.WISH -> navController.navigate(KidWish, navOptions)
+            KidMainTab.MYSPACE -> navController.navigate(KidMySpace, navOptions)
         }
     }
 
@@ -205,6 +208,9 @@ class MainAppState(
 
     fun navigateToWish(navOptions: NavOptions? = null) =
         navController.navigateToWish(navOptions)
+
+    fun navigateToMySpace(navOptions: NavOptions? = null) =
+        navController.navigateToMySpace(navOptions)
 
     fun navigateToMypage(navOptions: NavOptions? = null) =
         navController.navigateToMypage(navOptions)

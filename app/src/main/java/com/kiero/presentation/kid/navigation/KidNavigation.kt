@@ -19,6 +19,7 @@ import com.kiero.presentation.kid.journey.map.navigation.navigateToMap
 import com.kiero.presentation.kid.journey.navigation.kidJourneyNavGraph
 import com.kiero.presentation.kid.journey.navigation.navigateToJourney
 import com.kiero.presentation.kid.mission.navigation.kidMissionNavGraph
+import com.kiero.presentation.kid.myspace.navigation.kidMySpaceNavGraph
 import com.kiero.presentation.kid.onboarding.navigation.kidOnboardingNavGraph
 import com.kiero.presentation.kid.wish.navigation.kidWishNavGraph
 import kotlinx.serialization.Serializable
@@ -36,6 +37,9 @@ data object KidMission : KidTab
 
 @Serializable
 data object KidWish : KidTab
+
+@Serializable
+data object KidMySpace : KidTab
 
 @Serializable
 data object Onboarding : KidTab
@@ -111,6 +115,11 @@ fun NavGraphBuilder.kidNavGraph(
         )
 
         kidJourneyMapNavGraph(
+            paddingValues = paddingValues,
+            navigateUp = navigateUp
+        )
+
+        kidMySpaceNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp
         )
