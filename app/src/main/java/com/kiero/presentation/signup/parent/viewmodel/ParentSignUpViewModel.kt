@@ -9,8 +9,8 @@ import com.kiero.core.common.viewmodel.throttleFirst
 import com.kiero.core.localstorage.TokenManager
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.auth.repository.AuthRepository
-import com.kiero.data.parent.signup.repository.ParentSignUpRepository
 import com.kiero.data.sse.manager.SseManager
+import com.kiero.domain.parent.invite.usecase.GetInviteCode
 import com.kiero.presentation.signup.parent.model.ParentInfoUiModel
 import com.kiero.presentation.signup.parent.model.ParentSignUpStep
 import com.kiero.presentation.signup.parent.model.toUiModel
@@ -34,11 +34,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ParentSignUpViewModel @Inject constructor(
-    private val repository: ParentSignUpRepository,
     private val authRepository: AuthRepository,
     private val userInfoManager: UserInfoManager,
     private val tokenManager: TokenManager,
     private val sseManager: SseManager,
+    private val getInviteCode: GetInviteCode,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ParentSignUpState())
     val state: StateFlow<ParentSignUpState> = _state.asStateFlow()
@@ -107,7 +107,7 @@ class ParentSignUpViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            repository.postSignUp(
+            getInviteCode(
                 childLastName = _state.value.childInfo.childLastName.text.toString(),
                 childFirstName = _state.value.childInfo.childFirstName.text.toString()
             ).onSuccess { result ->

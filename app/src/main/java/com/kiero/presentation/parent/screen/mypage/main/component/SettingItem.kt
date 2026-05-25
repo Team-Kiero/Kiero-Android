@@ -1,4 +1,4 @@
-package com.kiero.presentation.parent.screen.mypage.component
+package com.kiero.presentation.parent.screen.mypage.main.component
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,13 +19,14 @@ import com.kiero.core.designsystem.component.chip.KieroChip
 import com.kiero.core.designsystem.component.chip.action.KieroTextAction
 import com.kiero.core.designsystem.component.chip.action.KieroTextColor
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.presentation.parent.screen.mypage.model.ChildConnectionStatus
 
 @Composable
 fun SettingItem(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    connectChildren: Int = 0,
+    connectionStatus: ChildConnectionStatus = ChildConnectionStatus.CONNECTED,
     hasConnectChildren: Boolean = false
 ) {
     Row(
@@ -44,13 +45,16 @@ fun SettingItem(
         Spacer(modifier = Modifier.weight(1f))
 
         if (hasConnectChildren) {
+            val isPending = connectionStatus == ChildConnectionStatus.PENDING
+
             KieroChip(
-                isCompleted = connectChildren == 0,
-                isEnabled = connectChildren == 0,
+                isCompleted = !isPending,
+                isEnabled = isPending,
+                isPoint = isPending,
                 action = KieroTextAction(
-                    text = if (connectChildren != 0) "$connectChildren 명 연결됨" else "연결 필요",
-                    textColor = if (connectChildren == 0) KieroTextColor.MAIN else KieroTextColor.GRAY500,
-                    onClick = { }
+                    text = if (isPending) "연결 대기" else "연결 코드 재발급",
+                    textColor = if (isPending) KieroTextColor.POINT else KieroTextColor.GRAY500,
+                    onClick = {}
                 )
             )
         }
@@ -69,8 +73,9 @@ private fun SettingItemPreview() {
     KieroTheme {
         SettingItem(
             text = "설정",
-            connectChildren = 1,
-            onClick = {}
+            onClick = {},
+            connectionStatus = ChildConnectionStatus.PENDING,
+            hasConnectChildren = true
         )
     }
 }
