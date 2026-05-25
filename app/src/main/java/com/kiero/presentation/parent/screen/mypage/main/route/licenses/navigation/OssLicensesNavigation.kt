@@ -1,4 +1,4 @@
-package com.kiero.presentation.parent.screen.mypage.route.licenses.navigation
+package com.kiero.presentation.parent.screen.mypage.main.route.licenses.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions

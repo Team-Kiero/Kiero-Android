@@ -7,7 +7,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
 
-enum class KieroTextColor { WHITE, MAIN, GRAY500 }
+enum class KieroTextColor { WHITE, MAIN, POINT, GRAY500 }
 
 class KieroTextAction(
     private val text: String,
@@ -20,6 +20,7 @@ class KieroTextAction(
             KieroTextColor.WHITE -> KieroTheme.colors.white
             KieroTextColor.MAIN -> KieroTheme.colors.main
             KieroTextColor.GRAY500 -> KieroTheme.colors.gray500
+            KieroTextColor.POINT -> KieroTheme.colors.point
         }
 
         Text(

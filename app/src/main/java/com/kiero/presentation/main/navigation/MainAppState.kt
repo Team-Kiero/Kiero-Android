@@ -36,7 +36,7 @@ import com.kiero.presentation.parent.screen.alarm.navigation.navigateToAlarm
 import com.kiero.presentation.parent.screen.journey.navigation.navigateToParentJourney
 import com.kiero.presentation.parent.screen.mission.navigation.navigateToMissionAdd
 import com.kiero.presentation.parent.screen.mission.navigation.navigateToParentMission
-import com.kiero.presentation.parent.screen.mypage.navigation.navigateToMypage
+import com.kiero.presentation.parent.screen.mypage.main.navigation.navigateToMypage
 import com.kiero.presentation.parent.screen.reward.navigation.navigateToReward
 import com.kiero.presentation.parent.screen.schedule.navigation.navigateToSchedule
 import com.kiero.presentation.parent.screen.schedule.plan.navigation.navigateToScheduleAdd
