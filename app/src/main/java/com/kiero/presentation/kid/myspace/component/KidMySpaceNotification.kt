@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.kiero.core.designsystem.component.switches.KieroAlarmSwitch
 import com.kiero.core.designsystem.theme.KieroTheme
 
 @Composable
@@ -52,7 +53,10 @@ fun KidMySpaceNotification(
             )
         }
 
-        // Todo: 토글 추가
+        KieroAlarmSwitch(
+            checked = isChecked,
+            onCheckedChange = onCheckedChange
+        )
     }
 }
 
