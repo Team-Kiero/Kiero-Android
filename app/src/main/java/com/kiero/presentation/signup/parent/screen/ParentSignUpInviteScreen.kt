@@ -8,8 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.kiero.core.designsystem.component.textfield.KieroTextField
 import com.kiero.core.designsystem.component.button.KieroButtonMedium
+import com.kiero.core.designsystem.component.textfield.KieroTextField
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.signup.parent.component.ParentSignUpInviteHolder
 import com.kiero.presentation.signup.parent.state.ParentSignUpState
@@ -44,6 +44,7 @@ fun ParentSignUpInviteScreen(
 
         Spacer(modifier = Modifier.weight(1f))
 
+        // Todo : 나중에 약관 동의 데이터도 함께 보낼 것
         KieroButtonMedium(
             text = "시작하기",
             onClick = onStartClick,
