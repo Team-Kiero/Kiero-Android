@@ -10,6 +10,7 @@ import com.kiero.core.model.UiState
 import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.domain.login.HandleKakaoLoginResultUseCase
 import com.kiero.presentation.auth.parent.model.KakaoLoginResult
+import com.kiero.presentation.auth.parent.model.TermsType
 import com.kiero.presentation.auth.parent.state.AuthParentState
 import com.kiero.presentation.auth.state.AuthSideEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -47,7 +48,7 @@ class AuthParentViewModel @Inject constructor(
                         is KakaoLoginResult.HasChildren ->
                             _sideEffect.emit(AuthSideEffect.NavigateToParentGraph)
                         is KakaoLoginResult.NoChildren ->
-                            _sideEffect.emit(AuthSideEffect.NavigateToParentSignUp)
+                            showTermsAgreement()
                     }
                 }.onFailure { throwable ->
                     Timber.e(throwable)
@@ -68,6 +69,91 @@ class AuthParentViewModel @Inject constructor(
         viewModelScope.launch {
             _sideEffect.emit(AuthSideEffect.NavigateToSelection)
             _state.update { it.copy(uiState = UiState.Empty) }
+        }
+    }
+
+    /**
+     * 이용약관 동의, 개인정보 상태를 토글합니다.
+     */
+    fun toggleTermsAccepted(termsType: TermsType) {
+        when (termsType) {
+            TermsType.SERVICE_AGREEMENT -> {
+                _state.update { currentState ->
+                    currentState.copy(
+                        consents = currentState.consents.copy(
+                            isTermsAccepted = !currentState.consents.isTermsAccepted
+                        )
+                    )
+                }
+            }
+
+            TermsType.PRIVACY_POLICY -> {
+                _state.update { currentState ->
+                    currentState.copy(
+                        consents = currentState.consents.copy(
+                            isPrivacyPolicyAccepted = !currentState.consents.isPrivacyPolicyAccepted
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * 현재 둘 다 동의 상태면 모두 해제하고, 하나라도 미동의 상태면 모두 동의합니다.
+     * 기획 상에는 없지만 혹시나 사용하게 될 수 있어서 일단 구현
+     */
+    fun toggleAllConsents() {
+        _state.update { currentState ->
+            val allAccepted = currentState.consents.isTermsAccepted && currentState.consents.isPrivacyPolicyAccepted
+
+            currentState.copy(
+                consents = currentState.consents.copy(
+                    isTermsAccepted = !allAccepted,
+                    isPrivacyPolicyAccepted = !allAccepted
+                )
+            )
+        }
+    }
+
+    fun showTermsAgreement() {
+        val isShowTermsAgreement = _state.value.isShowTermsAgreement
+
+        _state.update {
+            it.copy(
+                isShowTermsAgreement = !isShowTermsAgreement,
+                uiState = UiState.Empty
+            )
+        }
+    }
+
+    fun successTermsAgreement() {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    isShowTermsAgreement = false,
+                    uiState = UiState.Empty
+                )
+            }
+
+            _sideEffect.emit(AuthSideEffect.NavigateToParentSignUp)
+        }
+    }
+
+    // Todo: 나중에 약관들 보여주는 화면으로 이동
+    fun navigateToTerms(termsType: TermsType) {
+        when (termsType) {
+            TermsType.SERVICE_AGREEMENT -> {
+                viewModelScope.launch {
+                    //_sideEffect.emit(AuthSideEffect.NavigateToTerms)
+                }
+            }
+
+            TermsType.PRIVACY_POLICY -> {
+                viewModelScope.launch {
+                    //_sideEffect.emit(AuthSideEffect.NavigateToPrivacyPolicy)
+                }
+            }
         }
     }
 

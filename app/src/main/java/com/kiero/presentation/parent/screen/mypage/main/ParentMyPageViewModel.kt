@@ -1,4 +1,4 @@
-package com.kiero.presentation.parent.screen.mypage
+package com.kiero.presentation.parent.screen.mypage.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -6,6 +6,7 @@ import com.kiero.core.app.AppRestarter
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.model.parent.ParentInfo
 import com.kiero.data.auth.repository.AuthRepository
+import com.kiero.presentation.parent.screen.mypage.model.ChildConnectionStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,7 +42,7 @@ class ParentMyPageViewModel @Inject constructor(
             _state.update {
                 it.copy(
                     parentInfo = userInfo ?: ParentInfo(),
-                    connectedChildren = if (kidInfo != null) 1 else 0
+                    connectionStatus = if (kidInfo != null) ChildConnectionStatus.CONNECTED else ChildConnectionStatus.PENDING
                 )
             }
         }
@@ -57,6 +58,22 @@ class ParentMyPageViewModel @Inject constructor(
                 .onFailure {
                     Timber.e("Logout failed $it")
                 }
+        }
+    }
+
+    fun updateIsAlarmChecked(checked: Boolean) {
+        _state.update {
+            it.copy(
+                isAlarmChecked = checked
+            )
+        }
+    }
+
+    // 아이의 연결 유무를 판단하여 ui 업데이트 및 화면 이동
+    // Todo : 아이의 연결 여부 처리 확인하기
+    fun checkChildCare() {
+        viewModelScope.launch {
+            _sideEffect.emit(ParentMyPageSideEffect.NavigateToChildCare)
         }
     }
 }

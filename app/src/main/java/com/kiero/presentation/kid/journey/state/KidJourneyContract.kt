@@ -11,7 +11,8 @@ import com.kiero.presentation.kid.journey.model.KidJourneyStoneType
 @Immutable
 data class KidJourneyState(
     val header: KidJourneyHeaderUiModel? = null,
-    val content: KidJourneyContentUiModel = KidJourneyContentUiModel.NoSchedule
+    val content: KidJourneyContentUiModel = KidJourneyContentUiModel.NoSchedule,
+    val permissionCameraDeniedCount: Int = 0,
 ) {
 
     // 버튼 타입

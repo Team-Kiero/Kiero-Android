@@ -37,12 +37,14 @@ fun KieroChip(
     verticalPadding: Int = 4,
     isCompleted : Boolean = false,
     isEnabled: Boolean = false,
+    isPoint: Boolean = false
 ) {
     val shape = RoundedCornerShape(36.dp)
     val backgroundColor = KieroTheme.colors.gray900
 
     val targetColor = when {
         !isEnabled -> KieroTheme.colors.gray500
+        isPoint -> KieroTheme.colors.point
         isCompleted -> KieroTheme.colors.main
         else -> KieroTheme.colors.gray100
     }
@@ -146,6 +148,18 @@ private fun KieroChipPreview() {
                     isEnabled = true,
                     onClick = {}
                 )
+            )
+
+            KieroChip(
+                isCompleted = false,
+                isEnabled = true,
+                action = KieroCoinAction(
+                    coinCount = 150,
+                    isCompleted = true,
+                    isEnabled = true,
+                    onClick = {}
+                ),
+                isPoint = true
             )
         }
     }
