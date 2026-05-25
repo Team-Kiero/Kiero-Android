@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -37,10 +38,11 @@ fun KieroChip(
     verticalPadding: Int = 4,
     isCompleted : Boolean = false,
     isEnabled: Boolean = false,
-    isPoint: Boolean = false
+    isPoint: Boolean = false,
+    backgroundColor: Color = KieroTheme.colors.gray900,
+    hasBorder: Boolean = true
 ) {
     val shape = RoundedCornerShape(36.dp)
-    val backgroundColor = KieroTheme.colors.gray900
 
     val targetColor = when {
         !isEnabled -> KieroTheme.colors.gray500
@@ -105,11 +107,13 @@ fun KieroChip(
                     style = Fill
                 )
 
-                drawRoundRect(
-                    color = targetColor,
-                    style = Stroke(width = 1.dp.toPx()),
-                    cornerRadius = CornerRadius(cornerRadius, cornerRadius)
-                )
+                if (hasBorder) {
+                    drawRoundRect(
+                        color = targetColor,
+                        style = Stroke(width = 1.dp.toPx()),
+                        cornerRadius = CornerRadius(cornerRadius, cornerRadius)
+                    )
+                }
             }
             .padding(
                 horizontal = horizontalPadding.dp,
