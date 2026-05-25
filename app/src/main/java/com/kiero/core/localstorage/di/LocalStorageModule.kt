@@ -10,6 +10,8 @@ import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.localstorage.info.UserInfoManagerImpl
 import com.kiero.core.localstorage.onboarding.OnboardingManager
 import com.kiero.core.localstorage.onboarding.OnboardingManagerImpl
+import com.kiero.core.localstorage.permission.PermissionInfoManager
+import com.kiero.core.localstorage.permission.PermissionInfoManagerImpl
 import com.kiero.core.security.CryptoManager
 import dagger.Module
 import dagger.Provides
@@ -52,5 +54,13 @@ object LocalStorageModule {
         dataStore: DataStore<Preferences>,
     ): UserInfoManager {
         return UserInfoManagerImpl(dataStore)
+    }
+
+    @Provides
+    @Singleton
+    fun providePermissionInfoManager(
+        dataStore: DataStore<Preferences>,
+    ): PermissionInfoManager {
+        return PermissionInfoManagerImpl(dataStore)
     }
 }
