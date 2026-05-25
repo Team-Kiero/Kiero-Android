@@ -33,6 +33,7 @@ import com.kiero.core.model.UiState
 import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
 import com.kiero.presentation.auth.parent.component.KakaoLoginButton
+import com.kiero.presentation.auth.parent.component.TermsAgreementBottomSheet
 import com.kiero.presentation.auth.parent.viewmodel.AuthParentViewModel
 import com.kiero.presentation.auth.state.AuthSideEffect
 
@@ -89,6 +90,16 @@ fun AuthParentRoute(
 
         if (state.uiState is UiState.Loading) {
             KieroLoadingIndicator()
+        }
+
+        if (state.isShowTermsAgreement) {
+            TermsAgreementBottomSheet(
+                consentsItem = state.consents,
+                onDismiss = viewModel::showTermsAgreement,
+                onClickTerms = viewModel::toggleTermsAccepted,
+                navigateToTerms = viewModel::navigateToTerms,
+                onConfirm = viewModel::successTermsAgreement
+            )
         }
     }
 }
