@@ -17,13 +17,15 @@ fun NavController.navigateToMySpace(
 fun NavGraphBuilder.kidMySpaceNavGraph(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
-    navigateToWishArchive: () -> Unit
+    navigateToWishArchive: () -> Unit,
+    navigateToPolicy: () -> Unit,
 ) {
     composable<KidMySpace> {
         KidMySpaceRoute(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
-            navigateToWishArchive = navigateToWishArchive
+            navigateToWishArchive = navigateToWishArchive,
+            navigateToPolicy = navigateToPolicy
         )
     }
 }

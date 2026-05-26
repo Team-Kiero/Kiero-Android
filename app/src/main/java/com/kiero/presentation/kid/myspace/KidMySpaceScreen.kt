@@ -11,9 +11,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.kiero.core.designsystem.component.dialog.KieroDialog
+import com.kiero.core.designsystem.component.dialog.action.KieroCancelAction
+import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.kid.component.KidProfileChip
 import com.kiero.presentation.kid.myspace.component.KidMySpaceNotification
@@ -24,11 +31,14 @@ import com.kiero.presentation.kid.myspace.component.KidMySpaceWishArchive
 fun KidMySpaceRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
-    navigateToWishArchive: () -> Unit
+    navigateToWishArchive: () -> Unit,
+    navigateToPolicy: () -> Unit,
 ) {
     KidMySpaceScreen(
         paddingValues = paddingValues,
-        onClickWishArchive = navigateToWishArchive
+        onClickWishArchive = navigateToWishArchive,
+        navigateToPolicy = navigateToPolicy,
+        onLogout = { }
     )
 }
 
@@ -36,8 +46,12 @@ fun KidMySpaceRoute(
 private fun KidMySpaceScreen(
     paddingValues: PaddingValues,
     onClickWishArchive: () -> Unit,
+    navigateToPolicy: () -> Unit,
+    onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var showLogoutDialog by remember { mutableStateOf(false) }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -72,16 +86,16 @@ private fun KidMySpaceScreen(
             onCheckedChange = {}
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(17.dp))
 
         KidMySpaceSettingItem(
             text = "키어로 이용 약속",
-            onClick = {},
+            onClick = navigateToPolicy,
         )
 
         KidMySpaceSettingItem(
             text = "키어로 나가기",
-            onClick = {}
+            onClick = { showLogoutDialog = true }
         )
 
         Text(
@@ -89,6 +103,26 @@ private fun KidMySpaceScreen(
             style = KieroTheme.typography.regular.body4,
             color = KieroTheme.colors.gray500,
             modifier = Modifier.padding(top = 17.dp, start = 9.dp)
+        )
+    }
+
+    if (showLogoutDialog) {
+        KieroDialog(
+            onDismiss = { showLogoutDialog = false },
+            title = "키어로에서 나갈거야?",
+            subDescription = "다시 들어오려면 초대코드가 필요해!",
+            cancelAction = KieroCancelAction(
+                text = "취소",
+                onClick = { showLogoutDialog = false }
+            ),
+            confirmAction = KieroConfirmAction(
+                text = "나가기",
+                onClick = {
+                    showLogoutDialog = false
+                    onLogout()
+                }
+            ),
+            content = {}
         )
     }
 }
@@ -99,7 +133,9 @@ private fun KidMySpaceScreenPreview() {
     KieroTheme {
         KidMySpaceScreen(
             paddingValues = PaddingValues(),
-            onClickWishArchive = {}
+            onClickWishArchive = {},
+            navigateToPolicy = {},
+            onLogout = {}
         )
     }
 }
