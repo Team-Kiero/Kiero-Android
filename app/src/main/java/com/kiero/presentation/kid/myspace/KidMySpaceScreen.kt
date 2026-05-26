@@ -1,5 +1,7 @@
 package com.kiero.presentation.kid.myspace
 
+import android.content.Intent
+import android.provider.Settings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,8 +18,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.core.designsystem.component.dialog.KieroDialog
 import com.kiero.core.designsystem.component.dialog.action.KieroCancelAction
 import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
@@ -26,6 +33,7 @@ import com.kiero.presentation.kid.component.KidProfileChip
 import com.kiero.presentation.kid.myspace.component.KidMySpaceNotification
 import com.kiero.presentation.kid.myspace.component.KidMySpaceSettingItem
 import com.kiero.presentation.kid.myspace.component.KidMySpaceWishArchive
+import com.kiero.presentation.kid.myspace.state.KidMySpaceState
 
 @Composable
 fun KidMySpaceRoute(
@@ -33,23 +41,35 @@ fun KidMySpaceRoute(
     navigateUp: () -> Unit,
     navigateToWishArchive: () -> Unit,
     navigateToPolicy: () -> Unit,
+    viewModel: KidMySpaceViewModel = hiltViewModel()
 ) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        viewModel.syncNotificationState()
+    }
+
     KidMySpaceScreen(
         paddingValues = paddingValues,
+        state = state,
         onClickWishArchive = navigateToWishArchive,
         navigateToPolicy = navigateToPolicy,
-        onLogout = { }
+        onNotificationToggle = viewModel::onNotificationToggle,
+        onNotificationDialogDismiss = viewModel::onNotificationDialogDismiss,
     )
 }
 
 @Composable
 private fun KidMySpaceScreen(
     paddingValues: PaddingValues,
+    state: KidMySpaceState,
     onClickWishArchive: () -> Unit,
     navigateToPolicy: () -> Unit,
-    onLogout: () -> Unit,
+    onNotificationToggle: (Boolean) -> Unit,
+    onNotificationDialogDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     var showLogoutDialog by remember { mutableStateOf(false) }
 
     Column(
@@ -82,8 +102,8 @@ private fun KidMySpaceScreen(
         Spacer(modifier = Modifier.height(17.dp))
 
         KidMySpaceNotification(
-            isChecked = false,
-            onCheckedChange = {}
+            isChecked = state.isNotificationChecked,
+            onCheckedChange = onNotificationToggle
         )
 
         Spacer(modifier = Modifier.height(17.dp))
@@ -106,6 +126,30 @@ private fun KidMySpaceScreen(
         )
     }
 
+    if (state.showNotificationDialog) {
+        KieroDialog(
+            onDismiss = onNotificationDialogDismiss,
+            title = "설정에서 알림을 켜줘!",
+            subDescription = "알림을 받으려면 설정에서 키어로 알림을 허용해줘!",
+            cancelAction = KieroCancelAction(
+                text = "취소",
+                onClick = onNotificationDialogDismiss
+            ),
+            confirmAction = KieroConfirmAction(
+                text = "설정으로 이동",
+                onClick = {
+                    onNotificationDialogDismiss()
+                    context.startActivity(
+                        Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                            putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                        }
+                    )
+                }
+            ),
+            content = {}
+        )
+    }
+
     if (showLogoutDialog) {
         KieroDialog(
             onDismiss = { showLogoutDialog = false },
@@ -119,7 +163,6 @@ private fun KidMySpaceScreen(
                 text = "나가기",
                 onClick = {
                     showLogoutDialog = false
-                    onLogout()
                 }
             ),
             content = {}
@@ -133,9 +176,11 @@ private fun KidMySpaceScreenPreview() {
     KieroTheme {
         KidMySpaceScreen(
             paddingValues = PaddingValues(),
+            state = KidMySpaceState(),
             onClickWishArchive = {},
             navigateToPolicy = {},
-            onLogout = {}
+            onNotificationToggle = {},
+            onNotificationDialogDismiss = {}
         )
     }
 }
