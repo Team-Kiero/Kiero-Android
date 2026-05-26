@@ -23,17 +23,19 @@ import com.kiero.presentation.kid.myspace.component.KidMySpaceWishArchive
 @Composable
 fun KidMySpaceRoute(
     paddingValues: PaddingValues,
-    navigateUp: () -> Unit
+    navigateUp: () -> Unit,
+    navigateToWishArchive: () -> Unit
 ) {
     KidMySpaceScreen(
-        paddingValues = paddingValues
+        paddingValues = paddingValues,
+        onClickWishArchive = navigateToWishArchive
     )
 }
-
 
 @Composable
 private fun KidMySpaceScreen(
     paddingValues: PaddingValues,
+    onClickWishArchive: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -53,7 +55,7 @@ private fun KidMySpaceScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         KidMySpaceWishArchive(
-            onClick = {}
+            onClick = onClickWishArchive
         )
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -96,7 +98,8 @@ private fun KidMySpaceScreen(
 private fun KidMySpaceScreenPreview() {
     KieroTheme {
         KidMySpaceScreen(
-            paddingValues = PaddingValues()
+            paddingValues = PaddingValues(),
+            onClickWishArchive = {}
         )
     }
 }
