@@ -52,7 +52,7 @@ fun rememberPermissionRequester(
         }
 
         val permission = type.manifestPermission ?: run {
-            onGranted()
+            onPermanentlyDenied()
             return@request
         }
 
