@@ -48,7 +48,7 @@ fun KidMySpaceWishArchiveItem(
                 shape = RoundedCornerShape(10.dp)
             )
             .then(
-                if (isToday) Modifier.border(
+                if (isToday || !hasWish) Modifier.border(
                     width = 1.dp,
                     color = KieroTheme.colors.gray300,
                     shape = RoundedCornerShape(10.dp)
