@@ -1,7 +1,5 @@
 package com.kiero.presentation.kid.myspace
 
-import android.content.Intent
-import android.provider.Settings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -30,6 +28,10 @@ import com.kiero.core.designsystem.component.dialog.KieroDialog
 import com.kiero.core.designsystem.component.dialog.action.KieroCancelAction
 import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.core.permission.PermissionChecker
+import com.kiero.core.permission.model.PermissionType
+import com.kiero.core.permission.ui.rememberPermissionRequester
+import com.kiero.core.permission.util.navigateToSettings
 import com.kiero.presentation.kid.component.KidProfileChip
 import com.kiero.presentation.kid.myspace.component.KidMySpaceNotification
 import com.kiero.presentation.kid.myspace.component.KidMySpaceSettingItem
@@ -45,18 +47,46 @@ fun KidMySpaceRoute(
     viewModel: KidMySpaceViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        viewModel.syncNotificationState()
+        val isEnabled = PermissionChecker.isGranted(context, PermissionType.POST_NOTIFICATIONS)
+        viewModel.onNotificationToggle(isEnabled)
     }
+
+    val notificationPermissionRequester = rememberPermissionRequester(
+        type = PermissionType.POST_NOTIFICATIONS,
+        deniedCount = 0,
+        onGranted = {
+            viewModel.onNotificationToggle(true)
+        },
+        onDenied = {
+            viewModel.onNotificationToggle(false)
+        },
+        onPermanentlyDenied = {
+            // Android 12 이하이거나 영구 거부 → 설정 안내 다이얼로그 노출
+            viewModel.showNotificationDialog(true)
+        },
+        onCountIncrease = {}
+    )
 
     KidMySpaceScreen(
         paddingValues = paddingValues,
         state = state,
         onClickWishArchive = navigateToWishArchive,
         navigateToPolicy = navigateToPolicy,
-        onNotificationToggle = viewModel::onNotificationToggle,
+        onNotificationToggle = { isChecked ->
+            if (isChecked) {
+                notificationPermissionRequester()
+            } else {
+                viewModel.onNotificationToggle(false)
+            }
+        },
         onNotificationDialogDismiss = viewModel::onNotificationDialogDismiss,
+        onNavigateToNotificationSettings = {
+            viewModel.onNotificationDialogDismiss()
+            context.navigateToSettings(PermissionType.POST_NOTIFICATIONS)
+        }
     )
 }
 
@@ -68,9 +98,9 @@ private fun KidMySpaceScreen(
     navigateToPolicy: () -> Unit,
     onNotificationToggle: (Boolean) -> Unit,
     onNotificationDialogDismiss: () -> Unit,
+    onNavigateToNotificationSettings: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
     var showLogoutDialog by remember { mutableStateOf(false) }
 
     Column(
@@ -89,9 +119,7 @@ private fun KidMySpaceScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        KidMySpaceWishArchive(
-            onClick = onClickWishArchive
-        )
+        KidMySpaceWishArchive(onClick = onClickWishArchive)
 
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -127,6 +155,7 @@ private fun KidMySpaceScreen(
         )
     }
 
+    // 알림 설정 안내 팝업 (영구 거부 또는 Android 12 이하)
     if (state.showNotificationDialog) {
         KieroDialog(
             onDismiss = onNotificationDialogDismiss,
@@ -138,14 +167,7 @@ private fun KidMySpaceScreen(
             ),
             confirmAction = KieroConfirmAction(
                 text = "설정으로 이동",
-                onClick = {
-                    onNotificationDialogDismiss()
-                    context.startActivity(
-                        Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
-                            putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
-                        }
-                    )
-                }
+                onClick = onNavigateToNotificationSettings
             ),
             content = {}
         )
@@ -162,9 +184,7 @@ private fun KidMySpaceScreen(
             ),
             confirmAction = KieroConfirmAction(
                 text = "나가기",
-                onClick = {
-                    showLogoutDialog = false
-                }
+                onClick = { showLogoutDialog = false }
             ),
             content = {}
         )
@@ -181,7 +201,8 @@ private fun KidMySpaceScreenPreview() {
             onClickWishArchive = {},
             navigateToPolicy = {},
             onNotificationToggle = {},
-            onNotificationDialogDismiss = {}
+            onNotificationDialogDismiss = {},
+            onNavigateToNotificationSettings = {}
         )
     }
 }
