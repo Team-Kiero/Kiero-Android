@@ -25,6 +25,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kiero.BuildConfig
 import com.kiero.core.designsystem.component.dialog.KieroDialog
 import com.kiero.core.designsystem.component.dialog.action.KieroCancelAction
 import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
@@ -119,7 +120,7 @@ private fun KidMySpaceScreen(
         )
 
         Text(
-            text = "앱 버전 v1.0.0",
+            text = "앱 버전 v${BuildConfig.VERSION_NAME}",
             style = KieroTheme.typography.regular.body4,
             color = KieroTheme.colors.gray500,
             modifier = Modifier.padding(top = 17.dp, start = 9.dp)
