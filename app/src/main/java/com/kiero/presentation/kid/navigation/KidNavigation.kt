@@ -20,6 +20,8 @@ import com.kiero.presentation.kid.journey.navigation.kidJourneyNavGraph
 import com.kiero.presentation.kid.journey.navigation.navigateToJourney
 import com.kiero.presentation.kid.mission.navigation.kidMissionNavGraph
 import com.kiero.presentation.kid.myspace.navigation.kidMySpaceNavGraph
+import com.kiero.presentation.kid.myspace.policy.navigation.kidMySpacePolicyNavGraph
+import com.kiero.presentation.kid.myspace.policy.navigation.navigateToPolicy
 import com.kiero.presentation.kid.myspace.wisharchive.navigation.kidMySpaceWishArchiveNavGraph
 import com.kiero.presentation.kid.myspace.wisharchive.navigation.navigateToWishArchive
 import com.kiero.presentation.kid.onboarding.navigation.kidOnboardingNavGraph
@@ -126,7 +128,8 @@ fun NavGraphBuilder.kidNavGraph(
         kidMySpaceNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
-            navigateToWishArchive = navController::navigateToWishArchive
+            navigateToWishArchive = navController::navigateToWishArchive,
+            navigateToPolicy = navController::navigateToPolicy
         )
 
         kidMySpaceWishArchiveNavGraph(
@@ -140,6 +143,12 @@ fun NavGraphBuilder.kidNavGraph(
                     }
                 )
             }
+        )
+
+        kidMySpacePolicyNavGraph(
+            paddingValues = paddingValues,
+            navigateUp = navigateUp,
+            navController = navController
         )
     }
 }
