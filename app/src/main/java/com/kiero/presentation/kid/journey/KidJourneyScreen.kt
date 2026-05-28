@@ -53,9 +53,9 @@ import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
 import com.kiero.core.model.trigger.SnackbarState
+import com.kiero.core.permission.PermissionChecker
 import com.kiero.core.permission.model.PermissionType
 import com.kiero.core.permission.ui.rememberPermissionRequester
-import com.kiero.core.permission.util.navigateToSettings
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
 import com.kiero.core.trigger.LocalRefreshState
 import com.kiero.presentation.kid.component.KidSpeechField
@@ -113,7 +113,6 @@ fun KidJourneyRoute(
         is UiState.Success -> {
             val onNavigateToCamera = {
                 val content = state.data.content
-
                 if (content is KidJourneyContentUiModel.ScheduledContent) {
                     navigateToCamera(content.scheduleDetailId!!, content.stoneType!!)
                 }
@@ -134,15 +133,27 @@ fun KidJourneyRoute(
                 onCountIncrease = viewModel::increaseDeniedCount,
             )
 
+            // 최초 데이터 로드 완료 시 알림 권한 체크
+            LaunchedEffect(Unit) {
+                val isGranted = PermissionChecker.isGranted(context, PermissionType.POST_NOTIFICATIONS)
+                viewModel.checkNotificationPermission(isAlreadyGranted = isGranted)
+            }
+
+            val requestNotification = rememberPermissionRequester(
+                type = PermissionType.POST_NOTIFICATIONS,
+                deniedCount = state.data.permissionNotificationDeniedCount,
+                onGranted = { viewModel.onNotificationPermissionDialogDismiss() },
+                onDenied = { viewModel.onNotificationPermissionDialogDismiss() },
+                onPermanentlyDenied = { viewModel.onNotificationPermissionDialogDismiss() },
+                onCountIncrease = viewModel::increaseDeniedCount,
+            )
+
             KidJourneyScreen(
                 paddingValues = paddingValues,
                 state = state.data,
                 onButtonClick = {
                     when (state.data.buttonType) {
-                        KidJourneyButtonType.AUTH -> {
-                            requestCamera()
-                        }
-
+                        KidJourneyButtonType.AUTH -> requestCamera()
                         KidJourneyButtonType.FIRE -> {
                             navigateToFire(
                                 state.data.header!!.currentDate,
@@ -154,19 +165,18 @@ fun KidJourneyRoute(
                     }
                 },
                 onNextClick = viewModel::onNextClick,
+                onFinishClick = viewModel::onNextClick,
                 onMapClick = { navigateToMap(state.data.header!!.currentDate) },
                 navigateUp = navigateUp,
+                onNotificationPermissionConfirm = { requestNotification() },
+                onNotificationPermissionDismiss = viewModel::onNotificationPermissionDialogDismiss,
             )
         }
 
         UiState.Empty -> {}
         is UiState.Failure -> {}
-
-        UiState.Loading -> {
-            KieroLoadingIndicator()
-        }
+        UiState.Loading -> KieroLoadingIndicator()
     }
-
 }
 
 @Composable
@@ -175,11 +185,15 @@ private fun KidJourneyScreen(
     state: KidJourneyState,
     onButtonClick: () -> Unit,
     onNextClick: () -> Unit,
+    onFinishClick: () -> Unit,
     onMapClick: () -> Unit,
     navigateUp: () -> Unit,
+    onNotificationPermissionConfirm: () -> Unit,
+    onNotificationPermissionDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var showDialog by remember { mutableStateOf(false) }
+    var showNextDialog by remember { mutableStateOf(false) }
+    var showFinishDialog by remember { mutableStateOf(false) }
 
     BoxWithConstraints(
         modifier = modifier
@@ -189,7 +203,6 @@ private fun KidJourneyScreen(
     ) {
         val imageWidth = maxWidth + 8.dp
 
-        // 배경 이미지
         Image(
             painter = painterResource(id = R.drawable.img_kid_journey_mask_background),
             contentDescription = null,
@@ -232,7 +245,6 @@ private fun KidJourneyScreen(
                         KidJourneyScheduleItem(item = schedule)
                     }
                 }
-
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -272,17 +284,20 @@ private fun KidJourneyScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 9.dp),
-                isVisibleButton = state.shouldShowNextButton,
-                onClick = { showDialog = true }
+                isVisibleButton = state.shouldShowNextButton || state.shouldShowFinishButton,
+                onClick = {
+                    when {
+                        state.shouldShowFinishButton -> showFinishDialog = true
+                        state.shouldShowNextButton -> showNextDialog = true
+                    }
+                },
+                buttonText = if (state.shouldShowFinishButton) "여정 끝내기" else "다음 여정으로"
             ) {
-                KidJourneyGoblinMessage(
-                    content = state.content
-                )
+                KidJourneyGoblinMessage(content = state.content)
             }
 
             Spacer(modifier = Modifier.height(11.dp))
 
-            // 액션 버튼 (특정 상태에서만 표시)
             KidJourneyActionButton(
                 buttonType = state.buttonType,
                 buttonTextRes = state.buttonTextRes,
@@ -290,7 +305,6 @@ private fun KidJourneyScreen(
             )
         }
 
-        // 꾸비 gif
         KieroAnimationView(
             type = KieroAnimationType.Image(R.drawable.webp_kid_intro),
             modifier = Modifier
@@ -299,21 +313,52 @@ private fun KidJourneyScreen(
         )
     }
 
-    if (showDialog) {
+    // 다음 여정 다이얼로그
+    if (showNextDialog) {
         KieroDialog(
-            onDismiss = { showDialog = false },
+            onDismiss = { showNextDialog = false },
             title = "다음 여정으로 갈거야?",
             subDescription = "한 번 다음 여정으로 넘어가면 \n다시 지금 여정으로 돌아올 수 없어!",
-            cancelAction = KieroCancelAction(
-                text = "취소",
-                onClick = { showDialog = false }
-            ),
+            cancelAction = KieroCancelAction(text = "취소", onClick = { showNextDialog = false }),
             confirmAction = KieroConfirmAction(
                 text = "확인",
                 onClick = {
-                    showDialog = false
+                    showNextDialog = false
                     onNextClick()
                 }
+            ),
+            content = {}
+        )
+    }
+
+    // 여정 끝내기 다이얼로그
+    if (showFinishDialog) {
+        KieroDialog(
+            onDismiss = { showFinishDialog = false },
+            title = "오늘의 여정을 끝낼거야?",
+            subDescription = "한 번 오늘 여정을 끝내면 \n다시 오늘의 여정으로 돌아올 수 없어!",
+            cancelAction = KieroCancelAction(text = "취소", onClick = { showFinishDialog = false }),
+            confirmAction = KieroConfirmAction(
+                text = "끝내기",
+                onClick = {
+                    showFinishDialog = false
+                    onFinishClick()
+                }
+            ),
+            content = {}
+        )
+    }
+
+    // 최초 알림 권한 요청 팝업
+    if (state.showNotificationPermissionDialog) {
+        KieroDialog(
+            onDismiss = onNotificationPermissionDismiss,
+            title = "오늘의 여정을 놓치지 않게 해줄게!",
+            subDescription = "여정의 중요한 알림을 받아볼 수 있어.",
+            cancelAction = null,
+            confirmAction = KieroConfirmAction(
+                text = "알림 받기",
+                onClick = onNotificationPermissionConfirm
             ),
             content = {}
         )
@@ -330,7 +375,10 @@ private fun KidJourneyScreenPreview() {
             state = KidJourneyState.FAKE,
             onButtonClick = {},
             onNextClick = {},
-            onMapClick = {}
+            onFinishClick = {},
+            onMapClick = {},
+            onNotificationPermissionConfirm = {},
+            onNotificationPermissionDismiss = {}
         )
     }
 }
