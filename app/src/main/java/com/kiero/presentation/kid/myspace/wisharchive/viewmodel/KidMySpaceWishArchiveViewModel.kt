@@ -11,6 +11,6 @@ import javax.inject.Inject
 @HiltViewModel
 class KidMySpaceWishArchiveViewModel @Inject constructor() : ViewModel() {
 
-    private val _uiState = MutableStateFlow(KidMySpaceWishArchiveState.Companion.FAKE)
+    private val _uiState = MutableStateFlow(KidMySpaceWishArchiveState.FAKE)
     val uiState: StateFlow<KidMySpaceWishArchiveState> = _uiState.asStateFlow()
 }
