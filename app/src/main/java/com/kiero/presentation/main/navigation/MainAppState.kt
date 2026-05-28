@@ -283,10 +283,10 @@ class MainAppState(
             "SCHEDULE_SKIPPED",
             "PARENT_SCHEDULE_REMINDER" -> navigateParentTab(ParentMainTab.JOURNEY)
 
-            "SCHEDULE_VERIFIED",
+            "COUPON_PURCHASED",
             "FIRE_LIT",
             "MISSION_COMPLETE",
-            "COUPON_PURCHASED" -> navigateToAlarm() // TODO: 알람 쪽 항목 id 확인 후 targetId 처리예정
+            "SCHEDULE_VERIFIED" -> navigateToAlarm() // TODO: 알람 쪽 항목 id 확인 후 targetId 처리예정
 
             "CHILD_DAILY_START",
             "CHILD_NEXT_JOURNEY",
