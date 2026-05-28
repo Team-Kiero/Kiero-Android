@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,13 +30,16 @@ import com.kiero.core.designsystem.theme.KieroTheme
 fun MissionListItem(
     missionTitle: String,
     reward: Int,
+    isCompleted: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val contentAlpha = if (isCompleted) 0.5f else 1f
+
     Row(
         modifier = modifier
             .fillMaxWidth()
             .background(
-                color = KieroTheme.colors.gray900,
+                color = KieroTheme.colors.gray900.copy(alpha = contentAlpha),
                 shape = RoundedCornerShape(10.dp)
             )
             .padding(
@@ -44,26 +48,54 @@ fun MissionListItem(
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = missionTitle,
-            style = KieroTheme.typography.semiBold.title3,
-            color = KieroTheme.colors.white,
-            modifier = Modifier.weight(1f),
-            maxLines = 1,
-        )
+
+        if (isCompleted) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = "금화 ${reward} 개",
+                    style = KieroTheme.typography.regular.body4,
+                    color = KieroTheme.colors.gray400.copy(alpha = contentAlpha)
+                )
+
+                Text(
+                    text = missionTitle,
+                    style = KieroTheme.typography.regular.body2,
+                    color = KieroTheme.colors.white.copy(alpha = contentAlpha),
+                    maxLines = 1,
+                )
+            }
+        } else {
+            Text(
+                text = missionTitle,
+                style = KieroTheme.typography.semiBold.title3,
+                color = KieroTheme.colors.white.copy(alpha = contentAlpha),
+                modifier = Modifier.weight(1f),
+                maxLines = 1,
+            )
+
+        }
 
         Spacer(modifier = Modifier.width(16.dp))
 
-        /*
-            TODO : pull 받고 수정
-         */
-        KieroChip(
-            action = KieroCoinAction(
-                coinCount = reward,
-                isEnabled = true,
-                onClick = {}
+        if (isCompleted) {
+            Text(
+                text = "성공!",
+                style = KieroTheme.typography.semiBold.title4,
+                color = KieroTheme.colors.white.copy(alpha = 0.5f),
             )
-        )
+        } else {
+            KieroChip(
+                action = KieroCoinAction(
+                    coinCount = reward,
+                    isEnabled = true,
+                    onClick = {}
+                )
+            )
+
+        }
     }
 }
 
@@ -124,6 +156,7 @@ private fun MissionListItemPreview() {
             MissionListItem(
                 missionTitle = "테스트 미션 테스트 미션 테스트 미션 테스트 미션 테스트미션 미션미션",
                 reward = 150,
+                isCompleted = false,
             )
 
             MissionInfo(

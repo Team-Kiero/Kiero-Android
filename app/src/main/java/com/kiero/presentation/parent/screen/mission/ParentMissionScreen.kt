@@ -198,7 +198,8 @@ private fun ParentMissionScreen(
                             ) {
                                 MissionListItem(
                                     missionTitle = mission.name,
-                                    reward = mission.reward
+                                    reward = mission.reward,
+                                    isCompleted = mission.isCompleted
                                 )
                             }
                         }
