@@ -2,6 +2,8 @@ package com.kiero.presentation.main.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.data.fcm.manager.FcmTokenManager
+import com.kiero.data.fcm.repository.FcmRepository
 import com.kiero.data.parent.alarm.repository.AlarmRepository
 import com.kiero.data.sse.manager.SseManager
 import com.kiero.presentation.main.model.toUiModel
@@ -19,6 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val alarmRepository: AlarmRepository,
+    private val fcmRepository: FcmRepository,
     private val sseManager: SseManager
 ) : ViewModel() {
     private val _state = MutableStateFlow(MainState())
@@ -27,6 +30,24 @@ class MainViewModel @Inject constructor(
     init {
         fetchUnreadAlarmStatus()
         observeFeedEvent()
+        syncFcmToken()
+    }
+
+    private fun syncFcmToken() {
+        viewModelScope.launch {
+            val token = FcmTokenManager.getToken()
+            if (token == null) {
+                Timber.e("FCM 토큰을 가져오지 못했습니다.")
+                return@launch
+            }
+            fcmRepository.updateFcmToken(token)
+                .onSuccess {
+                    Timber.d("FCM 토큰 서버 갱신 성공: $token")
+                }
+                .onFailure {
+                    Timber.e(it, "FCM 토큰 서버 갱신 실패")
+                }
+        }
     }
 
     fun fetchUnreadAlarmStatus() {
