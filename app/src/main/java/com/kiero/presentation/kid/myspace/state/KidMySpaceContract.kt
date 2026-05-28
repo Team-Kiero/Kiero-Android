@@ -6,5 +6,6 @@ import androidx.compose.runtime.Immutable
 data class KidMySpaceState(
     val kidName: String = "",
     val isNotificationChecked: Boolean = false,
-    val showNotificationDialog: Boolean = false
+    val showNotificationDialog: Boolean = false,
+    val permissionNotificationDeniedCount: Int = 0,
 )

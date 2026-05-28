@@ -67,7 +67,7 @@ fun KidMySpaceRoute(
             // Android 12 이하이거나 영구 거부 → 설정 안내 다이얼로그 노출
             viewModel.showNotificationDialog(true)
         },
-        onCountIncrease = {}
+        onCountIncrease = viewModel::increaseDeniedCount
     )
 
     KidMySpaceScreen(

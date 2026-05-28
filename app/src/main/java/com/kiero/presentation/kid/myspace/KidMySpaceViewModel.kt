@@ -2,6 +2,8 @@ package com.kiero.presentation.kid.myspace
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.localstorage.permission.PermissionInfoManager
+import com.kiero.core.permission.model.PermissionType
 import com.kiero.data.kid.coin.repository.CoinRepository
 import com.kiero.presentation.kid.myspace.state.KidMySpaceState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +17,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class KidMySpaceViewModel @Inject constructor(
-    private val coinRepository: CoinRepository
+    private val coinRepository: CoinRepository,
+    private val permissionInfoManager: PermissionInfoManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(KidMySpaceState())
@@ -23,6 +26,7 @@ class KidMySpaceViewModel @Inject constructor(
 
     init {
         fetchKidName()
+        observeNotificationDeniedCount()
     }
 
     private fun fetchKidName() {
@@ -34,6 +38,20 @@ class KidMySpaceViewModel @Inject constructor(
                 .onFailure {
                     Timber.e("fetchKidName fail: $it")
                 }
+        }
+    }
+
+    private fun observeNotificationDeniedCount() {
+        viewModelScope.launch {
+            permissionInfoManager.deniedCount(PermissionType.POST_NOTIFICATIONS).collect { count ->
+                _uiState.update { it.copy(permissionNotificationDeniedCount = count) }
+            }
+        }
+    }
+
+    fun increaseDeniedCount(type: PermissionType) {
+        viewModelScope.launch {
+            permissionInfoManager.increaseDeniedCount(type)
         }
     }
 
