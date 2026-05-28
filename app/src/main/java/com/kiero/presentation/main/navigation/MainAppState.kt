@@ -26,6 +26,7 @@ import com.kiero.presentation.kid.navigation.KidMission
 import com.kiero.presentation.kid.navigation.KidWish
 import com.kiero.presentation.kid.onboarding.navigation.navigateToKidOnboarding
 import com.kiero.presentation.kid.wish.navigation.navigateToWish
+import com.kiero.core.model.fcm.PushData
 import com.kiero.presentation.parent.navigation.Mypage
 import com.kiero.presentation.parent.navigation.ParentGraph
 import com.kiero.presentation.parent.navigation.ParentJourney
@@ -47,6 +48,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import timber.log.Timber
 
 
 @Stable
@@ -254,9 +256,9 @@ class MainAppState(
         date: String,
         navOptions: NavOptions? = null
     ) = navController.navigateToMap(
-            date = date,
-            navOptions = navOptions
-        )
+        date = date,
+        navOptions = navOptions
+    )
 
     fun navigateToParentMission(navOptions: NavOptions? = null) =
         navController.navigateToParentMission(navOptions)
@@ -274,19 +276,42 @@ class MainAppState(
     fun popBackStack() {
         navController.popBackStack()
     }
-}
 
-@Composable
-fun rememberMainAppState(
-    networkMonitor: NetworkMonitor,
-    navController: NavHostController = rememberNavController(),
-    coroutineScope: CoroutineScope = rememberCoroutineScope(),
-): MainAppState {
-    return remember(networkMonitor, navController, coroutineScope) {
-        MainAppState(
-            networkMonitor = networkMonitor,
-            navController = navController,
-            coroutineScope = coroutineScope
-        )
+    fun navigateFromPushData(pushData: PushData) {
+        when (pushData.type) {
+            "PARENT_DAILY_START",
+            "SCHEDULE_SKIPPED",
+            "PARENT_SCHEDULE_REMINDER" -> navigateParentTab(ParentMainTab.JOURNEY)
+
+            "SCHEDULE_VERIFIED",
+            "FIRE_LIT",
+            "MISSION_COMPLETE",
+            "COUPON_PURCHASED" -> navigateToAlarm() // TODO: 알람 쪽 항목 id 확인 후 targetId 처리예정
+
+            "CHILD_DAILY_START",
+            "CHILD_NEXT_JOURNEY",
+            "SCHEDULE_CREATED",
+            "SCHEDULE_DELETED",
+            "SCHEDULE_MODIFIED" -> navigateKidTab(KidMainTab.JOURNEY)
+
+            "CHILD_MISSION_INCOMPLETE" -> navigateKidTab(KidMainTab.MISSION)
+
+            else -> Timber.w("알 수 없는 FCM 타입입니다: ${pushData.type}")
+        }
     }
 }
+
+    @Composable
+    fun rememberMainAppState(
+        networkMonitor: NetworkMonitor,
+        navController: NavHostController = rememberNavController(),
+        coroutineScope: CoroutineScope = rememberCoroutineScope(),
+    ): MainAppState {
+        return remember(networkMonitor, navController, coroutineScope) {
+            MainAppState(
+                networkMonitor = networkMonitor,
+                navController = navController,
+                coroutineScope = coroutineScope
+            )
+        }
+    }
