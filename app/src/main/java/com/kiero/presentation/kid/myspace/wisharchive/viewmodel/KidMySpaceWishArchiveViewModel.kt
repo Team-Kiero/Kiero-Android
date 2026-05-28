@@ -1,4 +1,4 @@
-package com.kiero.presentation.kid.myspace.wisharchive
+package com.kiero.presentation.kid.myspace.wisharchive.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.kiero.presentation.kid.myspace.wisharchive.state.KidMySpaceWishArchiveState
@@ -11,6 +11,6 @@ import javax.inject.Inject
 @HiltViewModel
 class KidMySpaceWishArchiveViewModel @Inject constructor() : ViewModel() {
 
-    private val _uiState = MutableStateFlow(KidMySpaceWishArchiveState.FAKE)
+    private val _uiState = MutableStateFlow(KidMySpaceWishArchiveState.Companion.FAKE)
     val uiState: StateFlow<KidMySpaceWishArchiveState> = _uiState.asStateFlow()
 }

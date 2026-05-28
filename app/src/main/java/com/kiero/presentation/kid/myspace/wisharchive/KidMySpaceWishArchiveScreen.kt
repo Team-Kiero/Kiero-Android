@@ -29,6 +29,7 @@ import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.kid.component.KidHeader
 import com.kiero.presentation.kid.myspace.wisharchive.component.KidMySpaceWishArchiveItem
 import com.kiero.presentation.kid.myspace.wisharchive.state.KidMySpaceWishArchiveState
+import com.kiero.presentation.kid.myspace.wisharchive.viewmodel.KidMySpaceWishArchiveViewModel
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable

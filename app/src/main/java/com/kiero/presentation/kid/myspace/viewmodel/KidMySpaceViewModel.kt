@@ -1,4 +1,4 @@
-package com.kiero.presentation.kid.myspace
+package com.kiero.presentation.kid.myspace.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -36,7 +36,7 @@ class KidMySpaceViewModel @Inject constructor(
                     _uiState.update { it.copy(kidName = coin.firstName) }
                 }
                 .onFailure {
-                    Timber.e("fetchKidName fail: $it")
+                    Timber.Forest.e("fetchKidName fail: $it")
                 }
         }
     }

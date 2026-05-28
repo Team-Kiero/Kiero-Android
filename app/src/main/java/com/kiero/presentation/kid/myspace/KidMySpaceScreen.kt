@@ -37,6 +37,7 @@ import com.kiero.presentation.kid.myspace.component.KidMySpaceNotification
 import com.kiero.presentation.kid.myspace.component.KidMySpaceSettingItem
 import com.kiero.presentation.kid.myspace.component.KidMySpaceWishArchive
 import com.kiero.presentation.kid.myspace.state.KidMySpaceState
+import com.kiero.presentation.kid.myspace.viewmodel.KidMySpaceViewModel
 
 @Composable
 fun KidMySpaceRoute(
