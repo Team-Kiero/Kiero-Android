@@ -46,7 +46,7 @@ fun KakaoLoginButton(
         )
 
         Text(
-            text = "카카오톡 로그인",
+            text = "카카오 계정으로 로그인",
             style = KieroTheme.typography.semiBold.title3,
             color = KieroTheme.colors.black,
             textAlign = TextAlign.Center,
