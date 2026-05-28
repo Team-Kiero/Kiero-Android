@@ -4,6 +4,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
@@ -23,6 +24,18 @@
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.Kiero">
 
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/kiero_mint" />
+
+        <service
+            android:name="com.kiero.data.fcm.KieroFcmService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -33,7 +46,6 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <!-- MainActivity -->
         <activity
             android:name="com.kiero.presentation.main.activity.MainActivity"
             android:exported="true"
@@ -45,7 +57,6 @@
             </intent-filter>
         </activity>
 
-        <!-- KaKao_Login_Activity -->
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
             android:exported="true">
@@ -53,8 +64,6 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
-                <!-- manifestPlaceholders from build.gradle.kts(App) -->
                 <data
                     android:host="oauth"
                     android:scheme="kakao${NATIVE_APP_KEY}" />
@@ -62,5 +71,4 @@
         </activity>
 
     </application>
-
 </manifest>
