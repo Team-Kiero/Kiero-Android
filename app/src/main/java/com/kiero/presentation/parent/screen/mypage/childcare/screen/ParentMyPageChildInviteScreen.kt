@@ -20,7 +20,8 @@ fun ParentMyPageChildInviteScreen(
 ) {
     Column {
         ParentMyPageChildNameHolder(
-            childInfo = state.childInfo
+            childInfo = state.childInfo,
+            connectionStatus = state.connectionStatus
         )
 
         Spacer(modifier = Modifier.height(11.dp))

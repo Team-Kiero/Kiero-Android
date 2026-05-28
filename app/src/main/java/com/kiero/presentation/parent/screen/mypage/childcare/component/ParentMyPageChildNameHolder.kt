@@ -14,10 +14,12 @@ import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.component.text.KieroTextHolder
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.screen.mypage.childcare.model.ParentMyPageChildInfoModel
+import com.kiero.presentation.parent.screen.mypage.model.ChildConnectionStatus
 
 @Composable
 fun ParentMyPageChildNameHolder(
     childInfo: ParentMyPageChildInfoModel,
+    connectionStatus: ChildConnectionStatus,
     modifier: Modifier = Modifier,
 ) {
     Column (
@@ -44,7 +46,7 @@ fun ParentMyPageChildNameHolder(
         Spacer(modifier = Modifier.height(6.dp))
 
         ParentMyPageChildStatus(
-            isChildJoined = childInfo.isChildJoined,
+            connectionStatus = connectionStatus,
             modifier = Modifier
                 .align(Alignment.End)
         )
@@ -60,7 +62,8 @@ private fun ParentMyPageChildNameHolderPreview() {
                 childLastName = "키",
                 childFirstName = "어로",
                 isChildJoined = true
-            )
+            ),
+            connectionStatus = ChildConnectionStatus.CONNECTED
         )
     }
 }
