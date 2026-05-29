@@ -1,7 +1,7 @@
 package com.kiero.data.fcm.manager
 
 import com.google.firebase.messaging.FirebaseMessaging
-import com.kiero.core.common.util.suspendRunCatching // 유저님이 만드신 유틸
+import com.kiero.core.common.util.suspendRunCatching
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 
