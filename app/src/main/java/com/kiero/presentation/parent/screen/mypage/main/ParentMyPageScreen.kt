@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.BuildConfig
@@ -66,30 +67,21 @@ fun ParentMyPageRoute(
     val lifecycleOwner = LocalLifecycleOwner.current
     val globalTrigger = LocalGlobalUiEventTrigger.current
 
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                val hasOsPermission = PermissionChecker.isGranted(
-                    context = context,
-                    type = PermissionType.POST_NOTIFICATIONS
-                )
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        val hasOsPermission = PermissionChecker.isGranted(
+            context = context,
+            type = PermissionType.POST_NOTIFICATIONS
+        )
 
-                if (isWaitingForSettingsResult) {
-                    if (hasOsPermission) {
-                        viewModel.updateIsAlarmChecked(true)
-                    }
-                    isWaitingForSettingsResult = false
-                } else {
-                    if (!hasOsPermission && state.isAlarmChecked) {
-                        viewModel.updateIsAlarmChecked(false)
-                    }
-                }
+        if (isWaitingForSettingsResult) {
+            if (hasOsPermission) {
+                viewModel.updateIsAlarmChecked(true)
             }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
+            isWaitingForSettingsResult = false
+        } else {
+            if (!hasOsPermission && state.isAlarmChecked) {
+                viewModel.updateIsAlarmChecked(false)
+            }
         }
     }
     val requestPushPermission = rememberPermissionRequester(
