@@ -45,3 +45,10 @@ jobs:
       - name: Build with Gradle
         # 단순히 빌드만 확인하려면 assembleDebug, 테스트(ktlint 등)까지 돌리려면 check 사용
         run: ./gradlew assembleDebug --stacktrace --no-daemon
+
+      # Fcm google service
+      - name: Create google-services.json from secret
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          printf "%s" "$GOOGLE_SERVICES_JSON" > app/google-services.json
