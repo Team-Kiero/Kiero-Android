@@ -11,13 +11,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -37,10 +39,14 @@ import com.kiero.presentation.parent.screen.alarm.state.AlarmFeedState
 import com.kiero.presentation.parent.screen.alarm.viewmodel.ParentAlarmViewModel
 import com.kiero.presentation.signup.parent.state.ParentSignUpSideEffect
 import com.kiero.presentation.signup.parent.state.ParentSignUpState
+import kotlinx.coroutines.delay
+import timber.log.Timber
 
 
 @Composable
 fun ParentAlarmRoute(
+    targetId: Long?,
+    shouldExpand: Boolean,
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
     navigateToSelection: () -> Unit,
@@ -50,6 +56,7 @@ fun ParentAlarmRoute(
     val authState by viewModel.authState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     val refreshState = LocalRefreshState.current
+    var hasScrolledToTarget by remember { mutableStateOf(false) }
 
     val isAtTop by remember {
         derivedStateOf {
@@ -80,6 +87,45 @@ fun ParentAlarmRoute(
         }
     }
 
+    LaunchedEffect(state.alarms.size, targetId) {
+        if (targetId == null || state.alarms.isEmpty() || hasScrolledToTarget) return@LaunchedEffect
+
+        val sortedAlarms = state.alarms.sortedWith(
+            compareByDescending<ParentAlarmUiModel> { it.date }.thenByDescending { it.time }
+        )
+        val groupedAlarms = sortedAlarms.groupBy { it.date }
+
+        var targetIndex = -1
+        var exactMatchedId = ""
+        var currentIndex = 0
+
+        for ((_, alarms) in groupedAlarms) {
+            currentIndex++
+
+            val itemIndex = alarms.indexOfFirst { it.id == targetId.toString() }
+
+            if (itemIndex != -1) {
+                targetIndex = currentIndex + itemIndex
+                exactMatchedId = alarms[itemIndex].id
+                break
+            }
+            currentIndex += alarms.size
+        }
+
+        if (targetIndex != -1) {
+            if (shouldExpand) {
+                viewModel.toggleExpand(exactMatchedId)
+            }
+            delay(300)
+
+            try {
+                listState.animateScrollToItem(index = targetIndex)
+                hasScrolledToTarget = true
+            } catch (e: Exception) {
+                Timber.e(e, "FCM 타겟 자동 스크롤 실패")
+            }
+        }
+    }
     viewModel.sideEffect.collectSideEffect {
         when (it) {
             is ParentSignUpSideEffect.NavigateToSelection -> navigateToSelection()
@@ -169,7 +215,10 @@ private fun ParentAlarmScreen(
                             ParentAlarmDateHeader(date = date)
                         }
 
-                        items(items = alarmsForDate, key = { it.id }) { alarm ->
+                        itemsIndexed(
+                            items = alarmsForDate,
+                            key = { index, alarm -> "${alarm.id}_${index}" }
+                        ) { index, alarm ->
                             ParentAlarmCard(
                                 time = alarm.time,
                                 message = alarm.message,

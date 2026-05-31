@@ -36,7 +36,7 @@ fun AlarmItemModel.toUiModel(childName: String): ParentAlarmUiModel {
         is AlarmItemModel.Complete -> AlarmUiConstant.TEXT_COMPLETE_KEY
     }
 
-    val uniqueId = "${occurredAt}_${this::class.simpleName}_${contentKey.hashCode()}"
+    val uniqueId = this.id.toString()
     val subject = childName.withJosa("이가")
 
     val dateStr = occurredAt.formattedAlarmDate()
