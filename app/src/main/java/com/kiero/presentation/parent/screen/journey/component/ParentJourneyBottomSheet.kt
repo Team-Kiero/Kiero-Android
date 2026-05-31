@@ -1,7 +1,5 @@
 package com.kiero.presentation.parent.screen.journey.component
 
-import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,8 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -26,15 +22,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.kiero.R
 import com.kiero.core.common.extension.disableNestedScroll
-import com.kiero.core.common.extension.disableUpScroll
-import com.kiero.core.common.extension.disableUpSheetScroll
+import com.kiero.core.common.extension.disableUpWardEvent
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.component.bottomsheet.KieroBottomSheet
 import com.kiero.core.designsystem.component.chip.KieroChip
@@ -44,7 +38,6 @@ import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.screen.journey.model.JourneyMissionUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,7 +46,6 @@ fun ParentJourneyBottomSheet(
     incompleteMissions: ImmutableList<JourneyMissionUiModel>,
     onDismiss: () -> Unit,
     sheetHeight: Dp,
-    modifier: Modifier = Modifier,
     initialTab: Int = 0, // 0 완료, 1 미완료
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(initialTab) }
@@ -63,26 +55,12 @@ fun ParentJourneyBottomSheet(
     KieroBottomSheet(
         onDismiss = onDismiss,
         dragHandle = null,
-        modifier = modifier
-            .pointerInput(Unit) {
-                detectDragGestures { change, dragAmount ->
-                    Timber.e("dragAmount: $dragAmount")
-                }
-            },
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(sheetHeight)
-                .disableUpSheetScroll()
-                .pointerInput(Unit) {
-                    detectVerticalDragGestures { change, dragAmount ->
-                        // dragAmount가 0보다 작다 = 손가락을 위로 올리고 있다
-                        if (dragAmount < 0) {
-                            change.consume()
-                        }
-                    }
-                }
+                .disableUpWardEvent()
         ) {
             Row (
                 modifier = Modifier
@@ -141,16 +119,15 @@ fun ParentJourneyBottomSheet(
                         .weight(1f)
                         .fillMaxWidth()
                         .align(Alignment.CenterHorizontally)
-                        .disableUpScroll()
-                        .verticalScroll(rememberScrollState()),
+                        .disableUpWardEvent(),
                     bottomHeight = 50.dp
                 )
             } else {
                 LazyColumn(
                     modifier = Modifier
                         .weight(1f)
-                        .disableNestedScroll()
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .disableNestedScroll(),
                 ) {
                     items(
                         items = currentList,

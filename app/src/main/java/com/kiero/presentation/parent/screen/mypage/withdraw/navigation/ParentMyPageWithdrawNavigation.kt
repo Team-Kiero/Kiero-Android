@@ -5,11 +5,11 @@ import androidx.navigation.NavOptions
 import com.kiero.core.navigation.Route
 import kotlinx.serialization.Serializable
 
-fun NavController.navigateToMyPageWithDraw(
+fun NavController.navigateToMyPageWithdraw(
     navOptions: NavOptions? = null,
 ) {
-    navigate(MyPageWithDraw, navOptions)
+    navigate(MyPageWithdraw, navOptions)
 }
 
 @Serializable
-data object MyPageWithDraw: Route
+data object MyPageWithdraw: Route

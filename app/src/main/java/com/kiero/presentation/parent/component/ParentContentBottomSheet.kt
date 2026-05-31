@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
@@ -26,7 +24,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
-import com.kiero.core.common.extension.disableUpScroll
+import com.kiero.core.common.extension.disableUpWardEvent
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
 
@@ -53,9 +51,8 @@ fun ParentContentBottomSheet(
     ) {
         Column(
             modifier = Modifier
-                .disableUpScroll()
-                .verticalScroll(rememberScrollState())
                 .fillMaxWidth()
+                .disableUpWardEvent()
                 .background(color = KieroTheme.colors.gray900)
                 .padding(16.dp)
         ) {

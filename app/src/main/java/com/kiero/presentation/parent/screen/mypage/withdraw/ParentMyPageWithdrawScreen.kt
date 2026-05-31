@@ -25,16 +25,28 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.kiero.R
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.component.button.KieroButtonMedium
 import com.kiero.core.designsystem.theme.KieroTheme
 
-// Todo: API 구현 시 반영
 @Composable
-fun ParentMyPageWithDrawScreen(
+fun ParentMyPageWithdrawRoute(
+    navigateUp: () -> Unit,
+    viewModel: ParentMyPageWithdrawViewModel = hiltViewModel()
+) {
+    ParentMyPageWithdrawScreen(
+        onBackClick = navigateUp,
+        onWithdraw = viewModel::withdraw
+    )
+}
+
+@Composable
+private fun ParentMyPageWithdrawScreen(
     onBackClick: () -> Unit,
+    onWithdraw: () -> Unit = {}
 ) {
     var isConfirmProcess by remember { mutableStateOf(false) }
 
@@ -108,10 +120,7 @@ fun ParentMyPageWithDrawScreen(
             text = "계정 삭제하고 탈퇴하기",
             isEnabled = isConfirmProcess,
             onClick = {
-                if (isConfirmProcess) {
-                    // TODO: 회원 탈퇴 API 호출
-                    onBackClick()
-                }
+                if (isConfirmProcess) onWithdraw()
             }
         )
     }
@@ -119,9 +128,9 @@ fun ParentMyPageWithDrawScreen(
 
 @Preview
 @Composable
-private fun ParentMyPageWithDrawScreenPreview() {
+private fun ParentMyPageWithdrawScreenPreview() {
     KieroTheme {
-        ParentMyPageWithDrawScreen(
+        ParentMyPageWithdrawScreen(
             onBackClick = {}
         )
     }

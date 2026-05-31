@@ -39,7 +39,6 @@ fun ParentSignUpInviteScreen(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // Todo : 나중에 약관 동의 데이터도 함께 보낼 것
         KieroButtonMedium(
             text = "시작하기",
             onClick = onStartClick,

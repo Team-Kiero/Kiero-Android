@@ -4,8 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -16,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
-import com.kiero.core.common.extension.disableUpScroll
+import com.kiero.core.common.extension.disableUpWardEvent
 import com.kiero.core.designsystem.component.bottomsheet.KieroBottomSheet
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.screen.mission.component.datepicker.model.CalendarDisplayMode
@@ -44,10 +42,9 @@ fun CalendarBottomSheet(
     ) {
         Column(
             modifier = modifier
-                .disableUpScroll()
-                .verticalScroll(rememberScrollState())
                 .fillMaxWidth()
                 .fillMaxHeight(0.5f)
+                .disableUpWardEvent()
                 .padding(vertical = 20.dp, horizontal = 30.dp)
         ) {
             PickerTopbar(

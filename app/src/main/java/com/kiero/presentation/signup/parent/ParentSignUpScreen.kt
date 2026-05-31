@@ -84,7 +84,8 @@ fun ParentSignUpRoute(
             is ParentSignUpSideEffect.ShowSnackbar -> {
                 globalTrigger.showSnackbar(
                     SnackbarState(
-                        message = it.message
+                        message = it.message,
+                        bottomPadding = 110
                     )
                 )
             }

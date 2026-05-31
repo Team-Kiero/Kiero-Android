@@ -91,7 +91,7 @@ fun ParentMyPageChildCareScreen(
         when(state.currentStep) {
             ParentChildCareStep.MANAGEMENT -> {
                 ParentMyPageChildManagementScreen(
-                    state = state.childInfo,
+                    state = state,
                     onReIssueClick = viewModel::onReIssueClick
                 )
             }

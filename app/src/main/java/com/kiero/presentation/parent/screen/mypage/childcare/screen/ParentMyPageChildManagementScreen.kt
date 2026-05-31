@@ -1,5 +1,6 @@
 package com.kiero.presentation.parent.screen.mypage.childcare.screen
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -13,22 +14,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.core.designsystem.component.button.KieroButtonMedium
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.presentation.parent.screen.mypage.childcare.ParentMyPageChildCareState
 import com.kiero.presentation.parent.screen.mypage.childcare.component.ParentMyPageChildNameHolder
-import com.kiero.presentation.parent.screen.mypage.childcare.model.ParentMyPageChildInfoModel
+import com.kiero.presentation.parent.screen.mypage.model.ChildConnectionStatus
 
 @Composable
 fun ParentMyPageChildManagementScreen(
-    state: ParentMyPageChildInfoModel,
+    state: ParentMyPageChildCareState,
     onReIssueClick: () -> Unit,
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(KieroTheme.colors.black),
+            .background(KieroTheme.colors.black)
+            .animateContentSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         ParentMyPageChildNameHolder(
-            childInfo = state
+            childInfo = state.childInfo,
+            connectionStatus = state.connectionStatus
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -41,8 +45,14 @@ fun ParentMyPageChildManagementScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        val buttonText = if (state.connectionStatus == ChildConnectionStatus.PENDING && !state.isExpired) {
+            "연결 코드 확인"
+        } else {
+            "연결 코드 재발급"
+        }
+
         KieroButtonMedium(
-            text = "연결 코드 재발급",
+            text = buttonText,
             onClick = onReIssueClick,
             containerColor = KieroTheme.colors.main,
             contentColor = KieroTheme.colors.black
@@ -57,7 +67,7 @@ fun ParentMyPageChildManagementScreen(
 private fun ParentMyPageChildManagementScreenPreview() {
     KieroTheme {
         ParentMyPageChildManagementScreen(
-            state = ParentMyPageChildInfoModel(),
+            state = ParentMyPageChildCareState(),
             onReIssueClick = {}
         )
     }

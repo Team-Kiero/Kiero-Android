@@ -14,13 +14,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.presentation.parent.screen.mypage.model.ChildConnectionStatus
 
-// Todo : 서버 SSE 또는 API 구현 시 status 변경
 @Composable
 fun ParentMyPageChildStatus(
+    connectionStatus: ChildConnectionStatus,
     modifier: Modifier = Modifier,
-    isChildJoined: Boolean = false,
 ) {
+    val isPending = connectionStatus == ChildConnectionStatus.PENDING
+    val statusText = if (isPending) "연결 대기" else "연결 완료"
+    val tintColor = if (isPending) KieroTheme.colors.main else KieroTheme.colors.gray300
+
     Row (
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
@@ -29,15 +33,15 @@ fun ParentMyPageChildStatus(
         Icon(
             imageVector = ImageVector.vectorResource(R.drawable.ic_info_circle),
             contentDescription = null,
-            tint = if (isChildJoined) KieroTheme.colors.gray300 else KieroTheme.colors.main,
+            tint = tintColor,
             modifier = Modifier
                 .size(11.dp)
         )
 
         Text(
-            text = if (isChildJoined) "연결 완료" else "연결 대기",
+            text = statusText,
             style = KieroTheme.typography.regular.body6,
-            color = if (isChildJoined) KieroTheme.colors.gray300 else KieroTheme.colors.main,
+            color = tintColor,
         )
     }
 }
@@ -46,6 +50,8 @@ fun ParentMyPageChildStatus(
 @Composable
 private fun ParentMyPageChildStatusPreview() {
     KieroTheme {
-        ParentMyPageChildStatus()
+        ParentMyPageChildStatus(
+            connectionStatus = ChildConnectionStatus.CONNECTED
+        )
     }
 }
