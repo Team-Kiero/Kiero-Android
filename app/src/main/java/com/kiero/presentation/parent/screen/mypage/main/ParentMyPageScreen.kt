@@ -46,7 +46,7 @@ fun ParentMyPageRoute(
     paddingValues: PaddingValues,
     navigateToOssLicenses: () -> Unit,
     navigateToParentChildCare: () -> Unit,
-    navigateToWithDraw: () -> Unit,
+    navigateToWithdraw: () -> Unit,
     viewModel: ParentMyPageViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -68,7 +68,7 @@ fun ParentMyPageRoute(
             )
 
             is ParentMyPageSideEffect.NavigateToChildCare -> navigateToParentChildCare()
-            is ParentMyPageSideEffect.NavigateToWithDraw -> navigateToWithDraw()
+            is ParentMyPageSideEffect.NavigateToWithdraw -> navigateToWithdraw()
         }
     }
 
@@ -89,7 +89,7 @@ fun ParentMyPageRoute(
                 isLogOut = false
             }
 
-            override fun onClickWithDraw() = navigateToWithDraw()
+            override fun onClickWithdraw() = navigateToWithdraw()
 
             override fun onClickOss() = navigateToOssLicenses()
 
@@ -240,7 +240,7 @@ private fun ParentMyPageScreen(
                     textDecoration = TextDecoration.Underline,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .noRippleClickable(onClick = actions::onClickWithDraw)
+                        .noRippleClickable(onClick = actions::onClickWithdraw)
                 )
 
                 Spacer(modifier = Modifier.height(70.dp))
@@ -279,7 +279,7 @@ private fun ParentMyPageScreenPreview() {
                 override fun onClickLogOut() {}
                 override fun onClickLogOutConfirm() {}
                 override fun onClickLogOutCancel() {}
-                override fun onClickWithDraw() {}
+                override fun onClickWithdraw() {}
                 override fun onClickOss() {}
                 override fun onCheckedChange(checked: Boolean) {}
                 override fun onClickTerms(type: ParentMenuLinkType) {}

@@ -9,7 +9,7 @@ interface ParentMyPageActions {
     fun onClickLogOut()
     fun onClickLogOutConfirm()
     fun onClickLogOutCancel()
-    fun onClickWithDraw()
+    fun onClickWithdraw()
     fun onClickOss()
     fun onCheckedChange(checked: Boolean)
     fun onClickTerms(type: ParentMenuLinkType)

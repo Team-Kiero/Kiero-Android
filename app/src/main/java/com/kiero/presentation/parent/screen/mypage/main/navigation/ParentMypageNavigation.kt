@@ -15,9 +15,9 @@ import com.kiero.presentation.parent.screen.mypage.main.ParentMyPageRoute
 import com.kiero.presentation.parent.screen.mypage.main.route.licenses.OssLicensesScreen
 import com.kiero.presentation.parent.screen.mypage.main.route.licenses.navigation.OssLicenses
 import com.kiero.presentation.parent.screen.mypage.main.route.licenses.navigation.navigateToOssLicenses
-import com.kiero.presentation.parent.screen.mypage.withdraw.ParentMyPageWithDrawRoute
-import com.kiero.presentation.parent.screen.mypage.withdraw.navigation.MyPageWithDraw
-import com.kiero.presentation.parent.screen.mypage.withdraw.navigation.navigateToMyPageWithDraw
+import com.kiero.presentation.parent.screen.mypage.withdraw.ParentMyPageWithdrawRoute
+import com.kiero.presentation.parent.screen.mypage.withdraw.navigation.MyPageWithdraw
+import com.kiero.presentation.parent.screen.mypage.withdraw.navigation.navigateToMyPageWithdraw
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -42,7 +42,7 @@ fun NavGraphBuilder.parentMypageNavGraph(
                 paddingValues = paddingValues,
                 navigateToOssLicenses = navController::navigateToOssLicenses,
                 navigateToParentChildCare = navController::navigateToMyPageChildCare,
-                navigateToWithDraw = navController::navigateToMyPageWithDraw
+                navigateToWithdraw = navController::navigateToMyPageWithdraw
             )
         }
 
@@ -60,8 +60,8 @@ fun NavGraphBuilder.parentMypageNavGraph(
             )
         }
 
-        composable<MyPageWithDraw> {
-            ParentMyPageWithDrawRoute(
+        composable<MyPageWithdraw> {
+            ParentMyPageWithdrawRoute(
                 navigateUp = navigateUp
             )
         }

@@ -13,7 +13,7 @@ class PostTermsUseCase @Inject constructor(
     suspend operator fun invoke() : Result<Unit> = suspendRunCatching{
         val isTermsAgreed = userInfoManager.getTermsInfo() ?: false
         if (!isTermsAgreed) {
-            return Result.failure(IllegalStateException("약관 동의가 필요합니다."))
+            throw IllegalStateException("약관 동의가 필요합니다.")
         }
 
         val termsIds = userInfoManager.getAgreedTermsIds() ?: emptyList()

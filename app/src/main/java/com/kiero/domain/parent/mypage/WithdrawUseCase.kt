@@ -4,7 +4,7 @@ import com.kiero.core.localstorage.TokenManager
 import com.kiero.data.parent.mypage.parent.repository.ParentMyPageRepository
 import javax.inject.Inject
 
-class WithDrawUseCase @Inject constructor(
+class WithdrawUseCase @Inject constructor(
     private val parentMyPageRepository: ParentMyPageRepository,
     private val tokenManager: TokenManager
 ) {

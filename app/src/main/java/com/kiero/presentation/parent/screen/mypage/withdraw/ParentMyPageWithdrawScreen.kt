@@ -32,22 +32,21 @@ import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.component.button.KieroButtonMedium
 import com.kiero.core.designsystem.theme.KieroTheme
 
-// Todo: API 구현 시 반영
 @Composable
-fun ParentMyPageWithDrawRoute(
+fun ParentMyPageWithdrawRoute(
     navigateUp: () -> Unit,
-    viewModel: ParentMyPageWithDrawViewModel = hiltViewModel()
+    viewModel: ParentMyPageWithdrawViewModel = hiltViewModel()
 ) {
-    ParentMyPageWithDrawScreen(
+    ParentMyPageWithdrawScreen(
         onBackClick = navigateUp,
-        onWithDraw = viewModel::withDraw
+        onWithdraw = viewModel::withDraw
     )
 }
 
 @Composable
-private fun ParentMyPageWithDrawScreen(
+private fun ParentMyPageWithdrawScreen(
     onBackClick: () -> Unit,
-    onWithDraw: () -> Unit = {}
+    onWithdraw: () -> Unit = {}
 ) {
     var isConfirmProcess by remember { mutableStateOf(false) }
 
@@ -121,7 +120,7 @@ private fun ParentMyPageWithDrawScreen(
             text = "계정 삭제하고 탈퇴하기",
             isEnabled = isConfirmProcess,
             onClick = {
-                if (isConfirmProcess) onWithDraw()
+                if (isConfirmProcess) onWithdraw()
             }
         )
     }
@@ -129,9 +128,9 @@ private fun ParentMyPageWithDrawScreen(
 
 @Preview
 @Composable
-private fun ParentMyPageWithDrawScreenPreview() {
+private fun ParentMyPageWithdrawScreenPreview() {
     KieroTheme {
-        ParentMyPageWithDrawScreen(
+        ParentMyPageWithdrawScreen(
             onBackClick = {}
         )
     }

@@ -18,5 +18,5 @@ sealed interface ParentMyPageSideEffect {
     data class ShowSnackBar(val message : String) : ParentMyPageSideEffect
 
     data object NavigateToChildCare: ParentMyPageSideEffect
-    data object NavigateToWithDraw : ParentMyPageSideEffect
+    data object NavigateToWithdraw : ParentMyPageSideEffect
 }
