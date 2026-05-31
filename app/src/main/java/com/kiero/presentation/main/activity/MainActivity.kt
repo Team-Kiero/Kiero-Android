@@ -13,13 +13,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.kiero.core.common.extension.toPushDataOrNull
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.network.monitor.NetworkMonitor
 import com.kiero.core.model.fcm.PushData
 import com.kiero.presentation.main.navigation.rememberMainAppState
 import com.kiero.presentation.main.screen.MainRoute
 import dagger.hilt.android.AndroidEntryPoint
-import toPushDataOrNull
 import javax.inject.Inject
 
 @AndroidEntryPoint

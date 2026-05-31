@@ -29,6 +29,7 @@ import com.kiero.presentation.kid.navigation.KidWish
 import com.kiero.presentation.kid.onboarding.navigation.navigateToKidOnboarding
 import com.kiero.presentation.kid.wish.navigation.navigateToWish
 import com.kiero.core.model.fcm.PushData
+import com.kiero.core.model.fcm.PushType
 import com.kiero.presentation.parent.navigation.Mypage
 import com.kiero.presentation.parent.navigation.ParentGraph
 import com.kiero.presentation.parent.navigation.ParentJourney
@@ -196,8 +197,11 @@ class MainAppState(
         }
     }
 
-    fun navigateToAlarm(navOptions: NavOptions? = null) =
-        navController.navigateToAlarm(navOptions)
+    fun navigateToAlarm(
+        targetId: Long? = null,
+        expand: Boolean = false,
+        navOptions: NavOptions? = null
+    ) = navController.navigateToAlarm(targetId, expand, navOptions)
 
     fun navigateToSchedule(navOptions: NavOptions? = null) =
         navController.navigateToSchedule(navOptions)
@@ -285,24 +289,30 @@ class MainAppState(
 
     fun navigateFromPushData(pushData: PushData) {
         when (pushData.type) {
-            "PARENT_DAILY_START",
-            "SCHEDULE_SKIPPED",
-            "PARENT_SCHEDULE_REMINDER" -> navigateParentTab(ParentMainTab.JOURNEY)
+            PushType.PARENT_DAILY_START,
+            PushType.SCHEDULE_SKIPPED,
+            PushType.PARENT_SCHEDULE_REMINDER -> navigateParentTab(ParentMainTab.JOURNEY)
 
-            "COUPON_PURCHASED",
-            "FIRE_LIT",
-            "MISSION_COMPLETE",
-            "SCHEDULE_VERIFIED" -> navigateToAlarm() // TODO: 알람 쪽 항목 id 확인 후 targetId 처리예정
+            PushType.SCHEDULE_VERIFIED -> {
+                val targetId = pushData.targetId?.toLongOrNull()
+                navigateToAlarm(targetId = targetId, expand = true)
+            }
 
-            "CHILD_DAILY_START",
-            "CHILD_NEXT_JOURNEY",
-            "SCHEDULE_CREATED",
-            "SCHEDULE_DELETED",
-            "SCHEDULE_MODIFIED" -> navigateKidTab(KidMainTab.JOURNEY)
+            PushType.COUPON_PURCHASED,
+            PushType.FIRE_LIT,
+            PushType.MISSION_COMPLETE -> {
+                navigateToAlarm()
+            }
 
-            "CHILD_MISSION_INCOMPLETE" -> navigateKidTab(KidMainTab.MISSION)
+            PushType.CHILD_DAILY_START,
+            PushType.CHILD_NEXT_JOURNEY,
+            PushType.SCHEDULE_CREATED,
+            PushType.SCHEDULE_DELETED,
+            PushType.SCHEDULE_MODIFIED -> navigateKidTab(KidMainTab.JOURNEY)
 
-            else -> Timber.w("알 수 없는 FCM 타입입니다: ${pushData.type}")
+            PushType.CHILD_MISSION_INCOMPLETE -> navigateKidTab(KidMainTab.MISSION)
+
+            PushType.UNKNOWN -> Timber.w("알 수 없는 FCM 타입입니다.")
         }
     }
 }
