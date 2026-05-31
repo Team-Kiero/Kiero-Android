@@ -18,6 +18,7 @@ import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -48,6 +49,7 @@ fun AuthParentRoute(
 ) {
     val context = LocalContext.current
     val globalTrigger = LocalGlobalUiEventTrigger.current
+    val urlHandler = LocalUriHandler.current
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     viewModel.sideEffect.collectSingleEvent {
@@ -63,6 +65,8 @@ fun AuthParentRoute(
                     )
                 )
             }
+
+            is AuthSideEffect.OpenWebView -> urlHandler.openUri(it.url)
 
             AuthSideEffect.NavigateToParentGraph -> navigateToParentGraph()
             AuthSideEffect.NavigateToSelection -> navigateToSelection()
@@ -94,7 +98,8 @@ fun AuthParentRoute(
 
         if (state.isShowTermsAgreement) {
             TermsAgreementBottomSheet(
-                consentsItem = state.consents,
+                termsList = state.termsList,
+                isAllAgreed = state.isAllAgreed,
                 onDismiss = viewModel::showTermsAgreement,
                 onClickTerms = viewModel::toggleTermsAccepted,
                 navigateToTerms = viewModel::navigateToTerms,

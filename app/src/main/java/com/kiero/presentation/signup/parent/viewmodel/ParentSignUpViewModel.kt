@@ -11,6 +11,7 @@ import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.data.sse.manager.SseManager
 import com.kiero.domain.parent.invite.usecase.GetInviteCode
+import com.kiero.domain.parent.signup.PostTermsUseCase
 import com.kiero.presentation.signup.parent.model.ParentInfoUiModel
 import com.kiero.presentation.signup.parent.model.ParentSignUpStep
 import com.kiero.presentation.signup.parent.model.toUiModel
@@ -38,6 +39,7 @@ class ParentSignUpViewModel @Inject constructor(
     private val userInfoManager: UserInfoManager,
     private val tokenManager: TokenManager,
     private val sseManager: SseManager,
+    private val postTermsUseCase: PostTermsUseCase,
     private val getInviteCode: GetInviteCode,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ParentSignUpState())
@@ -66,7 +68,24 @@ class ParentSignUpViewModel @Inject constructor(
 
             ParentSignUpStep.INVITE -> {
                 viewModelScope.launch {
-                    _sideEffect.emit(ParentSignUpSideEffect.NavigateToParent)
+                    _state.update { it.copy(isLoading = true) }
+
+                    postTermsUseCase()
+                        .onSuccess {
+                            userInfoManager.saveChildName(
+                                lastName = _state.value.childInfo.childLastName.text.toString(),
+                                firstName = _state.value.childInfo.childFirstName.text.toString()
+                            )
+
+                            _state.update { it.copy(isLoading = false) }
+                            _sideEffect.emit(ParentSignUpSideEffect.NavigateToParent)
+                        }
+                        .onFailure { error ->
+                            _state.update { it.copy(isLoading = false) }
+                            _sideEffect.emit(
+                                ParentSignUpSideEffect.ShowSnackbar(error.toHandleErrorMessage())
+                            )
+                        }
                 }
             }
         }

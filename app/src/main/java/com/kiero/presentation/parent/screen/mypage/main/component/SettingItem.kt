@@ -26,8 +26,8 @@ fun SettingItem(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    connectionStatus: ChildConnectionStatus = ChildConnectionStatus.CONNECTED,
-    hasConnectChildren: Boolean = false
+    connectionStatus: ChildConnectionStatus = ChildConnectionStatus.REISSUE,
+    showConnectionStatus: Boolean = false
 ) {
     Row(
         modifier = modifier
@@ -44,7 +44,7 @@ fun SettingItem(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        if (hasConnectChildren) {
+        if (showConnectionStatus) {
             val isPending = connectionStatus == ChildConnectionStatus.PENDING
 
             KieroChip(
@@ -52,7 +52,7 @@ fun SettingItem(
                 isEnabled = isPending,
                 isPoint = isPending,
                 action = KieroTextAction(
-                    text = if (isPending) "연결 대기" else "연결 코드 재발급",
+                    text = connectionStatus.text,
                     textColor = if (isPending) KieroTextColor.POINT else KieroTextColor.GRAY500,
                     onClick = {}
                 )
@@ -75,7 +75,7 @@ private fun SettingItemPreview() {
             text = "설정",
             onClick = {},
             connectionStatus = ChildConnectionStatus.PENDING,
-            hasConnectChildren = true
+            showConnectionStatus = true
         )
     }
 }
