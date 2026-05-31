@@ -29,7 +29,7 @@
             android:resource="@color/kiero_mint" />
 
         <service
-            android:name="com.kiero.data.fcm.KieroFcmService"
+            android:name="com.kiero.core.fcm.KieroFcmService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
