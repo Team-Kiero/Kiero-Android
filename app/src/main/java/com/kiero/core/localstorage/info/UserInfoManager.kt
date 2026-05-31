@@ -7,6 +7,7 @@ interface UserInfoManager {
     suspend fun getParentInfo(): ParentInfo?
 
     suspend fun clearParentInfo()
+    suspend fun clearKidInfo()
 
     suspend fun saveChildIdInfo(childId : Long)
     suspend fun getChildIdInfo(): Long?

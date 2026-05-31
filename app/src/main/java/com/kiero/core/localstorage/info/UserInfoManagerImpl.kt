@@ -75,6 +75,29 @@ class UserInfoManagerImpl @Inject constructor(
         }
     }
 
+    override suspend fun clearKidInfo() {
+        suspendRunCatching {
+            dataStore.edit { preferences ->
+                DataStoreConstant.CHILD_INFO_KEYS.forEach { key ->
+                    preferences.remove(key)
+                }
+
+                val dynamicPermissionKeys = preferences.asMap().keys.filter {
+                    it.name.startsWith(DataStoreConstant.KEY_PERMISSION_DENIED_COUNT)
+                }
+                dynamicPermissionKeys.forEach { key ->
+                    preferences.remove(key)
+                }
+
+                DataStoreConstant.TOKEN_KEYS.forEach { key ->
+                    preferences.remove(key)
+                }
+            }
+        }.onFailure {
+            Timber.e(it, "Failed to clear kid info")
+        }
+    }
+
     override suspend fun saveChildIdInfo(childId: Long) {
         suspendRunCatching {
             dataStore.edit { preferences ->
