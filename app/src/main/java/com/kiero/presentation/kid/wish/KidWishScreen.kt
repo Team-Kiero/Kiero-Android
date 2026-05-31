@@ -65,6 +65,7 @@ import kotlinx.collections.immutable.ImmutableList
 fun KidWishRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
+    onWishArchiveClick: () -> Unit,
     viewModel: KidWishViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -118,8 +119,8 @@ fun KidWishRoute(
                         scrollState = scrollState,
                         paddingValues = paddingValues,
                         state = data,
-                        navigateUp = navigateUp,
-                        onClickWish = viewModel::openDialogWithItem
+                        onClickWish = viewModel::openDialogWithItem,
+                        onWishArchiveClick = onWishArchiveClick
                     )
 
                     if (data.isVisibleDialog) {
@@ -197,8 +198,8 @@ private fun KidWishScreen(
     paddingValues: PaddingValues,
     scrollState: ScrollState,
     state: KidWishState,
-    navigateUp: () -> Unit,
     onClickWish : (Long) -> Unit,
+    onWishArchiveClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -236,6 +237,7 @@ private fun KidWishScreen(
         Spacer(modifier = Modifier.height(15.dp))
 
         KidWishDescription(
+            onClick = onWishArchiveClick,
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -280,8 +282,8 @@ private fun KidWishScreenPreview(
         KidWishScreen(
             paddingValues = PaddingValues(),
             state = state,
-            navigateUp = {},
             onClickWish = {},
+            onWishArchiveClick = {},
             scrollState = rememberScrollState()
         )
     }

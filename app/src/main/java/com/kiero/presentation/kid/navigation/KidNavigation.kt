@@ -19,8 +19,14 @@ import com.kiero.presentation.kid.journey.map.navigation.navigateToMap
 import com.kiero.presentation.kid.journey.navigation.kidJourneyNavGraph
 import com.kiero.presentation.kid.journey.navigation.navigateToJourney
 import com.kiero.presentation.kid.mission.navigation.kidMissionNavGraph
+import com.kiero.presentation.kid.myspace.navigation.kidMySpaceNavGraph
+import com.kiero.presentation.kid.myspace.policy.navigation.kidMySpacePolicyNavGraph
+import com.kiero.presentation.kid.myspace.policy.navigation.navigateToPolicy
+import com.kiero.presentation.kid.myspace.wisharchive.navigation.kidMySpaceWishArchiveNavGraph
+import com.kiero.presentation.kid.myspace.wisharchive.navigation.navigateToWishArchive
 import com.kiero.presentation.kid.onboarding.navigation.kidOnboardingNavGraph
 import com.kiero.presentation.kid.wish.navigation.kidWishNavGraph
+import com.kiero.presentation.kid.wish.navigation.navigateToWish
 import kotlinx.serialization.Serializable
 
 sealed interface KidTab : Route
@@ -36,6 +42,9 @@ data object KidMission : KidTab
 
 @Serializable
 data object KidWish : KidTab
+
+@Serializable
+data object KidMySpace : KidTab
 
 @Serializable
 data object Onboarding : KidTab
@@ -60,7 +69,7 @@ fun NavGraphBuilder.kidNavGraph(
             navigateToCamera = { scheduleDetailId, stoneType ->
                 navController.navigateToCamera(scheduleDetailId, stoneType)
             },
-            navigateToFire = { date, stones->
+            navigateToFire = { date, stones ->
                 navController.navigateToFire(date, stones)
             },
             navigateToMap = { date ->
@@ -76,6 +85,7 @@ fun NavGraphBuilder.kidNavGraph(
         kidWishNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
+            onWishArchiveClick = navController::navigateToWishArchive
         )
 
         kidOnboardingNavGraph(
@@ -113,6 +123,32 @@ fun NavGraphBuilder.kidNavGraph(
         kidJourneyMapNavGraph(
             paddingValues = paddingValues,
             navigateUp = navigateUp
+        )
+
+        kidMySpaceNavGraph(
+            paddingValues = paddingValues,
+            navigateUp = navigateUp,
+            navigateToWishArchive = navController::navigateToWishArchive,
+            navigateToPolicy = navController::navigateToPolicy
+        )
+
+        kidMySpaceWishArchiveNavGraph(
+            paddingValues = paddingValues,
+            navigateUp = navigateUp,
+            navigateToWish = {
+                navController.navigateToWish(
+                    navOptions = navOptions {
+                        popUpTo(KidMySpace) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                )
+            }
+        )
+
+        kidMySpacePolicyNavGraph(
+            paddingValues = paddingValues,
+            navigateUp = navigateUp,
+            navController = navController
         )
     }
 }

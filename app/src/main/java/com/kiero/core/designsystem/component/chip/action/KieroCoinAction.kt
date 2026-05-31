@@ -25,7 +25,8 @@ class KieroCoinAction(
     private val coinCount: Int,
     private val isCompleted: Boolean = false,
     private val isEnabled: Boolean = true,
-    private val viewType: DisplayType = DisplayType.KID,
+    private val isUseMode: Boolean = false,
+    private val viewType: DisplayType? = DisplayType.KID,
     private val onClick: () -> Unit
 ) : ChipAction {
     @Composable
@@ -33,6 +34,7 @@ class KieroCoinAction(
         val coin = painterResource(id = R.drawable.img_coin)
 
         val targetColor = when {
+            isUseMode -> KieroTheme.colors.white
             !isEnabled -> KieroTheme.colors.gray500
             isCompleted -> KieroTheme.colors.main
             else -> KieroTheme.colors.gray100
@@ -41,11 +43,19 @@ class KieroCoinAction(
         val textContent = when (viewType) {
             DisplayType.KID -> "$coinCount 개"
             DisplayType.PARENT -> "$coinCount 개 사용"
+            else -> "$coinCount 사용"
         }
 
         val textStyle = when (viewType) {
             DisplayType.KID -> KieroTheme.typography.regular.body3
             DisplayType.PARENT -> KieroTheme.typography.regular.body5
+            else -> KieroTheme.typography.regular.body6
+        }
+
+        val iconSize = when (viewType) {
+            DisplayType.KID -> 20.dp
+            DisplayType.PARENT -> 16.dp
+            null -> 16.dp
         }
 
         Row(
@@ -58,7 +68,7 @@ class KieroCoinAction(
                 painter = coin,
                 contentDescription = null,
                 modifier = Modifier
-                    .size(20.dp)
+                    .size(iconSize)
             )
 
             Text(
