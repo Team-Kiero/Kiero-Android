@@ -150,7 +150,7 @@ class KidJourneyViewModel @Inject constructor(
         viewModelScope.launch {
             repository.patchScheduleToday()
                 .onSuccess { scheduleData ->
-                    val currentDeniedCount = (_state.value as? UiState.Success)?.data?.permissionNotificationDeniedCount ?: 0
+                    val currentDeniedCount = _state.value.successData?.permissionNotificationDeniedCount ?: 0
                     val stoneType = scheduleData.stoneType?.let { KidJourneyStoneType.from(it) }
                     val scheduleInfo = KidJourneyScheduleUiModel(
                         order = scheduleData.scheduleOrder,
