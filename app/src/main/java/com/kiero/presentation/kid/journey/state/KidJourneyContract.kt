@@ -13,23 +13,21 @@ data class KidJourneyState(
     val header: KidJourneyHeaderUiModel? = null,
     val content: KidJourneyContentUiModel = KidJourneyContentUiModel.NoSchedule,
     val permissionCameraDeniedCount: Int = 0,
+    val permissionNotificationDeniedCount: Int = 0,
+    val showNotificationPermissionDialog: Boolean = false,
 ) {
-
-    // 버튼 타입
     val buttonType: KidJourneyButtonType
         get() = when (content) {
             is KidJourneyContentUiModel.ScheduledContent -> {
-                if (content.isNowScheduleVerified) {
-                    KidJourneyButtonType.NONE
-                } else {
-                    KidJourneyButtonType.AUTH
+                when {
+                    content.isNowScheduleVerified -> KidJourneyButtonType.NONE
+                    else -> KidJourneyButtonType.AUTH
                 }
             }
             is KidJourneyContentUiModel.FireNotLit -> KidJourneyButtonType.FIRE
             else -> KidJourneyButtonType.NONE
         }
 
-    // 버튼 텍스트 리소스 ID
     val buttonTextRes: Int?
         get() = when (buttonType) {
             KidJourneyButtonType.AUTH -> R.string.journey_btn_auth
@@ -37,15 +35,22 @@ data class KidJourneyState(
             KidJourneyButtonType.NONE -> null
         }
 
-    // 다음 일정 버튼 활성화
     val shouldShowNextButton: Boolean
         get() = (content as? KidJourneyContentUiModel.ScheduledContent)?.isSkippable ?: false
 
-    // 일정 정보 표시 여부
+    val shouldShowFinishButton: Boolean
+        get() {
+            val scheduledContent = content as? KidJourneyContentUiModel.ScheduledContent ?: return false
+            val h = header ?: return false
+            return !scheduledContent.isSkippable
+                    && h.totalScheduleCount != null
+                    && h.totalScheduleCount > 0
+                    && scheduledContent.scheduleInfo.order == h.totalScheduleCount
+        }
+
     val shouldShowSchedule: Boolean
         get() = content is KidJourneyContentUiModel.ScheduledContent
 
-    //  스케줄 정보
     val currentScheduleInfo: KidJourneyScheduleUiModel?
         get() = (content as? KidJourneyContentUiModel.ScheduledContent)?.scheduleInfo
 

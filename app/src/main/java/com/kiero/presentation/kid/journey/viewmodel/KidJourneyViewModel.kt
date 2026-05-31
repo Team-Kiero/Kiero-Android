@@ -24,9 +24,11 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -80,11 +82,50 @@ class KidJourneyViewModel @Inject constructor(
     init {
         sseManager.startChildSubscription()
         collectChildKidScheduleEvents()
+        observeNotificationDeniedCount()
     }
 
     fun fetchData() {
         fetchTodaySchedule()
         fetchCoin()
+    }
+
+    fun checkNotificationPermission(isAlreadyGranted: Boolean) {
+        if (isAlreadyGranted) return
+
+        viewModelScope.launch {
+            val deniedCount = permissionInfoManager.deniedCount(PermissionType.POST_NOTIFICATIONS).first()
+            if (deniedCount == 0) {
+                _state.update { uiState ->
+                    if (uiState is UiState.Success) {
+                        UiState.Success(uiState.data.copy(showNotificationPermissionDialog = true))
+                    } else uiState
+                }
+            }
+        }
+    }
+
+    fun onNotificationPermissionDialogDismiss() {
+        viewModelScope.launch {
+            permissionInfoManager.increaseDeniedCount(PermissionType.POST_NOTIFICATIONS)
+            _state.update { uiState ->
+                if (uiState is UiState.Success) {
+                    UiState.Success(uiState.data.copy(showNotificationPermissionDialog = false))
+                } else uiState
+            }
+        }
+    }
+
+    private fun observeNotificationDeniedCount() {
+        viewModelScope.launch {
+            permissionInfoManager.deniedCount(PermissionType.POST_NOTIFICATIONS).collect { count ->
+                _state.update { uiState ->
+                    if (uiState is UiState.Success) {
+                        UiState.Success(uiState.data.copy(permissionNotificationDeniedCount = count))
+                    } else uiState
+                }
+            }
+        }
     }
 
     private fun collectChildKidScheduleEvents() {
@@ -109,6 +150,7 @@ class KidJourneyViewModel @Inject constructor(
         viewModelScope.launch {
             repository.patchScheduleToday()
                 .onSuccess { scheduleData ->
+                    val currentDeniedCount = _state.value.successData?.permissionNotificationDeniedCount ?: 0
                     val stoneType = scheduleData.stoneType?.let { KidJourneyStoneType.from(it) }
                     val scheduleInfo = KidJourneyScheduleUiModel(
                         order = scheduleData.scheduleOrder,
@@ -118,6 +160,7 @@ class KidJourneyViewModel @Inject constructor(
 
                     _state.value = UiState.Success(
                         KidJourneyState(
+                            permissionNotificationDeniedCount = currentDeniedCount,
                             header = KidJourneyHeaderUiModel(
                                 kidName = coin.value.firstName,
                                 currentDate = coin.value.today,
@@ -173,7 +216,6 @@ class KidJourneyViewModel @Inject constructor(
 
     fun onNextClick() {
         val content = _state.value.successData?.content
-
         val scheduleDetailId =
             (content as? KidJourneyContentUiModel.ScheduledContent)?.scheduleDetailId
 
