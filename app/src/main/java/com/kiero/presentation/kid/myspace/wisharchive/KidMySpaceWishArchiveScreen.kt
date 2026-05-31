@@ -25,7 +25,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.component.button.KieroButtonMedium
+import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.core.model.UiState
 import com.kiero.presentation.kid.component.KidHeader
 import com.kiero.presentation.kid.myspace.wisharchive.component.KidMySpaceWishArchiveItem
 import com.kiero.presentation.kid.myspace.wisharchive.state.KidMySpaceWishArchiveState
@@ -39,14 +41,19 @@ fun KidMySpaceWishArchiveRoute(
     navigateToWish: () -> Unit,
     viewModel: KidMySpaceWishArchiveViewModel = hiltViewModel()
 ) {
-    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
-    KidMySpaceWishArchiveScreen(
-        paddingValues = paddingValues,
-        state = state,
-        onConfirmClick = navigateUp,
-        onNavigateToWishClick = navigateToWish
-    )
+    when (val state = state) {
+        is UiState.Loading -> KieroLoadingIndicator()
+        is UiState.Success -> KidMySpaceWishArchiveScreen(
+            paddingValues = paddingValues,
+            state = state.data,
+            onConfirmClick = navigateUp,
+            onNavigateToWishClick = navigateToWish
+        )
+        is UiState.Failure -> Unit
+        is UiState.Empty -> Unit
+    }
 }
 
 @Composable
