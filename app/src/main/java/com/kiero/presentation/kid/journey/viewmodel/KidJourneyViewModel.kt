@@ -6,6 +6,7 @@ import com.kiero.core.common.util.successData
 import com.kiero.core.localstorage.permission.PermissionInfoManager
 import com.kiero.core.model.UiState
 import com.kiero.core.permission.model.PermissionType
+import com.kiero.data.fcm.repository.FcmRepository
 import com.kiero.data.kid.coin.repository.CoinRepository
 import com.kiero.data.kid.schedule.model.ScheduleStatus
 import com.kiero.data.kid.schedule.repository.ScheduleRepository
@@ -36,7 +37,8 @@ class KidJourneyViewModel @Inject constructor(
     private val repository: ScheduleRepository,
     private val coinRepository: CoinRepository,
     private val sseManager: SseManager,
-    private val permissionInfoManager: PermissionInfoManager
+    private val permissionInfoManager: PermissionInfoManager,
+    private val fcmRepository: FcmRepository
 ) : ViewModel() {
     private val coin = coinRepository.myCoin
 
@@ -77,9 +79,35 @@ class KidJourneyViewModel @Inject constructor(
     private val _sideEffect = MutableSharedFlow<KidJourneySideEffect>()
     val sideEffect: SharedFlow<KidJourneySideEffect> = _sideEffect.asSharedFlow()
 
+    val notificationDeniedCount = permissionInfoManager.deniedCount(PermissionType.POST_NOTIFICATIONS)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = 0
+        )
+
+    private var hasShownInitialPrompt = false
+
     init {
         sseManager.startChildSubscription()
         collectChildKidScheduleEvents()
+    }
+
+    fun checkShouldShowPushPrompt(hasOsPermission: Boolean, deniedCount: Int): Boolean {
+        if (hasShownInitialPrompt) return false
+
+        if (!hasOsPermission && deniedCount == 0) {
+            hasShownInitialPrompt = true
+            return true
+        }
+        return false
+    }
+
+    fun updatePushSetting(isEnabled: Boolean) {
+        viewModelScope.launch {
+            fcmRepository.updatePushSetting(isEnabled)
+                .onFailure { Timber.e("푸시 알림 서버 업데이트 실패: $it") }
+        }
     }
 
     fun fetchData() {
