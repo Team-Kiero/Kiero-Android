@@ -26,17 +26,21 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
+import com.kiero.core.common.extension.disableUpWardEvent
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.component.bottomsheet.KieroBottomSheet
 import com.kiero.core.designsystem.component.button.KieroButtonMedium
 import com.kiero.core.designsystem.theme.KieroTheme
-import com.kiero.presentation.auth.parent.model.AuthParentConsentsUiModel
 import com.kiero.presentation.auth.parent.model.TermsType
+import com.kiero.presentation.auth.parent.model.TermsUiModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TermsAgreementBottomSheet(
-    consentsItem: AuthParentConsentsUiModel,
+    termsList: ImmutableList<TermsUiModel>,
+    isAllAgreed: Boolean,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
     onClickTerms: (TermsType) -> Unit,
@@ -47,7 +51,8 @@ fun TermsAgreementBottomSheet(
         onDismiss = onDismiss,
     ) {
         TermsAgreementContent(
-            consentsItem = consentsItem,
+            termsList = termsList,
+            isAllAgreed = isAllAgreed,
             onConfirm = onConfirm,
             onClickTerms = onClickTerms,
             navigateToTerms = navigateToTerms,
@@ -58,7 +63,8 @@ fun TermsAgreementBottomSheet(
 
 @Composable
 private fun TermsAgreementContent(
-    consentsItem: AuthParentConsentsUiModel,
+    termsList: ImmutableList<TermsUiModel>,
+    isAllAgreed: Boolean,
     onConfirm: () -> Unit,
     onClickTerms: (TermsType) -> Unit,
     navigateToTerms: (TermsType) -> Unit,
@@ -67,6 +73,7 @@ private fun TermsAgreementContent(
     Column (
         modifier = modifier
             .fillMaxWidth()
+            .disableUpWardEvent()
             .dropShadow(
                 shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp),
                 shadow = Shadow(
@@ -95,35 +102,26 @@ private fun TermsAgreementContent(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        TermsItem(
-            termsText = "(필수) KIERO 이용약관 동의",
-            isSelected = consentsItem.isTermsAccepted,
-            onClickTerms = {
-                onClickTerms(TermsType.SERVICE_AGREEMENT)
-            },
-            navigateToTerms = {
-                navigateToTerms(TermsType.SERVICE_AGREEMENT)
-            },
-        )
+        termsList.forEachIndexed { index, term ->
+            TermsItem(
+                termsText = term.termsType.description,
+                isSelected = term.isAgreed,
+                onClickTerms = { onClickTerms(term.termsType) },
+                navigateToTerms = { navigateToTerms(term.termsType) },
+            )
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        TermsItem(
-            termsText = "(필수) 개인정보 필수 동의",
-            isSelected = consentsItem.isPrivacyPolicyAccepted,
-            onClickTerms = {
-                onClickTerms(TermsType.PRIVACY_POLICY)
-            },
-            navigateToTerms = {
-                navigateToTerms(TermsType.PRIVACY_POLICY)
-            },
-        )
+            if (index == termsList.lastIndex) {
+                Spacer(modifier = Modifier.height(20.dp))
+            } else {
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+        }
 
         Spacer(modifier = Modifier.height(20.dp))
 
         KieroButtonMedium(
             text = "확인",
-            isEnabled = consentsItem.isTermsAccepted && consentsItem.isPrivacyPolicyAccepted,
+            isEnabled = isAllAgreed,
             onClick = onConfirm,
             modifier = Modifier
                 .padding(horizontal = 16.dp)
@@ -182,6 +180,21 @@ private fun TermsItem(
 @Composable
 private fun TermsAgreementBottomSheetPreview() {
     KieroTheme {
+        val dummyTermsList = persistentListOf(
+            TermsUiModel(
+                termsType = TermsType.SERVICE_AGREEMENT,
+                termsId = 1L,
+                url = "",
+                isAgreed = true
+            ),
+            TermsUiModel(
+                termsType = TermsType.PRIVACY_POLICY,
+                termsId = 2L,
+                url = "",
+                isAgreed = false
+            )
+        )
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -191,7 +204,8 @@ private fun TermsAgreementBottomSheetPreview() {
             )
 
             TermsAgreementContent(
-                consentsItem = AuthParentConsentsUiModel(),
+                termsList = dummyTermsList,
+                isAllAgreed = false,
                 onConfirm = {},
                 navigateToTerms = {},
                 onClickTerms = {},

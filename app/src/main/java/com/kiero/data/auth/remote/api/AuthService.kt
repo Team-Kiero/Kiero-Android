@@ -9,8 +9,10 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface AuthService {
-    // 부모
-    @POST("api/v1/parents/login/access-token")
+    /**
+     * 부모 카카오 로그인
+     * */
+    @POST("api/v1/parents/login/kakao/access-token")
     suspend fun postAuthLogin(
         @Query("accessToken") accessToken: String
     ): BaseResponse<AuthLoginResponseDto>

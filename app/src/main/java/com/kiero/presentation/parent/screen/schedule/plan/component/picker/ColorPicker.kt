@@ -31,6 +31,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
+import com.kiero.core.common.extension.disableUpWardEvent
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.screen.schedule.plan.model.ColorType
@@ -55,14 +56,12 @@ fun ColorPickerBottomSheet(
         containerColor = KieroTheme.colors.gray900,
         dragHandle = null,
         modifier = modifier
-            .pointerInput(Unit) {
-                detectTapGestures { }
-            }
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 16.dp)
+                .disableUpWardEvent()
         ) {
             PickerTopbar(
                 title = "컬러",
