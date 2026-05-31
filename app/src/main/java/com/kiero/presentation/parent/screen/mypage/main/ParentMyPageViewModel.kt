@@ -99,11 +99,9 @@ class ParentMyPageViewModel @Inject constructor(
             fcmRepository.updatePushSetting(isEnabled)
                 .onSuccess {
                     _state.update { it.copy(isAlarmChecked = isEnabled) }
-                    _sideEffect.emit(ParentMyPageSideEffect.ShowToast("알림 설정이 변경되었습니다."))
                 }
                 .onFailure { error ->
                     Timber.e("푸시 알림 설정 변경 실패: $error")
-                    _sideEffect.emit(ParentMyPageSideEffect.ShowSnackBar("알림 설정 변경에 실패했습니다."))
                 }
         }
     }
