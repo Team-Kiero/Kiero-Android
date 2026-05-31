@@ -36,6 +36,7 @@ import com.kiero.core.designsystem.component.dialog.action.KieroCancelAction
 import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.parent.ParentInfo
+import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.permission.PermissionChecker
 import com.kiero.core.permission.model.PermissionType
 import com.kiero.core.permission.util.navigateToSettings
@@ -55,14 +56,15 @@ fun ParentMyPageRoute(
     viewModel: ParentMyPageViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    var isLogOut by remember { mutableStateOf(false) }
+    val uriHandler = LocalUriHandler.current
+    val globalTrigger = LocalGlobalUiEventTrigger.current
+    val context = LocalContext.current
 
+    var isLogOut by remember { mutableStateOf(false) }
     var showSettingsDialog by remember { mutableStateOf(false) }
     var isWaitingForSettingsResult by remember { mutableStateOf(false) }
 
-    val context = LocalContext.current
-
-   LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         val hasOsPermission = PermissionChecker.isGranted(
             context = context,
             type = PermissionType.POST_NOTIFICATIONS
@@ -80,11 +82,6 @@ fun ParentMyPageRoute(
                 viewModel.updateIsAlarmChecked(false)
             }
         }
-    val uriHandler = LocalUriHandler.current
-    val globalTrigger = LocalGlobalUiEventTrigger.current
-
-    var isLogOut by remember {
-        mutableStateOf(false)
     }
 
     viewModel.sideEffect.collectSideEffect {
@@ -96,13 +93,12 @@ fun ParentMyPageRoute(
                     bottomPadding = 110
                 )
             )
-
             is ParentMyPageSideEffect.NavigateToChildCare -> navigateToParentChildCare()
             is ParentMyPageSideEffect.NavigateToWithdraw -> navigateToWithdraw()
         }
     }
 
-    val actions = remember(viewModel) {
+    val actions = remember(viewModel, context, state) {
         object : ParentMyPageActions {
             override fun onClickChildCare() = navigateToParentChildCare()
 
@@ -124,7 +120,17 @@ fun ParentMyPageRoute(
             override fun onClickOss() = navigateToOssLicenses()
 
             override fun onCheckedChange(checked: Boolean) {
-                viewModel.updateIsAlarmChecked(checked)
+                if (checked) {
+                    val hasOsPermission = PermissionChecker.isGranted(context, PermissionType.POST_NOTIFICATIONS)
+
+                    if (hasOsPermission) {
+                        viewModel.updateIsAlarmChecked(true)
+                    } else {
+                        showSettingsDialog = true
+                    }
+                } else {
+                    viewModel.updateIsAlarmChecked(false)
+                }
             }
 
             override fun onClickTerms(type: ParentMenuLinkType) {
@@ -143,28 +149,7 @@ fun ParentMyPageRoute(
         paddingValues = paddingValues,
         state = state,
         isLogOut = isLogOut,
-        onClickChildCare = navigateToParentChildCare,
-        onClickLogOut = { isLogOut = true },
-        onClickLogOutConfirm = {
-            isLogOut = false
-            viewModel.logOut()
-        },
-        onClickLogOutCancel = { isLogOut = false },
-        onClickWithDraw = navigateToWithDraw,
-        onClickOss = navigateToOssLicenses,
-        onCheckedChange = { isChecked ->
-            if (isChecked) {
-                val hasOsPermission = PermissionChecker.isGranted(context, PermissionType.POST_NOTIFICATIONS)
-
-                if (hasOsPermission) {
-                    viewModel.updateIsAlarmChecked(true)
-                } else {
-                    showSettingsDialog = true
-                }
-            } else {
-                viewModel.updateIsAlarmChecked(false)
-            }
-        }
+        actions = actions
     )
 
     if (showSettingsDialog) {
