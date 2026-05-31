@@ -6,14 +6,18 @@ import androidx.lifecycle.viewModelScope
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kiero.core.common.extension.toHandleErrorMessage
+import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.model.UiState
 import com.kiero.data.auth.repository.AuthRepository
+import com.kiero.data.terms.repository.TermsRepository
 import com.kiero.domain.login.HandleKakaoLoginResultUseCase
-import com.kiero.presentation.auth.parent.model.KakaoLoginResult
+import com.kiero.domain.login.model.KakaoLoginResult
 import com.kiero.presentation.auth.parent.model.TermsType
+import com.kiero.presentation.auth.parent.model.toUiModel
 import com.kiero.presentation.auth.parent.state.AuthParentState
 import com.kiero.presentation.auth.state.AuthSideEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,6 +31,8 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthParentViewModel @Inject constructor(
     private val authRepository: AuthRepository,
+    private val termsRepository: TermsRepository,
+    private val userInfoManager: UserInfoManager,
     private val handleKakaoLoginResultUseCase: HandleKakaoLoginResultUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AuthParentState())
@@ -43,13 +49,13 @@ class AuthParentViewModel @Inject constructor(
                 handleKakaoLoginResultUseCase(
                     name = result.name,
                     image = result.image
-                ).onSuccess { kakaoLoginResult ->
-                    when (kakaoLoginResult) {
-                        is KakaoLoginResult.HasChildren ->
-                            _sideEffect.emit(AuthSideEffect.NavigateToParentGraph)
-                        is KakaoLoginResult.NoChildren ->
-                            showTermsAgreement()
+                ).onSuccess { domainResult: KakaoLoginResult ->
+                    when (domainResult) {
+                        is KakaoLoginResult.NeedTermsAgreement -> showTermsAgreement()
+                        is KakaoLoginResult.HasChildren -> _sideEffect.emit(AuthSideEffect.NavigateToParentGraph)
+                        is KakaoLoginResult.NoChildren -> _sideEffect.emit(AuthSideEffect.NavigateToParentSignUp)
                     }
+
                 }.onFailure { throwable ->
                     Timber.e(throwable)
                     handleError(throwable)
@@ -76,26 +82,15 @@ class AuthParentViewModel @Inject constructor(
      * 이용약관 동의, 개인정보 상태를 토글합니다.
      */
     fun toggleTermsAccepted(termsType: TermsType) {
-        when (termsType) {
-            TermsType.SERVICE_AGREEMENT -> {
-                _state.update { currentState ->
-                    currentState.copy(
-                        consents = currentState.consents.copy(
-                            isTermsAccepted = !currentState.consents.isTermsAccepted
-                        )
-                    )
+        _state.update { currentState ->
+            val updatedList = currentState.termsList.map { term ->
+                if (term.termsType == termsType) {
+                    term.copy(isAgreed = !term.isAgreed)
+                } else {
+                    term
                 }
             }
-
-            TermsType.PRIVACY_POLICY -> {
-                _state.update { currentState ->
-                    currentState.copy(
-                        consents = currentState.consents.copy(
-                            isPrivacyPolicyAccepted = !currentState.consents.isPrivacyPolicyAccepted
-                        )
-                    )
-                }
-            }
+            currentState.copy(termsList = updatedList.toImmutableList())
         }
     }
 
@@ -105,57 +100,72 @@ class AuthParentViewModel @Inject constructor(
      */
     fun toggleAllConsents() {
         _state.update { currentState ->
-            val allAccepted = currentState.consents.isTermsAccepted && currentState.consents.isPrivacyPolicyAccepted
-
-            currentState.copy(
-                consents = currentState.consents.copy(
-                    isTermsAccepted = !allAccepted,
-                    isPrivacyPolicyAccepted = !allAccepted
-                )
-            )
+            val updatedList = currentState.termsList.map { term ->
+                term.copy(isAgreed = !currentState.isAllAgreed)
+            }
+            currentState.copy(termsList = updatedList.toImmutableList())
         }
     }
 
     fun showTermsAgreement() {
-        val isShowTermsAgreement = _state.value.isShowTermsAgreement
-
-        _state.update {
-            it.copy(
-                isShowTermsAgreement = !isShowTermsAgreement,
-                uiState = UiState.Empty
-            )
-        }
-    }
-
-    fun successTermsAgreement() {
         viewModelScope.launch {
+            val isShowTermsAgreement = _state.value.isShowTermsAgreement
+
+            if (!isShowTermsAgreement && _state.value.termsList.isEmpty()) {
+                termsRepository.getTermsLink()
+                    .onSuccess { terms ->
+                        _state.update { currentState ->
+                            currentState.copy(termsList = terms.map { it.toUiModel() }.toImmutableList())
+                        }
+                    }
+                    .onFailure {
+                        handleError(it)
+                        return@launch
+                    }
+            }
+
             _state.update {
                 it.copy(
-                    isShowTermsAgreement = false,
+                    isShowTermsAgreement = !isShowTermsAgreement,
                     uiState = UiState.Empty
                 )
             }
-
-            _sideEffect.emit(AuthSideEffect.NavigateToParentSignUp)
         }
     }
 
-    // Todo: 나중에 약관들 보여주는 화면으로 이동
+    /**
+     * 약관 동의 완료 처리 및 UserInfoManager에 저장
+     */
+    fun successTermsAgreement() {
+        viewModelScope.launch {
+            Timber.e("successTermsAgreement")
+            if (_state.value.isAllAgreed) {
+                val agreedTermsIds = _state.value.termsList.map { it.termsId }
+
+                userInfoManager.saveTermsInfo(isRequiredTermsAllAgreed = _state.value.isAllAgreed)
+                userInfoManager.saveAgreedTermsIds(agreedTermsIds)
+
+                _state.update { it.copy(isShowTermsAgreement = false) }
+                _sideEffect.emit(AuthSideEffect.NavigateToParentSignUp)
+            } else {
+                handleError(message = "필수 약관에 모두 동의해주세요.")
+            }
+        }
+    }
+
     fun navigateToTerms(termsType: TermsType) {
-        when (termsType) {
-            TermsType.SERVICE_AGREEMENT -> {
-                viewModelScope.launch {
-                    //_sideEffect.emit(AuthSideEffect.NavigateToTerms)
-                }
-            }
+        viewModelScope.launch {
+            val targetTerm = _state.value.termsList.find { it.termsType == termsType }
 
-            TermsType.PRIVACY_POLICY -> {
-                viewModelScope.launch {
-                    //_sideEffect.emit(AuthSideEffect.NavigateToPrivacyPolicy)
-                }
+            if (targetTerm != null && targetTerm.url.isNotBlank()) {
+                _sideEffect.emit(AuthSideEffect.OpenWebView(targetTerm.url))
+            } else {
+                handleError(message = "약관 링크를 찾을 수 없습니다.")
             }
         }
     }
+
+
 
     private suspend fun handleError(
         throwable: Throwable? = null,

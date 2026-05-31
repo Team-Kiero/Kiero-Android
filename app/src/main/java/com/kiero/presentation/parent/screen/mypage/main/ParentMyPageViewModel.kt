@@ -9,8 +9,11 @@ import com.kiero.core.model.parent.ParentInfo
 import com.kiero.core.permission.model.PermissionType
 import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.data.fcm.repository.FcmRepository
+import com.kiero.data.parent.mypage.parent.repository.ParentMyPageRepository
+import com.kiero.presentation.parent.screen.mypage.main.model.toUiModel
 import com.kiero.presentation.parent.screen.mypage.model.ChildConnectionStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -25,6 +28,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ParentMyPageViewModel @Inject constructor(
     private val authRepository: AuthRepository,
+    private val parentMyPageRepository: ParentMyPageRepository,
     private val userInfoManager: UserInfoManager,
     private val appRestarter: AppRestarter,
     private val fcmRepository: FcmRepository,
@@ -45,21 +49,60 @@ class ParentMyPageViewModel @Inject constructor(
 
 
     init {
+        fetchMyPageTerms()
         fetchInfo()
         fetchPushSetting()
     }
 
+    fun fetchMyPageTerms() {
+        viewModelScope.launch {
+            parentMyPageRepository.getParentTermsExternalLink()
+                .onSuccess { result ->
+                    _state.update { currentState ->
+                        currentState.copy(
+                            myPageMenus = result.map { it.toUiModel() }.toImmutableList()
+                        )
+                    }
+                }
+                .onFailure {
+                    Timber.e(it, "약관 불러오기 실패")
+                    _sideEffect.emit(ParentMyPageSideEffect.ShowToast("약관 불러오기에 실패했어요. 다시 시도해주세요."))
+                }
+        }
+    }
     fun fetchInfo() {
         viewModelScope.launch {
-            val kidInfo = userInfoManager.getChildIdInfo()
-            val userInfo = userInfoManager.getParentInfo()
+            parentMyPageRepository.getParentMyProfile()
+                .onSuccess { response ->
+                    _state.update {
+                        it.copy(
+                            parentInfo = ParentInfo(
+                                name = response.name,
+                                profileImage = response.image ?: ""
+                            ),
 
-            _state.update {
-                it.copy(
-                    parentInfo = userInfo ?: ParentInfo(),
-                    connectionStatus = if (kidInfo != null) ChildConnectionStatus.CONNECTED else ChildConnectionStatus.PENDING
-                )
-            }
+                            connectionStatus = if (response.hasPendingChildSession) {
+                                ChildConnectionStatus.PENDING
+                            } else {
+                                ChildConnectionStatus.REISSUE
+                            },
+
+                            isAlarmChecked = response.pushNotificationEnabled
+                        )
+                    }
+                }
+                .onFailure { error ->
+                    Timber.e(error, "프로필 정보 불러오기 실패")
+                    val kidInfo = userInfoManager.getChildIdInfo()
+                    val userInfo = userInfoManager.getParentInfo()
+
+                    _state.update {
+                        it.copy(
+                            parentInfo = userInfo ?: ParentInfo(),
+                            connectionStatus = if (kidInfo != null) ChildConnectionStatus.REISSUE else ChildConnectionStatus.PENDING
+                        )
+                    }
+                }
         }
     }
 

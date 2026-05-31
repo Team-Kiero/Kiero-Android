@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -41,13 +42,15 @@ import com.kiero.core.permission.util.navigateToSettings
 import com.kiero.presentation.parent.screen.mypage.main.component.AlarmSettingItem
 import com.kiero.presentation.parent.screen.mypage.main.component.ParentMyPageUserInfo
 import com.kiero.presentation.parent.screen.mypage.main.component.SettingItem
+import com.kiero.presentation.parent.screen.mypage.main.model.ParentMenuLinkType
+import com.kiero.presentation.parent.screen.mypage.main.model.actions.ParentMyPageActions
 
 @Composable
 fun ParentMyPageRoute(
     paddingValues: PaddingValues,
     navigateToOssLicenses: () -> Unit,
     navigateToParentChildCare: () -> Unit,
-    navigateToWithDraw: () -> Unit,
+    navigateToWithdraw: () -> Unit,
     viewModel: ParentMyPageViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -76,13 +79,62 @@ fun ParentMyPageRoute(
                 viewModel.updateIsAlarmChecked(false)
             }
         }
+    val uriHandler = LocalUriHandler.current
+    val globalTrigger = LocalGlobalUiEventTrigger.current
+
+    var isLogOut by remember {
+        mutableStateOf(false)
     }
 
     viewModel.sideEffect.collectSideEffect {
         when (it) {
+            is ParentMyPageSideEffect.ShowToast -> globalTrigger.showToast(it.message)
+            is ParentMyPageSideEffect.ShowSnackBar -> globalTrigger.showSnackbar(
+                SnackbarState(
+                    message = it.message,
+                    bottomPadding = 110
+                )
+            )
+
             is ParentMyPageSideEffect.NavigateToChildCare -> navigateToParentChildCare()
-            is ParentMyPageSideEffect.NavigateToWithDraw -> navigateToWithDraw()
-            else -> {}
+            is ParentMyPageSideEffect.NavigateToWithdraw -> navigateToWithdraw()
+        }
+    }
+
+    val actions = remember(viewModel) {
+        object : ParentMyPageActions {
+            override fun onClickChildCare() = navigateToParentChildCare()
+
+            override fun onClickLogOut() {
+                isLogOut = true
+            }
+
+            override fun onClickLogOutConfirm() {
+                isLogOut = false
+                viewModel.logOut()
+            }
+
+            override fun onClickLogOutCancel() {
+                isLogOut = false
+            }
+
+            override fun onClickWithdraw() = navigateToWithdraw()
+
+            override fun onClickOss() = navigateToOssLicenses()
+
+            override fun onCheckedChange(checked: Boolean) {
+                viewModel.updateIsAlarmChecked(checked)
+            }
+
+            override fun onClickTerms(type: ParentMenuLinkType) {
+                val link = state.myPageMenus.find { it.linkType == type }?.link
+
+                if (!link.isNullOrEmpty()) {
+                    uriHandler.openUri(link)
+                } else {
+                    globalTrigger.showToast("링크를 찾을 수 없습니다.")
+                }
+            }
         }
     }
 
@@ -140,13 +192,7 @@ private fun ParentMyPageScreen(
     paddingValues: PaddingValues,
     state: ParentMyPageState,
     isLogOut: Boolean,
-    onClickChildCare: () -> Unit = {},
-    onClickLogOut: () -> Unit = {},
-    onClickLogOutConfirm: () -> Unit = {},
-    onClickLogOutCancel: () -> Unit = {},
-    onClickWithDraw: () -> Unit = {},
-    onClickOss: () -> Unit = {},
-    onCheckedChange: (Boolean) -> Unit = {}
+    actions: ParentMyPageActions,
 ) {
     Box(
         modifier = Modifier
@@ -174,21 +220,23 @@ private fun ParentMyPageScreen(
             ) {
                 SettingItem(
                     text = "자녀 관리",
-                    onClick = onClickChildCare,
+                    onClick = actions::onClickChildCare,
                     connectionStatus = state.connectionStatus,
-                    hasConnectChildren = true,
+                    showConnectionStatus = true,
                 )
 
                 AlarmSettingItem(
                     text = "푸시 알림",
                     checked = state.isAlarmChecked,
                     enabled = true,
-                    onCheckedChange = onCheckedChange
+                    onCheckedChange = actions::onCheckedChange
                 )
 
                 SettingItem(
                     text = "고객 지원",
-                    onClick = {}
+                    onClick = {
+                        actions.onClickTerms(ParentMenuLinkType.CUSTOMER_SUPPORT)
+                    }
                 )
             }
 
@@ -211,17 +259,21 @@ private fun ParentMyPageScreen(
 
                 SettingItem(
                     text = "서비스 이용약관",
-                    onClick = {}, // Todo: 페이지 구현 시 반영
+                    onClick = {
+                        actions.onClickTerms(ParentMenuLinkType.SERVICE_TERMS)
+                    },
                 )
 
                 SettingItem(
                     text = "개인정보 처리방침",
-                    onClick = {} // Todo: 페이지 구현 시 반영
+                    onClick = {
+                        actions.onClickTerms(ParentMenuLinkType.PRIVACY_POLICY)
+                    }
                 )
 
                 SettingItem(
                     text = "오픈소스 라이선스",
-                    onClick = onClickOss
+                    onClick = actions::onClickOss
                 )
             }
 
@@ -248,7 +300,7 @@ private fun ParentMyPageScreen(
                     textDecoration = TextDecoration.Underline,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .noRippleClickable(onClick = onClickLogOut)
+                        .noRippleClickable(onClick = actions::onClickLogOut)
                 )
 
                 Text(
@@ -258,7 +310,7 @@ private fun ParentMyPageScreen(
                     textDecoration = TextDecoration.Underline,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .noRippleClickable(onClick = onClickWithDraw)
+                        .noRippleClickable(onClick = actions::onClickWithdraw)
                 )
 
                 Spacer(modifier = Modifier.height(70.dp))
@@ -268,12 +320,12 @@ private fun ParentMyPageScreen(
         if (isLogOut) {
             KieroDialog(
                 isDisabled = true,
-                onDismiss = onClickLogOutCancel,
+                onDismiss = actions::onClickLogOutCancel,
                 confirmAction = KieroConfirmAction(
-                    onClick = onClickLogOutConfirm
+                    onClick = actions::onClickLogOutConfirm
                 ),
                 cancelAction = KieroCancelAction(
-                    onClick = onClickLogOutCancel
+                    onClick = actions::onClickLogOutCancel
                 ),
                 title = "로그아웃",
                 subDescription = "로그아웃 하시겠습니까?"
@@ -291,7 +343,17 @@ private fun ParentMyPageScreenPreview() {
             state = ParentMyPageState(
                 parentInfo = ParentInfo(name = "키어로")
             ),
-            isLogOut = false
+            isLogOut = false,
+            actions = object : ParentMyPageActions {
+                override fun onClickChildCare() {}
+                override fun onClickLogOut() {}
+                override fun onClickLogOutConfirm() {}
+                override fun onClickLogOutCancel() {}
+                override fun onClickWithdraw() {}
+                override fun onClickOss() {}
+                override fun onCheckedChange(checked: Boolean) {}
+                override fun onClickTerms(type: ParentMenuLinkType) {}
+            }
         )
     }
 }
