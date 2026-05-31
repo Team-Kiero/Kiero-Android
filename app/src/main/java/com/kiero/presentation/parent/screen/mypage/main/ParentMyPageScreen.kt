@@ -53,12 +53,14 @@ fun ParentMyPageRoute(
     val state by viewModel.state.collectAsStateWithLifecycle()
     var isLogOut by remember { mutableStateOf(false) }
 
+    // [MP-001-P02] 기기 설정 유도 팝업 상태
     var showSettingsDialog by remember { mutableStateOf(false) }
     var isWaitingForSettingsResult by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
 
-   LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+    // 앱 복귀(ON_RESUME) 시 기기 OS 권한 상태 확인 후 토글 동기화
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         val hasOsPermission = PermissionChecker.isGranted(
             context = context,
             type = PermissionType.POST_NOTIFICATIONS
@@ -109,7 +111,7 @@ fun ParentMyPageRoute(
                     showSettingsDialog = true
                 }
             } else {
-               viewModel.updateIsAlarmChecked(false)
+                viewModel.updateIsAlarmChecked(false)
             }
         }
     )
@@ -211,12 +213,12 @@ private fun ParentMyPageScreen(
 
                 SettingItem(
                     text = "서비스 이용약관",
-                    onClick = {}, // Todo: 페이지 구현 시 반영
+                    onClick = {},
                 )
 
                 SettingItem(
                     text = "개인정보 처리방침",
-                    onClick = {} // Todo: 페이지 구현 시 반영
+                    onClick = {}
                 )
 
                 SettingItem(
