@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
@@ -39,6 +38,7 @@ import com.kiero.core.designsystem.component.KieroSnackbar
 import com.kiero.core.designsystem.component.dialog.KieroDialog
 import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.core.model.fcm.PushData
 import com.kiero.core.model.trigger.DialogTrigger
 import com.kiero.core.model.trigger.GlobalUiEventHolder
 import com.kiero.core.model.trigger.RefreshState
@@ -66,11 +66,20 @@ import timber.log.Timber
 @Composable
 fun MainRoute(
     appState: MainAppState,
+    pushData: PushData? = null,
+    onPushConsumed: () -> Unit = {},
     viewModel: MainViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     val snackBarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(pushData) {
+        if (pushData != null) {
+            appState.navigateFromPushData(pushData)
+            onPushConsumed()
+        }
+    }
 
     LifecycleResumeEffect(Unit) {
         Timber.e("App resumed")

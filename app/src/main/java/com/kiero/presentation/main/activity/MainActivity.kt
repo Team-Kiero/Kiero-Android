@@ -9,7 +9,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -44,13 +43,11 @@ class MainActivity : ComponentActivity() {
             KieroTheme {
                 val appState = rememberMainAppState(networkMonitor = networkMonitor)
 
-                LaunchedEffect(pendingPushData) {
-                    pendingPushData?.let { pushData ->
-                        appState.navigateFromPushData(pushData)
-                        pendingPushData = null
-                    }
-                }
-                MainRoute(appState = appState)
+                MainRoute(
+                    appState = appState,
+                    pushData = pendingPushData,
+                    onPushConsumed = { pendingPushData = null }
+                )
             }
         }
     }

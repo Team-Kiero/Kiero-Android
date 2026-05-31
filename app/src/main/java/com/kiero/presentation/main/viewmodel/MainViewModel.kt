@@ -2,14 +2,12 @@ package com.kiero.presentation.main.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kiero.data.fcm.manager.FcmTokenManager
 import com.kiero.data.fcm.repository.FcmRepository
 import com.kiero.data.parent.alarm.repository.AlarmRepository
 import com.kiero.data.sse.manager.SseManager
 import com.kiero.presentation.main.model.toUiModel
 import com.kiero.presentation.main.state.MainState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,17 +33,12 @@ class MainViewModel @Inject constructor(
 
     private fun syncFcmToken() {
         viewModelScope.launch {
-            val token = FcmTokenManager.getToken()
-            if (token == null) {
-                Timber.e("FCM 토큰을 가져오지 못했습니다.")
-                return@launch
-            }
-            fcmRepository.updateFcmToken(token)
+            fcmRepository.syncFcmToken()
                 .onSuccess {
-                    Timber.d("FCM 토큰 서버 갱신 성공: $token")
+                    Timber.d("FCM 토큰 동기화(획득 및 서버 갱신) 성공")
                 }
                 .onFailure {
-                    Timber.e(it, "FCM 토큰 서버 갱신 실패")
+                    Timber.e(it, "FCM 토큰 동기화 실패")
                 }
         }
     }
