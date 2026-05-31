@@ -12,11 +12,11 @@ import javax.inject.Inject
 @HiltViewModel
 class ParentMyPageWithdrawViewModel @Inject constructor(
     private val appRestarter: AppRestarter,
-    private val withDrawUseCase: WithdrawUseCase
+    private val withdrawUseCase: WithdrawUseCase
 ) : ViewModel() {
-    fun withDraw() {
+    fun withdraw() {
         viewModelScope.launch {
-            withDrawUseCase()
+            withdrawUseCase()
                 .onSuccess {
                     appRestarter.restartApp()
                 }

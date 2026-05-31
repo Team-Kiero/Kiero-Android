@@ -39,7 +39,7 @@ fun ParentMyPageWithdrawRoute(
 ) {
     ParentMyPageWithdrawScreen(
         onBackClick = navigateUp,
-        onWithdraw = viewModel::withDraw
+        onWithdraw = viewModel::withdraw
     )
 }
 
