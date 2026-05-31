@@ -2,7 +2,10 @@ package com.kiero.presentation.parent.screen.journey
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.localstorage.permission.PermissionInfoManager
+import com.kiero.core.permission.model.PermissionType
 import com.kiero.data.auth.repository.AuthRepository
+import com.kiero.data.fcm.repository.FcmRepository
 import com.kiero.data.parent.journey.repository.ParentJourneyRepository
 import com.kiero.data.sse.manager.SseManager
 import com.kiero.data.sse.model.parent.SseScheduleEventType
@@ -14,8 +17,10 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -26,7 +31,9 @@ import javax.inject.Inject
 class ParentJourneyViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val parentJourneyRepository: ParentJourneyRepository,
-    private val sseManager: SseManager
+    private val sseManager: SseManager,
+    private val fcmRepository: FcmRepository,
+    private val permissionInfoManager: PermissionInfoManager
 ) : ViewModel() {
     private val _state = MutableStateFlow(ParentJourneyState())
     val state = _state.asStateFlow()
@@ -34,9 +41,41 @@ class ParentJourneyViewModel @Inject constructor(
     private val _sideEffect = MutableSharedFlow<ParentJourneySideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
 
+    val notificationDeniedCount = permissionInfoManager.deniedCount(PermissionType.POST_NOTIFICATIONS)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = 0
+        )
+
+    private var hasShownInitialPrompt = false
+
     init {
         fetchKidInfo()
         sseManager.startParentSubscription()
+    }
+
+    fun checkShouldShowPushPrompt(hasOsPermission: Boolean, deniedCount: Int): Boolean {
+        if (hasShownInitialPrompt) return false
+
+        if (!hasOsPermission && deniedCount == 0) {
+            hasShownInitialPrompt = true
+            return true
+        }
+        return false
+    }
+
+    fun updatePushSetting(isEnabled: Boolean) {
+        viewModelScope.launch {
+            fcmRepository.updatePushSetting(isEnabled)
+                .onFailure { Timber.e("푸시 알림 서버 업데이트 실패: $it") }
+        }
+    }
+
+    fun increaseDeniedCount(type: PermissionType) {
+        viewModelScope.launch {
+            permissionInfoManager.increaseDeniedCount(type)
+        }
     }
 
     fun collectConnectionEvents() {

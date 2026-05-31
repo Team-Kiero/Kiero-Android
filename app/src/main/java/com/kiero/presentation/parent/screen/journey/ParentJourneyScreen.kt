@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -26,9 +27,15 @@ import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.common.util.toDotSeparatedDate
+import com.kiero.core.designsystem.component.dialog.KieroDialog
+import com.kiero.core.designsystem.component.dialog.action.KieroCancelAction
+import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
 import com.kiero.core.designsystem.component.emptyview.KieroContentEmptyScreen
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.trigger.SnackbarState
+import com.kiero.core.permission.PermissionChecker
+import com.kiero.core.permission.model.PermissionType
+import com.kiero.core.permission.ui.rememberPermissionRequester
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
 import com.kiero.presentation.parent.screen.journey.component.ParentJourneyBottomSheet
 import com.kiero.presentation.parent.screen.journey.component.ParentJourneyTodayKidInfo
@@ -48,15 +55,39 @@ fun ParentJourneyRoute(
 ) {
     val globalUiEventHolder = LocalGlobalUiEventTrigger.current
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    var showInitialPermissionDialog by remember { mutableStateOf(false) }
+    val deniedCount by viewModel.notificationDeniedCount.collectAsStateWithLifecycle()
 
     viewModel.sideEffect.collectSideEffect {
         when (it) {
             ParentJourneySideEffect.NavigateUp -> navigateUp()
             is ParentJourneySideEffect.ShowSnackbar -> globalUiEventHolder.showSnackbar(
-                SnackbarState(
-                    message = it.message
-                )
+                SnackbarState(message = it.message)
             )
+        }
+    }
+
+    val requestPushPermission = rememberPermissionRequester(
+        type = PermissionType.POST_NOTIFICATIONS,
+        deniedCount = deniedCount,
+        onGranted = {
+            viewModel.updatePushSetting(true)
+        },
+        onDenied = {
+            viewModel.updatePushSetting(false)
+        },
+        onPermanentlyDenied = {
+            viewModel.updatePushSetting(false)
+        },
+        onCountIncrease = viewModel::increaseDeniedCount
+    )
+
+    LaunchedEffect(deniedCount) {
+        val hasOsPermission = PermissionChecker.isGranted(context, PermissionType.POST_NOTIFICATIONS)
+
+        if (viewModel.checkShouldShowPushPrompt(hasOsPermission, deniedCount)) {
+            showInitialPermissionDialog = true
         }
     }
 
@@ -68,10 +99,7 @@ fun ParentJourneyRoute(
 
     LifecycleResumeEffect(Unit) {
         viewModel.fetchParentJourney(state.kidInfo.kidId.toLong())
-
-        onPauseOrDispose {
-
-        }
+        onPauseOrDispose { }
     }
 
     ParentJourneyScreen(
@@ -80,6 +108,30 @@ fun ParentJourneyRoute(
         onJourneyDialogDismiss = onRefreshUnreadAlarm,
         state = state
     )
+
+    if (showInitialPermissionDialog) {
+        KieroDialog(
+            isDisabled = false,
+            onDismiss = {
+                showInitialPermissionDialog = false
+            },
+            title = "아이의 여정을 알려드릴게요.",
+            subDescription = "일정 인증, 미션 완료, 쿠폰 사용처럼\n중요한 순간을 알림으로 받아보세요.",
+            confirmAction = KieroConfirmAction(
+                text = "알림 받기",
+                onClick = {
+                    showInitialPermissionDialog = false
+                    requestPushPermission()
+                }
+            ),
+            cancelAction = KieroCancelAction(
+                text = "나중에 할게요",
+                onClick = {
+                    showInitialPermissionDialog = false
+                }
+            )
+        )
+    }
 }
 
 @Composable
