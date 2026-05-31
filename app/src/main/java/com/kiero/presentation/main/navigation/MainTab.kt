@@ -5,6 +5,7 @@ import androidx.annotation.StringRes
 import com.kiero.R
 import com.kiero.presentation.kid.navigation.KidJourney
 import com.kiero.presentation.kid.navigation.KidMission
+import com.kiero.presentation.kid.navigation.KidMySpace
 import com.kiero.presentation.kid.navigation.KidTab
 import com.kiero.presentation.kid.navigation.KidWish
 import com.kiero.presentation.main.navigation.component.BottomBarTab
@@ -44,14 +45,14 @@ enum class ParentMainTab(
 
     REWARD(
         iconRes = R.drawable.ic_parent_tab_reward,
-        contentDescription = R.string.reward_tab_content_description,
-        labelRes = R.string.reward_tab_content_description,
+        contentDescription = R.string.parent_reward_tab_content_description,
+        labelRes = R.string.parent_reward_tab_content_description,
         route = ParentReward,
     ),
     MYPAGE(
         iconRes = R.drawable.ic_parent_tab_mypage,
-        contentDescription = R.string.mypage_tab_content_description,
-        labelRes = R.string.mypage_tab_content_description,
+        contentDescription = R.string.parent_mypage_tab_content_description,
+        labelRes = R.string.parent_mypage_tab_content_description,
         route = Mypage,
     );
 
@@ -87,9 +88,15 @@ enum class KidMainTab(
     ),
     WISH(
         iconRes = R.drawable.ic_kid_tab_wish,
-        contentDescription = R.string.wish_tab_content_description,
-        labelRes = R.string.wish_tab_content_description,
+        contentDescription = R.string.kid_wish_tab_content_description,
+        labelRes = R.string.kid_wish_tab_content_description,
         route = KidWish,
+    ),
+    MYSPACE(
+        iconRes = R.drawable.ic_kid_tab_myspace,
+        contentDescription = R.string.kid_myspace_tab_content_description,
+        labelRes = R.string.kid_myspace_tab_content_description,
+        route = KidMySpace,
     );
 
     companion object {
