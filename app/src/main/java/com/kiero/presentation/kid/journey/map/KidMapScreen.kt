@@ -28,8 +28,8 @@ import com.kiero.core.designsystem.component.button.KieroButtonMedium
 import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
+import com.kiero.presentation.kid.component.KidHeader
 import com.kiero.presentation.kid.journey.map.component.KidMapEmptyView
-import com.kiero.presentation.kid.journey.map.component.KidMapHeader
 import com.kiero.presentation.kid.journey.map.component.KidMapScheduleList
 import com.kiero.presentation.kid.journey.map.state.KidMapState
 import com.kiero.presentation.kid.journey.map.viewModel.KidMapViewModel
@@ -96,7 +96,7 @@ private fun KidMapScreen(
                 Spacer(modifier = Modifier.height(30.dp))
 
                 if (state.schedules.isNotEmpty()) {
-                    KidMapHeader(scheduleCount = state.scheduleCount)
+                    KidHeader(count = state.scheduleCount)
 
                     Spacer(modifier = Modifier.height(25.dp))
 

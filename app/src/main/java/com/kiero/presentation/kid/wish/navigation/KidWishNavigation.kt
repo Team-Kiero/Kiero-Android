@@ -17,11 +17,13 @@ fun NavController.navigateToWish(
 fun NavGraphBuilder.kidWishNavGraph(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
+    onWishArchiveClick: () -> Unit,
 ) {
     composable<KidWish> {
         KidWishRoute(
             paddingValues = paddingValues,
             navigateUp = navigateUp,
+            onWishArchiveClick = onWishArchiveClick
         )
     }
 }
