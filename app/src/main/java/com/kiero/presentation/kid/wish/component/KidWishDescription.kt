@@ -14,13 +14,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
+import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
 
 @Composable
 fun KidWishDescription(
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column (
@@ -46,12 +49,23 @@ fun KidWishDescription(
             color = KieroTheme.colors.white
         )
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(7.dp))
 
         Text(
             text = "미션을 통해 얻은 금화로 소원을 살 수 있어!",
             style = KieroTheme.typography.regular.body4,
             color = KieroTheme.colors.gray300
+        )
+
+        Spacer(modifier = Modifier.height(14.dp))
+
+        Text(
+            text = "내가 빈 소원 보러가기",
+            style = KieroTheme.typography.regular.body4.copy(
+                textDecoration = TextDecoration.Underline
+            ),
+            color = KieroTheme.colors.main,
+            modifier = Modifier.noRippleClickable(onClick)
         )
     }
 }
@@ -60,6 +74,8 @@ fun KidWishDescription(
 @Composable
 private fun KidWishDescriptionPreview() {
     KieroTheme {
-        KidWishDescription()
+        KidWishDescription(
+            onClick = {}
+        )
     }
 }
