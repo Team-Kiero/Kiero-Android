@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.localstorage.permission.PermissionInfoManager
 import com.kiero.core.permission.model.PermissionType
+import com.kiero.data.fcm.repository.FcmRepository
 import com.kiero.data.kid.coin.repository.CoinRepository
 import com.kiero.presentation.kid.myspace.state.KidMySpaceState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class KidMySpaceViewModel @Inject constructor(
     private val coinRepository: CoinRepository,
-    private val permissionInfoManager: PermissionInfoManager
+    private val permissionInfoManager: PermissionInfoManager,
+    private val fcmRepository: FcmRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(KidMySpaceState())
@@ -27,6 +29,7 @@ class KidMySpaceViewModel @Inject constructor(
     init {
         fetchKidName()
         observeNotificationDeniedCount()
+        fetchPushSetting()
     }
 
     private fun fetchKidName() {
@@ -55,10 +58,28 @@ class KidMySpaceViewModel @Inject constructor(
         }
     }
 
+    private fun fetchPushSetting() {
+        viewModelScope.launch {
+            fcmRepository.getPushSetting()
+                .onSuccess { isEnabled ->
+                    _uiState.update { it.copy(isNotificationChecked = isEnabled) }
+                }
+                .onFailure { error ->
+                    Timber.e("푸시 알림 설정 조회 실패: $error")
+                }
+        }
+    }
 
-    fun onNotificationToggle(checked: Boolean) {
-        // Todo: API 연결 시 서버에 알림 설정 저장
-        _uiState.update { it.copy(isNotificationChecked = checked) }
+   fun onNotificationToggle(checked: Boolean) {
+        viewModelScope.launch {
+            fcmRepository.updatePushSetting(checked)
+                .onSuccess {
+                   _uiState.update { it.copy(isNotificationChecked = checked) }
+                }
+                .onFailure { error ->
+                    Timber.e("푸시 알림 설정 변경 실패: $error")
+                }
+        }
     }
 
     fun showNotificationDialog(show: Boolean) {
