@@ -18,8 +18,8 @@ data class AlarmFeedResponseDto(
 
 @Serializable
 data class FeedItemDto(
-    @SerialName("feedItemId")
-    val id: Long? = null,
+    @SerialName("id")
+    val id: Long,
 
     @SerialName("eventType")
     val eventType: String,
