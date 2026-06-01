@@ -98,7 +98,7 @@ fun ParentMyPageRoute(
         }
     }
 
-    val actions = remember(viewModel, context, state) {
+    val actions = remember(viewModel, context) {
         object : ParentMyPageActions {
             override fun onClickChildCare() = navigateToParentChildCare()
 
