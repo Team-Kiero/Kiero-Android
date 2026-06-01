@@ -28,6 +28,8 @@ import com.kiero.presentation.kid.navigation.KidMySpace
 import com.kiero.presentation.kid.navigation.KidWish
 import com.kiero.presentation.kid.onboarding.navigation.navigateToKidOnboarding
 import com.kiero.presentation.kid.wish.navigation.navigateToWish
+import com.kiero.core.model.fcm.PushData
+import com.kiero.core.model.fcm.PushType
 import com.kiero.presentation.parent.navigation.Mypage
 import com.kiero.presentation.parent.navigation.ParentGraph
 import com.kiero.presentation.parent.navigation.ParentJourney
@@ -49,6 +51,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import timber.log.Timber
 
 
 @Stable
@@ -194,8 +197,11 @@ class MainAppState(
         }
     }
 
-    fun navigateToAlarm(navOptions: NavOptions? = null) =
-        navController.navigateToAlarm(navOptions)
+    fun navigateToAlarm(
+        targetId: Long? = null,
+        expand: Boolean = false,
+        navOptions: NavOptions? = null
+    ) = navController.navigateToAlarm(targetId, expand, navOptions)
 
     fun navigateToSchedule(navOptions: NavOptions? = null) =
         navController.navigateToSchedule(navOptions)
@@ -260,9 +266,9 @@ class MainAppState(
         date: String,
         navOptions: NavOptions? = null
     ) = navController.navigateToMap(
-            date = date,
-            navOptions = navOptions
-        )
+        date = date,
+        navOptions = navOptions
+    )
 
     fun navigateToParentMission(navOptions: NavOptions? = null) =
         navController.navigateToParentMission(navOptions)
@@ -280,19 +286,48 @@ class MainAppState(
     fun popBackStack() {
         navController.popBackStack()
     }
-}
 
-@Composable
-fun rememberMainAppState(
-    networkMonitor: NetworkMonitor,
-    navController: NavHostController = rememberNavController(),
-    coroutineScope: CoroutineScope = rememberCoroutineScope(),
-): MainAppState {
-    return remember(networkMonitor, navController, coroutineScope) {
-        MainAppState(
-            networkMonitor = networkMonitor,
-            navController = navController,
-            coroutineScope = coroutineScope
-        )
+    fun navigateFromPushData(pushData: PushData) {
+        when (pushData.type) {
+            PushType.PARENT_DAILY_START,
+            PushType.SCHEDULE_SKIPPED,
+            PushType.PARENT_SCHEDULE_REMINDER -> navigateParentTab(ParentMainTab.JOURNEY)
+
+            PushType.SCHEDULE_VERIFIED -> {
+                val targetId = pushData.targetId?.toLongOrNull()
+                navigateToAlarm(targetId = targetId, expand = true)
+            }
+
+            PushType.COUPON_PURCHASED,
+            PushType.FIRE_LIT,
+            PushType.MISSION_COMPLETE -> {
+                navigateToAlarm()
+            }
+
+            PushType.CHILD_DAILY_START,
+            PushType.CHILD_NEXT_JOURNEY,
+            PushType.SCHEDULE_CREATED,
+            PushType.SCHEDULE_DELETED,
+            PushType.SCHEDULE_MODIFIED -> navigateKidTab(KidMainTab.JOURNEY)
+
+            PushType.CHILD_MISSION_INCOMPLETE -> navigateKidTab(KidMainTab.MISSION)
+
+            PushType.UNKNOWN -> Timber.w("알 수 없는 FCM 타입입니다.")
+        }
     }
 }
+
+    @Composable
+    fun rememberMainAppState(
+        networkMonitor: NetworkMonitor,
+        navController: NavHostController = rememberNavController(),
+        coroutineScope: CoroutineScope = rememberCoroutineScope(),
+    ): MainAppState {
+        return remember(networkMonitor, navController, coroutineScope) {
+            MainAppState(
+                networkMonitor = networkMonitor,
+                navController = navController,
+                coroutineScope = coroutineScope
+            )
+        }
+    }

@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.devtools.ksp)
     alias(libs.plugins.baselineprofile)
     alias(libs.plugins.aboutlibraries.android)
+    alias(libs.plugins.google.services)
 }
 
 val properties = Properties().apply {
@@ -149,4 +150,7 @@ dependencies {
 
     implementation(libs.aboutlibraries.compose.m3)
     implementation(libs.wheelpicker)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
 }

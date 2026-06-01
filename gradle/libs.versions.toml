@@ -70,6 +70,10 @@ aboutLibraries = "13.2.1"
 # Wheel Picker
 wheelPicker = "0.0.1"
 
+#Firebase
+googleServices = "4.4.1"
+firebaseBom = "32.7.4"
+
 [libraries]
 # Test
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -143,6 +147,10 @@ aboutlibraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3",
 # WheelPicker
 wheelpicker = { group = "io.github.sonms", name = "wheelpicker", version.ref = "wheelPicker" }
 
+# Firebase
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging-ktx" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
@@ -157,6 +165,9 @@ baselineprofile = { id = "androidx.baselineprofile", version.ref = "baselineprof
 
 # AboutLibraries
 aboutlibraries-android = { id = "com.mikepenz.aboutlibraries.plugin.android", version.ref = "aboutLibraries" }
+
+#Firebase
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 
 
 [bundles]

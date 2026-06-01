@@ -31,7 +31,7 @@ jobs:
           mkdir -p /home/runner/.android
           echo "${{ secrets.DEBUG_KEYSTORE }}" | base64 --decode > /home/runner/.android/debug.keystore    
 
-      # 빌드를 위해 gradle에 선언된 키들을 설정 , printf는 출력이 아닌 파일 생성용이라 안전
+      # 빌드를 위해 gradle에 선언된 키들을 설정
       - name: Create local.properties from secret
         env:
           LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
@@ -42,6 +42,11 @@ jobs:
       - name: Grant permission to gradlew
         run: chmod +x ./gradlew
 
+      - name: Create google-services.json from secret
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          echo "$GOOGLE_SERVICES_JSON" > app/google-services.json
+
       - name: Build with Gradle
-        # 단순히 빌드만 확인하려면 assembleDebug, 테스트(ktlint 등)까지 돌리려면 check 사용
         run: ./gradlew assembleDebug --stacktrace --no-daemon
