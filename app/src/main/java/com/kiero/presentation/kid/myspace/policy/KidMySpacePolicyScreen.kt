@@ -9,24 +9,44 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.core.trigger.LocalGlobalUiEventTrigger
 import com.kiero.presentation.kid.myspace.component.KidMySpaceSettingItem
+import com.kiero.presentation.kid.myspace.policy.model.KidMenuLinkType
+import com.kiero.presentation.kid.myspace.policy.viewmodel.KidMySpacePolicyViewModel
 
 @Composable
 fun KidMySpacePolicyRoute(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
     navigateToOssLicenses: () -> Unit,
+    viewModel: KidMySpacePolicyViewModel = hiltViewModel()
 ) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val uriHandler = LocalUriHandler.current
+    val globalTrigger = LocalGlobalUiEventTrigger.current
+
     KidMySpacePolicyScreen(
         paddingValues = paddingValues,
         navigateUp = navigateUp,
-        navigateToOssLicenses = navigateToOssLicenses
+        navigateToOssLicenses = navigateToOssLicenses,
+        onClickTerms = { type ->
+            val link = state.myPageMenus.find { it.linkType == type }?.link
+            if (!link.isNullOrEmpty()) {
+                uriHandler.openUri(link)
+            } else {
+                globalTrigger.showToast("링크를 찾을 수 없습니다.")
+            }
+        }
     )
 }
 
@@ -35,6 +55,7 @@ private fun KidMySpacePolicyScreen(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
     navigateToOssLicenses: () -> Unit,
+    onClickTerms: (KidMenuLinkType) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -64,13 +85,13 @@ private fun KidMySpacePolicyScreen(
 
         KidMySpaceSettingItem(
             text = "서비스 이용 약관",
-            onClick = {}, // Todo: 페이지 구현 시 반영
+            onClick = { onClickTerms(KidMenuLinkType.SERVICE_TERMS) },
             modifier = Modifier.padding(horizontal = 16.dp)
         )
 
         KidMySpaceSettingItem(
             text = "개인정보 처리방침",
-            onClick = {}, // Todo: 페이지 구현 시 반영
+            onClick = { onClickTerms(KidMenuLinkType.PRIVACY_POLICY) },
             modifier = Modifier.padding(horizontal = 16.dp)
         )
 
@@ -89,7 +110,8 @@ private fun KidMySpacePolicyScreenPreview() {
         KidMySpacePolicyScreen(
             paddingValues = PaddingValues(),
             navigateUp = {},
-            navigateToOssLicenses = {}
+            navigateToOssLicenses = {},
+            onClickTerms = {}
         )
     }
 }
