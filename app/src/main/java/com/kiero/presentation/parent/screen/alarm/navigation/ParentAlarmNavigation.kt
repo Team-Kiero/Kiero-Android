@@ -30,11 +30,11 @@ fun NavGraphBuilder.parentAlarmNavGraph(
     navigateToSelection: () -> Unit,
 ) {
     composable<Alarm> { backStackEntry ->
-        val alarmRoute = backStackEntry.toRoute<Alarm>()
+        val alarmArgs = backStackEntry.toRoute<Alarm>()
 
         ParentAlarmRoute(
-            targetId = alarmRoute.targetId,
-            shouldExpand = alarmRoute.expand,
+            targetId = alarmArgs.targetId,
+            shouldExpand = alarmArgs.expand,
             paddingValues = paddingValues,
             navigateUp = navigateUp,
             navigateToSelection = navigateToSelection,
