@@ -27,6 +27,7 @@ class CheckParentAutoLoginUseCase @Inject constructor(
             if (children.isNotEmpty()) {
                 // 서버에서 확인한 자녀 정보를 로컬에 저장하고 홈으로
                 userInfoManager.saveChildIdInfo(children.first().childId)
+                userInfoManager.saveChildName(children.first().childLastName, children.first().childFirstName)
                 ParentAutoLoginResult.MoveToParentHome
             } else {
                 // 약관 동의는 했지만 자녀가 없는 경우 (자녀 등록/온보딩 화면으로)
