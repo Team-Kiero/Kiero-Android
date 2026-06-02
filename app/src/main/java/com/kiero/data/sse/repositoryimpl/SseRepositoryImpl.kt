@@ -1,6 +1,6 @@
 package com.kiero.data.sse.repositoryimpl
 
-import com.kiero.core.localstorage.TokenManager
+import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.model.auth.UserRole
 import com.kiero.data.sse.model.RawSseEvent
 import com.kiero.data.sse.model.SseEvent
@@ -22,7 +22,7 @@ import javax.inject.Inject
 
 class SseRepositoryImpl @Inject constructor(
     private val sseDataSource: SseDataSource,
-    private val tokenManager: TokenManager,
+    private val userInfoManager: UserInfoManager,
     private val json: Json
 ) : SseRepository {
 
@@ -101,7 +101,7 @@ class SseRepositoryImpl @Inject constructor(
 
             SseEventType.SCHEDULE -> {
                 try {
-                    val userRole = tokenManager.getUserRole()
+                    val userRole = userInfoManager.getUserRole()
                     if (userRole == UserRole.PARENT) {
                         val data = json.decodeFromString<ParentScheduleDataDto>(raw.data)
                         Timber.d("📅 Parent Schedule 이벤트 파싱 성공: ${data.childId}")
