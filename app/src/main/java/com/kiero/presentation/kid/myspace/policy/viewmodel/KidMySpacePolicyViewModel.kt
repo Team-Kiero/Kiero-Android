@@ -2,7 +2,7 @@ package com.kiero.presentation.kid.myspace.policy.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kiero.data.parent.mypage.kid.repository.KidMyPageRepository
+import com.kiero.data.kid.mypage.repository.KidMyPageRepository
 import com.kiero.presentation.kid.myspace.policy.model.toUiModel
 import com.kiero.presentation.kid.myspace.policy.state.KidMySpacePolicyState
 import dagger.hilt.android.lifecycle.HiltViewModel

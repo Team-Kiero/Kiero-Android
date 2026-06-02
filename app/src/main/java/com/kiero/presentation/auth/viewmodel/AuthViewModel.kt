@@ -2,7 +2,7 @@ package com.kiero.presentation.auth.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kiero.core.localstorage.TokenManager
+import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.model.auth.UserRole
 import com.kiero.presentation.auth.state.AuthSideEffect
 import com.kiero.presentation.auth.state.AuthState
@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val tokenManager: TokenManager
+    private val userInfoManager: UserInfoManager
 ) : ViewModel() {
     private val _state = MutableStateFlow(AuthState())
     val state = _state.asStateFlow()
@@ -29,7 +29,7 @@ class AuthViewModel @Inject constructor(
         role: UserRole
     ) {
         viewModelScope.launch {
-            tokenManager.saveUserRole(
+            userInfoManager.saveUserRole(
                 role = role
             )
 
