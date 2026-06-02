@@ -86,6 +86,25 @@ fun KidJourneyRoute(
     val globalTrigger = LocalGlobalUiEventTrigger.current
     val refreshState = LocalRefreshState.current
 
+    var showInitialPermissionDialog by remember { mutableStateOf(false) }
+    val notificationDeniedCount by viewModel.notificationDeniedCount.collectAsStateWithLifecycle()
+
+    val requestPushPermission = rememberPermissionRequester(
+        type = PermissionType.POST_NOTIFICATIONS,
+        deniedCount = notificationDeniedCount,
+        onGranted = { viewModel.updatePushSetting(true) },
+        onDenied = { viewModel.updatePushSetting(false) },
+        onPermanentlyDenied = { viewModel.updatePushSetting(false) },
+        onCountIncrease = { viewModel.increaseDeniedCount(PermissionType.POST_NOTIFICATIONS) }
+    )
+
+    LaunchedEffect(notificationDeniedCount) {
+        val hasOsPermission = PermissionChecker.isGranted(context, PermissionType.POST_NOTIFICATIONS)
+        if (viewModel.checkShouldShowPushPrompt(hasOsPermission, notificationDeniedCount)) {
+            showInitialPermissionDialog = true
+        }
+    }
+
     LaunchedEffect(Unit) {
         refreshState.refreshEvent.collect { tab ->
             if (tab == KidMainTab.JOURNEY) {
@@ -175,10 +194,28 @@ fun KidJourneyRoute(
 
         UiState.Empty -> {}
         is UiState.Failure -> {}
+
         UiState.Loading -> KieroLoadingIndicator()
     }
-}
 
+    if (showInitialPermissionDialog) {
+        KieroDialog(
+            isDisabled = false,
+            onDismiss = {
+                showInitialPermissionDialog = false
+            },
+            title = "오늘의 여정을 놓치지 않게 해줄게!",
+            subDescription = "여정의 중요한 알림을 받아볼 수 있어.",
+            confirmAction = KieroConfirmAction(
+                text = "알림받기",
+                onClick = {
+                    showInitialPermissionDialog = false
+                    requestPushPermission()
+                }
+            )
+        )
+    }
+}
 @Composable
 private fun KidJourneyScreen(
     paddingValues: PaddingValues,

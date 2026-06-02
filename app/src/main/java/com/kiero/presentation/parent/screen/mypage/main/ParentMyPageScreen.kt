@@ -19,11 +19,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.BuildConfig
 import com.kiero.core.common.extension.collectSideEffect
@@ -34,6 +37,9 @@ import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.parent.ParentInfo
 import com.kiero.core.model.trigger.SnackbarState
+import com.kiero.core.permission.PermissionChecker
+import com.kiero.core.permission.model.PermissionType
+import com.kiero.core.permission.util.navigateToSettings
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
 import com.kiero.presentation.parent.screen.mypage.main.component.AlarmSettingItem
 import com.kiero.presentation.parent.screen.mypage.main.component.ParentMyPageUserInfo
@@ -52,9 +58,30 @@ fun ParentMyPageRoute(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val uriHandler = LocalUriHandler.current
     val globalTrigger = LocalGlobalUiEventTrigger.current
+    val context = LocalContext.current
 
-    var isLogOut by remember {
-        mutableStateOf(false)
+    var isLogOut by remember { mutableStateOf(false) }
+    var showSettingsDialog by remember { mutableStateOf(false) }
+    var isWaitingForSettingsResult by remember { mutableStateOf(false) }
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        val hasOsPermission = PermissionChecker.isGranted(
+            context = context,
+            type = PermissionType.POST_NOTIFICATIONS
+        )
+
+        if (isWaitingForSettingsResult) {
+            if (hasOsPermission) {
+                viewModel.updateIsAlarmChecked(true)
+            } else {
+                viewModel.updateIsAlarmChecked(false)
+            }
+            isWaitingForSettingsResult = false
+        } else {
+            if (!hasOsPermission && state.isAlarmChecked) {
+                viewModel.updateIsAlarmChecked(false)
+            }
+        }
     }
 
     viewModel.sideEffect.collectSideEffect {
@@ -66,13 +93,12 @@ fun ParentMyPageRoute(
                     bottomPadding = 110
                 )
             )
-
             is ParentMyPageSideEffect.NavigateToChildCare -> navigateToParentChildCare()
             is ParentMyPageSideEffect.NavigateToWithdraw -> navigateToWithdraw()
         }
     }
 
-    val actions = remember(viewModel) {
+    val actions = remember(viewModel, context) {
         object : ParentMyPageActions {
             override fun onClickChildCare() = navigateToParentChildCare()
 
@@ -94,7 +120,17 @@ fun ParentMyPageRoute(
             override fun onClickOss() = navigateToOssLicenses()
 
             override fun onCheckedChange(checked: Boolean) {
-                viewModel.updateIsAlarmChecked(checked)
+                if (checked) {
+                    val hasOsPermission = PermissionChecker.isGranted(context, PermissionType.POST_NOTIFICATIONS)
+
+                    if (hasOsPermission) {
+                        viewModel.updateIsAlarmChecked(true)
+                    } else {
+                        showSettingsDialog = true
+                    }
+                } else {
+                    viewModel.updateIsAlarmChecked(false)
+                }
             }
 
             override fun onClickTerms(type: ParentMenuLinkType) {
@@ -115,6 +151,26 @@ fun ParentMyPageRoute(
         isLogOut = isLogOut,
         actions = actions
     )
+
+    if (showSettingsDialog) {
+        KieroDialog(
+            isDisabled = false,
+            onDismiss = {
+                showSettingsDialog = false
+                viewModel.updateIsAlarmChecked(false)
+            },
+            title = "설정에서 알림을 켜주세요.",
+            subDescription = "아이의 일정과 미션 알림을 받으려면\n설정에서 키어로 알림을 켜주세요.",
+            confirmAction = KieroConfirmAction(
+                text = "기기 설정으로 이동하기",
+                onClick = {
+                    showSettingsDialog = false
+                    isWaitingForSettingsResult = true
+                    context.navigateToSettings(PermissionType.POST_NOTIFICATIONS)
+                }
+            )
+        )
+    }
 }
 
 @Composable

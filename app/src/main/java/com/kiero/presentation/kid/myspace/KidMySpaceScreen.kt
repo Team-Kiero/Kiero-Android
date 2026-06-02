@@ -30,7 +30,6 @@ import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.permission.PermissionChecker
 import com.kiero.core.permission.model.PermissionType
-import com.kiero.core.permission.ui.rememberPermissionRequester
 import com.kiero.core.permission.util.navigateToSettings
 import com.kiero.presentation.kid.component.KidProfileChip
 import com.kiero.presentation.kid.myspace.component.KidMySpaceNotification
@@ -50,26 +49,20 @@ fun KidMySpaceRoute(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        val isEnabled = PermissionChecker.isGranted(context, PermissionType.POST_NOTIFICATIONS)
-        viewModel.onNotificationToggle(isEnabled)
-    }
+    var isWaitingForSettingsResult by remember { mutableStateOf(false) }
 
-    val notificationPermissionRequester = rememberPermissionRequester(
-        type = PermissionType.POST_NOTIFICATIONS,
-        deniedCount = 0,
-        onGranted = {
-            viewModel.onNotificationToggle(true)
-        },
-        onDenied = {
-            viewModel.onNotificationToggle(false)
-        },
-        onPermanentlyDenied = {
-            // Android 12 이하이거나 영구 거부 → 설정 안내 다이얼로그 노출
-            viewModel.showNotificationDialog(true)
-        },
-        onCountIncrease = viewModel::increaseDeniedCount
-    )
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        val hasOsPermission = PermissionChecker.isGranted(context, PermissionType.POST_NOTIFICATIONS)
+
+        if (isWaitingForSettingsResult) {
+            viewModel.onNotificationToggle(hasOsPermission)
+            isWaitingForSettingsResult = false
+        } else {
+            if (!hasOsPermission && state.isNotificationChecked) {
+                viewModel.onNotificationToggle(false)
+            }
+        }
+    }
 
     KidMySpaceScreen(
         paddingValues = paddingValues,
@@ -79,14 +72,24 @@ fun KidMySpaceRoute(
         navigateToPolicy = navigateToPolicy,
         onNotificationToggle = { isChecked ->
             if (isChecked) {
-                notificationPermissionRequester()
+               val hasOsPermission = PermissionChecker.isGranted(context, PermissionType.POST_NOTIFICATIONS)
+
+                if (hasOsPermission) {
+                    viewModel.onNotificationToggle(true)
+                } else {
+                   viewModel.showNotificationDialog(true)
+                }
             } else {
                 viewModel.onNotificationToggle(false)
             }
         },
-        onNotificationDialogDismiss = viewModel::onNotificationDialogDismiss,
+        onNotificationDialogDismiss = {
+            viewModel.showNotificationDialog(false)
+            viewModel.onNotificationToggle(false)
+        },
         onNavigateToNotificationSettings = {
-            viewModel.onNotificationDialogDismiss()
+            viewModel.showNotificationDialog(false)
+            isWaitingForSettingsResult = true
             context.navigateToSettings(PermissionType.POST_NOTIFICATIONS)
         }
     )
@@ -158,9 +161,9 @@ private fun KidMySpaceScreen(
         )
     }
 
-    // 알림 설정 안내 팝업 (영구 거부 또는 Android 12 이하)
-    if (state.showNotificationDialog) {
+   if (state.showNotificationDialog) {
         KieroDialog(
+            isDisabled = false,
             onDismiss = onNotificationDialogDismiss,
             title = "설정에서 알림을 켜줘!",
             subDescription = "알림을 받으려면 설정에서 키어로 알림을 허용해줘!",
@@ -171,13 +174,13 @@ private fun KidMySpaceScreen(
             confirmAction = KieroConfirmAction(
                 text = "설정으로 이동",
                 onClick = onNavigateToNotificationSettings
-            ),
-            content = {}
+            )
         )
     }
 
     if (showLogoutDialog) {
         KieroDialog(
+            isDisabled = false,
             onDismiss = { showLogoutDialog = false },
             title = "키어로에서 나갈거야?",
             subDescription = "다시 들어오려면 초대코드가 필요해!",
@@ -191,8 +194,7 @@ private fun KidMySpaceScreen(
                     showLogoutDialog = false
                     onClickLogout()
                 }
-            ),
-            content = {}
+            )
         )
     }
 }

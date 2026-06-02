@@ -8,5 +8,6 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
+    <color name="kiero_mint">#FF34D9D3</color>
     <color name="bottombar_color">#FF232428</color>
 </resources>

@@ -4,8 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.app.AppRestarter
 import com.kiero.core.localstorage.info.UserInfoManager
+import com.kiero.core.localstorage.permission.PermissionInfoManager
 import com.kiero.core.model.parent.ParentInfo
+import com.kiero.core.permission.model.PermissionType
 import com.kiero.data.auth.repository.AuthRepository
+import com.kiero.data.fcm.repository.FcmRepository
 import com.kiero.data.parent.mypage.parent.repository.ParentMyPageRepository
 import com.kiero.presentation.parent.screen.mypage.main.model.toUiModel
 import com.kiero.presentation.parent.screen.mypage.model.ChildConnectionStatus
@@ -13,8 +16,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -25,7 +30,9 @@ class ParentMyPageViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val parentMyPageRepository: ParentMyPageRepository,
     private val userInfoManager: UserInfoManager,
-    private val appRestarter: AppRestarter
+    private val appRestarter: AppRestarter,
+    private val fcmRepository: FcmRepository,
+    private val permissionInfoManager: PermissionInfoManager
 ) : ViewModel() {
     private val _state = MutableStateFlow(ParentMyPageState())
     val state = _state.asStateFlow()
@@ -33,10 +40,18 @@ class ParentMyPageViewModel @Inject constructor(
     private val _sideEffect = MutableSharedFlow<ParentMyPageSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
 
+    val notificationDeniedCount = permissionInfoManager.deniedCount(PermissionType.POST_NOTIFICATIONS)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = 0
+        )
+
 
     init {
         fetchMyPageTerms()
         fetchInfo()
+        fetchPushSetting()
     }
 
     fun fetchMyPageTerms() {
@@ -104,11 +119,33 @@ class ParentMyPageViewModel @Inject constructor(
         }
     }
 
-    fun updateIsAlarmChecked(checked: Boolean) {
-        _state.update {
-            it.copy(
-                isAlarmChecked = checked
-            )
+    private fun fetchPushSetting() {
+        viewModelScope.launch {
+            fcmRepository.getPushSetting()
+                .onSuccess { isEnabled ->
+                    _state.update { it.copy(isAlarmChecked = isEnabled) }
+                }
+                .onFailure { error ->
+                    Timber.e("푸시 알림 설정 조회 실패: $error")
+                }
+        }
+    }
+
+    fun increasePermissionDeniedCount(type: PermissionType) {
+        viewModelScope.launch {
+            permissionInfoManager.increaseDeniedCount(type)
+        }
+    }
+
+    fun updateIsAlarmChecked(isEnabled: Boolean) {
+        viewModelScope.launch {
+            fcmRepository.updatePushSetting(isEnabled)
+                .onSuccess {
+                    _state.update { it.copy(isAlarmChecked = isEnabled) }
+                }
+                .onFailure { error ->
+                    Timber.e("푸시 알림 설정 변경 실패: $error")
+                }
         }
     }
 }
