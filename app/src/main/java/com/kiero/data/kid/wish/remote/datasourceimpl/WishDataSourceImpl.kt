@@ -3,6 +3,7 @@ package com.kiero.data.kid.wish.remote.datasourceimpl
 import com.kiero.core.network.model.BaseResponse
 import com.kiero.data.kid.wish.remote.api.WishService
 import com.kiero.data.kid.wish.remote.datasource.WishDataSource
+import com.kiero.data.kid.wish.remote.dto.response.WishHistoryResponseDto
 import com.kiero.data.kid.wish.remote.dto.response.WishResponseDto
 import javax.inject.Inject
 
@@ -14,4 +15,7 @@ class WishDataSourceImpl @Inject constructor(
 
     override suspend fun patchCoupon(couponId: Long): BaseResponse<WishResponseDto> =
         wishService.patchCoupon(couponId)
+
+    override suspend fun getWishHistory(): BaseResponse<List<WishHistoryResponseDto>> =
+        wishService.getWishHistory()
 }

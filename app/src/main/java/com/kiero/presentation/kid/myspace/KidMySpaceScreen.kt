@@ -68,6 +68,7 @@ fun KidMySpaceRoute(
         paddingValues = paddingValues,
         state = state,
         onClickWishArchive = navigateToWishArchive,
+        onClickLogout = { viewModel.logOut() },
         navigateToPolicy = navigateToPolicy,
         onNotificationToggle = { isChecked ->
             if (isChecked) {
@@ -99,6 +100,7 @@ private fun KidMySpaceScreen(
     paddingValues: PaddingValues,
     state: KidMySpaceState,
     onClickWishArchive: () -> Unit,
+    onClickLogout: () -> Unit,
     navigateToPolicy: () -> Unit,
     onNotificationToggle: (Boolean) -> Unit,
     onNotificationDialogDismiss: () -> Unit,
@@ -188,7 +190,10 @@ private fun KidMySpaceScreen(
             ),
             confirmAction = KieroConfirmAction(
                 text = "나가기",
-                onClick = { showLogoutDialog = false }
+                onClick = {
+                    showLogoutDialog = false
+                    onClickLogout()
+                }
             )
         )
     }
@@ -202,6 +207,7 @@ private fun KidMySpaceScreenPreview() {
             paddingValues = PaddingValues(),
             state = KidMySpaceState(),
             onClickWishArchive = {},
+            onClickLogout = {},
             navigateToPolicy = {},
             onNotificationToggle = {},
             onNotificationDialogDismiss = {},

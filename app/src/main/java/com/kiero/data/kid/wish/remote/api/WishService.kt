@@ -1,6 +1,7 @@
 package com.kiero.data.kid.wish.remote.api
 
 import com.kiero.core.network.model.BaseResponse
+import com.kiero.data.kid.wish.remote.dto.response.WishHistoryResponseDto
 import com.kiero.data.kid.wish.remote.dto.response.WishResponseDto
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -14,4 +15,7 @@ interface WishService {
     suspend fun patchCoupon(
         @Path("couponId") couponId: Long,
     ) : BaseResponse<WishResponseDto>
+
+    @GET("api/v1/coupons/history")
+    suspend fun getWishHistory() : BaseResponse<List<WishHistoryResponseDto>>
 }

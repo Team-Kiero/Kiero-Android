@@ -12,3 +12,13 @@ data class WishResponseDto(
     @SerialName("price")
     val price: Int,
 )
+
+@Serializable
+data class WishHistoryResponseDto(
+    @SerialName("name")
+    val name: String,
+    @SerialName("price")
+    val price: Int,
+    @SerialName("purchasedAt")
+    val purchasedAt: String
+)

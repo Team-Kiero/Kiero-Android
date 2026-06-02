@@ -2,8 +2,11 @@ package com.kiero.presentation.kid.myspace.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.app.AppRestarter
+import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.localstorage.permission.PermissionInfoManager
 import com.kiero.core.permission.model.PermissionType
+import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.data.fcm.repository.FcmRepository
 import com.kiero.data.kid.coin.repository.CoinRepository
 import com.kiero.presentation.kid.myspace.state.KidMySpaceState
@@ -19,6 +22,9 @@ import javax.inject.Inject
 @HiltViewModel
 class KidMySpaceViewModel @Inject constructor(
     private val coinRepository: CoinRepository,
+    private val authRepository: AuthRepository,
+    private val userInfoManager: UserInfoManager,
+    private val appRestarter: AppRestarter,
     private val permissionInfoManager: PermissionInfoManager,
     private val fcmRepository: FcmRepository
 ) : ViewModel() {
@@ -39,7 +45,20 @@ class KidMySpaceViewModel @Inject constructor(
                     _uiState.update { it.copy(kidName = coin.firstName) }
                 }
                 .onFailure {
-                    Timber.Forest.e("fetchKidName fail: $it")
+                    Timber.e("fetchKidName fail: $it")
+                }
+        }
+    }
+
+    fun logOut() {
+        viewModelScope.launch {
+            authRepository.postLogout()
+                .onSuccess {
+                    userInfoManager.clearKidInfo()
+                    appRestarter.restartApp()
+                }
+                .onFailure {
+                    Timber.e("Logout failed $it")
                 }
         }
     }
