@@ -12,6 +12,7 @@ import com.kiero.data.sse.remote.dto.response.FeedDataDto
 import com.kiero.data.sse.remote.dto.response.InviteDataDto
 import com.kiero.data.sse.remote.dto.response.MissionDataDto
 import com.kiero.data.sse.remote.dto.response.ParentScheduleDataDto
+import com.kiero.data.sse.remote.dto.response.ParentWithDrawnDataDto
 import com.kiero.data.sse.remote.dto.response.ScheduleDataDto
 import com.kiero.data.sse.repository.SseRepository
 import kotlinx.coroutines.flow.Flow
@@ -135,6 +136,17 @@ class SseRepositoryImpl @Inject constructor(
                     SseEvent.Kid.Date(data, eventId = raw.id)
                 } catch (e: Exception) {
                     Timber.e(e, "Date 파싱 실패: ${raw.data}")
+                    null
+                }
+            }
+
+            SseEventType.PARENT_WITH_DRAWN -> {
+                try {
+                    val data = json.decodeFromString<ParentWithDrawnDataDto>(raw.data)
+                    Timber.d("ParentWithDrawnD 이벤트 파싱 성공: ${data.eventType}")
+                    SseEvent.Kid.ParentWithDrawn(data, eventId = raw.id)
+                } catch (e: Exception) {
+                    Timber.e(e, "ParentWithDrawnD 파싱 실패: ${raw.data}")
                     null
                 }
             }

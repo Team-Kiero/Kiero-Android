@@ -24,7 +24,7 @@ import kotlin.coroutines.cancellation.CancellationException
 
 @Singleton
 class SseManager @Inject constructor(
-    private val sseRepository: SseRepository
+    private val sseRepository: SseRepository,
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var activeSseJob: Job? = null
@@ -83,6 +83,12 @@ class SseManager @Inject constructor(
         extraBufferCapacity = 1
     )
     val dateEvents: SharedFlow<SseEvent.Kid.Date> = _childDateEvents.asSharedFlow()
+
+    private val _childParentWithDrawnEvents = MutableSharedFlow<SseEvent.Kid.ParentWithDrawn>(
+        replay = 0,
+        extraBufferCapacity = 1
+    )
+    val childParentWithDrawnEvents: SharedFlow<SseEvent.Kid.ParentWithDrawn> = _childParentWithDrawnEvents.asSharedFlow()
 
     // 연결 상태
     private val _connectionState = MutableSharedFlow<Boolean>(replay = 1)
@@ -294,6 +300,7 @@ class SseManager @Inject constructor(
             is SseEvent.Kid.Schedule -> _childScheduleEvents.emit(event)
             is SseEvent.Kid.Coupon -> _childCouponEvents.emit(event)
             is SseEvent.Kid.Date -> _childDateEvents.emit(event)
+            is SseEvent.Kid.ParentWithDrawn -> _childParentWithDrawnEvents.emit(event)
             else -> Timber.w("자녀 모드에서 알 수 없는 이벤트: $event")
         }
     }
