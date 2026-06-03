@@ -1,6 +1,7 @@
 package com.kiero.core.network.auth
 
 import com.kiero.core.localstorage.TokenManager
+import com.kiero.core.localstorage.info.UserInfoManager
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -15,6 +16,7 @@ import javax.inject.Singleton
 @Singleton
 class TokenAuthenticator @Inject constructor(
     private val tokenManager: TokenManager,
+    private val userInfoManager: UserInfoManager,
     private val tokenRefreshService: TokenRefreshService
 ) : Authenticator {
     private val mutex = Mutex()
@@ -33,7 +35,7 @@ class TokenAuthenticator @Inject constructor(
             }
 
             val refreshToken = tokenManager.getRefreshToken() ?: return@withLock null // 로그아웃 필요
-            val userRole = tokenManager.getUserRole()
+            val userRole = userInfoManager.getUserRole()
 
             if (userRole == null) {
                 tokenManager.clearTokens()

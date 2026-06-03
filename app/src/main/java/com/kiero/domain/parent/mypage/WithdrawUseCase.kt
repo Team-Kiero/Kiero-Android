@@ -1,7 +1,7 @@
 package com.kiero.domain.parent.mypage
 
 import com.kiero.core.localstorage.TokenManager
-import com.kiero.data.parent.mypage.parent.repository.ParentMyPageRepository
+import com.kiero.data.parent.mypage.repository.ParentMyPageRepository
 import javax.inject.Inject
 
 class WithdrawUseCase @Inject constructor(
@@ -12,7 +12,7 @@ class WithdrawUseCase @Inject constructor(
         val result = parentMyPageRepository.postWithdrawStatus()
 
         return result.onSuccess {
-            tokenManager.clearTokens()
+            tokenManager.clearAllData()
         }
     }
 }

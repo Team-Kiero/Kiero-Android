@@ -14,6 +14,8 @@ import com.kiero.core.localstorage.constant.DataStoreConstant.KEY_PARENT_NAME
 import com.kiero.core.localstorage.constant.DataStoreConstant.KEY_PARENT_PROFILE_IMAGE
 import com.kiero.core.localstorage.constant.DataStoreConstant.KEY_PENDING_INVITE_CODE
 import com.kiero.core.localstorage.constant.DataStoreConstant.KEY_PENDING_INVITE_EXPIRE_TIME
+import com.kiero.core.localstorage.constant.DataStoreConstant.KEY_USER_ROLE
+import com.kiero.core.model.auth.UserRole
 import com.kiero.core.model.parent.ParentInfo
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -229,5 +231,20 @@ class UserInfoManagerImpl @Inject constructor(
         }.onFailure {
             Timber.e(it, "Failed to clear pending invite code")
         }
+    }
+
+    override suspend fun saveUserRole(role: UserRole) {
+        suspendRunCatching {
+            dataStore.edit {
+                it[KEY_USER_ROLE] = role.name
+            }
+        }.onFailure { Timber.e(it, "UserRole 저장 실패") }
+    }
+
+    override suspend fun getUserRole(): UserRole? {
+        return suspendRunCatching {
+            val roleName = dataStore.data.map { it[KEY_USER_ROLE] }.first()
+            roleName?.let { UserRole.valueOf(it) }
+        }.onFailure { Timber.e(it, "UserRole 로드 실패") }.getOrNull()
     }
 }

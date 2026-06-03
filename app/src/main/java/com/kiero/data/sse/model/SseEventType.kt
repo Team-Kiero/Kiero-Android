@@ -9,6 +9,8 @@ enum class SseEventType(val value: String) {
     SCHEDULE("schedule"),
     COUPON("coupon"),
     DATE("date"),
+    PARENT_WITH_DRAWN("parentWithdrawn"),
+
     UNKNOWN("unknown");
 
     companion object {

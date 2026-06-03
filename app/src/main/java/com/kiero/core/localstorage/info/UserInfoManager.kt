@@ -1,5 +1,6 @@
 package com.kiero.core.localstorage.info
 
+import com.kiero.core.model.auth.UserRole
 import com.kiero.core.model.parent.ParentInfo
 
 interface UserInfoManager {
@@ -11,6 +12,12 @@ interface UserInfoManager {
 
     suspend fun saveChildIdInfo(childId : Long)
     suspend fun getChildIdInfo(): Long?
+
+    /**
+     * 유저 역할 저장
+     * */
+    suspend fun saveUserRole(role: UserRole)
+    suspend fun getUserRole(): UserRole?
 
     /**
      * 필수 약관 동의 여부 저장
