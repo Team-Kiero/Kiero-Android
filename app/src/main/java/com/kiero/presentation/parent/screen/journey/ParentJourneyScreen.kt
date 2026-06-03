@@ -57,6 +57,8 @@ fun ParentJourneyRoute(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
     var showInitialPermissionDialog by remember { mutableStateOf(false) }
+    var triggerPermissionRequest by remember { mutableStateOf(false) }
+
     val deniedCount by viewModel.notificationDeniedCount.collectAsStateWithLifecycle()
 
     viewModel.sideEffect.collectSideEffect {
@@ -83,6 +85,13 @@ fun ParentJourneyRoute(
         onCountIncrease = viewModel::increaseDeniedCount
     )
 
+    LaunchedEffect(triggerPermissionRequest) {
+        if (triggerPermissionRequest) {
+            requestPushPermission()
+            triggerPermissionRequest = false
+        }
+    }
+
     LaunchedEffect(deniedCount) {
         val hasOsPermission = PermissionChecker.isGranted(context, PermissionType.POST_NOTIFICATIONS)
 
@@ -97,8 +106,10 @@ fun ParentJourneyRoute(
         }
     }
 
-    LifecycleResumeEffect(Unit) {
-        viewModel.fetchParentJourney(state.kidInfo.kidId.toLong())
+    LifecycleResumeEffect(state.kidInfo.kidId) {
+        if (state.kidInfo.kidId.isNotEmpty()) {
+            viewModel.fetchParentJourney(state.kidInfo.kidId.toLong())
+        }
         onPauseOrDispose { }
     }
 
@@ -114,6 +125,7 @@ fun ParentJourneyRoute(
             isDisabled = false,
             onDismiss = {
                 showInitialPermissionDialog = false
+                triggerPermissionRequest = true
             },
             title = "아이의 여정을 알려드릴게요.",
             subDescription = "일정 인증, 미션 완료, 쿠폰 사용처럼\n중요한 순간을 알림으로 받아보세요.",
@@ -121,13 +133,14 @@ fun ParentJourneyRoute(
                 text = "알림 받기",
                 onClick = {
                     showInitialPermissionDialog = false
-                    requestPushPermission()
+                    triggerPermissionRequest = true
                 }
             ),
             cancelAction = KieroCancelAction(
                 text = "나중에 할게요",
                 onClick = {
                     showInitialPermissionDialog = false
+                    viewModel.updatePushSetting(false)
                 }
             )
         )
