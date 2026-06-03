@@ -117,7 +117,7 @@ private fun KidMySpaceScreen(
             .padding(horizontal = 16.dp)
     ) {
         KidProfileChip(
-            kidName = state.kidName,
+            kidName = state.kidName + "의 공간",
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 25.dp)
