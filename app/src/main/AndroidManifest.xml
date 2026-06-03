@@ -28,6 +28,10 @@
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/kiero_mint" />
 
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_push_notification" />
+
         <service
             android:name="com.kiero.core.fcm.KieroFcmService"
             android:exported="false">
@@ -49,7 +53,7 @@
         <activity
             android:name="com.kiero.presentation.main.activity.MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
+            android:label="@string/launcher_name"
             android:theme="@style/Theme.Kiero">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
