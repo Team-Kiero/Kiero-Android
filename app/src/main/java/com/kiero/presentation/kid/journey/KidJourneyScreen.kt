@@ -86,24 +86,7 @@ fun KidJourneyRoute(
     val globalTrigger = LocalGlobalUiEventTrigger.current
     val refreshState = LocalRefreshState.current
 
-    var showInitialPermissionDialog by remember { mutableStateOf(false) }
     val notificationDeniedCount by viewModel.notificationDeniedCount.collectAsStateWithLifecycle()
-
-    val requestPushPermission = rememberPermissionRequester(
-        type = PermissionType.POST_NOTIFICATIONS,
-        deniedCount = notificationDeniedCount,
-        onGranted = { viewModel.updatePushSetting(true) },
-        onDenied = { viewModel.updatePushSetting(false) },
-        onPermanentlyDenied = { viewModel.updatePushSetting(false) },
-        onCountIncrease = { viewModel.increaseDeniedCount(PermissionType.POST_NOTIFICATIONS) }
-    )
-
-    LaunchedEffect(notificationDeniedCount) {
-        val hasOsPermission = PermissionChecker.isGranted(context, PermissionType.POST_NOTIFICATIONS)
-        if (viewModel.checkShouldShowPushPrompt(hasOsPermission, notificationDeniedCount)) {
-            showInitialPermissionDialog = true
-        }
-    }
 
     LaunchedEffect(Unit) {
         refreshState.refreshEvent.collect { tab ->
@@ -152,20 +135,19 @@ fun KidJourneyRoute(
                 onCountIncrease = viewModel::increaseDeniedCount,
             )
 
-            // 최초 데이터 로드 완료 시 알림 권한 체크
-            LaunchedEffect(Unit) {
-                val isGranted = PermissionChecker.isGranted(context, PermissionType.POST_NOTIFICATIONS)
-                viewModel.checkNotificationPermission(isAlreadyGranted = isGranted)
-            }
-
-            val requestNotification = rememberPermissionRequester(
+            val requestPushPermission = rememberPermissionRequester(
                 type = PermissionType.POST_NOTIFICATIONS,
-                deniedCount = state.data.permissionNotificationDeniedCount,
-                onGranted = { viewModel.onNotificationPermissionDialogDismiss() },
-                onDenied = { viewModel.onNotificationPermissionDialogDismiss() },
-                onPermanentlyDenied = { viewModel.onNotificationPermissionDialogDismiss() },
-                onCountIncrease = viewModel::increaseDeniedCount,
+                deniedCount = notificationDeniedCount,
+                onGranted = { viewModel.onNotificationPermissionResult(true) },
+                onDenied = { viewModel.onNotificationPermissionResult(false) },
+                onPermanentlyDenied = { viewModel.onNotificationPermissionResult(false) },
+                onCountIncrease = viewModel::increaseDeniedCount
             )
+
+            LaunchedEffect(notificationDeniedCount) {
+                val hasOsPermission = PermissionChecker.isGranted(context, PermissionType.POST_NOTIFICATIONS)
+                viewModel.onNotificationDeniedCountChanged(hasOsPermission)
+            }
 
             KidJourneyScreen(
                 paddingValues = paddingValues,
@@ -179,42 +161,21 @@ fun KidJourneyRoute(
                                 state.data.header.earnedStones!!
                             )
                         }
-
                         else -> {}
                     }
                 },
                 onNextClick = viewModel::onNextClick,
                 onFinishClick = viewModel::onNextClick,
                 onMapClick = { navigateToMap(state.data.header!!.currentDate) },
-                navigateUp = navigateUp,
-                onNotificationPermissionConfirm = { requestNotification() },
-                onNotificationPermissionDismiss = viewModel::onNotificationPermissionDialogDismiss,
+                onNotificationPermissionConfirm = { requestPushPermission() },
+                onNotificationPermissionDismiss = viewModel::dismissNotificationPermissionDialog
             )
         }
-
         UiState.Empty -> {}
         is UiState.Failure -> {}
-
         UiState.Loading -> KieroLoadingIndicator()
     }
 
-    if (showInitialPermissionDialog) {
-        KieroDialog(
-            isDisabled = false,
-            onDismiss = {
-                showInitialPermissionDialog = false
-            },
-            title = "오늘의 여정을 놓치지 않게 해줄게!",
-            subDescription = "여정의 중요한 알림을 받아볼 수 있어.",
-            confirmAction = KieroConfirmAction(
-                text = "알림받기",
-                onClick = {
-                    showInitialPermissionDialog = false
-                    requestPushPermission()
-                }
-            )
-        )
-    }
 }
 @Composable
 private fun KidJourneyScreen(
@@ -224,7 +185,6 @@ private fun KidJourneyScreen(
     onNextClick: () -> Unit,
     onFinishClick: () -> Unit,
     onMapClick: () -> Unit,
-    navigateUp: () -> Unit,
     onNotificationPermissionConfirm: () -> Unit,
     onNotificationPermissionDismiss: () -> Unit,
     modifier: Modifier = Modifier,
@@ -408,7 +368,6 @@ private fun KidJourneyScreenPreview() {
     KieroTheme {
         KidJourneyScreen(
             paddingValues = PaddingValues(),
-            navigateUp = {},
             state = KidJourneyState.FAKE,
             onButtonClick = {},
             onNextClick = {},

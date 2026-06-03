@@ -13,7 +13,6 @@ data class KidJourneyState(
     val header: KidJourneyHeaderUiModel? = null,
     val content: KidJourneyContentUiModel = KidJourneyContentUiModel.NoSchedule,
     val permissionCameraDeniedCount: Int = 0,
-    val permissionNotificationDeniedCount: Int = 0,
     val showNotificationPermissionDialog: Boolean = false,
 ) {
     val buttonType: KidJourneyButtonType

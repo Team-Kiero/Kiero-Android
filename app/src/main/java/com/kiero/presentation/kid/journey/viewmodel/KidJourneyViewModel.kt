@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.stateIn
@@ -93,47 +92,29 @@ class KidJourneyViewModel @Inject constructor(
     init {
         sseManager.startChildSubscription()
         collectChildKidScheduleEvents()
-        observeNotificationDeniedCount()
     }
 
-    fun checkShouldShowPushPrompt(hasOsPermission: Boolean, deniedCount: Int): Boolean {
-        if (hasShownInitialPrompt) return false
-
-        if (!hasOsPermission && deniedCount == 0) {
+    fun onNotificationDeniedCountChanged(hasOsPermission: Boolean) {
+        if (hasShownInitialPrompt) return
+        if (!hasOsPermission && notificationDeniedCount.value == 0) {
             hasShownInitialPrompt = true
-            return true
-        }
-        return false
-    }
-
-    fun updatePushSetting(isEnabled: Boolean) {
-        viewModelScope.launch {
-            fcmRepository.updatePushSetting(isEnabled)
-                .onFailure { Timber.e("푸시 알림 서버 업데이트 실패: $it") }
-        }
-    }
-
-    fun fetchData() {
-        fetchTodaySchedule()
-        fetchCoin()
-    }
-
-    fun checkNotificationPermission(isAlreadyGranted: Boolean) {
-        if (isAlreadyGranted) return
-
-        viewModelScope.launch {
-            val deniedCount = permissionInfoManager.deniedCount(PermissionType.POST_NOTIFICATIONS).first()
-            if (deniedCount == 0) {
-                _state.update { uiState ->
-                    if (uiState is UiState.Success) {
-                        UiState.Success(uiState.data.copy(showNotificationPermissionDialog = true))
-                    } else uiState
-                }
+            _state.update { uiState ->
+                if (uiState is UiState.Success) {
+                    UiState.Success(uiState.data.copy(showNotificationPermissionDialog = true))
+                } else uiState
             }
         }
     }
 
-    fun onNotificationPermissionDialogDismiss() {
+    fun onNotificationPermissionResult(isGranted: Boolean) {
+        viewModelScope.launch {
+            fcmRepository.updatePushSetting(isGranted)
+                .onFailure { Timber.e("푸시 알림 서버 업데이트 실패: $it") }
+        }
+        dismissNotificationPermissionDialog()
+    }
+
+    fun dismissNotificationPermissionDialog() {
         viewModelScope.launch {
             permissionInfoManager.increaseDeniedCount(PermissionType.POST_NOTIFICATIONS)
             _state.update { uiState ->
@@ -144,16 +125,9 @@ class KidJourneyViewModel @Inject constructor(
         }
     }
 
-    private fun observeNotificationDeniedCount() {
-        viewModelScope.launch {
-            permissionInfoManager.deniedCount(PermissionType.POST_NOTIFICATIONS).collect { count ->
-                _state.update { uiState ->
-                    if (uiState is UiState.Success) {
-                        UiState.Success(uiState.data.copy(permissionNotificationDeniedCount = count))
-                    } else uiState
-                }
-            }
-        }
+    fun fetchData() {
+        fetchTodaySchedule()
+        fetchCoin()
     }
 
     private fun collectChildKidScheduleEvents() {
@@ -178,7 +152,6 @@ class KidJourneyViewModel @Inject constructor(
         viewModelScope.launch {
             repository.patchScheduleToday()
                 .onSuccess { scheduleData ->
-                    val currentDeniedCount = _state.value.successData?.permissionNotificationDeniedCount ?: 0
                     val stoneType = scheduleData.stoneType?.let { KidJourneyStoneType.from(it) }
                     val scheduleInfo = KidJourneyScheduleUiModel(
                         order = scheduleData.scheduleOrder,
@@ -188,7 +161,6 @@ class KidJourneyViewModel @Inject constructor(
 
                     _state.value = UiState.Success(
                         KidJourneyState(
-                            permissionNotificationDeniedCount = currentDeniedCount,
                             header = KidJourneyHeaderUiModel(
                                 kidName = coin.value.firstName,
                                 currentDate = coin.value.today,
