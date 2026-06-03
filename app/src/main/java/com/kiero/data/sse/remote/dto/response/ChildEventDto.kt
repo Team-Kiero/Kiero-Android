@@ -53,3 +53,10 @@ data class DateDataDto(
     @SerialName("date")
     val date: String        // "2026-03-14"
 )
+
+// ParentWithDrawn 이벤트 (PARENT_WITHDRAWN)
+@Serializable
+data class ParentWithDrawnDataDto(
+    @SerialName("eventType")
+    val eventType: String,  // "PARENT_WITHDRAWN"
+)

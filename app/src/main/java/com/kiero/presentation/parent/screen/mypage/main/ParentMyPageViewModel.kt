@@ -9,7 +9,7 @@ import com.kiero.core.model.parent.ParentInfo
 import com.kiero.core.permission.model.PermissionType
 import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.data.fcm.repository.FcmRepository
-import com.kiero.data.parent.mypage.parent.repository.ParentMyPageRepository
+import com.kiero.data.parent.mypage.repository.ParentMyPageRepository
 import com.kiero.presentation.parent.screen.mypage.main.model.toUiModel
 import com.kiero.presentation.parent.screen.mypage.model.ChildConnectionStatus
 import dagger.hilt.android.lifecycle.HiltViewModel

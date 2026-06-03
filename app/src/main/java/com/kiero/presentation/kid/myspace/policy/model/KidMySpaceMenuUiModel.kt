@@ -1,6 +1,6 @@
 package com.kiero.presentation.kid.myspace.policy.model
 
-import com.kiero.data.parent.mypage.kid.model.KidTermsModel
+import com.kiero.data.kid.mypage.model.KidTermsModel
 
 data class KidMySpaceMenuUiModel(
     val linkType: KidMenuLinkType,

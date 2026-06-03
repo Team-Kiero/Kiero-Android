@@ -103,13 +103,15 @@ android {
         create("parent") {
             dimension = "version"
             applicationIdSuffix = ".parent"
-            resValue("string", "app_name", "Kiero_Parent")
+            resValue("string", "app_name", "KIERO")
+            resValue("string", "launcher_name", "kiero-parent")
         }
 
         create("child") {
             dimension = "version"
             applicationIdSuffix = ".child"
-            resValue("string", "app_name", "Kiero_Kid")
+            resValue("string", "app_name", "KIERO")
+            resValue("string", "launcher_name", "kiero-child")
         }
     }
 
