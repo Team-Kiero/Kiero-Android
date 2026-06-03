@@ -20,6 +20,7 @@ private val ALARM_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy.MM.dd")
 private val ALARM_TIME_FORMAT = DateTimeFormatter.ofPattern("HH : mm")
 private val KOREAN_TIME_FORMATTER = DateTimeFormatter.ofPattern("a hh : mm", Locale.KOREAN)
 val ALARM_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm")
+private val WISH_ARCHIVE_DATE_FMT = DateTimeFormatter.ofPattern("M월 d일", Locale.KOREAN)
 
 fun String.formattedDeadLine(): String {
     if (this.isBlank()) return ""
@@ -172,6 +173,17 @@ fun String.toKoreanTimeString(): String {
     return try {
         val time = LocalTime.parse(this)
         time.format(KOREAN_TIME_FORMATTER)
+    } catch (e: Exception) {
+        this
+    }
+}
+
+fun String.toWishArchiveDateString(): String {
+    if (this.isBlank()) return this
+
+    return try {
+        val date = LocalDate.parse(this, DATE_FORMAT_DASH)
+        date.format(WISH_ARCHIVE_DATE_FMT)
     } catch (e: Exception) {
         this
     }

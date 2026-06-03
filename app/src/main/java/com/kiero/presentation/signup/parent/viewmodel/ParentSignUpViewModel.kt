@@ -172,17 +172,18 @@ class ParentSignUpViewModel @Inject constructor(
     }
 
     fun logOut() {
-        sseManager.stopSubscription()
-
-        Timber.e("로그아웃 되었습니다")
         viewModelScope.launch {
-            val networkJobs = listOf(
-                async { suspendRunCatching { authRepository.postLogout() } },
-            )
-            networkJobs.awaitAll()
+            suspendRunCatching { authRepository.postLogout() }
+                .onFailure {
+                    Timber.e("Logout failed $it")
+                }
+
             sseManager.stopSubscription()
 
             suspendRunCatching { tokenManager.clearTokens() }
+                .onFailure {
+                    Timber.e("Token clear failed $it")
+                }
 
             _state.update {
                 it.copy(isLoading = false)

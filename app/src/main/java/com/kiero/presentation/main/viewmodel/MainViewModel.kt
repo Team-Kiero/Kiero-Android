@@ -2,6 +2,9 @@ package com.kiero.presentation.main.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.app.AppRestarter
+import com.kiero.core.localstorage.info.UserInfoManager
+import com.kiero.core.model.auth.UserRole
 import com.kiero.data.fcm.repository.FcmRepository
 import com.kiero.data.parent.alarm.repository.AlarmRepository
 import com.kiero.data.sse.manager.SseManager
@@ -20,15 +23,56 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val alarmRepository: AlarmRepository,
     private val fcmRepository: FcmRepository,
-    private val sseManager: SseManager
+    private val sseManager: SseManager,
+    private val userInfoManager: UserInfoManager,
+    private val appRestarter: AppRestarter,
 ) : ViewModel() {
     private val _state = MutableStateFlow(MainState())
     val state: StateFlow<MainState> = _state.asStateFlow()
 
     init {
         fetchUnreadAlarmStatus()
-        observeFeedEvent()
         syncFcmToken()
+        observeSseEventsByRole()
+    }
+    private fun observeSseEventsByRole() {
+        viewModelScope.launch {
+            val userRole = userInfoManager.getUserRole() ?: return@launch
+
+            when (userRole) {
+                UserRole.PARENT -> observeParentFeedEvent()
+                UserRole.KID -> observeParentWithdrawalEvent()
+            }
+        }
+    }
+
+    // 부모용: 피드 이벤트 관찰
+    private fun observeParentFeedEvent() {
+        viewModelScope.launch {
+            sseManager.parentFeedEvents.collect {
+                Timber.d("sseManager.parentFeedEvents: $it")
+                _state.update { currentState ->
+                    currentState.copy(
+                        unreadAlarm = currentState.unreadAlarm.copy(
+                            hasUnread = true
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    // 자녀용: 부모 탈퇴 이벤트 관찰
+    private fun observeParentWithdrawalEvent() {
+        viewModelScope.launch {
+            sseManager.childParentWithDrawnEvents.collect {
+                Timber.e("부모 탈퇴 감지 -> 자녀 강제 로그아웃 진행")
+
+                sseManager.stopSubscription()
+                userInfoManager.clearKidInfo()
+                appRestarter.restartApp()
+            }
+        }
     }
 
     private fun syncFcmToken() {

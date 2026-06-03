@@ -147,6 +147,7 @@ private fun TermsItem(
     ) {
         Row (
             modifier = Modifier
+                .weight(1f)
                 .noRippleClickable(onClickTerms),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -160,11 +161,9 @@ private fun TermsItem(
             Text(
                 text = termsText,
                 style = KieroTheme.typography.regular.body3,
-                color = KieroTheme.colors.white
+                color = KieroTheme.colors.white,
             )
         }
-
-        Spacer(modifier = Modifier.weight(1f))
 
         Icon(
             imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_right),

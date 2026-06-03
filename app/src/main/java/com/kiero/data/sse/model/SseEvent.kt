@@ -6,6 +6,7 @@ import com.kiero.data.sse.remote.dto.response.FeedDataDto
 import com.kiero.data.sse.remote.dto.response.InviteDataDto
 import com.kiero.data.sse.remote.dto.response.MissionDataDto
 import com.kiero.data.sse.remote.dto.response.ParentScheduleDataDto
+import com.kiero.data.sse.remote.dto.response.ParentWithDrawnDataDto
 import com.kiero.data.sse.remote.dto.response.ScheduleDataDto
 
 sealed class SseEvent {
@@ -25,5 +26,6 @@ sealed class SseEvent {
         data class Schedule(val data: ScheduleDataDto, override val eventId: String? = null) : Kid()
         data class Coupon(val data: CouponDataDto, override val eventId: String? = null) : Kid()
         data class Date(val data: DateDataDto, override val eventId: String? = null) : Kid()
+        data class ParentWithDrawn(val data: ParentWithDrawnDataDto, override val eventId: String? = null) : Kid()
     }
 }

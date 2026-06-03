@@ -111,7 +111,7 @@ class ParentJourneyViewModel @Inject constructor(
         }
     }
 
-    private fun fetchKidInfo() {
+    fun fetchKidInfo() {
         viewModelScope.launch {
             authRepository.getChildren()
                 .onSuccess { response ->

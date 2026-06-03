@@ -6,8 +6,6 @@ import androidx.datastore.preferences.core.edit
 import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.core.localstorage.constant.DataStoreConstant.KEY_ACCESS_TOKEN
 import com.kiero.core.localstorage.constant.DataStoreConstant.KEY_REFRESH_TOKEN
-import com.kiero.core.localstorage.constant.DataStoreConstant.KEY_USER_ROLE
-import com.kiero.core.model.auth.UserRole
 import com.kiero.core.security.CryptoManager
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -77,25 +75,24 @@ class TokenManagerImpl @Inject constructor(
         }.onFailure { Timber.e(it, "RefreshToken 로드 실패") }.getOrNull()
     }
 
-    override suspend fun clearTokens() {
+    override suspend fun clearAllData() {
         suspendRunCatching {
             cachedAccessToken = null
             dataStore.edit { it.clear() }
+        }.onFailure {
+            Timber.e(it, "전체 데이터 삭제 실패")
         }
     }
 
-    override suspend fun saveUserRole(role: UserRole) {
+    override suspend fun clearTokens() {
         suspendRunCatching {
+            cachedAccessToken = null
             dataStore.edit {
-                it[KEY_USER_ROLE] = role.name
+                it.remove(KEY_ACCESS_TOKEN)
+                it.remove(KEY_REFRESH_TOKEN)
             }
-        }.onFailure { Timber.e(it, "UserRole 저장 실패") }
-    }
-
-    override suspend fun getUserRole(): UserRole? {
-        return suspendRunCatching {
-            val roleName = dataStore.data.map { it[KEY_USER_ROLE] }.first()
-            roleName?.let { UserRole.valueOf(it) }
-        }.onFailure { Timber.e(it, "UserRole 로드 실패") }.getOrNull()
+        }.onFailure {
+            Timber.e(it, "토큰 삭제 실패")
+        }
     }
 }

@@ -32,6 +32,10 @@ class HandleKakaoLoginResultUseCase @Inject constructor(
 
         if (children.isNotEmpty()) {
             userInfoManager.saveChildIdInfo(childId = children.first().childId)
+            userInfoManager.saveChildName(
+                lastName = children.first().childLastName,
+                firstName = children.first().childFirstName
+            )
             KakaoLoginResult.HasChildren(firstChildId = children.first().childId.toInt())
         } else {
             KakaoLoginResult.NoChildren

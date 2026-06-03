@@ -2,12 +2,14 @@ package com.kiero.presentation.splash.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.app.AppRestarter
 import com.kiero.core.localstorage.TokenManager
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.localstorage.onboarding.OnboardingManager
 import com.kiero.core.model.auth.UserRole
 import com.kiero.core.network.auth.TokenRefreshService
-import com.kiero.data.auth.repository.AuthRepository
+import com.kiero.data.kid.mypage.repository.KidMyPageRepository
+import com.kiero.domain.kid.user.usecase.CheckParentStatusUseCase
 import com.kiero.domain.parent.splash.model.ParentAutoLoginResult
 import com.kiero.domain.parent.splash.usecase.CheckParentAutoLoginUseCase
 import com.kiero.presentation.splash.state.SplashSideEffect
@@ -22,19 +24,37 @@ import javax.inject.Inject
 @HiltViewModel
 class SplashViewModel @Inject constructor(
     private val tokenManager: TokenManager,
+    private val userInfoManager: UserInfoManager,
     private val onboardingManager: OnboardingManager,
     private val reIssueManager: TokenRefreshService,
-    private val checkParentAutoLoginUseCase: CheckParentAutoLoginUseCase
+    private val checkParentStatusUseCase: CheckParentStatusUseCase,
+    private val checkParentAutoLoginUseCase: CheckParentAutoLoginUseCase,
+    private val appRestarter: AppRestarter,
 ) : ViewModel() {
     private val _sideEffect = Channel<SplashSideEffect>()
     val sideEffect = _sideEffect.receiveAsFlow()
 
+
+    fun checkParentStatus() {
+        viewModelScope.launch {
+            checkParentStatusUseCase()
+                .onSuccess {
+                    if (it) {
+                        userInfoManager.clearKidInfo()
+                        appRestarter.restartApp()
+                    }
+                }
+                .onFailure {
+                    Timber.e("checkParentStatus failed $it")
+                }
+        }
+    }
     fun checkLoginState() {
         viewModelScope.launch {
             delay(2000)
 
             val accessToken = tokenManager.getAccessToken()
-            val userRole = tokenManager.getUserRole()
+            val userRole = userInfoManager.getUserRole()
             val refreshToken = tokenManager.getRefreshToken()
 
             if (!accessToken.isNullOrBlank() && userRole != null && !refreshToken.isNullOrBlank()) {
@@ -76,8 +96,17 @@ class SplashViewModel @Inject constructor(
 
     // 아이 로그인 처리 분리
     private suspend fun handleKidLogin() {
+        // 부모의 탈퇴 여부를 먼저 확인
+        val isParentWithdrawn = checkParentStatusUseCase().getOrNull() ?: false
+
+        if (isParentWithdrawn) {
+            userInfoManager.clearKidInfo()
+            appRestarter.restartApp()
+            return
+        }
+
+        // 부모가 탈퇴하지 않은 정상 상태일 때만 기존 온보딩/홈 진입 로직 수행
         if (onboardingManager.getIsSawOnboarding()) {
-            // 온보딩을 봤다면
             _sideEffect.send(SplashSideEffect.NavigateToKidHome)
         } else {
             _sideEffect.send(SplashSideEffect.NavigateToKidOnboarding)
