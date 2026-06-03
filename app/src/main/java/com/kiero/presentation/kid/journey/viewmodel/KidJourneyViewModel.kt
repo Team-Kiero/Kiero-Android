@@ -106,19 +106,15 @@ class KidJourneyViewModel @Inject constructor(
         }
     }
 
-    fun updatePushSetting(isEnabled: Boolean) {
+    fun onNotificationPermissionResult(isGranted: Boolean) {
         viewModelScope.launch {
-            fcmRepository.updatePushSetting(isEnabled)
+            fcmRepository.updatePushSetting(isGranted)
                 .onFailure { Timber.e("푸시 알림 서버 업데이트 실패: $it") }
         }
+        dismissNotificationPermissionDialog()
     }
 
-    fun fetchData() {
-        fetchTodaySchedule()
-        fetchCoin()
-    }
-
-    fun onNotificationPermissionDialogDismiss() {
+    fun dismissNotificationPermissionDialog() {
         viewModelScope.launch {
             permissionInfoManager.increaseDeniedCount(PermissionType.POST_NOTIFICATIONS)
             _state.update { uiState ->
@@ -127,6 +123,11 @@ class KidJourneyViewModel @Inject constructor(
                 } else uiState
             }
         }
+    }
+
+    fun fetchData() {
+        fetchTodaySchedule()
+        fetchCoin()
     }
 
     private fun collectChildKidScheduleEvents() {

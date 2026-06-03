@@ -138,18 +138,9 @@ fun KidJourneyRoute(
             val requestPushPermission = rememberPermissionRequester(
                 type = PermissionType.POST_NOTIFICATIONS,
                 deniedCount = notificationDeniedCount,
-                onGranted = {
-                    viewModel.updatePushSetting(true)
-                    viewModel.onNotificationPermissionDialogDismiss()
-                },
-                onDenied = {
-                    viewModel.updatePushSetting(false)
-                    viewModel.onNotificationPermissionDialogDismiss()
-                },
-                onPermanentlyDenied = {
-                    viewModel.updatePushSetting(false)
-                    viewModel.onNotificationPermissionDialogDismiss()
-                },
+                onGranted = { viewModel.onNotificationPermissionResult(true) },
+                onDenied = { viewModel.onNotificationPermissionResult(false) },
+                onPermanentlyDenied = { viewModel.onNotificationPermissionResult(false) },
                 onCountIncrease = viewModel::increaseDeniedCount
             )
 
@@ -177,7 +168,7 @@ fun KidJourneyRoute(
                 onFinishClick = viewModel::onNextClick,
                 onMapClick = { navigateToMap(state.data.header!!.currentDate) },
                 onNotificationPermissionConfirm = { requestPushPermission() },
-                onNotificationPermissionDismiss = viewModel::onNotificationPermissionDialogDismiss,
+                onNotificationPermissionDismiss = viewModel::dismissNotificationPermissionDialog
             )
         }
         UiState.Empty -> {}
