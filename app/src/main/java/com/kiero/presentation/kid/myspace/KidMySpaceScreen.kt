@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,17 +51,22 @@ fun KidMySpaceRoute(
     val context = LocalContext.current
 
     var isWaitingForSettingsResult by remember { mutableStateOf(false) }
+    var hasOsPermission by remember {
+        mutableStateOf(PermissionChecker.isGranted(context, PermissionType.POST_NOTIFICATIONS))
+    }
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        val hasOsPermission = PermissionChecker.isGranted(context, PermissionType.POST_NOTIFICATIONS)
+        hasOsPermission = PermissionChecker.isGranted(context, PermissionType.POST_NOTIFICATIONS)
 
         if (isWaitingForSettingsResult) {
             viewModel.onNotificationToggle(hasOsPermission)
             isWaitingForSettingsResult = false
-        } else {
-            if (!hasOsPermission && state.isNotificationChecked) {
-                viewModel.onNotificationToggle(false)
-            }
+        }
+    }
+
+    LaunchedEffect(hasOsPermission, state.isNotificationChecked) {
+        if (!hasOsPermission && state.isNotificationChecked) {
+            viewModel.onNotificationToggle(false)
         }
     }
 
