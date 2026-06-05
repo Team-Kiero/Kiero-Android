@@ -166,7 +166,7 @@ private fun KidMySpaceScreen(
             isDisabled = false,
             onDismiss = onNotificationDialogDismiss,
             title = "설정에서 알림을 켜줘!",
-            subDescription = "알림을 받으려면 설정에서 키어로 알림을 허용해줘!",
+            subDescription = "알림을 받으려면\n설정에서 키어로 알림을 허용해줘!",
             cancelAction = KieroCancelAction(
                 text = "취소",
                 onClick = onNotificationDialogDismiss
