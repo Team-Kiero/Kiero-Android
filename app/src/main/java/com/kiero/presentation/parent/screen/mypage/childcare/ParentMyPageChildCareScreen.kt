@@ -80,7 +80,7 @@ fun ParentMyPageChildCareScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(KieroTheme.colors.black)
-            .padding(paddingValues)
+            .padding(top = paddingValues.calculateTopPadding())
             .padding(horizontal = 16.dp, vertical = 13.dp)
     ) {
         KieroTopbar(
@@ -92,7 +92,8 @@ fun ParentMyPageChildCareScreen(
             ParentChildCareStep.MANAGEMENT -> {
                 ParentMyPageChildManagementScreen(
                     state = state,
-                    onReIssueClick = viewModel::onReIssueClick
+                    onReIssueClick = viewModel::onReIssueClick,
+                    modifier = Modifier.weight(1f)
                 )
             }
 
@@ -100,7 +101,8 @@ fun ParentMyPageChildCareScreen(
                 ParentMyPageChildInviteScreen(
                     state = state,
                     onCopyClick = viewModel::onCopyClick,
-                    onReIssueClick = viewModel::onReIssueClick
+                    onReIssueClick = viewModel::onReIssueClick,
+                    modifier = Modifier.weight(1f)
                 )
             }
         }
