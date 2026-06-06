@@ -61,6 +61,7 @@ fun ParentJourneyRoute(
     val context = LocalContext.current
     var showInitialPermissionDialog by remember { mutableStateOf(false) }
     var triggerPermissionRequest by remember { mutableStateOf(false) }
+    var hasSkippedInitialResume by remember { mutableStateOf(false) }
 
     val deniedCount by viewModel.notificationDeniedCount.collectAsStateWithLifecycle()
 
@@ -103,17 +104,15 @@ fun ParentJourneyRoute(
         }
     }
 
-    LaunchedEffect(state.kidInfo.kidId) {
-        if (state.kidInfo.kidId.isNotEmpty()) {
-            viewModel.fetchParentJourney(state.kidInfo.kidId.toLong())
-        }
-    }
-
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        if (!hasSkippedInitialResume) {
+            hasSkippedInitialResume = true
+            return@LifecycleEventEffect
+        }
+
         if (state.kidInfo.kidId.isNotEmpty()) {
             viewModel.fetchParentJourney(state.kidInfo.kidId.toLong())
         }
-
     }
 
     ParentJourneyScreen(
