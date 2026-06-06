@@ -20,7 +20,7 @@ class PostTermsUseCase @Inject constructor(
             request = TermsAgreementModel(
                 termsIds = termsIds
             )
-        )
+        ).getOrThrow()
 
         userInfoManager.saveTermsInfo(isRequiredTermsAllAgreed = true)
     }

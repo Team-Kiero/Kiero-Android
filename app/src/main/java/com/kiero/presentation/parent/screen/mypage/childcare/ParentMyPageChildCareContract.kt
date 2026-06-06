@@ -12,6 +12,7 @@ data class ParentMyPageChildCareState(
     val isLogoutDialogVisible: Boolean = false,
     val isExpired: Boolean = false,
     val isLoading: Boolean = false,
+    val isInitialized: Boolean = false,
 )
 
 sealed interface ParentMyPageChildCareSideEffect {

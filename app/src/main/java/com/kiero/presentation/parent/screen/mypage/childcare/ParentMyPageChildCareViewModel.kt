@@ -98,7 +98,8 @@ class ParentMyPageChildCareViewModel @Inject constructor(
                             isChildJoined = (childId != null)
                         ),
                         connectionStatus = ChildConnectionStatus.PENDING,
-                        currentStep = ParentChildCareStep.INVITE
+                        currentStep = ParentChildCareStep.INVITE,
+                        isInitialized = true
                     )
                 }
                 startTimer(expireTime)
@@ -115,7 +116,8 @@ class ParentMyPageChildCareViewModel @Inject constructor(
                             isChildJoined = true
                         ),
                         connectionStatus = ChildConnectionStatus.CONNECTED,
-                        currentStep = ParentChildCareStep.MANAGEMENT
+                        currentStep = ParentChildCareStep.MANAGEMENT,
+                        isInitialized = true
                     )
                 }
             }
@@ -131,7 +133,8 @@ class ParentMyPageChildCareViewModel @Inject constructor(
                             isChildJoined = false
                         ),
                         connectionStatus = ChildConnectionStatus.CONNECTED,
-                        currentStep = ParentChildCareStep.MANAGEMENT
+                        currentStep = ParentChildCareStep.MANAGEMENT,
+                        isInitialized = true
                     )
                 }
             }

@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +20,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.core.common.extension.collectSingleEvent
 import com.kiero.core.designsystem.component.KieroTopbar
+import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
@@ -76,35 +78,45 @@ fun ParentMyPageChildCareScreen(
         viewModel.onBackClick()
     }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(KieroTheme.colors.black)
             .padding(top = paddingValues.calculateTopPadding())
             .padding(horizontal = 16.dp, vertical = 13.dp)
     ) {
-        KieroTopbar(
-            title = "자녀 관리",
-            leftIconClick = viewModel::onBackClick
-        )
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            KieroTopbar(
+                title = "자녀 관리",
+                leftIconClick = viewModel::onBackClick
+            )
 
-        when(state.currentStep) {
-            ParentChildCareStep.MANAGEMENT -> {
-                ParentMyPageChildManagementScreen(
-                    state = state,
-                    onReIssueClick = viewModel::onReIssueClick,
-                    modifier = Modifier.weight(1f)
-                )
-            }
+            if (state.isInitialized) {
+                when(state.currentStep) {
+                    ParentChildCareStep.MANAGEMENT -> {
+                        ParentMyPageChildManagementScreen(
+                            state = state,
+                            onReIssueClick = viewModel::onReIssueClick,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
 
-            ParentChildCareStep.INVITE -> {
-                ParentMyPageChildInviteScreen(
-                    state = state,
-                    onCopyClick = viewModel::onCopyClick,
-                    onReIssueClick = viewModel::onReIssueClick,
-                    modifier = Modifier.weight(1f)
-                )
+                    ParentChildCareStep.INVITE -> {
+                        ParentMyPageChildInviteScreen(
+                            state = state,
+                            onCopyClick = viewModel::onCopyClick,
+                            onReIssueClick = viewModel::onReIssueClick,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
             }
+        }
+
+        if (!state.isInitialized || state.isLoading) {
+            KieroLoadingIndicator()
         }
     }
 }
