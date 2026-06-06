@@ -142,7 +142,6 @@ class AuthParentViewModel @Inject constructor(
             if (_state.value.isAllAgreed) {
                 val agreedTermsIds = _state.value.termsList.map { it.termsId }
 
-                userInfoManager.saveTermsInfo(isRequiredTermsAllAgreed = _state.value.isAllAgreed)
                 userInfoManager.saveAgreedTermsIds(agreedTermsIds)
 
                 _state.update { it.copy(isShowTermsAgreement = false) }
