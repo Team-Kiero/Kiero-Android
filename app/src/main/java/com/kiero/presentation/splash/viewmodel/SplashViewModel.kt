@@ -8,7 +8,6 @@ import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.localstorage.onboarding.OnboardingManager
 import com.kiero.core.model.auth.UserRole
 import com.kiero.core.network.auth.TokenRefreshService
-import com.kiero.data.kid.mypage.repository.KidMyPageRepository
 import com.kiero.domain.kid.user.usecase.CheckParentStatusUseCase
 import com.kiero.domain.parent.splash.model.ParentAutoLoginResult
 import com.kiero.domain.parent.splash.usecase.CheckParentAutoLoginUseCase
@@ -34,21 +33,6 @@ class SplashViewModel @Inject constructor(
     private val _sideEffect = Channel<SplashSideEffect>()
     val sideEffect = _sideEffect.receiveAsFlow()
 
-
-    fun checkParentStatus() {
-        viewModelScope.launch {
-            checkParentStatusUseCase()
-                .onSuccess {
-                    if (it) {
-                        userInfoManager.clearKidInfo()
-                        appRestarter.restartApp()
-                    }
-                }
-                .onFailure {
-                    Timber.e("checkParentStatus failed $it")
-                }
-        }
-    }
     fun checkLoginState() {
         viewModelScope.launch {
             delay(2000)
@@ -56,8 +40,13 @@ class SplashViewModel @Inject constructor(
             val accessToken = tokenManager.getAccessToken()
             val userRole = userInfoManager.getUserRole()
             val refreshToken = tokenManager.getRefreshToken()
+            val isRequiredTermsAllAgreed = userInfoManager.getTermsInfo() ?: false
 
-            if (!accessToken.isNullOrBlank() && userRole != null && !refreshToken.isNullOrBlank()) {
+            val isParentAndAgreed = userRole == UserRole.PARENT && isRequiredTermsAllAgreed
+            val isKid = userRole == UserRole.KID
+
+            // 토큰이 존재하면서 (부모+동의완료) 이거나 (자녀)인 경우
+            if (!accessToken.isNullOrBlank() && userRole != null && !refreshToken.isNullOrBlank() && (isParentAndAgreed || isKid)) {
                 reIssueManager.refresh(
                     refreshToken = refreshToken,
                     role = userRole
@@ -71,6 +60,7 @@ class SplashViewModel @Inject constructor(
                     _sideEffect.send(SplashSideEffect.NavigateToAuth)
                 }
             } else {
+                // 토큰이 없거나 부모인데 약관 동의를 안 한 경우 인증 화면으로 이동
                 _sideEffect.send(SplashSideEffect.NavigateToAuth)
             }
         }
