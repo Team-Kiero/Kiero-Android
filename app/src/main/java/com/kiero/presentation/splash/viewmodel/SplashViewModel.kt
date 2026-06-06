@@ -40,13 +40,12 @@ class SplashViewModel @Inject constructor(
             val accessToken = tokenManager.getAccessToken()
             val userRole = userInfoManager.getUserRole()
             val refreshToken = tokenManager.getRefreshToken()
-            val isRequiredTermsAllAgreed = userInfoManager.getTermsInfo() ?: false
 
-            val isParentAndAgreed = userRole == UserRole.PARENT && isRequiredTermsAllAgreed
+            val isParent = userRole == UserRole.PARENT
             val isKid = userRole == UserRole.KID
 
-            // 토큰이 존재하면서 (부모+동의완료) 이거나 (자녀)인 경우
-            if (!accessToken.isNullOrBlank() && userRole != null && !refreshToken.isNullOrBlank() && (isParentAndAgreed || isKid)) {
+            // 토큰이 존재하면 부모는 서버 약관 상태를 다시 확인하고, 자녀는 기존 온보딩 상태를 확인
+            if (!accessToken.isNullOrBlank() && userRole != null && !refreshToken.isNullOrBlank() && (isParent || isKid)) {
                 reIssueManager.refresh(
                     refreshToken = refreshToken,
                     role = userRole
