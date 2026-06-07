@@ -75,8 +75,14 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun syncFcmToken() {
+    fun syncFcmToken() {
         viewModelScope.launch {
+            val userRole = userInfoManager.getUserRole()
+            if (userRole == null) {
+                Timber.w("로그인 정보(JWT)가 아직 없어 FCM 토큰 동기화를 보류합니다.")
+                return@launch
+            }
+
             fcmRepository.syncFcmToken()
                 .onSuccess {
                     Timber.d("FCM 토큰 동기화(획득 및 서버 갱신) 성공")
