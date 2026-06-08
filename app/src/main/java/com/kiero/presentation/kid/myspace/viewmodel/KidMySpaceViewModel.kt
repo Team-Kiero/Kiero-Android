@@ -4,8 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.app.AppRestarter
 import com.kiero.core.localstorage.info.UserInfoManager
-import com.kiero.core.localstorage.permission.PermissionInfoManager
-import com.kiero.core.permission.model.PermissionType
 import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.data.fcm.repository.FcmRepository
 import com.kiero.data.kid.coin.repository.CoinRepository
@@ -25,7 +23,6 @@ class KidMySpaceViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val userInfoManager: UserInfoManager,
     private val appRestarter: AppRestarter,
-    private val permissionInfoManager: PermissionInfoManager,
     private val fcmRepository: FcmRepository
 ) : ViewModel() {
 
@@ -34,7 +31,6 @@ class KidMySpaceViewModel @Inject constructor(
 
     init {
         fetchKidName()
-        observeNotificationDeniedCount()
         fetchPushSetting()
     }
 
@@ -63,20 +59,6 @@ class KidMySpaceViewModel @Inject constructor(
         }
     }
 
-    private fun observeNotificationDeniedCount() {
-        viewModelScope.launch {
-            permissionInfoManager.deniedCount(PermissionType.POST_NOTIFICATIONS).collect { count ->
-                _uiState.update { it.copy(permissionNotificationDeniedCount = count) }
-            }
-        }
-    }
-
-    fun increaseDeniedCount(type: PermissionType) {
-        viewModelScope.launch {
-            permissionInfoManager.increaseDeniedCount(type)
-        }
-    }
-
     private fun fetchPushSetting() {
         viewModelScope.launch {
             fcmRepository.getPushSetting()
@@ -89,11 +71,13 @@ class KidMySpaceViewModel @Inject constructor(
         }
     }
 
-   fun onNotificationToggle(checked: Boolean) {
+    fun onNotificationToggle(checked: Boolean) {
+        _uiState.update { it.copy(isNotificationChecked = checked) }
+
         viewModelScope.launch {
             fcmRepository.updatePushSetting(checked)
                 .onSuccess {
-                   _uiState.update { it.copy(isNotificationChecked = checked) }
+                    Timber.d("푸시 알림 서버 동기화 성공: $checked")
                 }
                 .onFailure { error ->
                     Timber.e("푸시 알림 설정 변경 실패: $error")
@@ -103,9 +87,5 @@ class KidMySpaceViewModel @Inject constructor(
 
     fun showNotificationDialog(show: Boolean) {
         _uiState.update { it.copy(showNotificationDialog = show) }
-    }
-
-    fun onNotificationDialogDismiss() {
-        _uiState.update { it.copy(showNotificationDialog = false) }
     }
 }

@@ -36,7 +36,7 @@ fun KidMySpaceWishArchiveItem(
     price: Int = 0,
     onActionClick: () -> Unit = {}
 ) {
-    val displayTitle = if (hasWish) title else "오늘 아직 소원이 없어!"
+    val displayTitle = if (hasWish) title else "아직 빌었던 소원이 없어!"
     val displaySubtitle = if (hasWish) "획득일 | $date" else "오늘의 소원을 빌어볼까?"
 
 
