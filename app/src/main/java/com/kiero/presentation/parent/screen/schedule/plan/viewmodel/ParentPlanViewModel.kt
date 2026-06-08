@@ -253,6 +253,8 @@ class ParentPlanViewModel @Inject constructor(
     private fun onAddPlanClick() {
         if (_state.value.isLoading) return
 
+        _state.update { it.copy(isLoading = true) }
+
         viewModelScope.launch {
             val name = textState.text.toString().trim()
             val current = _state.value
@@ -267,6 +269,7 @@ class ParentPlanViewModel @Inject constructor(
                     referenceDate = current.currentReferenceDate
                 ).getOrElse {
                     _sideEffect.emit(ShowSnackBar("일정 저장에 실패했어요. 잠시 후 다시 시도해주세요."))
+                    _state.update { it.copy(isLoading = false) }
                     return@launch
                 }
             } else {
@@ -283,10 +286,9 @@ class ParentPlanViewModel @Inject constructor(
 
             if (validationErrors.isNotEmpty()) {
                 _sideEffect.emit(ShowSnackBar(validationErrors.first()))
+                _state.update { it.copy(isLoading = false) }
                 return@launch
             }
-
-            _state.update { it.copy(isLoading = true) }
 
             val serverStartTime = current.formatTimeForServer(current.startTime)
             val serverEndTime = current.formatTimeForServer(current.endTime)
@@ -322,6 +324,7 @@ class ParentPlanViewModel @Inject constructor(
                 _sideEffect.emit(ShowSnackBar(message))
                 delay(200)
                 _sideEffect.emit(navigateUp)
+                _state.update { it.copy(isLoading = false) }
             }.onFailure { throwable ->
                 val serverMessage = throwable.message.orEmpty()
 

@@ -19,13 +19,13 @@ class KieroFcmService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
-        Timber.d("푸시 알림 수신: ${message.data}")
+        Timber.d("푸시 알림 수신 (data): ${message.data}")
 
-        val title = message.notification?.title
-        val body = message.notification?.body
+        val title = message.data["title"] ?: message.notification?.title
+        val body = message.data["body"] ?: message.notification?.body
 
         if (title.isNullOrEmpty() || body.isNullOrEmpty()) {
-            Timber.w("푸시 알림의 제목이나 내용이 비어있어 무시합니다. (title: $title, body: $body)")
+            Timber.w("푸시 알림의 제목이나 내용이 비어있어 무시합니다. (전달된 data: ${message.data})")
             return
         }
 

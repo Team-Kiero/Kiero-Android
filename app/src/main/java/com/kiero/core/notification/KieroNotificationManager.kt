@@ -58,8 +58,11 @@ class KieroNotificationManager @Inject constructor(
             .setStyle(NotificationCompat.BigTextStyle().bigText(body))
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setDefaults(NotificationCompat.DEFAULT_ALL)
             .setContentIntent(pendingIntent)
             .setColor(ContextCompat.getColor(context, R.color.kiero_mint))
+            .setGroup("KIERO_PUSH_GROUP")
+            .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_ALL)
 
         val uniqueId = System.currentTimeMillis().toInt()
 
