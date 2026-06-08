@@ -9,7 +9,7 @@ import kotlinx.collections.immutable.persistentListOf
 data class ParentMyPageState(
     val parentInfo : ParentInfo = ParentInfo(),
     val myPageMenus : ImmutableList<ParentMyPageMenuUiModel> = persistentListOf(),
-    val connectionStatus: ChildConnectionStatus = ChildConnectionStatus.REISSUE,
+    val connectionStatus: ChildConnectionStatus? = null,
     val isAlarmChecked: Boolean = false
 )
 

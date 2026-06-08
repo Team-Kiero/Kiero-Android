@@ -88,12 +88,17 @@ class SseRepositoryImpl @Inject constructor(
                 }
             }
 
-            // 아이
             SseEventType.MISSION -> {
                 try {
                     val data = json.decodeFromString<MissionDataDto>(raw.data)
-                    Timber.d("📋 Mission 이벤트 파싱 성공: ${data.missionName}")
-                    SseEvent.Kid.Mission(data, eventId = raw.id)
+                    val userRole = userInfoManager.getUserRole()
+                    if (userRole == UserRole.PARENT) {
+                        Timber.d("📋 Parent MissionComplete 이벤트 파싱 성공: ${data.missionName}")
+                        SseEvent.Parent.MissionComplete(data, eventId = raw.id)
+                    } else {
+                        Timber.d("📋 Child Mission 이벤트 파싱 성공: ${data.missionName}")
+                        SseEvent.Kid.Mission(data, eventId = raw.id)
+                    }
                 } catch (e: Exception) {
                     Timber.e(e, "Mission 파싱 실패: ${raw.data}")
                     null
