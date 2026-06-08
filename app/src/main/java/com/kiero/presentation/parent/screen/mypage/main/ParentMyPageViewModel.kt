@@ -74,6 +74,10 @@ class ParentMyPageViewModel @Inject constructor(
         viewModelScope.launch {
             parentMyPageRepository.getParentMyProfile()
                 .onSuccess { response ->
+                    if (!response.hasPendingChildSession) {
+                        userInfoManager.clearPendingInviteCode()
+                    }
+
                     _state.update {
                         it.copy(
                             parentInfo = ParentInfo(

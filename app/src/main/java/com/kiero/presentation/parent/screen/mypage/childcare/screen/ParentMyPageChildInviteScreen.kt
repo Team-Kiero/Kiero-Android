@@ -17,8 +17,11 @@ fun ParentMyPageChildInviteScreen(
     state: ParentMyPageChildCareState,
     onCopyClick: () -> Unit,
     onReIssueClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Column {
+    Column(
+        modifier = modifier
+    ) {
         ParentMyPageChildNameHolder(
             childInfo = state.childInfo,
             connectionStatus = state.connectionStatus

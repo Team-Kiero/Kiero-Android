@@ -1,7 +1,9 @@
 package com.kiero.presentation.parent.screen.journey
 
+import android.os.SystemClock
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.localstorage.permission.PermissionInfoManager
 import com.kiero.core.permission.model.PermissionType
 import com.kiero.data.auth.repository.AuthRepository
@@ -9,6 +11,7 @@ import com.kiero.data.fcm.repository.FcmRepository
 import com.kiero.data.parent.journey.repository.ParentJourneyRepository
 import com.kiero.data.sse.manager.SseManager
 import com.kiero.data.sse.model.parent.SseScheduleEventType
+import com.kiero.presentation.parent.screen.journey.model.KidInfo
 import com.kiero.presentation.parent.screen.journey.model.TodayJourneyUiModel
 import com.kiero.presentation.parent.screen.journey.model.TodayStatus
 import com.kiero.presentation.parent.screen.journey.model.toUiModel
@@ -33,7 +36,8 @@ class ParentJourneyViewModel @Inject constructor(
     private val parentJourneyRepository: ParentJourneyRepository,
     private val sseManager: SseManager,
     private val fcmRepository: FcmRepository,
-    private val permissionInfoManager: PermissionInfoManager
+    private val permissionInfoManager: PermissionInfoManager,
+    private val userInfoManager: UserInfoManager
 ) : ViewModel() {
     private val _state = MutableStateFlow(ParentJourneyState())
     val state = _state.asStateFlow()
@@ -49,6 +53,9 @@ class ParentJourneyViewModel @Inject constructor(
         )
 
     private var hasShownInitialPrompt = false
+    private var hasStartedSseCollectors = false
+    private var isParentJourneyFetching = false
+    private var lastParentJourneyFetchAt = 0L
 
     init {
         fetchKidInfo()
@@ -79,6 +86,10 @@ class ParentJourneyViewModel @Inject constructor(
     }
 
     fun collectConnectionEvents() {
+        if (hasStartedSseCollectors) return
+
+        hasStartedSseCollectors = true
+
         viewModelScope.launch {
             sseManager.connectionState.collect { isConnected ->
                 if (isConnected) {
@@ -113,11 +124,35 @@ class ParentJourneyViewModel @Inject constructor(
 
     fun fetchKidInfo() {
         viewModelScope.launch {
+            val localChildId = userInfoManager.getChildIdInfo()
+            val localChildFirstName = userInfoManager.getChildFirstName().orEmpty()
+
+            if (localChildId != null) {
+                _state.update { currentState ->
+                    currentState.copy(
+                        kidInfo = KidInfo(
+                            kidId = localChildId.toString(),
+                            kidName = localChildFirstName
+                        )
+                    )
+                }
+
+                fetchParentJourney(localChildId)
+                collectParentJourneyScheduleEvents()
+                collectConnectionEvents()
+                return@launch
+            }
+
             authRepository.getChildren()
                 .onSuccess { response ->
                     val kidInfo = response.firstOrNull()?.toUiModel()
                     Timber.e("fetchKidInfo, $kidInfo")
                     if (kidInfo != null) {
+                        userInfoManager.saveChildIdInfo(kidInfo.kidId.toLong())
+                        userInfoManager.saveChildName(
+                            lastName = response.first().childLastName,
+                            firstName = response.first().childFirstName
+                        )
                         _state.update { currentState ->
                             currentState.copy(
                                 kidInfo = kidInfo
@@ -137,29 +172,41 @@ class ParentJourneyViewModel @Inject constructor(
     }
 
     fun fetchParentJourney(childId: Long) {
-        viewModelScope.launch {
-            parentJourneyRepository.getParentJourney(
-                childId = childId
-            ).onSuccess { result ->
-                val currentTime = LocalTime.now()
+        val now = SystemClock.elapsedRealtime()
+        if (isParentJourneyFetching || now - lastParentJourneyFetchAt < PARENT_JOURNEY_FETCH_THROTTLE_MS) {
+            return
+        }
 
-                _state.update { currentState ->
-                    currentState.copy(
-                        isFireLitToday = result.isFireLitToday,
-                        completeMissions = result.completeMissions.map { it.toUiModel() }.toImmutableList(),
-                        incompleteMissions = result.incompleteMissions.map { it.toUiModel() }.toImmutableList(),
-                        todayMissionList = if (result.isFireLitToday) {
-                            result.schedules.toUiModels(currentTime).toPersistentList().add(
-                                TodayJourneyUiModel(todayStatus = TodayStatus.TODAY_COMPLETED)
-                            )
-                        } else {
-                            result.schedules.toUiModels(currentTime).toPersistentList()
-                        }
-                    )
+        isParentJourneyFetching = true
+        lastParentJourneyFetchAt = now
+
+        viewModelScope.launch {
+            try {
+                parentJourneyRepository.getParentJourney(
+                    childId = childId
+                ).onSuccess { result ->
+                    val currentTime = LocalTime.now()
+
+                    _state.update { currentState ->
+                        currentState.copy(
+                            isFireLitToday = result.isFireLitToday,
+                            completeMissions = result.completeMissions.map { it.toUiModel() }.toImmutableList(),
+                            incompleteMissions = result.incompleteMissions.map { it.toUiModel() }.toImmutableList(),
+                            todayMissionList = if (result.isFireLitToday) {
+                                result.schedules.toUiModels(currentTime).toPersistentList().add(
+                                    TodayJourneyUiModel(todayStatus = TodayStatus.TODAY_COMPLETED)
+                                )
+                            } else {
+                                result.schedules.toUiModels(currentTime).toPersistentList()
+                            }
+                        )
+                    }
+                }.onFailure {
+                    Timber.e("parentJourney ${it.message.toString()}")
+                    _sideEffect.emit(ParentJourneySideEffect.ShowSnackbar(message = "일정 정보 불러오기에 실패하였습니다"))
                 }
-            }.onFailure {
-                Timber.e("parentJourney ${it.message.toString()}")
-                _sideEffect.emit(ParentJourneySideEffect.ShowSnackbar(message = "일정 정보 불러오기에 실패하였습니다"))
+            } finally {
+                isParentJourneyFetching = false
             }
         }
     }
@@ -186,5 +233,9 @@ class ParentJourneyViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         sseManager.stopSubscription()
+    }
+
+    companion object {
+        private const val PARENT_JOURNEY_FETCH_THROTTLE_MS = 500L
     }
 }

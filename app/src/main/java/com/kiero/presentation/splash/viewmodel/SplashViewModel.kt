@@ -8,7 +8,6 @@ import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.localstorage.onboarding.OnboardingManager
 import com.kiero.core.model.auth.UserRole
 import com.kiero.core.network.auth.TokenRefreshService
-import com.kiero.data.kid.mypage.repository.KidMyPageRepository
 import com.kiero.domain.kid.user.usecase.CheckParentStatusUseCase
 import com.kiero.domain.parent.splash.model.ParentAutoLoginResult
 import com.kiero.domain.parent.splash.usecase.CheckParentAutoLoginUseCase
@@ -34,21 +33,6 @@ class SplashViewModel @Inject constructor(
     private val _sideEffect = Channel<SplashSideEffect>()
     val sideEffect = _sideEffect.receiveAsFlow()
 
-
-    fun checkParentStatus() {
-        viewModelScope.launch {
-            checkParentStatusUseCase()
-                .onSuccess {
-                    if (it) {
-                        userInfoManager.clearKidInfo()
-                        appRestarter.restartApp()
-                    }
-                }
-                .onFailure {
-                    Timber.e("checkParentStatus failed $it")
-                }
-        }
-    }
     fun checkLoginState() {
         viewModelScope.launch {
             delay(2000)
@@ -57,7 +41,11 @@ class SplashViewModel @Inject constructor(
             val userRole = userInfoManager.getUserRole()
             val refreshToken = tokenManager.getRefreshToken()
 
-            if (!accessToken.isNullOrBlank() && userRole != null && !refreshToken.isNullOrBlank()) {
+            val isParent = userRole == UserRole.PARENT
+            val isKid = userRole == UserRole.KID
+
+            // 토큰이 존재하면 부모는 서버 약관 상태를 다시 확인하고, 자녀는 기존 온보딩 상태를 확인
+            if (!accessToken.isNullOrBlank() && userRole != null && !refreshToken.isNullOrBlank() && (isParent || isKid)) {
                 reIssueManager.refresh(
                     refreshToken = refreshToken,
                     role = userRole
@@ -71,6 +59,7 @@ class SplashViewModel @Inject constructor(
                     _sideEffect.send(SplashSideEffect.NavigateToAuth)
                 }
             } else {
+                // 토큰이 없거나 부모인데 약관 동의를 안 한 경우 인증 화면으로 이동
                 _sideEffect.send(SplashSideEffect.NavigateToAuth)
             }
         }

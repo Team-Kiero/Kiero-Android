@@ -2,7 +2,6 @@ package com.kiero.presentation.parent.screen.schedule.plan.component.picker
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,12 +23,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -41,6 +40,7 @@ import com.kiero.core.designsystem.theme.KieroTheme
 import com.sonms.wheelpicker.VerticalWheelPicker
 import com.sonms.wheelpicker.state.rememberWheelPickerState
 import com.sonms.wheelpicker.style.WheelPickerDefaults
+import kotlinx.coroutines.launch
 
 @Composable
 fun TimePicker(
@@ -129,17 +129,13 @@ fun TimePickerBottomSheet(
         containerColor = KieroTheme.colors.gray900,
         dragHandle = {},
         modifier = modifier
-            .pointerInput(Unit) {
-                detectTapGestures {
-                    onDismissRequest()
-                }
-            }
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 16.dp)
                 .disableNestedScroll()
+                .disableUpWardEvent()
         ) {
             PickerTopbar(
                 title = pickerTitle,
@@ -224,6 +220,7 @@ fun TimeSelectionSection(
     val minuteState = rememberWheelPickerState(initialIndex = minuteIndex)
     val amPmState = rememberWheelPickerState(initialIndex = amPmIndex)
 
+    val scope = rememberCoroutineScope()
     val itemHeight = 44.dp
 
     Box(
@@ -263,7 +260,18 @@ fun TimeSelectionSection(
                 ),
                 onItemSelected = { _, item -> onHourChosen(item) },
             ) { item, isSelected ->
-                TimePickerItem(text = item, isSelected = isSelected)
+                TimePickerItem(
+                    text = item,
+                    isSelected = isSelected,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(itemHeight),
+                    onClick = {
+                        scope.launch {
+                            hourState.animateScrollToIndex(TimePickerConstants.hours.indexOf(item))
+                        }
+                    }
+                )
             }
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -284,7 +292,18 @@ fun TimeSelectionSection(
                 ),
                 onItemSelected = { _, item -> onMinuteChosen(item) },
             ) { item, isSelected ->
-                TimePickerItem(text = item, isSelected = isSelected)
+                TimePickerItem(
+                    text = item,
+                    isSelected = isSelected,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(itemHeight),
+                    onClick = {
+                        scope.launch {
+                            minuteState.animateScrollToIndex(TimePickerConstants.minutes.indexOf(item))
+                        }
+                    }
+                )
             }
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -305,7 +324,18 @@ fun TimeSelectionSection(
                 ),
                 onItemSelected = { _, item -> onAmPmChosen(item) },
             ) { item, isSelected ->
-                TimePickerItem(text = item, isSelected = isSelected)
+                TimePickerItem(
+                    text = item,
+                    isSelected = isSelected,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(itemHeight),
+                    onClick = {
+                        scope.launch {
+                            amPmState.animateScrollToIndex(TimePickerConstants.amPmList.indexOf(item))
+                        }
+                    }
+                )
             }
         }
     }
@@ -315,13 +345,20 @@ fun TimeSelectionSection(
 private fun TimePickerItem(
     text: String,
     isSelected: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
 ) {
-    Text(
-        text = text,
-        color = if (isSelected) KieroTheme.colors.white else KieroTheme.colors.gray600,
-        style = KieroTheme.typography.semiBold.title2,
-        textAlign = TextAlign.Center,
-    )
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier.noRippleClickable(onClick = onClick),
+    ) {
+        Text(
+            text = text,
+            color = if (isSelected) KieroTheme.colors.white else KieroTheme.colors.gray600,
+            style = KieroTheme.typography.semiBold.title2,
+            textAlign = TextAlign.Center,
+        )
+    }
 }
 
 @Preview(showBackground = true)

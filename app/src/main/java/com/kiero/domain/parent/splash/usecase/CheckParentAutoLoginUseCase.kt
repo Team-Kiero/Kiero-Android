@@ -2,17 +2,25 @@ package com.kiero.domain.parent.splash.usecase
 
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.auth.repository.AuthRepository
+import com.kiero.data.terms.repository.TermsRepository
 import com.kiero.domain.parent.splash.model.ParentAutoLoginResult
 import javax.inject.Inject
 
 class CheckParentAutoLoginUseCase @Inject constructor(
     private val userInfoManager: UserInfoManager,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val termsRepository: TermsRepository
 ) {
     suspend operator fun invoke(): ParentAutoLoginResult {
-        // 권한 확인된게 없으면 로그인 화면(역할 선택 화면)으로
-        val isTermsAgreed = userInfoManager.getTermsInfo() ?: false
-        if (!isTermsAgreed) {
+        val termsStatus = termsRepository.getTermsStatus()
+            .getOrElse {
+                userInfoManager.saveTermsInfo(isRequiredTermsAllAgreed = false)
+                return ParentAutoLoginResult.MoveToAuth
+            }
+
+        userInfoManager.saveTermsInfo(termsStatus.isRequiredTermsAllAgreed)
+
+        if (!termsStatus.isRequiredTermsAllAgreed) {
             return ParentAutoLoginResult.MoveToAuth
         }
 

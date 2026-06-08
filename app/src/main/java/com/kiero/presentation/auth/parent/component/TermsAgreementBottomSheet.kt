@@ -24,9 +24,9 @@ import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.kiero.R
-import com.kiero.core.common.extension.disableUpWardEvent
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.component.bottomsheet.KieroBottomSheet
 import com.kiero.core.designsystem.component.button.KieroButtonMedium
@@ -73,12 +73,12 @@ private fun TermsAgreementContent(
     Column (
         modifier = modifier
             .fillMaxWidth()
-            .disableUpWardEvent()
             .dropShadow(
                 shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp),
                 shadow = Shadow(
                     radius = 8.dp,
                     color = KieroTheme.colors.gray900,
+                    offset = DpOffset(x = 0.dp, y = ((-3).dp))
                 )
             )
             .background(
