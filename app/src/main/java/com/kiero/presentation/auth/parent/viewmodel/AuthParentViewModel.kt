@@ -9,6 +9,7 @@ import com.kiero.core.common.extension.toHandleErrorMessage
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.model.UiState
 import com.kiero.data.auth.repository.AuthRepository
+import com.kiero.data.fcm.repository.FcmRepository
 import com.kiero.data.terms.repository.TermsRepository
 import com.kiero.domain.login.HandleKakaoLoginResultUseCase
 import com.kiero.domain.login.model.KakaoLoginResult
@@ -34,6 +35,7 @@ class AuthParentViewModel @Inject constructor(
     private val termsRepository: TermsRepository,
     private val userInfoManager: UserInfoManager,
     private val handleKakaoLoginResultUseCase: HandleKakaoLoginResultUseCase,
+    private val fcmRepository: FcmRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(AuthParentState())
     val state: StateFlow<AuthParentState> = _state.asStateFlow()
@@ -52,10 +54,15 @@ class AuthParentViewModel @Inject constructor(
                 ).onSuccess { domainResult: KakaoLoginResult ->
                     when (domainResult) {
                         is KakaoLoginResult.NeedTermsAgreement -> showTermsAgreement()
-                        is KakaoLoginResult.HasChildren -> _sideEffect.emit(AuthSideEffect.NavigateToParentGraph)
-                        is KakaoLoginResult.NoChildren -> _sideEffect.emit(AuthSideEffect.NavigateToParentSignUp)
+                        is KakaoLoginResult.HasChildren -> {
+                            syncFcmToken()
+                            _sideEffect.emit(AuthSideEffect.NavigateToParentGraph)
+                        }
+                        is KakaoLoginResult.NoChildren -> {
+                            syncFcmToken()
+                            _sideEffect.emit(AuthSideEffect.NavigateToParentSignUp)
+                        }
                     }
-
                 }.onFailure { throwable ->
                     Timber.e(throwable)
                     handleError(throwable)
@@ -75,6 +82,14 @@ class AuthParentViewModel @Inject constructor(
         viewModelScope.launch {
             _sideEffect.emit(AuthSideEffect.NavigateToSelection)
             _state.update { it.copy(uiState = UiState.Empty) }
+        }
+    }
+
+    private fun syncFcmToken() {
+        viewModelScope.launch {
+            fcmRepository.syncFcmToken()
+                .onSuccess { Timber.d("부모 로그인 완료: FCM 동기화 성공!") }
+                .onFailure { Timber.e(it, "부모 FCM 동기화 실패") }
         }
     }
 

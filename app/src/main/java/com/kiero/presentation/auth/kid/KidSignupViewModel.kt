@@ -2,14 +2,13 @@ package com.kiero.presentation.auth.kid
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kiero.core.common.extension.toHandleErrorMessage
 import com.kiero.core.localstorage.TokenManager
 import com.kiero.data.auth.repository.AuthRepository
+import com.kiero.data.fcm.repository.FcmRepository
 import com.kiero.presentation.auth.kid.model.toModel
 import com.kiero.presentation.auth.kid.state.KidSignUpState
 import com.kiero.presentation.auth.kid.state.KidSignupSideEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,7 +22,8 @@ import javax.inject.Inject
 @HiltViewModel
 class KidSignupViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val tokenRepository: TokenManager
+    private val tokenRepository: TokenManager,
+    private val fcmRepository: FcmRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(KidSignUpState())
     val state: StateFlow<KidSignUpState> = _state.asStateFlow()
@@ -60,6 +60,10 @@ class KidSignupViewModel @Inject constructor(
                     accessToken = authResponse.accessToken,
                     refreshToken = authResponse.refreshToken
                 )
+
+                fcmRepository.syncFcmToken()
+                    .onSuccess { Timber.d("아이 로그인 직후 FCM 동기화 성공!") }
+                    .onFailure { Timber.e(it, "아이 FCM 동기화 실패") }
 
                 _sideEffect.emit(KidSignupSideEffect.NavigateToKidOnboarding)
             }.onFailure {
