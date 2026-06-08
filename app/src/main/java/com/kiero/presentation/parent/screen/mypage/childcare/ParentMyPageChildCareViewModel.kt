@@ -39,6 +39,7 @@ class ParentMyPageChildCareViewModel @Inject constructor(
     private var timerJob: Job? = null
 
     private var lastCopyTime = 0L
+    private var shouldClearPendingInviteOnExit = false
 
     init {
         collectInviteEvents()
@@ -60,14 +61,17 @@ class ParentMyPageChildCareViewModel @Inject constructor(
 
     private suspend fun handleChildJoined(childId: Long) {
         userInfoManager.saveChildIdInfo(childId)
+        shouldClearPendingInviteOnExit = true
+        timerJob?.cancel()
         _state.update {
             it.copy(
                 connectionStatus = ChildConnectionStatus.CONNECTED,
-                // 연결완료시 management로 이동할지 말지? Todo
-                // currentStep = ParentChildCareStep.MANAGEMENT
+                isExpired = false,
+                childInfo = it.childInfo.copy(
+                    isChildJoined = true
+                )
             )
         }
-        timerJob?.cancel()
         _sideEffect.emit(ParentMyPageChildCareSideEffect.ShowSnackbar("자녀 연동이 완료되었습니다!"))
     }
 
@@ -94,7 +98,8 @@ class ParentMyPageChildCareViewModel @Inject constructor(
                             isChildJoined = (childId != null)
                         ),
                         connectionStatus = ChildConnectionStatus.PENDING,
-                        currentStep = ParentChildCareStep.MANAGEMENT
+                        currentStep = ParentChildCareStep.INVITE,
+                        isInitialized = true
                     )
                 }
                 startTimer(expireTime)
@@ -111,7 +116,8 @@ class ParentMyPageChildCareViewModel @Inject constructor(
                             isChildJoined = true
                         ),
                         connectionStatus = ChildConnectionStatus.CONNECTED,
-                        currentStep = ParentChildCareStep.MANAGEMENT
+                        currentStep = ParentChildCareStep.MANAGEMENT,
+                        isInitialized = true
                     )
                 }
             }
@@ -127,7 +133,8 @@ class ParentMyPageChildCareViewModel @Inject constructor(
                             isChildJoined = false
                         ),
                         connectionStatus = ChildConnectionStatus.CONNECTED,
-                        currentStep = ParentChildCareStep.MANAGEMENT
+                        currentStep = ParentChildCareStep.MANAGEMENT,
+                        isInitialized = true
                     )
                 }
             }
@@ -190,18 +197,26 @@ class ParentMyPageChildCareViewModel @Inject constructor(
         when (currentStep) {
             ParentChildCareStep.MANAGEMENT -> {
                 viewModelScope.launch {
+                    clearPendingInviteCodeIfChildJoined()
                     _sideEffect.emit(ParentMyPageChildCareSideEffect.NavigateToMyPage)
                 }
             }
 
             ParentChildCareStep.INVITE -> {
-                _state.update {
-                    it.copy(
-                        currentStep = ParentChildCareStep.MANAGEMENT
-                    )
+                viewModelScope.launch {
+                    clearPendingInviteCodeIfChildJoined()
+                    _sideEffect.emit(ParentMyPageChildCareSideEffect.NavigateToMyPage)
                 }
             }
         }
+    }
+
+    private suspend fun clearPendingInviteCodeIfChildJoined() {
+        if (!shouldClearPendingInviteOnExit) return
+
+        userInfoManager.clearPendingInviteCode()
+        shouldClearPendingInviteOnExit = false
+        timerJob?.cancel()
     }
 
     fun onReIssueClick() {

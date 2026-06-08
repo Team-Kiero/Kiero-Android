@@ -54,8 +54,14 @@ class SseManager @Inject constructor(
         replay = 0,
         extraBufferCapacity = 1
     )
-
     val parentScheduleEvents = _parentScheduleEvents.asSharedFlow()
+
+    private val _parentMissionCompleteEvents = MutableSharedFlow<SseEvent.Parent.MissionComplete>(
+        replay = 0,
+        extraBufferCapacity = 1
+    )
+    val parentMissionCompleteEvents = _parentMissionCompleteEvents.asSharedFlow()
+
 
 
 
@@ -289,6 +295,7 @@ class SseManager @Inject constructor(
             is SseEvent.Parent.Invite -> _parentInviteEvents.emit(event)
             is SseEvent.Parent.Feed -> _parentFeedEvents.emit(event)
             is SseEvent.Parent.Schedule -> _parentScheduleEvents.emit(event)
+            is SseEvent.Parent.MissionComplete -> _parentMissionCompleteEvents.emit(event)
             else -> Timber.w("부모 모드에서 알 수 없는 이벤트: $event")
         }
     }

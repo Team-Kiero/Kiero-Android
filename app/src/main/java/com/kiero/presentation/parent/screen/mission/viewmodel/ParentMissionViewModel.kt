@@ -6,6 +6,7 @@ import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.model.UiState
 import com.kiero.data.parent.mission.repository.MissionRepository
 import com.kiero.data.parent.mission.repository.ParentMissionAddRepository
+import com.kiero.data.sse.manager.SseManager
 import com.kiero.presentation.kid.mission.model.toUiModel
 import com.kiero.presentation.parent.screen.mission.state.ParentMissionSideEffect
 import com.kiero.presentation.parent.screen.mission.state.ParentMissionState
@@ -22,14 +23,32 @@ class ParentMissionViewModel @Inject constructor(
     private val missionRepository: MissionRepository,
     private val parentMissionAddRepository: ParentMissionAddRepository,
     private val userInfoManager: UserInfoManager,
+    private val sseManager: SseManager
 ) : ViewModel() {
-
     private val _state = MutableStateFlow<UiState<ParentMissionState>>(UiState.Loading)
     val state = _state.asStateFlow()
 
     private val _sideEffect = MutableSharedFlow<ParentMissionSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
 
+    init {
+        collectParentMissionEvents()
+    }
+
+    private fun collectParentMissionEvents() {
+        viewModelScope.launch {
+            val childId = userInfoManager.getChildIdInfo() ?: run {
+                _state.value = UiState.Empty
+                return@launch
+            }
+
+            sseManager.parentMissionCompleteEvents.collect { event ->
+                if (event.data.childId == childId) {
+                    getMissions()
+                }
+            }
+        }
+    }
     fun getMissions() {
         viewModelScope.launch {
             val childId = userInfoManager.getChildIdInfo() ?: run {

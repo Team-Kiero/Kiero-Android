@@ -18,6 +18,7 @@ sealed class SseEvent {
         data class Invite(val data: InviteDataDto, override val eventId: String? = null) : Parent()
         data class Feed(val data: FeedDataDto, override val eventId: String? = null) : Parent()
         data class Schedule(val data: ParentScheduleDataDto, override val eventId: String? = null) : Parent()
+        data class MissionComplete(val data: MissionDataDto, override val eventId: String? = null) : Parent()
     }
 
     // 자녀 전용

@@ -12,6 +12,7 @@ import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.data.terms.repository.TermsRepository
 import com.kiero.domain.login.HandleKakaoLoginResultUseCase
 import com.kiero.domain.login.model.KakaoLoginResult
+import com.kiero.domain.parent.signup.PostTermsUseCase
 import com.kiero.presentation.auth.parent.model.TermsType
 import com.kiero.presentation.auth.parent.model.toUiModel
 import com.kiero.presentation.auth.parent.state.AuthParentState
@@ -34,6 +35,7 @@ class AuthParentViewModel @Inject constructor(
     private val termsRepository: TermsRepository,
     private val userInfoManager: UserInfoManager,
     private val handleKakaoLoginResultUseCase: HandleKakaoLoginResultUseCase,
+    private val postTermsUseCase: PostTermsUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AuthParentState())
     val state: StateFlow<AuthParentState> = _state.asStateFlow()
@@ -142,11 +144,30 @@ class AuthParentViewModel @Inject constructor(
             if (_state.value.isAllAgreed) {
                 val agreedTermsIds = _state.value.termsList.map { it.termsId }
 
-                userInfoManager.saveTermsInfo(isRequiredTermsAllAgreed = _state.value.isAllAgreed)
                 userInfoManager.saveAgreedTermsIds(agreedTermsIds)
 
-                _state.update { it.copy(isShowTermsAgreement = false) }
-                _sideEffect.emit(AuthSideEffect.NavigateToParentSignUp)
+                val hasConnectedChild = userInfoManager.getChildIdInfo() != null
+                if (!hasConnectedChild) {
+                    _state.update { it.copy(isShowTermsAgreement = false) }
+                    _sideEffect.emit(AuthSideEffect.NavigateToParentSignUp)
+                    return@launch
+                }
+
+                _state.update {
+                    it.copy(
+                        isShowTermsAgreement = false,
+                        uiState = UiState.Loading
+                    )
+                }
+
+                postTermsUseCase()
+                    .onSuccess {
+                        navigateAfterTermsAgreement()
+                    }
+                    .onFailure { throwable ->
+                        Timber.e(throwable)
+                        handleError(throwable)
+                    }
             } else {
                 handleError(message = "필수 약관에 모두 동의해주세요.")
             }
@@ -163,6 +184,30 @@ class AuthParentViewModel @Inject constructor(
                 handleError(message = "약관 링크를 찾을 수 없습니다.")
             }
         }
+    }
+
+
+    private suspend fun navigateAfterTermsAgreement() {
+        authRepository.getChildren()
+            .onSuccess { children ->
+                val firstChild = children.firstOrNull()
+
+                if (firstChild != null) {
+                    userInfoManager.saveChildIdInfo(childId = firstChild.childId)
+                    userInfoManager.saveChildName(
+                        lastName = firstChild.childLastName,
+                        firstName = firstChild.childFirstName
+                    )
+                }
+
+                _state.update { it.copy(uiState = UiState.Empty) }
+                _sideEffect.emit(AuthSideEffect.NavigateToParentGraph)
+            }
+            .onFailure { throwable ->
+                Timber.e(throwable)
+                _state.update { it.copy(uiState = UiState.Empty) }
+                _sideEffect.emit(AuthSideEffect.NavigateToParentGraph)
+            }
     }
 
 

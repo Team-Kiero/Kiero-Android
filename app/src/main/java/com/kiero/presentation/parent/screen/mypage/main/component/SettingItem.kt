@@ -26,7 +26,7 @@ fun SettingItem(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    connectionStatus: ChildConnectionStatus = ChildConnectionStatus.REISSUE,
+    connectionStatus: ChildConnectionStatus? = null,
     showConnectionStatus: Boolean = false
 ) {
     Row(
@@ -44,7 +44,7 @@ fun SettingItem(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        if (showConnectionStatus) {
+        if (showConnectionStatus && connectionStatus != null) {
             val isPending = connectionStatus == ChildConnectionStatus.PENDING
 
             KieroChip(
