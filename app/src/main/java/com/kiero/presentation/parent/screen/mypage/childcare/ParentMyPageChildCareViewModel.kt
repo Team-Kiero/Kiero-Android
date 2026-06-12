@@ -69,7 +69,8 @@ class ParentMyPageChildCareViewModel @Inject constructor(
                 isExpired = false,
                 childInfo = it.childInfo.copy(
                     isChildJoined = true
-                )
+                ),
+                currentStep = ParentChildCareStep.MANAGEMENT
             )
         }
         _sideEffect.emit(ParentMyPageChildCareSideEffect.ShowSnackbar("자녀 연동이 완료되었습니다!"))
