@@ -124,6 +124,7 @@ android {
 dependencies {
     implementation(libs.androidx.profileinstaller)
     testImplementation(libs.bundles.unitTest)
+    debugImplementation(libs.leakcanary.android)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.bundles.test)
     "baselineProfile"(project(":baselineprofile"))
