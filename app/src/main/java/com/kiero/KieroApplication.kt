@@ -12,11 +12,18 @@ import coil.disk.DiskCache
 import coil.memory.MemoryCache
 import coil.util.DebugLogger
 import com.kakao.sdk.common.KakaoSdk
+import com.kiero.core.network.di.NoAuthNetwork
 import dagger.hilt.android.HiltAndroidApp
+import okhttp3.OkHttpClient
 import timber.log.Timber
+import javax.inject.Inject
 
 @HiltAndroidApp
 class KieroApplication : Application(), ImageLoaderFactory {
+    @Inject
+    @NoAuthNetwork
+    lateinit var okHttpClient: OkHttpClient
+
     override fun onCreate() {
         super.onCreate()
         setTimber()
@@ -46,6 +53,7 @@ class KieroApplication : Application(), ImageLoaderFactory {
 
     override fun newImageLoader(): ImageLoader {
         return ImageLoader.Builder(this)
+            .okHttpClient(okHttpClient)
             .components {
                 if (SDK_INT >= 28) {
                     add(ImageDecoderDecoder.Factory())
@@ -55,7 +63,7 @@ class KieroApplication : Application(), ImageLoaderFactory {
             }
             .memoryCache {
                 MemoryCache.Builder(this)
-                    .maxSizePercent(0.25)
+                    .maxSizePercent(0.15)
                     .build()
             }
             .diskCache {
@@ -65,7 +73,8 @@ class KieroApplication : Application(), ImageLoaderFactory {
                     .build()
             }
             .crossfade(false)
-            .bitmapConfig(Bitmap.Config.HARDWARE)
+            .bitmapConfig(Bitmap.Config.RGB_565)
+            .allowHardware(true)
             .respectCacheHeaders(false)
             .apply {
                 if (BuildConfig.DEBUG) {

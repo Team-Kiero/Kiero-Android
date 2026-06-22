@@ -85,6 +85,10 @@ android {
             )
         }
     }
+    composeCompiler {
+        metricsDestination = layout.buildDirectory.dir("compose_metrics")
+        reportsDestination = layout.buildDirectory.dir("compose_reports")
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -119,7 +123,8 @@ android {
 
 dependencies {
     implementation(libs.androidx.profileinstaller)
-    testImplementation(libs.junit)
+    testImplementation(libs.bundles.unitTest)
+    debugImplementation(libs.leakcanary.android)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.bundles.test)
     "baselineProfile"(project(":baselineprofile"))

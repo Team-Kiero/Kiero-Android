@@ -6,7 +6,10 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import androidx.core.net.toUri
+import com.kiero.core.coroutine.di.IoDispatcher
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -16,12 +19,13 @@ import javax.inject.Inject
 import kotlin.math.max
 
 class ImageLocalDataSource @Inject constructor(
-    @param: ApplicationContext private val context: Context
+    @param: ApplicationContext private val context: Context,
+    @param: IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
-    fun getOptimizedFile(uriString: String): File {
+    suspend fun getOptimizedFile(uriString: String): File = withContext(ioDispatcher) {
         val uri = uriString.toUri()
         val dir = getDirectory()
-        return compressToWebP(uri, dir)
+        compressToWebP(uri, dir)
     }
 
     fun clearCache() {

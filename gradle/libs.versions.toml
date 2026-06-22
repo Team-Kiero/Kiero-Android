@@ -13,12 +13,15 @@ agp = "8.13.2"
 kotlin = "2.2.21"
 kotlinxImmutable = "0.4.0"
 kotlinxSerializationJson = "1.9.0"
-jetbrainsKotlinJvm = "2.0.0"
+jetbrainsKotlinJvm = "2.2.21"
 
 #Test
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
+coroutinesTest = "1.8.0"
+mockk = "1.13.11"
+leakcanary = "2.14"
 
 #AndroidX
 coreKtx = "1.17.0"
@@ -39,7 +42,7 @@ retrofit = "3.0.0"
 retrofitKotlinSerializationConverter = "1.0.0"
 
 #Dependency Injection
-daggerHilt = "2.57.2"
+daggerHilt = "2.58"
 hiltNavigationCompose = "1.3.0"
 ksp = "2.2.21-2.0.4"
 
@@ -56,7 +59,7 @@ kakao = "2.20.6"
 #Lottie
 lottie = "6.7.1"
 
-# DataStore & Tink (여기 추가!)
+# DataStore & Tink
 datastore = "1.0.0"
 tink = "1.21.0"
 uiautomator = "2.2.0"
@@ -80,6 +83,9 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutinesTest" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+leakcanary-android = { group = "com.squareup.leakcanary", name = "leakcanary-android", version.ref = "leakcanary" }
 
 # Debug
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
@@ -192,6 +198,12 @@ test = [
     "androidx-junit",
     "androidx-espresso-core",
     "androidx-ui-test-junit4"
+]
+
+unitTest = [
+    "junit",
+    "kotlinx-coroutines-test",
+    "mockk"
 ]
 
 debug = [

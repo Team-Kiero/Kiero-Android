@@ -10,6 +10,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -40,25 +41,25 @@ class SseManager @Inject constructor(
     // 부모 이벤트
     private val _parentInviteEvents = MutableSharedFlow<SseEvent.Parent.Invite>(
         replay = 0,
-        extraBufferCapacity = 1
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
     val parentInviteEvents: SharedFlow<SseEvent.Parent.Invite> = _parentInviteEvents.asSharedFlow()
 
     private val _parentFeedEvents = MutableSharedFlow<SseEvent.Parent.Feed>(
-        replay = 0,
-        extraBufferCapacity = 1
+        replay = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
     val parentFeedEvents: SharedFlow<SseEvent.Parent.Feed> = _parentFeedEvents.asSharedFlow()
 
     private val _parentScheduleEvents = MutableSharedFlow<SseEvent.Parent.Schedule>(
-        replay = 0,
-        extraBufferCapacity = 1
+        replay = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
     val parentScheduleEvents = _parentScheduleEvents.asSharedFlow()
 
     private val _parentMissionCompleteEvents = MutableSharedFlow<SseEvent.Parent.MissionComplete>(
         replay = 0,
-        extraBufferCapacity = 1
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
     val parentMissionCompleteEvents = _parentMissionCompleteEvents.asSharedFlow()
 
@@ -67,32 +68,32 @@ class SseManager @Inject constructor(
 
     // 자녀 이벤트
     private val _childMissionEvents = MutableSharedFlow<SseEvent.Kid.Mission>(
-        replay = 0,
-        extraBufferCapacity = 1
+        replay = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
     val childMissionEvents: SharedFlow<SseEvent.Kid.Mission> = _childMissionEvents.asSharedFlow()
 
     private val _childScheduleEvents = MutableSharedFlow<SseEvent.Kid.Schedule>(
-        replay = 0,
-        extraBufferCapacity = 1
+        replay = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
     val childScheduleEvents: SharedFlow<SseEvent.Kid.Schedule> = _childScheduleEvents.asSharedFlow()
 
     private val _childCouponEvents = MutableSharedFlow<SseEvent.Kid.Coupon>(
-        replay = 0,
-        extraBufferCapacity = 1
+        replay = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
     val childCouponEvents: SharedFlow<SseEvent.Kid.Coupon> = _childCouponEvents.asSharedFlow()
 
     private val _childDateEvents = MutableSharedFlow<SseEvent.Kid.Date>(
-        replay = 0,
-        extraBufferCapacity = 1
+        replay = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
     val dateEvents: SharedFlow<SseEvent.Kid.Date> = _childDateEvents.asSharedFlow()
 
     private val _childParentWithDrawnEvents = MutableSharedFlow<SseEvent.Kid.ParentWithDrawn>(
         replay = 0,
-        extraBufferCapacity = 1
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
     val childParentWithDrawnEvents: SharedFlow<SseEvent.Kid.ParentWithDrawn> = _childParentWithDrawnEvents.asSharedFlow()
 

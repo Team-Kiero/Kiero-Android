@@ -19,6 +19,7 @@ import com.kiero.core.designsystem.component.bottomsheet.KieroBottomSheet
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.screen.mission.component.datepicker.model.CalendarDisplayMode
 import com.kiero.presentation.parent.screen.schedule.plan.component.picker.PickerTopbar
+import kotlinx.collections.immutable.persistentMapOf
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -65,7 +66,7 @@ fun CalendarBottomSheet(
                 yearMonth = yearMonth,
                 selectedDate = selectedDate,
                 displayMode = CalendarDisplayMode.Normal(
-                    procedureCountByDate = emptyMap()
+                    procedureCountByDate = persistentMapOf()
                 ),
                 onDateClick = { selectedDate = it },
                 onMonthChange = { yearMonth = it },
