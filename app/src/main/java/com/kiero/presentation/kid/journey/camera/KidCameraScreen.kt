@@ -72,9 +72,7 @@ fun KidCameraRoute(
 
     viewModel.sideEffect.collectSideEffect {
         when(it) {
-            is KidCameraSideEffect.NavigateUp -> {
-                navigateUp()
-            }
+            is KidCameraSideEffect.NavigateUp -> navigateUp()
         }
     }
 

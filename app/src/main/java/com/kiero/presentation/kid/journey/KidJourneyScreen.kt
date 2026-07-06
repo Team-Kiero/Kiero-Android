@@ -56,6 +56,7 @@ import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.permission.PermissionChecker
 import com.kiero.core.permission.model.PermissionType
 import com.kiero.core.permission.ui.rememberPermissionRequester
+import com.kiero.core.permission.util.navigateToSettings
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
 import com.kiero.core.trigger.LocalRefreshState
 import com.kiero.presentation.kid.component.KidSpeechField
@@ -70,7 +71,6 @@ import com.kiero.presentation.kid.journey.state.KidJourneySideEffect
 import com.kiero.presentation.kid.journey.state.KidJourneyState
 import com.kiero.presentation.kid.journey.viewmodel.KidJourneyViewModel
 import com.kiero.presentation.main.navigation.KidMainTab
-import timber.log.Timber
 
 @Composable
 fun KidJourneyRoute(
@@ -87,6 +87,7 @@ fun KidJourneyRoute(
     val refreshState = LocalRefreshState.current
 
     val notificationDeniedCount by viewModel.notificationDeniedCount.collectAsStateWithLifecycle()
+    var showCameraPermissionSettingsDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         refreshState.refreshEvent.collect { tab ->
@@ -125,12 +126,10 @@ fun KidJourneyRoute(
                 deniedCount = state.data.permissionCameraDeniedCount,
                 onGranted = onNavigateToCamera,
                 onDenied = {
-                    // Todo : 퍼미션 거부됨 스낵바 등
+                    globalTrigger.showSnackbar(SnackbarState(message = "카메라 권한이 필요해요"))
                 },
                 onPermanentlyDenied = {
-                    // Todo : 퍼미션 거부 안내 UI 띄우기 - 2번 취소되었을 때 설정으로 이동
-                    Timber.e("퍼미션 완전 거부")
-                    //context.navigateToSettings(type = PermissionType.CAMERA)
+                    showCameraPermissionSettingsDialog = true
                 },
                 onCountIncrease = viewModel::increaseDeniedCount,
             )
@@ -176,7 +175,24 @@ fun KidJourneyRoute(
         UiState.Loading -> KieroLoadingIndicator()
     }
 
+    if (showCameraPermissionSettingsDialog) {
+        KieroDialog(
+            onDismiss = { showCameraPermissionSettingsDialog = false },
+            title = "카메라 권한이 필요해요",
+            subDescription = "사진 촬영을 위해 카메라 권한을\n설정에서 허용해주세요.",
+            cancelAction = KieroCancelAction(text = "취소", onClick = { showCameraPermissionSettingsDialog = false }),
+            confirmAction = KieroConfirmAction(
+                text = "설정으로 이동",
+                onClick = {
+                    showCameraPermissionSettingsDialog = false
+                    context.navigateToSettings(type = PermissionType.CAMERA)
+                }
+            ),
+            content = {}
+        )
+    }
 }
+
 @Composable
 private fun KidJourneyScreen(
     paddingValues: PaddingValues,
