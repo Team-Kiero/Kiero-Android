@@ -11,6 +11,8 @@ import coil.decode.ImageDecoderDecoder
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
 import coil.util.DebugLogger
+import com.google.firebase.Firebase
+import com.google.firebase.crashlytics.crashlytics
 import com.kakao.sdk.common.KakaoSdk
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
@@ -22,6 +24,7 @@ class KieroApplication : Application(), ImageLoaderFactory {
         setTimber()
         setDayMode()
         initKakaoSdk()
+        setCrashlytics()
     }
 
     private fun setTimber() {
@@ -34,6 +37,9 @@ class KieroApplication : Application(), ImageLoaderFactory {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
     }
 
+    private fun setCrashlytics() {
+        Firebase.crashlytics.setCrashlyticsCollectionEnabled(true)
+    }
     private fun initKakaoSdk() {
         try {
             KakaoSdk.init(this, BuildConfig.KAKAO_NATIVE_APP_KEY)

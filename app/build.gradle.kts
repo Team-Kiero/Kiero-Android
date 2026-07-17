@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.baselineprofile)
     alias(libs.plugins.aboutlibraries.android)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 val properties = Properties().apply {
@@ -83,6 +84,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Todo: isMinifyEnabled = true로 바꿀 때 추가
+            // firebaseCrashlytics {
+            //     mappingFileUploadEnabled = true
+            // }
         }
     }
     compileOptions {
@@ -155,4 +160,6 @@ dependencies {
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.messaging)
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.analytics)
 }
