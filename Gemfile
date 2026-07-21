@@ -2,9 +2,19 @@
 
 source "https://rubygems.org"
 
-git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
+gem "fastlane", "~> 2.226"
 
-gem "fastlane"
+
+gem "base64"
+gem "bigdecimal"
+gem "mutex_m"
+gem "abbrev"
+gem "observer"
+gem "racc"
+gem "drb"
+gem "csv"
+gem "nkf"
+gem "ostruct"
 
 
 plugins_path = File.join(File.dirname(__FILE__), 'fastlane', 'Pluginfile')
