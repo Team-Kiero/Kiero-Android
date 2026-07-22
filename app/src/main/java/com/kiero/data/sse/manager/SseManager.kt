@@ -41,6 +41,7 @@ class SseManager @Inject constructor(
     // 부모 이벤트
     private val _parentInviteEvents = MutableSharedFlow<SseEvent.Parent.Invite>(
         replay = 0,
+        extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
     val parentInviteEvents: SharedFlow<SseEvent.Parent.Invite> = _parentInviteEvents.asSharedFlow()
@@ -59,6 +60,7 @@ class SseManager @Inject constructor(
 
     private val _parentMissionCompleteEvents = MutableSharedFlow<SseEvent.Parent.MissionComplete>(
         replay = 0,
+        extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
     val parentMissionCompleteEvents = _parentMissionCompleteEvents.asSharedFlow()
@@ -93,6 +95,7 @@ class SseManager @Inject constructor(
 
     private val _childParentWithDrawnEvents = MutableSharedFlow<SseEvent.Kid.ParentWithDrawn>(
         replay = 0,
+        extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
     val childParentWithDrawnEvents: SharedFlow<SseEvent.Kid.ParentWithDrawn> = _childParentWithDrawnEvents.asSharedFlow()
