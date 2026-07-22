@@ -138,8 +138,9 @@ fun NavGraphBuilder.kidNavGraph(
             navigateToWish = {
                 navController.navigateToWish(
                     navOptions = navOptions {
-                        popUpTo(KidMySpace) { inclusive = true }
+                        popUpTo(KidGraph) { saveState = true }
                         launchSingleTop = true
+                        restoreState = true
                     }
                 )
             }
