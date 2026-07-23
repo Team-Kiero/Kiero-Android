@@ -2,6 +2,11 @@ package com.kiero.presentation.kid.journey.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.analytic.tracker.Tracker
+import com.kiero.core.analytic.type.KieroEvent
+import com.kiero.core.analytic.type.NotificationPermissionState
+import com.kiero.core.analytic.type.PushEnabled
+import com.kiero.core.common.extension.track
 import com.kiero.core.common.util.successData
 import com.kiero.core.localstorage.permission.PermissionInfoManager
 import com.kiero.core.model.UiState
@@ -39,7 +44,8 @@ class KidJourneyViewModel @Inject constructor(
     private val coinRepository: CoinRepository,
     private val sseManager: SseManager,
     private val permissionInfoManager: PermissionInfoManager,
-    private val fcmRepository: FcmRepository
+    private val fcmRepository: FcmRepository,
+    private val tracker: Tracker
 ) : ViewModel() {
     private val coin = coinRepository.myCoin
 
@@ -94,6 +100,10 @@ class KidJourneyViewModel @Inject constructor(
         collectChildKidScheduleEvents()
     }
 
+    fun trackAuthStarted(scheduleId: String) {
+        tracker.track(KieroEvent.Schedule.AuthStarted(scheduleId = scheduleId))
+    }
+
     fun onNotificationDeniedCountChanged(hasOsPermission: Boolean) {
         if (hasShownInitialPrompt) return
         if (!hasOsPermission && notificationDeniedCount.value == 0) {
@@ -108,8 +118,11 @@ class KidJourneyViewModel @Inject constructor(
 
     fun onNotificationPermissionResult(isGranted: Boolean) {
         viewModelScope.launch {
-            fcmRepository.updatePushSetting(isGranted)
-                .onFailure { Timber.e("푸시 알림 서버 업데이트 실패: $it") }
+            val permissionState = if (isGranted) NotificationPermissionState.GRANTED else NotificationPermissionState.DENIED
+            tracker.setUserProperty(permissionState)
+            tracker.setUserProperty(PushEnabled(isGranted))
+
+            fcmRepository.updatePushSetting(isGranted).onFailure { Timber.e("푸시 알림 서버 업데이트 실패: $it") }
         }
         dismissNotificationPermissionDialog()
     }
@@ -225,6 +238,7 @@ class KidJourneyViewModel @Inject constructor(
 
                 repository.patchScheduleSkip(scheduleDetailId)
                     .onSuccess {
+                        tracker.track(KieroEvent.Schedule.Skipped(scheduleId = scheduleDetailId.toString()))
                         fetchTodaySchedule()
                         Timber.d("patchScheduleSkip: $it")
                     }

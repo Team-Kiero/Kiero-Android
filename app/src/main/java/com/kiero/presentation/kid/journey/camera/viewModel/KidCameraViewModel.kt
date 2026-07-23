@@ -4,6 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.kiero.core.analytic.tracker.Tracker
+import com.kiero.core.analytic.type.KieroEvent
 import com.kiero.core.common.extension.updateSuccess
 import com.kiero.core.common.util.ImageUriManager
 import com.kiero.core.common.util.successData
@@ -28,7 +30,8 @@ import javax.inject.Inject
 class KidCameraViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val completeScheduleWithImageUseCase: CompleteScheduleWithImageUseCase,
-    private val imageUriManager: ImageUriManager
+    private val imageUriManager: ImageUriManager,
+    private val tracker: Tracker
 ) : ViewModel() {
     private val camera = savedStateHandle.toRoute<Camera>()
 
@@ -100,6 +103,11 @@ class KidCameraViewModel @Inject constructor(
                 timerJob.await()
                 apiJob.await()
                     .onSuccess {
+                        tracker.track(
+                            KieroEvent.Schedule.AuthCompleted(
+                                scheduleId = currentState.scheduleDetailId.toString()
+                            )
+                        )
                         Timber.d("이미지 업로드 및 일정 완료 성공")
                         _sideEffect.emit(KidCameraSideEffect.NavigateUp)
                     }

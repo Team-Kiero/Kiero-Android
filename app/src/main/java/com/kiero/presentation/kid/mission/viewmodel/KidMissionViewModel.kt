@@ -2,6 +2,8 @@ package com.kiero.presentation.kid.mission.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.analytic.tracker.Tracker
+import com.kiero.core.analytic.type.KieroEvent
 import com.kiero.core.common.extension.updateSuccess
 import com.kiero.core.common.util.successData
 import com.kiero.core.model.UiState
@@ -31,7 +33,8 @@ import javax.inject.Inject
 class KidMissionViewModel @Inject constructor(
     private val repository: CoinRepository,
     private val missionRepository: MissionRepository,
-    private val sseManager: SseManager
+    private val sseManager: SseManager,
+    private val tracker: Tracker
 ) : ViewModel() {
     private val _state = MutableStateFlow<UiState<KidMissionState>>(UiState.Loading)
     val state: StateFlow<UiState<KidMissionState>> = combine(
@@ -115,6 +118,12 @@ class KidMissionViewModel @Inject constructor(
 
             missionRepository.patchMission(selectedMission.id)
                 .onSuccess {
+                    tracker.track(
+                        KieroEvent.Mission.Completed(
+                            rewardGold = selectedMission.reward,
+                            missionId = selectedMission.id.toString()
+                        )
+                    )
                     _state.updateSuccess { currentState ->
                         val updatedGroups =
                             currentState.kidMissionByDateList.missionsByDate.map { group ->

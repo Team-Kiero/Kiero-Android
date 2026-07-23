@@ -2,6 +2,9 @@ package com.kiero.presentation.auth.kid
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.analytic.tracker.Tracker
+import com.kiero.core.analytic.type.LoginMethod
+import com.kiero.core.analytic.type.UserRole
 import com.kiero.core.localstorage.TokenManager
 import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.data.fcm.repository.FcmRepository
@@ -23,7 +26,8 @@ import javax.inject.Inject
 class KidSignupViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val tokenRepository: TokenManager,
-    private val fcmRepository: FcmRepository
+    private val fcmRepository: FcmRepository,
+    private val tracker: Tracker
 ) : ViewModel() {
     private val _state = MutableStateFlow(KidSignUpState())
     val state: StateFlow<KidSignUpState> = _state.asStateFlow()
@@ -55,6 +59,9 @@ class KidSignupViewModel @Inject constructor(
                 request = currentState.toModel()
             ).onSuccess { authResponse ->
                 Timber.d("postAuthKidLogin Success: ${authResponse.lastName}")
+
+                tracker.setUserProperty(UserRole.CHILD)
+                tracker.setUserProperty(LoginMethod.INVITE_CODE)
 
                 tokenRepository.saveTokens(
                     accessToken = authResponse.accessToken,
