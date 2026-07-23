@@ -5,6 +5,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.kiero.core.analytic.tracker.Tracker
+import com.kiero.core.analytic.type.KieroEvent
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.parent.plan.model.PlanAllModel
 import com.kiero.data.parent.plan.model.RecurringScheduleModel
@@ -41,6 +43,7 @@ class ParentPlanViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val planRepository: PlanRepository,
     private val userInfoManager: UserInfoManager,
+    private val tracker: Tracker
 ) : ViewModel() {
 
     private val addArgs = runCatching { savedStateHandle.toRoute<ScheduleAdd>() }.getOrNull()
@@ -315,7 +318,17 @@ class ParentPlanViewModel @Inject constructor(
                 dayOfWeek = current.formattedDays.takeIf { current.isRecurring },
                 dates = current.selectedDate.takeUnless { current.isRecurring },
                 firstOrderDate = recurringStartInfo?.firstOrderDate
-            ).onSuccess {
+            ).onSuccess { result ->
+                val dayCount = if (current.isRecurring) current.selectedDays.size else 1
+                tracker.track(
+                    KieroEvent.Schedule.Created(
+                        scheduleId = result.toString(),
+                        isRecurring = current.isRecurring,
+                        selectedDayCount = dayCount,
+                        durationMinutes = calculateDurationMinutes(serverStartTime, serverEndTime)
+                    )
+                )
+
                 val message = if (current.isRecurring && recurringStartInfo?.hasClosedDateInThisWeek == true) {
                     "일정 등록이 마감된 날이 있어, 오늘 이후부터 적용돼요"
                 } else {
@@ -594,6 +607,11 @@ class ParentPlanViewModel @Inject constructor(
         return childId
     }
 
+    private fun calculateDurationMinutes(start: String, end: String): Int {
+        val startTime = parseServerTime(start) ?: return 0
+        val endTime = parseServerTime(end) ?: return 0
+        return java.time.Duration.between(startTime, endTime).toMinutes().toInt()
+    }
     fun fetchDefaultColor() {
         viewModelScope.launch {
             val childId = userInfoManager.getChildIdInfo() ?: return@launch

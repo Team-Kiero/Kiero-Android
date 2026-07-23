@@ -3,6 +3,8 @@ package com.kiero.presentation.parent.screen.journey
 import android.os.SystemClock
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.analytic.tracker.Tracker
+import com.kiero.core.analytic.type.PushEnabled
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.localstorage.permission.PermissionInfoManager
 import com.kiero.core.permission.model.PermissionType
@@ -37,7 +39,8 @@ class ParentJourneyViewModel @Inject constructor(
     private val sseManager: SseManager,
     private val fcmRepository: FcmRepository,
     private val permissionInfoManager: PermissionInfoManager,
-    private val userInfoManager: UserInfoManager
+    private val userInfoManager: UserInfoManager,
+    private val tracker: Tracker
 ) : ViewModel() {
     private val _state = MutableStateFlow(ParentJourneyState())
     val state = _state.asStateFlow()
@@ -74,6 +77,7 @@ class ParentJourneyViewModel @Inject constructor(
 
     fun updatePushSetting(isEnabled: Boolean) {
         viewModelScope.launch {
+            tracker.setUserProperty(PushEnabled(isEnabled))
             fcmRepository.updatePushSetting(isEnabled)
                 .onFailure { Timber.e("푸시 알림 서버 업데이트 실패: $it") }
         }

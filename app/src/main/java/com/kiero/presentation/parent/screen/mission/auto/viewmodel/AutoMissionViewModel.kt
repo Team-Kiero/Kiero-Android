@@ -5,6 +5,10 @@ import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.analytic.tracker.Tracker
+import com.kiero.core.analytic.type.CreationMethod
+import com.kiero.core.analytic.type.DueDateType
+import com.kiero.core.analytic.type.KieroEvent
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.parent.mission.model.SuggestedMissionModel
 import com.kiero.data.parent.mission.repository.AutoMissionRepository
@@ -31,6 +35,7 @@ import javax.inject.Inject
 class AutoMissionViewModel @Inject constructor(
     private val autoMissionRepository: AutoMissionRepository,
     private val userInfoManager: UserInfoManager,
+    private val tracker: Tracker
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AutoMissionState())
@@ -270,7 +275,16 @@ class AutoMissionViewModel @Inject constructor(
             }
 
             autoMissionRepository.saveBatchMissions(childId, domainMissions)
-                .onSuccess {
+                .onSuccess { result ->
+                    tracker.track(
+                        KieroEvent.Mission.Created(
+                            creationMethod = CreationMethod.AI,
+                            dueDateType = DueDateType.FUTURE,
+                            rewardGold = domainMissions.sumOf { it.reward },
+                            missionCount = domainMissions.size,
+                            missionId = result.toString()
+                        )
+                    )
                     Timber.e("message saveBatchMissions")
                     _state.update {
                         it.copy(

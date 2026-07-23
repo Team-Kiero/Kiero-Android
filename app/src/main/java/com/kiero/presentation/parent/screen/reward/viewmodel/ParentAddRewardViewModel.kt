@@ -5,6 +5,8 @@ import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.analytic.tracker.Tracker
+import com.kiero.core.analytic.type.KieroEvent
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.parent.reward.repository.RewardRepository
 import com.kiero.presentation.parent.screen.reward.model.RewardPriceDefaults
@@ -24,6 +26,7 @@ import javax.inject.Inject
 class ParentAddRewardViewModel @Inject constructor(
     private val rewardRepository: RewardRepository,
     private val userInfoManager: UserInfoManager,
+    private val tracker: Tracker
 ) : ViewModel() {
     val nameState = TextFieldState()
     val priceState = TextFieldState(RewardPriceDefaults.DEFAULT_PRICE.toString())
@@ -68,7 +71,13 @@ class ParentAddRewardViewModel @Inject constructor(
             _state.update { it.copy(isLoading = true) }
             val childId = userInfoManager.getChildIdInfo() ?: return@launch
             rewardRepository.createCoupon(childId, name, price)
-                .onSuccess {
+                .onSuccess { result ->
+                    tracker.track(
+                        KieroEvent.Reward.Created(
+                            rewardId = result.toString(),
+                            goldCost = price
+                        )
+                    )
                     _sideEffect.emit(ParentRewardSideEffect.ShowSnackBar("보상이 등록되었습니다."))
                     _sideEffect.emit(ParentRewardSideEffect.NavigateUp)
                 }
