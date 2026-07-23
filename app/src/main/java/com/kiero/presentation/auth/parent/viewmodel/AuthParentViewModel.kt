@@ -5,6 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
+import com.kiero.core.analytic.tracker.Tracker
+import com.kiero.core.analytic.type.LoginMethod
+import com.kiero.core.analytic.type.UserRole
 import com.kiero.core.common.extension.toHandleErrorMessage
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.model.UiState
@@ -38,6 +41,7 @@ class AuthParentViewModel @Inject constructor(
     private val handleKakaoLoginResultUseCase: HandleKakaoLoginResultUseCase,
     private val fcmRepository: FcmRepository,
     private val postTermsUseCase: PostTermsUseCase,
+    private val tracker: Tracker
 ) : ViewModel() {
     private val _state = MutableStateFlow(AuthParentState())
     val state: StateFlow<AuthParentState> = _state.asStateFlow()
@@ -54,6 +58,9 @@ class AuthParentViewModel @Inject constructor(
                     name = result.name,
                     image = result.image
                 ).onSuccess { domainResult: KakaoLoginResult ->
+                    tracker.setUserProperty(UserRole.PARENT)
+                    tracker.setUserProperty(LoginMethod.KAKAO)
+
                     when (domainResult) {
                         is KakaoLoginResult.NeedTermsAgreement -> showTermsAgreement()
                         is KakaoLoginResult.HasChildren -> {
@@ -95,9 +102,6 @@ class AuthParentViewModel @Inject constructor(
         }
     }
 
-    /**
-     * 이용약관 동의, 개인정보 상태를 토글합니다.
-     */
     fun toggleTermsAccepted(termsType: TermsType) {
         _state.update { currentState ->
             val updatedList = currentState.termsList.map { term ->
@@ -111,10 +115,6 @@ class AuthParentViewModel @Inject constructor(
         }
     }
 
-    /**
-     * 현재 둘 다 동의 상태면 모두 해제하고, 하나라도 미동의 상태면 모두 동의합니다.
-     * 기획 상에는 없지만 혹시나 사용하게 될 수 있어서 일단 구현
-     */
     fun toggleAllConsents() {
         _state.update { currentState ->
             val updatedList = currentState.termsList.map { term ->
@@ -150,9 +150,6 @@ class AuthParentViewModel @Inject constructor(
         }
     }
 
-    /**
-     * 약관 동의 완료 처리 및 UserInfoManager에 저장
-     */
     fun successTermsAgreement() {
         viewModelScope.launch {
             Timber.e("successTermsAgreement")
@@ -224,8 +221,6 @@ class AuthParentViewModel @Inject constructor(
                 _sideEffect.emit(AuthSideEffect.NavigateToParentGraph)
             }
     }
-
-
 
     private suspend fun handleError(
         throwable: Throwable? = null,
