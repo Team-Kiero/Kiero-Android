@@ -9,22 +9,31 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.kiero.BuildConfig
+import com.kiero.core.analytic.tracker.LocalTracker
+import com.kiero.core.analytic.tracker.Tracker
+import com.kiero.core.analytic.type.AppVersion
+import com.kiero.core.analytic.type.KieroEvent
+import com.kiero.core.analytic.type.Platform
 import com.kiero.core.common.extension.toPushDataOrNull
 import com.kiero.core.designsystem.theme.KieroTheme
-import com.kiero.core.network.monitor.NetworkMonitor
 import com.kiero.core.model.fcm.PushData
+import com.kiero.core.network.monitor.NetworkMonitor
 import com.kiero.presentation.main.navigation.rememberMainAppState
 import com.kiero.presentation.main.screen.MainRoute
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var networkMonitor: NetworkMonitor
+
+    @Inject
+    lateinit var tracker: Tracker
 
     private var pendingPushData by mutableStateOf<PushData?>(null)
 
@@ -32,6 +41,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
+        tracker.setUserProperty(Platform.ANDROID)
+        tracker.setUserProperty(AppVersion(BuildConfig.VERSION_NAME))
+        tracker.track(KieroEvent.AppOpened)
 
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(scrim = Color.TRANSPARENT),
@@ -41,13 +54,15 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             KieroTheme {
-                val appState = rememberMainAppState(networkMonitor = networkMonitor)
+                val appState = rememberMainAppState(networkMonitor = networkMonitor, tracker = tracker)
 
-                MainRoute(
-                    appState = appState,
-                    pushData = pendingPushData,
-                    onPushConsumed = { pendingPushData = null }
-                )
+                CompositionLocalProvider(LocalTracker provides tracker) {
+                    MainRoute(
+                        appState = appState,
+                        pushData = pendingPushData,
+                        onPushConsumed = { pendingPushData = null }
+                    )
+                }
             }
         }
     }
