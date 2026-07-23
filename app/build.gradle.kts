@@ -69,7 +69,20 @@ android {
     }
     buildTypes {
         // Todo: 이거도 하나로 합치기 및 난독화 적용 후 테스트도 해보기
+
+        debug {
+            buildConfigField(
+                "String",
+                "AMPLITUDE_API_KEY",
+                "\"${properties["amplitude.api.key.debug"]}\""
+            )
+        }
         release {
+            buildConfigField(
+                "String",
+                "AMPLITUDE_API_KEY",
+                "\"${properties["amplitude.api.key.release"]}\""
+            )
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -162,4 +175,6 @@ dependencies {
     implementation(libs.firebase.messaging)
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.analytics)
+
+    implementation(libs.amplitude.analytics.android)
 }
