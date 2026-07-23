@@ -31,6 +31,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.BuildConfig
 import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.common.extension.noRippleClickable
+import com.kiero.core.common.extension.toSafeHttpsUrl
+import com.kiero.core.designsystem.component.WebViewDialog
 import com.kiero.core.designsystem.component.dialog.KieroDialog
 import com.kiero.core.designsystem.component.dialog.action.KieroCancelAction
 import com.kiero.core.designsystem.component.dialog.action.KieroConfirmAction
@@ -46,6 +48,7 @@ import com.kiero.presentation.parent.screen.mypage.main.component.ParentMyPageUs
 import com.kiero.presentation.parent.screen.mypage.main.component.SettingItem
 import com.kiero.presentation.parent.screen.mypage.main.model.ParentMenuLinkType
 import com.kiero.presentation.parent.screen.mypage.main.model.actions.ParentMyPageActions
+import timber.log.Timber
 
 @Composable
 fun ParentMyPageRoute(
@@ -62,6 +65,7 @@ fun ParentMyPageRoute(
 
     var isLogOut by remember { mutableStateOf(false) }
     var showSettingsDialog by remember { mutableStateOf(false) }
+    var webViewUrl by remember { mutableStateOf<String?>(null) }
     var isWaitingForSettingsResult by remember { mutableStateOf(false) }
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
@@ -137,7 +141,13 @@ fun ParentMyPageRoute(
                 val link = state.myPageMenus.find { it.linkType == type }?.link
 
                 if (!link.isNullOrEmpty()) {
-                    uriHandler.openUri(link)
+                    val safeLink = link.toSafeHttpsUrl()
+                    try {
+                        uriHandler.openUri(safeLink)
+                    } catch (e: Exception) {
+                        Timber.e(e)
+                        webViewUrl = safeLink
+                    }
                 } else {
                     globalTrigger.showToast("링크를 찾을 수 없습니다.")
                 }
@@ -151,6 +161,10 @@ fun ParentMyPageRoute(
         isLogOut = isLogOut,
         actions = actions
     )
+
+    webViewUrl?.let { url ->
+        WebViewDialog(url = url, onDismiss = { webViewUrl = null })
+    }
 
     if (showSettingsDialog) {
         KieroDialog(

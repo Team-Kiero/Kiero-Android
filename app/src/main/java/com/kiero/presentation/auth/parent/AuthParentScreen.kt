@@ -13,6 +13,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
@@ -26,8 +29,10 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
 import com.kiero.core.common.extension.collectSingleEvent
+import com.kiero.core.common.extension.toSafeHttpsUrl
 import com.kiero.core.designsystem.component.KieroToolTip
 import com.kiero.core.designsystem.component.KieroTopbar
+import com.kiero.core.designsystem.component.WebViewDialog
 import com.kiero.core.designsystem.component.indicator.KieroLoadingIndicator
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
@@ -37,6 +42,7 @@ import com.kiero.presentation.auth.parent.component.KakaoLoginButton
 import com.kiero.presentation.auth.parent.component.TermsAgreementBottomSheet
 import com.kiero.presentation.auth.parent.viewmodel.AuthParentViewModel
 import com.kiero.presentation.auth.state.AuthSideEffect
+import timber.log.Timber
 
 @Composable
 fun AuthParentRoute(
@@ -51,6 +57,7 @@ fun AuthParentRoute(
     val globalTrigger = LocalGlobalUiEventTrigger.current
     val urlHandler = LocalUriHandler.current
     val state by viewModel.state.collectAsStateWithLifecycle()
+    var webViewUrl by remember { mutableStateOf<String?>(null) }
 
     viewModel.sideEffect.collectSingleEvent {
         when (it) {
@@ -66,12 +73,24 @@ fun AuthParentRoute(
                 )
             }
 
-            is AuthSideEffect.OpenWebView -> urlHandler.openUri(it.url)
+            is AuthSideEffect.OpenWebView -> {
+                val safeUrl = it.url.toSafeHttpsUrl()
+                try {
+                    urlHandler.openUri(safeUrl)
+                } catch (e: Exception) {
+                    Timber.e(e)
+                    webViewUrl = safeUrl
+                }
+            }
 
             AuthSideEffect.NavigateToParentGraph -> navigateToParentGraph()
             AuthSideEffect.NavigateToSelection -> navigateToSelection()
             else -> {}
         }
+    }
+
+    webViewUrl?.let { url ->
+        WebViewDialog(url = url, onDismiss = { webViewUrl = null })
     }
 
     BackHandler {

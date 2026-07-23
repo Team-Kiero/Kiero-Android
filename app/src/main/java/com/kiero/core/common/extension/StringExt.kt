@@ -11,6 +11,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 
+private val HTTP_SCHEME_REGEX = Regex("^https?://")
 private val DATE_FORMAT_DASH = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 private val DATE_FORMAT_DOT = DateTimeFormatter.ofPattern("MM.dd")
 private val DATE_FORMAT_SINGLE_DIGIT = DateTimeFormatter.ofPattern("u-M-d")
@@ -177,6 +178,8 @@ fun String.toKoreanTimeString(): String {
         this
     }
 }
+
+fun String.toSafeHttpsUrl(): String = "https://" + replaceFirst(HTTP_SCHEME_REGEX, "")
 
 fun String.toWishArchiveDateString(): String {
     if (this.isBlank()) return this
