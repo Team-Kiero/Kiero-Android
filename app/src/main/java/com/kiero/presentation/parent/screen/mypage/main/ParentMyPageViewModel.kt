@@ -3,7 +3,7 @@ package com.kiero.presentation.parent.screen.mypage.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.analytic.tracker.Tracker
-import com.kiero.core.analytic.type.PushEnabled
+import com.kiero.core.analytic.event.PushEnabled
 import com.kiero.core.app.AppRestarter
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.localstorage.permission.PermissionInfoManager

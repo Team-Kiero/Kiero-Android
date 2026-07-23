@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.kiero.core.analytic.tracker.Tracker
-import com.kiero.core.analytic.type.KieroEvent
+import com.kiero.core.analytic.event.KieroEvent
 import com.kiero.core.common.extension.updateSuccess
 import com.kiero.core.common.util.ImageUriManager
 import com.kiero.core.common.util.successData

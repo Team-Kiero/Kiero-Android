@@ -1,6 +1,7 @@
-package com.kiero.core.analytic.type
+package com.kiero.core.analytic.event
 
-import com.kiero.core.analytic.UserPropertyKey
+import com.kiero.core.analytic.property.UserPropertyKey
+import com.kiero.core.analytic.property.UserProperty
 
 enum class UserRole(override val value: String) : UserProperty {
     PARENT("parent"),

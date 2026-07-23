@@ -8,9 +8,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.kiero.core.analytic.tracker.Tracker
-import com.kiero.core.analytic.type.CreationMethod
-import com.kiero.core.analytic.type.DueDateType
-import com.kiero.core.analytic.type.KieroEvent
+import com.kiero.core.analytic.event.CreationMethod
+import com.kiero.core.analytic.event.DueDateType
+import com.kiero.core.analytic.event.KieroEvent
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.parent.mission.model.UpdateMissionModel
 import com.kiero.data.parent.mission.repository.ParentMissionAddRepository

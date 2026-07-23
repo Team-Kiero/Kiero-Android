@@ -1,4 +1,4 @@
-package com.kiero.core.analytic
+package com.kiero.core.analytic.event
 
 object AnalyticsPropertyKey {
     // 일정

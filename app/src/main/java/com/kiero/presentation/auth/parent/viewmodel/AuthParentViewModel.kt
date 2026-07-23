@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kiero.core.analytic.tracker.Tracker
-import com.kiero.core.analytic.type.LoginMethod
-import com.kiero.core.analytic.type.UserRole
+import com.kiero.core.analytic.event.LoginMethod
+import com.kiero.core.analytic.event.UserRole
 import com.kiero.core.common.extension.toHandleErrorMessage
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.model.UiState

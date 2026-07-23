@@ -6,7 +6,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.analytic.tracker.Tracker
-import com.kiero.core.analytic.type.KieroEvent
+import com.kiero.core.analytic.event.KieroEvent
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.parent.reward.repository.RewardRepository
 import com.kiero.presentation.parent.screen.reward.model.RewardPriceDefaults

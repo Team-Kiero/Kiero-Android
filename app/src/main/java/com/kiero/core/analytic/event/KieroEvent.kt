@@ -1,6 +1,7 @@
-package com.kiero.core.analytic.type
+package com.kiero.core.analytic.event
 
-import com.kiero.core.analytic.AnalyticsPropertyKey
+import com.kiero.core.analytic.type.AnalyticsEvent
+import com.kiero.core.analytic.type.EventType
 
 sealed class KieroEvent(
     override val type: EventType,

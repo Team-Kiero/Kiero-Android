@@ -10,8 +10,8 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import com.kiero.core.analytic.tracker.Tracker
-import com.kiero.core.analytic.type.DestinationScreen
-import com.kiero.core.analytic.type.KieroEvent
+import com.kiero.core.analytic.event.DestinationScreen
+import com.kiero.core.analytic.event.KieroEvent
 import com.kiero.core.network.monitor.NetworkMonitor
 import com.kiero.presentation.auth.navigation.AuthGraph
 import com.kiero.presentation.auth.navigation.navigateToAuth

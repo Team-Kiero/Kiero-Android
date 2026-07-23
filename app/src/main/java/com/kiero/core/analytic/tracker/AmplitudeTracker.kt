@@ -3,7 +3,7 @@ package com.kiero.core.analytic.tracker
 import com.amplitude.android.Amplitude
 import com.amplitude.android.events.Identify
 import com.kiero.core.analytic.type.AnalyticsEvent
-import com.kiero.core.analytic.type.UserProperty
+import com.kiero.core.analytic.property.UserProperty
 import javax.inject.Inject
 
 class AmplitudeTracker @Inject constructor(

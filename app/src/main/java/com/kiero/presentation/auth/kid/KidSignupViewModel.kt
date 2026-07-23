@@ -3,8 +3,8 @@ package com.kiero.presentation.auth.kid
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.analytic.tracker.Tracker
-import com.kiero.core.analytic.type.LoginMethod
-import com.kiero.core.analytic.type.UserRole
+import com.kiero.core.analytic.event.LoginMethod
+import com.kiero.core.analytic.event.UserRole
 import com.kiero.core.localstorage.TokenManager
 import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.data.fcm.repository.FcmRepository
