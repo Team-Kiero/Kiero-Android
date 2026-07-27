@@ -6,7 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.kiero.core.analytic.tracker.Tracker
-import com.kiero.core.analytic.event.KieroEvent
+import com.kiero.core.analytics.event.KieroEvent
+import com.kiero.core.common.extension.track
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.parent.plan.model.PlanAllModel
 import com.kiero.data.parent.plan.model.RecurringScheduleModel

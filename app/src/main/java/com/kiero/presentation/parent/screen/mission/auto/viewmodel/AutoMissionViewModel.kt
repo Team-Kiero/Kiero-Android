@@ -8,7 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.kiero.core.analytic.tracker.Tracker
 import com.kiero.core.analytic.event.CreationMethod
 import com.kiero.core.analytic.event.DueDateType
-import com.kiero.core.analytic.event.KieroEvent
+import com.kiero.core.analytics.event.KieroEvent
+import com.kiero.core.common.extension.track
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.parent.mission.model.SuggestedMissionModel
 import com.kiero.data.parent.mission.repository.AutoMissionRepository
