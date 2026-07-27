@@ -17,9 +17,10 @@ import com.kiero.BuildConfig
 import com.kiero.core.analytic.tracker.LocalTracker
 import com.kiero.core.analytic.tracker.Tracker
 import com.kiero.core.analytic.event.AppVersion
-import com.kiero.core.analytic.event.KieroEvent
 import com.kiero.core.analytic.event.Platform
+import com.kiero.core.analytics.event.KieroEvent
 import com.kiero.core.common.extension.toPushDataOrNull
+import com.kiero.core.common.extension.track
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.fcm.PushData
 import com.kiero.core.network.monitor.NetworkMonitor

@@ -1,19 +1,24 @@
 package com.kiero.core.analytic.event
 
+import com.kiero.core.analytic.event.AnalyticsPropertyKey
+import com.kiero.core.analytic.event.CreationMethod
+import com.kiero.core.analytic.event.DestinationScreen
+import com.kiero.core.analytic.event.DueDateType
 import com.kiero.core.analytic.type.AnalyticsEvent
 import com.kiero.core.analytic.type.EventType
 
 sealed class KieroEvent(
     override val type: EventType,
     override val eventName: String,
-    override val properties: Map<String, Any?> = emptyMap()
+    override val properties: Map<String, Any?>
 ) : AnalyticsEvent {
 
-    object AppOpened : KieroEvent(EventType.VIEW, "app_opened")
+    object AppOpened : KieroEvent(EventType.VIEW, "app_opened", emptyMap())
 
-    object OnboardingCompleted : KieroEvent(EventType.VIEW, "onboarding_completed")
+    object OnboardingCompleted : KieroEvent(EventType.VIEW, "onboarding_completed", emptyMap())
 
-    class PushClicked(pushType: String, destinationScreen: DestinationScreen) : KieroEvent(
+
+    data class PushClicked(val pushType: String, val destinationScreen: DestinationScreen) : KieroEvent(
         type = EventType.CLICK,
         eventName = "push_clicked",
         properties = mapOf(
@@ -29,11 +34,11 @@ sealed class KieroEvent(
         properties: Map<String, Any?>
     ) : KieroEvent(type, eventName, properties) {
 
-        class Created(
-            scheduleId: String,
-            isRecurring: Boolean,
-            selectedDayCount: Int,
-            durationMinutes: Int
+        data class Created(
+            val scheduleId: String,
+            val isRecurring: Boolean,
+            val selectedDayCount: Int,
+            val durationMinutes: Int
         ) : Schedule(
             type = EventType.SUBMIT,
             eventName = "schedule_created",
@@ -45,25 +50,25 @@ sealed class KieroEvent(
             )
         )
 
-        class AuthStarted(scheduleId: String) : Schedule(
+        data class AuthStarted(val scheduleId: String) : Schedule(
             type = EventType.CLICK,
             eventName = "schedule_auth_started",
             properties = mapOf(AnalyticsPropertyKey.SCHEDULE_ID to scheduleId)
         )
 
-        class AuthCompleted(scheduleId: String) : Schedule(
+        data class AuthCompleted(val scheduleId: String) : Schedule(
             type = EventType.SUBMIT,
             eventName = "schedule_auth_completed",
             properties = mapOf(AnalyticsPropertyKey.SCHEDULE_ID to scheduleId)
         )
 
-        class Skipped(scheduleId: String) : Schedule(
+        data class Skipped(val scheduleId: String) : Schedule(
             type = EventType.CLICK,
             eventName = "schedule_skipped",
             properties = mapOf(AnalyticsPropertyKey.SCHEDULE_ID to scheduleId)
         )
 
-        class DailyJourneyCompleted(completedCount: Int, totalCount: Int) : Schedule(
+        data class DailyJourneyCompleted(val completedCount: Int, val totalCount: Int) : Schedule(
             type = EventType.SUBMIT,
             eventName = "daily_journey_completed",
             properties = mapOf(
@@ -73,19 +78,19 @@ sealed class KieroEvent(
         )
     }
 
-    // 미션 (Mission)  이벤트
+    // 미션 (Mission) 이벤트
     sealed class Mission(
         type: EventType,
         eventName: String,
         properties: Map<String, Any?>
     ) : KieroEvent(type, eventName, properties) {
 
-        class Created(
-            creationMethod: CreationMethod,
-            dueDateType: DueDateType,
-            rewardGold: Int,
-            missionCount: Int,
-            missionId: String
+        data class Created(
+            val creationMethod: CreationMethod,
+            val dueDateType: DueDateType,
+            val rewardGold: Int,
+            val missionCount: Int,
+            val missionId: String
         ) : Mission(
             type = EventType.SUBMIT,
             eventName = "mission_created",
@@ -98,7 +103,7 @@ sealed class KieroEvent(
             )
         )
 
-        class Completed(rewardGold: Int, missionId: String) : Mission(
+        data class Completed(val rewardGold: Int, val missionId: String) : Mission(
             type = EventType.SUBMIT,
             eventName = "mission_completed",
             properties = mapOf(
@@ -115,7 +120,7 @@ sealed class KieroEvent(
         properties: Map<String, Any?>
     ) : KieroEvent(type, eventName, properties) {
 
-        class Created(rewardId: String, goldCost: Int) : Reward(
+        data class Created(val rewardId: String, val goldCost: Int) : Reward(
             type = EventType.SUBMIT,
             eventName = "reward_created",
             properties = mapOf(
@@ -124,7 +129,7 @@ sealed class KieroEvent(
             )
         )
 
-        class Purchased(rewardId: String, goldCost: Int) : Reward(
+        data class Purchased(val rewardId: String, val goldCost: Int) : Reward(
             type = EventType.SUBMIT,
             eventName = "wish_purchased",
             properties = mapOf(

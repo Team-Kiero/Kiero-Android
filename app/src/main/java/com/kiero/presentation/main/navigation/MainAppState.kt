@@ -11,7 +11,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import com.kiero.core.analytic.tracker.Tracker
 import com.kiero.core.analytic.event.DestinationScreen
-import com.kiero.core.analytic.event.KieroEvent
+import com.kiero.core.analytics.event.KieroEvent
+import com.kiero.core.common.extension.track
 import com.kiero.core.network.monitor.NetworkMonitor
 import com.kiero.presentation.auth.navigation.AuthGraph
 import com.kiero.presentation.auth.navigation.navigateToAuth
@@ -344,7 +345,7 @@ class MainAppState(
         coroutineScope: CoroutineScope = rememberCoroutineScope(),
         tracker: Tracker
     ): MainAppState {
-        return remember(networkMonitor, navController, coroutineScope) {
+        return remember(networkMonitor, navController, coroutineScope,tracker) {
             MainAppState(
                 networkMonitor = networkMonitor,
                 navController = navController,
