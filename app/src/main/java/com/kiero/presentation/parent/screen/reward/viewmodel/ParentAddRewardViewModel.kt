@@ -5,8 +5,8 @@ import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.analytic.event.KieroEvent
 import com.kiero.core.analytic.tracker.Tracker
-import com.kiero.core.analytics.event.KieroEvent
 import com.kiero.core.common.extension.track
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.parent.reward.repository.RewardRepository

@@ -2,10 +2,10 @@ package com.kiero.presentation.kid.journey.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.analytic.event.KieroEvent
 import com.kiero.core.analytic.tracker.Tracker
 import com.kiero.core.analytic.event.NotificationPermissionState
 import com.kiero.core.analytic.event.PushEnabled
-import com.kiero.core.analytics.event.KieroEvent
 import com.kiero.core.common.extension.track
 import com.kiero.core.common.util.successData
 import com.kiero.core.localstorage.permission.PermissionInfoManager
