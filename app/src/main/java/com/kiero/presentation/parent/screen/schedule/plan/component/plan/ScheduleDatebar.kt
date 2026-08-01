@@ -13,6 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
@@ -55,6 +57,10 @@ fun ScheduleDatebar(
             text = date,
             style = KieroTheme.typography.semiBold.title4,
             color = KieroTheme.colors.white,
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
 
         Icon(
@@ -77,6 +83,20 @@ fun ScheduleDatebar(
 @Preview(showBackground = true, backgroundColor = 0xFF232428)
 @Composable
 private fun ScheduleDatebarPreview() {
+    KieroTheme {
+        ScheduleDatebar(
+            date = "12월 2주차",
+            onPreviousClick = {},
+            onNextClick = {},
+            isPreviousEnabled = false,
+            isNextEnabled = false
+        )
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF232428, fontScale = 2f)
+@Composable
+private fun ScheduleDatebarLargeFontPreview() {
     KieroTheme {
         ScheduleDatebar(
             date = "12월 2주차",

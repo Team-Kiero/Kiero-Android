@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kiero.core.designsystem.theme.KieroTheme
 
 @Composable
@@ -48,7 +50,8 @@ fun ScheduleTimeColumn(
                     style = KieroTheme.typography.regular.body5,
                     modifier = Modifier
                         .padding(top = 3.dp, bottom = 7.dp, start = 5.dp, end = 5.dp),
-                    maxLines = 1
+                    maxLines = 1,
+                    autoSize = TextAutoSize.StepBased(minFontSize = 8.sp, maxFontSize = 11.sp)
                 )
 
                 if (hour > 8) {
@@ -66,6 +69,14 @@ fun ScheduleTimeColumn(
 @Preview(name = "시간 컬럼", showBackground = true, backgroundColor = 0xFF232428)
 @Composable
 private fun TimeColumnPreview() {
+    ScheduleTimeColumn(
+        hourHeight = 38.dp
+    )
+}
+
+@Preview(name = "시간 컬럼 - Large Font", showBackground = true, backgroundColor = 0xFF232428, fontScale = 2f)
+@Composable
+private fun TimeColumnLargeFontPreview() {
     ScheduleTimeColumn(
         hourHeight = 38.dp
     )
