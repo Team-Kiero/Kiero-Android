@@ -29,7 +29,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
 import com.kiero.core.common.extension.collectSingleEvent
-import com.kiero.core.common.extension.toSafeHttpsUrl
+import com.kiero.core.common.extension.toTrustedHttpsUrl
 import com.kiero.core.designsystem.component.KieroToolTip
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.component.WebViewDialog
@@ -74,7 +74,11 @@ fun AuthParentRoute(
             }
 
             is AuthSideEffect.OpenWebView -> {
-                val safeUrl = it.url.toSafeHttpsUrl()
+                val safeUrl = it.url.toTrustedHttpsUrl(allowedHostSuffixes = NOTION_TERMS_HOST_SUFFIXES)
+                if (safeUrl == null) {
+                    globalTrigger.showToast("허용되지 않은 링크입니다.")
+                    return@collectSingleEvent
+                }
                 try {
                     urlHandler.openUri(safeUrl)
                 } catch (e: Exception) {
@@ -127,6 +131,8 @@ fun AuthParentRoute(
         }
     }
 }
+
+private val NOTION_TERMS_HOST_SUFFIXES = setOf("notion.site")
 
 @Composable
 fun AuthParentScreen(

@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
-import com.kiero.core.common.extension.toSafeHttpsUrl
+import com.kiero.core.common.extension.toTrustedHttpsUrl
 import com.kiero.core.designsystem.component.KieroTopbar
 import com.kiero.core.designsystem.component.WebViewDialog
 import com.kiero.core.designsystem.theme.KieroTheme
@@ -49,7 +49,11 @@ fun KidMySpacePolicyRoute(
         onClickTerms = { type ->
             val link = state.myPageMenus.find { it.linkType == type }?.link
             if (!link.isNullOrEmpty()) {
-                val safeLink = link.toSafeHttpsUrl()
+                val safeLink = link.toTrustedHttpsUrl(allowedHostSuffixes = NOTION_TERMS_HOST_SUFFIXES)
+                if (safeLink == null) {
+                    globalTrigger.showToast("허용되지 않은 링크입니다.")
+                    return@KidMySpacePolicyScreen
+                }
                 try {
                     uriHandler.openUri(safeLink)
                 } catch (e: Exception) {
@@ -66,6 +70,8 @@ fun KidMySpacePolicyRoute(
         WebViewDialog(url = url, onDismiss = { webViewUrl = null })
     }
 }
+
+private val NOTION_TERMS_HOST_SUFFIXES = setOf("notion.site")
 
 @Composable
 private fun KidMySpacePolicyScreen(

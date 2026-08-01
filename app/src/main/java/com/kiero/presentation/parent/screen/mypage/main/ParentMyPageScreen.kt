@@ -31,7 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.BuildConfig
 import com.kiero.core.common.extension.collectSideEffect
 import com.kiero.core.common.extension.noRippleClickable
-import com.kiero.core.common.extension.toSafeHttpsUrl
+import com.kiero.core.common.extension.toTrustedHttpsUrl
 import com.kiero.core.designsystem.component.WebViewDialog
 import com.kiero.core.designsystem.component.dialog.KieroDialog
 import com.kiero.core.designsystem.component.dialog.action.KieroCancelAction
@@ -102,8 +102,7 @@ fun ParentMyPageRoute(
         }
     }
 
-    val actions = remember(viewModel, context) {
-        object : ParentMyPageActions {
+    val actions = object : ParentMyPageActions {
             override fun onClickChildCare() = navigateToParentChildCare()
 
             override fun onClickLogOut() {
@@ -141,7 +140,14 @@ fun ParentMyPageRoute(
                 val link = state.myPageMenus.find { it.linkType == type }?.link
 
                 if (!link.isNullOrEmpty()) {
-                    val safeLink = link.toSafeHttpsUrl()
+                    val safeLink = link.toTrustedHttpsUrl(
+                        allowedHosts = type.allowedHosts,
+                        allowedHostSuffixes = type.allowedHostSuffixes
+                    )
+                    if (safeLink == null) {
+                        globalTrigger.showToast("허용되지 않은 링크입니다.")
+                        return
+                    }
                     try {
                         uriHandler.openUri(safeLink)
                     } catch (e: Exception) {
@@ -152,7 +158,6 @@ fun ParentMyPageRoute(
                     globalTrigger.showToast("링크를 찾을 수 없습니다.")
                 }
             }
-        }
     }
 
     ParentMyPageScreen(
@@ -186,6 +191,24 @@ fun ParentMyPageRoute(
         )
     }
 }
+
+private val ParentMenuLinkType.allowedHosts: Set<String>
+    get() = when (this) {
+        ParentMenuLinkType.CUSTOMER_SUPPORT -> setOf("forms.gle")
+        ParentMenuLinkType.OPENSOURCE_LICENSE,
+        ParentMenuLinkType.SERVICE_TERMS,
+        ParentMenuLinkType.PRIVACY_POLICY,
+        ParentMenuLinkType.UNKNOWN -> emptySet()
+    }
+
+private val ParentMenuLinkType.allowedHostSuffixes: Set<String>
+    get() = when (this) {
+        ParentMenuLinkType.SERVICE_TERMS,
+        ParentMenuLinkType.PRIVACY_POLICY -> setOf("notion.site")
+        ParentMenuLinkType.OPENSOURCE_LICENSE,
+        ParentMenuLinkType.CUSTOMER_SUPPORT,
+        ParentMenuLinkType.UNKNOWN -> emptySet()
+    }
 
 @Composable
 private fun ParentMyPageScreen(
