@@ -2,6 +2,8 @@ package com.kiero.presentation.kid.myspace.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.analytic.tracker.Tracker
+import com.kiero.core.analytic.event.PushEnabled
 import com.kiero.core.app.AppRestarter
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.auth.repository.AuthRepository
@@ -23,7 +25,8 @@ class KidMySpaceViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val userInfoManager: UserInfoManager,
     private val appRestarter: AppRestarter,
-    private val fcmRepository: FcmRepository
+    private val fcmRepository: FcmRepository,
+    private val tracker: Tracker
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(KidMySpaceState())
@@ -75,6 +78,7 @@ class KidMySpaceViewModel @Inject constructor(
         _uiState.update { it.copy(isNotificationChecked = checked) }
 
         viewModelScope.launch {
+            tracker.setUserProperty(PushEnabled(checked))
             fcmRepository.updatePushSetting(checked)
                 .onSuccess {
                     Timber.d("푸시 알림 서버 동기화 성공: $checked")

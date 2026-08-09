@@ -9,6 +9,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
+import com.kiero.core.analytic.tracker.Tracker
+import com.kiero.core.analytic.event.DestinationScreen
+import com.kiero.core.analytic.event.KieroEvent
+import com.kiero.core.common.extension.track
 import com.kiero.core.network.monitor.NetworkMonitor
 import com.kiero.presentation.auth.navigation.AuthGraph
 import com.kiero.presentation.auth.navigation.navigateToAuth
@@ -57,6 +61,7 @@ import timber.log.Timber
 @Stable
 class MainAppState(
     val navController: NavHostController,
+    val tracker: Tracker,
     coroutineScope: CoroutineScope,
     networkMonitor: NetworkMonitor,
 ) {
@@ -287,7 +292,23 @@ class MainAppState(
         navController.popBackStack()
     }
 
+
+    private fun determineDestinationScreen(type: PushType): DestinationScreen {
+        return when (type) {
+            PushType.PARENT_DAILY_START, PushType.SCHEDULE_SKIPPED, PushType.PARENT_SCHEDULE_REMINDER -> DestinationScreen.PARENT_HOME
+            PushType.SCHEDULE_VERIFIED, PushType.COUPON_PURCHASED, PushType.FIRE_LIT, PushType.MISSION_COMPLETE -> DestinationScreen.PARENT_NOTIFICATION_FEED
+            PushType.CHILD_DAILY_START, PushType.CHILD_NEXT_JOURNEY, PushType.SCHEDULE_CREATED, PushType.SCHEDULE_DELETED, PushType.SCHEDULE_MODIFIED -> DestinationScreen.CHILD_JOURNEY
+            PushType.CHILD_MISSION_INCOMPLETE -> DestinationScreen.CHILD_MISSION
+            else -> DestinationScreen.PARENT_HOME
+        }
+    }
     fun navigateFromPushData(pushData: PushData) {
+        tracker.track(
+            KieroEvent.PushClicked(
+                pushType = pushData.type.name.lowercase(),
+                destinationScreen = determineDestinationScreen(pushData.type)
+            )
+        )
         when (pushData.type) {
             PushType.PARENT_DAILY_START,
             PushType.SCHEDULE_SKIPPED,
@@ -322,12 +343,15 @@ class MainAppState(
         networkMonitor: NetworkMonitor,
         navController: NavHostController = rememberNavController(),
         coroutineScope: CoroutineScope = rememberCoroutineScope(),
+        tracker: Tracker
     ): MainAppState {
-        return remember(networkMonitor, navController, coroutineScope) {
+        return remember(networkMonitor, navController, coroutineScope,tracker) {
             MainAppState(
                 networkMonitor = networkMonitor,
                 navController = navController,
-                coroutineScope = coroutineScope
+                coroutineScope = coroutineScope,
+                tracker = tracker
+
             )
         }
     }

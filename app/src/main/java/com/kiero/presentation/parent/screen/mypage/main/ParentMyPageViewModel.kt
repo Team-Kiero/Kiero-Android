@@ -2,6 +2,8 @@ package com.kiero.presentation.parent.screen.mypage.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.analytic.tracker.Tracker
+import com.kiero.core.analytic.event.PushEnabled
 import com.kiero.core.app.AppRestarter
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.localstorage.permission.PermissionInfoManager
@@ -32,7 +34,8 @@ class ParentMyPageViewModel @Inject constructor(
     private val userInfoManager: UserInfoManager,
     private val appRestarter: AppRestarter,
     private val fcmRepository: FcmRepository,
-    private val permissionInfoManager: PermissionInfoManager
+    private val permissionInfoManager: PermissionInfoManager,
+    private val tracker: Tracker
 ) : ViewModel() {
     private val _state = MutableStateFlow(ParentMyPageState())
     val state = _state.asStateFlow()
@@ -143,6 +146,7 @@ class ParentMyPageViewModel @Inject constructor(
 
     fun updateIsAlarmChecked(isEnabled: Boolean) {
         viewModelScope.launch {
+            tracker.setUserProperty(PushEnabled(isEnabled))
             fcmRepository.updatePushSetting(isEnabled)
                 .onSuccess {
                     _state.update { it.copy(isAlarmChecked = isEnabled) }

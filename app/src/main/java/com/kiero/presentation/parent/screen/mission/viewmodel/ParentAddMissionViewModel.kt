@@ -7,6 +7,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.kiero.core.analytic.tracker.Tracker
+import com.kiero.core.analytic.event.CreationMethod
+import com.kiero.core.analytic.event.DueDateType
+import com.kiero.core.analytic.event.KieroEvent
+import com.kiero.core.common.extension.track
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.parent.mission.model.UpdateMissionModel
 import com.kiero.data.parent.mission.repository.ParentMissionAddRepository
@@ -30,6 +35,7 @@ class ParentAddMissionViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val parentMissionAddRepository: ParentMissionAddRepository,
     private val userInfoManager: UserInfoManager,
+    private val tracker: Tracker
 ) : ViewModel() {
 
     private val editArgs: MissionEdit? = runCatching {
@@ -143,6 +149,15 @@ class ParentAddMissionViewModel @Inject constructor(
         if (isEditMode) updateMission() else addMission()
     }
 
+    private fun getDueDateType(targetDate: LocalDate): DueDateType {
+        val today = LocalDate.now()
+        return when (targetDate) {
+            today -> DueDateType.TODAY
+            today.plusDays(1) -> DueDateType.TOMORROW
+            else -> DueDateType.FUTURE
+        }
+    }
+
     private fun addMission() {
         viewModelScope.launch {
             val name   = missionNameState.text.toString().trim()
@@ -164,6 +179,16 @@ class ParentAddMissionViewModel @Inject constructor(
                 reward  = reward!!,
                 dueAt   = dueAt!!.toString(),
             ).onSuccess { result ->
+                tracker.track(
+                    KieroEvent.Mission.Created(
+                        creationMethod = CreationMethod.MANUAL,
+                        dueDateType = getDueDateType(dueAt),
+                        rewardGold = reward,
+                        missionCount = 1,
+                        missionId = result.toString()
+                    )
+                )
+
                 _sideEffect.emit(ParentAddMissionSideEffect.ShowSnackbar("미션이 추가되었습니다"))
                 _sideEffect.emit(ParentAddMissionSideEffect.NavigateToMissionList(result))
             }.onFailure {
