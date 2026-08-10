@@ -76,6 +76,10 @@ wheelPicker = "0.0.1"
 #Firebase
 googleServices = "4.4.1"
 firebaseBom = "32.7.4"
+firebaseCrashlyticsPlugin = "3.0.2"
+
+#Amplitude
+amplitude = "1.29.0"
 
 [libraries]
 # Test
@@ -156,6 +160,11 @@ wheelpicker = { group = "io.github.sonms", name = "wheelpicker", version.ref = "
 # Firebase
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging-ktx" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics-ktx" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
+
+# Amplitude
+amplitude-analytics-android = { group = "com.amplitude", name = "analytics-android", version.ref = "amplitude" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -174,7 +183,7 @@ aboutlibraries-android = { id = "com.mikepenz.aboutlibraries.plugin.android", ve
 
 #Firebase
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
-
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlyticsPlugin" }
 
 [bundles]
 androidx = [

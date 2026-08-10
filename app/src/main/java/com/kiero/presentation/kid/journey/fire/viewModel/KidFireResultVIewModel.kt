@@ -4,6 +4,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.kiero.core.analytic.event.KieroEvent
+import com.kiero.core.analytic.tracker.Tracker
+import com.kiero.core.common.extension.track
 import com.kiero.core.model.UiState
 import com.kiero.data.kid.schedule.repository.ScheduleRepository
 import com.kiero.presentation.kid.journey.fire.model.toUiModel
@@ -19,7 +22,8 @@ import javax.inject.Inject
 @HiltViewModel
 class KidFireResultVIewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val repository: ScheduleRepository
+    private val repository: ScheduleRepository,
+    private val tracker: Tracker
 ) : ViewModel() {
     private val fireResult = savedStateHandle.toRoute<FireResult>()
 
@@ -36,6 +40,13 @@ class KidFireResultVIewModel @Inject constructor(
 
             repository.patchScheduleFireLit()
                 .onSuccess { fireModel ->
+                    tracker.track(
+                        //TODO: count 관련 값 확인 예정
+                        KieroEvent.Schedule.DailyJourneyCompleted(
+                            completedCount = 0,
+                            totalCount = 0
+                        )
+                    )
                     _state.value = UiState.Success(
                         KidFireResultState(
                             date = fireResult.date,

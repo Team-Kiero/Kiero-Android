@@ -1,0 +1,42 @@
+default_platform(:android)
+
+platform :android do
+
+  # 공통 배포 로직
+  private_lane :distribute_flavor do |options|
+    flavor = options[:flavor]
+    app_id = options[:app_id]
+
+    gradle(
+      tasks: ["clean", "assemble"],
+      flavor: flavor,
+      build_type: "Release"
+    )
+
+    firebase_app_distribution(
+      app: app_id,
+      android_artifact_type: "APK",
+      android_artifact_path: "app/build/outputs/apk/#{flavor}/release/app-#{flavor}-release.apk",
+      groups: "internal-testers",
+      release_notes: "내부 테스트 빌드입니다.",
+      service_credentials_file: ENV["FIREBASE_SERVICE_CREDENTIALS_PATH"] || "fastlane/firebase-service-account.json"
+    )
+  end
+
+  desc "Parent 앱 Firebase 배포"
+  lane :distribute_parent do
+    distribute_flavor(flavor: "parent", app_id: ENV["FIREBASE_APP_ID_PARENT"])
+  end
+
+  desc "Child 앱 Firebase 배포"
+  lane :distribute_child do
+    distribute_flavor(flavor: "child", app_id: ENV["FIREBASE_APP_ID_CHILD"])
+  end
+
+  desc "두 앱 모두 배포"
+  lane :distribute_all do
+    distribute_parent
+    distribute_child
+  end
+
+end

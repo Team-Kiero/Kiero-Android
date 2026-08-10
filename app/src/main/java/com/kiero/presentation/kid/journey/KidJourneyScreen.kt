@@ -153,7 +153,13 @@ fun KidJourneyRoute(
                 state = state.data,
                 onButtonClick = {
                     when (state.data.buttonType) {
-                        KidJourneyButtonType.AUTH -> requestCamera()
+                        KidJourneyButtonType.AUTH -> {
+                            val scheduleId = (state.data.content as? KidJourneyContentUiModel.ScheduledContent)?.scheduleDetailId
+                            if (scheduleId != null) {
+                                viewModel.trackAuthStarted(scheduleId.toString())
+                            }
+                            requestCamera()
+                        }
                         KidJourneyButtonType.FIRE -> {
                             navigateToFire(
                                 state.data.header!!.currentDate,

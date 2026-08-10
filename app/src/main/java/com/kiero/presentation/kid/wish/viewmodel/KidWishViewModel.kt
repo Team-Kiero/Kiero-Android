@@ -2,7 +2,10 @@ package com.kiero.presentation.kid.wish.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.analytic.event.KieroEvent
+import com.kiero.core.analytic.tracker.Tracker
 import com.kiero.core.common.extension.toHandleErrorMessage
+import com.kiero.core.common.extension.track
 import com.kiero.core.common.extension.updateSuccess
 import com.kiero.core.common.util.successData
 import com.kiero.core.model.UiState
@@ -32,7 +35,8 @@ import javax.inject.Inject
 class KidWishViewModel @Inject constructor(
     private val repository: CoinRepository,
     private val wishRepository: WishRepository,
-    private val sseManager: SseManager
+    private val sseManager: SseManager,
+    private val tracker: Tracker
 ) : ViewModel() {
     private val _state = MutableStateFlow<UiState<KidWishState>>(UiState.Loading)
     val state: StateFlow<UiState<KidWishState>> = combine(
@@ -128,6 +132,13 @@ class KidWishViewModel @Inject constructor(
         viewModelScope.launch {
             wishRepository.patchCoupon(couponId)
                 .onSuccess {
+                    val selectedWishItem = _state.value.successData?.selectedWishItem ?: return@launch
+                    tracker.track(
+                        KieroEvent.Reward.Purchased(
+                            rewardId = couponId.toString(),
+                            goldCost = selectedWishItem.price
+                        )
+                    )
                     _state.updateSuccess { state ->
                         state.copy(
                             isCompletedWish = true

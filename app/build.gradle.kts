@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.baselineprofile)
     alias(libs.plugins.aboutlibraries.android)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 val properties = Properties().apply {
@@ -68,7 +69,20 @@ android {
     }
     buildTypes {
         // Todo: 이거도 하나로 합치기 및 난독화 적용 후 테스트도 해보기
+
+        debug {
+            buildConfigField(
+                "String",
+                "AMPLITUDE_API_KEY",
+                "\"${properties["amplitude.api.key.debug"]}\""
+            )
+        }
         release {
+            buildConfigField(
+                "String",
+                "AMPLITUDE_API_KEY",
+                "\"${properties["amplitude.api.key.release"]}\""
+            )
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -83,6 +97,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Todo: isMinifyEnabled = true로 바꿀 때 추가
+            // firebaseCrashlytics {
+            //     mappingFileUploadEnabled = true
+            // }
         }
     }
     composeCompiler {
@@ -160,4 +178,8 @@ dependencies {
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.messaging)
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.analytics)
+
+    implementation(libs.amplitude.analytics.android)
 }
