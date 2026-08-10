@@ -2,6 +2,8 @@ package com.kiero.presentation.signup.parent.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.analytic.event.FamilyConnectionId
+import com.kiero.core.analytic.tracker.Tracker
 import com.kiero.core.common.extension.toHandleErrorMessage
 import com.kiero.core.common.util.formatTime
 import com.kiero.core.common.util.suspendRunCatching
@@ -19,8 +21,6 @@ import com.kiero.presentation.signup.parent.state.ParentSignUpSideEffect
 import com.kiero.presentation.signup.parent.state.ParentSignUpState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,6 +41,7 @@ class ParentSignUpViewModel @Inject constructor(
     private val sseManager: SseManager,
     private val postTermsUseCase: PostTermsUseCase,
     private val getInviteCode: GetInviteCode,
+    private val tracker: Tracker,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ParentSignUpState())
     val state: StateFlow<ParentSignUpState> = _state.asStateFlow()
@@ -178,6 +179,7 @@ class ParentSignUpViewModel @Inject constructor(
                     Timber.e("Logout failed $it")
                 }
 
+            tracker.setUserId(null)
             sseManager.stopSubscription()
 
             suspendRunCatching { tokenManager.clearTokens() }
@@ -269,6 +271,12 @@ class ParentSignUpViewModel @Inject constructor(
             )
         }
         _sideEffect.emit(ParentSignUpSideEffect.OnChildJoined(childId))
+
+        authRepository.getChildren().onSuccess { children ->
+            children.find { it.childId == childId }?.let { child ->
+                tracker.setUserProperty(FamilyConnectionId(child.connectionId))
+            }
+        }
     }
 
     override fun onCleared() {

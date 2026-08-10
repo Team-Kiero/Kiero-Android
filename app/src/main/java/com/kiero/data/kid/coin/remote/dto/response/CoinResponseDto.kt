@@ -5,6 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CoinResponseDto(
+    @SerialName("id")
+    val id: Int,
     @SerialName("lastName")
     val lastName: String,
     @SerialName("firstName")

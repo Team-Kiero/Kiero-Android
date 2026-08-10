@@ -53,6 +53,7 @@ class KidMySpaceViewModel @Inject constructor(
         viewModelScope.launch {
             authRepository.postLogout()
                 .onSuccess {
+                    tracker.setUserId(null)
                     userInfoManager.clearKidInfo()
                     appRestarter.restartApp()
                 }

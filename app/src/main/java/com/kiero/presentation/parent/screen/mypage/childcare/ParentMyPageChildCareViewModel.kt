@@ -3,9 +3,12 @@ package com.kiero.presentation.parent.screen.mypage.childcare
 import android.os.SystemClock
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.analytic.event.FamilyConnectionId
+import com.kiero.core.analytic.tracker.Tracker
 import com.kiero.core.common.extension.toHandleErrorMessage
 import com.kiero.core.common.util.formatTime
 import com.kiero.core.localstorage.info.UserInfoManager
+import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.data.sse.manager.SseManager
 import com.kiero.domain.parent.invite.usecase.GetInviteCode
 import com.kiero.presentation.parent.screen.mypage.childcare.model.ParentChildCareStep
@@ -29,6 +32,8 @@ class ParentMyPageChildCareViewModel @Inject constructor(
     private val getInviteCode: GetInviteCode,
     private val userInfoManager: UserInfoManager,
     private val sseManager: SseManager,
+    private val authRepository: AuthRepository,
+    private val tracker: Tracker,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ParentMyPageChildCareState())
     val state = _state.asStateFlow()
@@ -74,6 +79,12 @@ class ParentMyPageChildCareViewModel @Inject constructor(
             )
         }
         _sideEffect.emit(ParentMyPageChildCareSideEffect.ShowSnackbar("자녀 연동이 완료되었습니다!"))
+
+        authRepository.getChildren().onSuccess { children ->
+            children.find { it.childId == childId }?.let { child ->
+                tracker.setUserProperty(FamilyConnectionId(child.connectionId))
+            }
+        }
     }
 
     fun fetchChildInfo() {

@@ -25,4 +25,8 @@ class AmplitudeTracker @Inject constructor(
         val identify = Identify().set(property.key, property.value)
         amplitude.identify(identify)
     }
+
+    override fun setUserId(userId: String?) {
+        amplitude.setUserId(userId)
+    }
 }

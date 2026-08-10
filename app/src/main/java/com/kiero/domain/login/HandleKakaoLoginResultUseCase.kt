@@ -36,7 +36,10 @@ class HandleKakaoLoginResultUseCase @Inject constructor(
                 lastName = children.first().childLastName,
                 firstName = children.first().childFirstName
             )
-            KakaoLoginResult.HasChildren(firstChildId = children.first().childId.toInt())
+            KakaoLoginResult.HasChildren(
+                firstChildId = children.first().childId.toInt(),
+                connectionId = children.first().connectionId
+            )
         } else {
             KakaoLoginResult.NoChildren
         }
