@@ -13,18 +13,24 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
 import com.kiero.core.common.extension.collectSingleEvent
+import com.kiero.core.common.util.navigateToPlayStore
 import com.kiero.core.designsystem.theme.KieroTheme
+import com.kiero.data.config.model.UpdateState
+import com.kiero.presentation.splash.component.AppUpdateDialog
 import com.kiero.presentation.splash.component.SplashLightFloating
 import com.kiero.presentation.splash.state.SplashSideEffect
 import com.kiero.presentation.splash.viewmodel.SplashViewModel
@@ -39,6 +45,9 @@ fun SplashRoute(
     navigateToKidOnboarding: () -> Unit,
     viewModel: SplashViewModel = hiltViewModel()
 ) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
     viewModel.sideEffect.collectSingleEvent {
         when (it) {
             SplashSideEffect.NavigateToAuth -> navigateToAuth()
@@ -50,10 +59,18 @@ fun SplashRoute(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.checkLoginState()
+        viewModel.checkAppVersion()
     }
 
     SplashScreen()
+
+    if (state.updateState != UpdateState.NONE) {
+        AppUpdateDialog(
+            updateState = state.updateState,
+            onConfirm = { context.navigateToPlayStore() },
+            onDismiss = { viewModel.checkLoginState() },
+        )
+    }
 }
 
 @Composable

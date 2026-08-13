@@ -2,23 +2,32 @@ package com.kiero.presentation.splash.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.BuildConfig
 import com.kiero.core.app.AppRestarter
 import com.kiero.core.localstorage.TokenManager
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.localstorage.onboarding.OnboardingManager
 import com.kiero.core.model.auth.UserRole
 import com.kiero.core.network.auth.TokenRefreshService
+import com.kiero.data.config.model.AppVersion
+import com.kiero.data.config.model.UpdateState
+import com.kiero.data.config.repository.ConfigRepository
 import com.kiero.domain.kid.user.usecase.CheckParentStatusUseCase
 import com.kiero.domain.parent.splash.model.ParentAutoLoginResult
 import com.kiero.domain.parent.splash.usecase.CheckParentAutoLoginUseCase
 import com.kiero.presentation.splash.state.SplashSideEffect
+import com.kiero.presentation.splash.state.SplashState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
@@ -28,14 +37,18 @@ class SplashViewModel @Inject constructor(
     private val reIssueManager: TokenRefreshService,
     private val checkParentStatusUseCase: CheckParentStatusUseCase,
     private val checkParentAutoLoginUseCase: CheckParentAutoLoginUseCase,
+    private val configRepository: ConfigRepository,
     private val appRestarter: AppRestarter,
 ) : ViewModel() {
+    private val _state = MutableStateFlow(SplashState())
+    val state = _state.asStateFlow()
+
     private val _sideEffect = Channel<SplashSideEffect>()
     val sideEffect = _sideEffect.receiveAsFlow()
 
     fun checkLoginState() {
         viewModelScope.launch {
-            delay(2000)
+            delay(2.seconds)
 
             val accessToken = tokenManager.getAccessToken()
             val userRole = userInfoManager.getUserRole()
@@ -62,6 +75,21 @@ class SplashViewModel @Inject constructor(
                 // 토큰이 없거나 부모인데 약관 동의를 안 한 경우 인증 화면으로 이동
                 _sideEffect.send(SplashSideEffect.NavigateToAuth)
             }
+        }
+    }
+
+    fun checkAppVersion() {
+        val currentVersion = AppVersion(BuildConfig.VERSION_NAME)
+
+        viewModelScope.launch {
+            configRepository.getAppVersionInfo()
+                .onSuccess { info ->
+                    val state = info.checkUpdateState(currentVersion)
+                    _state.update { it.copy(updateState = state) }
+
+                    if (state == UpdateState.NONE) checkLoginState()
+                }
+                .onFailure { checkLoginState() }
         }
     }
 
