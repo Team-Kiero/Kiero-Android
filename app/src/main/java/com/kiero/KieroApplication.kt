@@ -4,6 +4,7 @@ import android.app.Application
 import android.graphics.Bitmap
 import android.os.Build.VERSION.SDK_INT
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.bundleOf
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.decode.GifDecoder
@@ -12,6 +13,7 @@ import coil.disk.DiskCache
 import coil.memory.MemoryCache
 import coil.util.DebugLogger
 import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
 import com.google.firebase.crashlytics.crashlytics
 import com.kakao.sdk.common.KakaoSdk
 import com.kiero.core.network.di.NoAuthNetwork
@@ -32,6 +34,7 @@ class KieroApplication : Application(), ImageLoaderFactory {
         setDayMode()
         initKakaoSdk()
         setCrashlytics()
+        setAnalytics()
     }
 
     private fun setTimber() {
@@ -46,6 +49,13 @@ class KieroApplication : Application(), ImageLoaderFactory {
 
     private fun setCrashlytics() {
         Firebase.crashlytics.setCrashlyticsCollectionEnabled(true)
+        Firebase.crashlytics.setCustomKey("environment", BuildConfig.FLAVOR_environment)
+    }
+
+    private fun setAnalytics() {
+        Firebase.analytics.setDefaultEventParameters(
+            bundleOf("environment" to BuildConfig.FLAVOR_environment)
+        )
     }
     private fun initKakaoSdk() {
         try {
