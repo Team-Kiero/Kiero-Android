@@ -59,7 +59,7 @@ class AuthParentViewModel @Inject constructor(
                     name = result.name,
                     image = result.image
                 ).onSuccess { domainResult: KakaoLoginResult ->
-                    tracker.setUserId(result.id.toString())
+                    tracker.setUserId("parent_${result.id}")
                     tracker.setUserProperty(UserRole.PARENT)
                     tracker.setUserProperty(LoginMethod.KAKAO)
 

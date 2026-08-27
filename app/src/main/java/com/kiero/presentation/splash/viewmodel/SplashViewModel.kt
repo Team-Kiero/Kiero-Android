@@ -3,6 +3,7 @@ package com.kiero.presentation.splash.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.BuildConfig
+import com.kiero.core.analytic.tracker.Tracker
 import com.kiero.core.app.AppRestarter
 import com.kiero.core.localstorage.TokenManager
 import com.kiero.core.localstorage.info.UserInfoManager
@@ -34,6 +35,7 @@ class SplashViewModel @Inject constructor(
     private val tokenManager: TokenManager,
     private val userInfoManager: UserInfoManager,
     private val onboardingManager: OnboardingManager,
+    private val tracker: Tracker,
     private val reIssueManager: TokenRefreshService,
     private val checkParentStatusUseCase: CheckParentStatusUseCase,
     private val checkParentAutoLoginUseCase: CheckParentAutoLoginUseCase,
@@ -118,6 +120,7 @@ class SplashViewModel @Inject constructor(
 
         if (isParentWithdrawn) {
             userInfoManager.clearKidInfo()
+            tracker.reset()
             appRestarter.restartApp()
             return
         }

@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.analytic.tracker.Tracker
 import com.kiero.core.analytic.event.CreationMethod
-import com.kiero.core.analytic.event.DueDateType
 import com.kiero.core.analytic.event.KieroEvent
 import com.kiero.core.common.extension.track
 import com.kiero.core.localstorage.info.UserInfoManager
@@ -275,14 +274,16 @@ class AutoMissionViewModel @Inject constructor(
             }
 
             autoMissionRepository.saveBatchMissions(childId, domainMissions)
-                .onSuccess { result ->
+                .onSuccess {
                     tracker.track(
                         KieroEvent.Mission.Created(
                             creationMethod = CreationMethod.AI,
-                            dueDateType = DueDateType.FUTURE,
+                            // TODO(analytics): 일괄 생성 이벤트를 건별로 나눌지,
+                            //  mission_ids/due_date_types 배열 속성을 추가할지 기획 확인이 필요하다.
+                            dueDateType = null,
                             rewardGold = domainMissions.sumOf { it.reward },
                             missionCount = domainMissions.size,
-                            missionId = result.toString()
+                            missionId = null
                         )
                     )
                     Timber.e("message saveBatchMissions")

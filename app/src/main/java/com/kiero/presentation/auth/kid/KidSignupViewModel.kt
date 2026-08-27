@@ -60,7 +60,7 @@ class KidSignupViewModel @Inject constructor(
             ).onSuccess { authResponse ->
                 Timber.d("postAuthKidLogin Success: ${authResponse.lastName}")
 
-                tracker.setUserId(authResponse.id.toString())
+                tracker.setUserId("child_${authResponse.id}")
                 tracker.setUserProperty(UserRole.CHILD)
                 tracker.setUserProperty(LoginMethod.INVITE_CODE)
 

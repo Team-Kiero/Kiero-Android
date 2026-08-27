@@ -87,16 +87,16 @@ sealed class KieroEvent(
 
         data class Created(
             val creationMethod: CreationMethod,
-            val dueDateType: DueDateType,
+            val dueDateType: DueDateType?,
             val rewardGold: Int,
             val missionCount: Int,
-            val missionId: String
+            val missionId: String?
         ) : Mission(
             type = EventType.SUBMIT,
             eventName = "mission_created",
             properties = mapOf(
                 AnalyticsPropertyKey.CREATION_METHOD to creationMethod.value,
-                AnalyticsPropertyKey.DUE_DATE_TYPE to dueDateType.value,
+                AnalyticsPropertyKey.DUE_DATE_TYPE to dueDateType?.value,
                 AnalyticsPropertyKey.REWARD_GOLD to rewardGold,
                 AnalyticsPropertyKey.MISSION_COUNT to missionCount,
                 AnalyticsPropertyKey.MISSION_ID to missionId

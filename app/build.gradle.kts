@@ -67,24 +67,16 @@ android {
 
     }
     buildTypes {
-        // Todo: 이거도 하나로 합치기 및 난독화 적용 후 테스트도 해보기
-
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
         getByName("release") {
+            // Todo: local properties로 키 옮기기 (release keystore 적용 시 함께 처리)
             signingConfig = signingConfigs.getByName("debug")
 
+            // Todo: isMinifyEnabled = true로 바꿀 때 추가
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            // Todo: isMinifyEnabled = true로 바꿀 때 추가
             // firebaseCrashlytics {
             //     mappingFileUploadEnabled = true
             // }

@@ -29,4 +29,8 @@ class AmplitudeTracker @Inject constructor(
     override fun setUserId(userId: String?) {
         amplitude.setUserId(userId)
     }
+
+    override fun reset() {
+        amplitude.reset()
+    }
 }

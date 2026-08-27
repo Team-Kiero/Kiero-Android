@@ -79,6 +79,8 @@ class ParentSignUpViewModel @Inject constructor(
                             )
 
                             _state.update { it.copy(isLoading = false) }
+                            // TODO(analytics): 부모의 onboarding_completed 발생 시점을
+                            //  이 가입 완료 지점으로 볼지 기획 확인 후 이벤트를 추가한다.
                             _sideEffect.emit(ParentSignUpSideEffect.NavigateToParent)
                         }
                         .onFailure { error ->
@@ -179,7 +181,7 @@ class ParentSignUpViewModel @Inject constructor(
                     Timber.e("Logout failed $it")
                 }
 
-            tracker.setUserId(null)
+            tracker.reset()
             sseManager.stopSubscription()
 
             suspendRunCatching { tokenManager.clearTokens() }

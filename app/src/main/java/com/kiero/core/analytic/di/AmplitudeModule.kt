@@ -33,6 +33,7 @@ abstract class AnalyticsModule {
                     apiKey = BuildConfig.AMPLITUDE_API_KEY,
                     context = context,
                     autocapture = setOf(AutocaptureOption.SESSIONS),
+                    enableAutocaptureRemoteConfig = false,
                     trackingOptions = TrackingOptions()
                         .disableIpAddress()
                         .disableLatLng()

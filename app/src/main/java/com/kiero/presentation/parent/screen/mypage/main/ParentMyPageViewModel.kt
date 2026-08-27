@@ -117,7 +117,7 @@ class ParentMyPageViewModel @Inject constructor(
         viewModelScope.launch {
             authRepository.postLogout()
                 .onSuccess {
-                    tracker.setUserId(null)
+                    tracker.reset()
                     userInfoManager.clearParentInfo()
                     appRestarter.restartApp()
                 }

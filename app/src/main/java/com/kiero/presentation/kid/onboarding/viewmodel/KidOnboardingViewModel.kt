@@ -2,6 +2,9 @@ package com.kiero.presentation.kid.onboarding.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.analytic.event.KieroEvent
+import com.kiero.core.analytic.tracker.Tracker
+import com.kiero.core.common.extension.track
 import com.kiero.core.localstorage.onboarding.OnboardingManager
 import com.kiero.core.model.UiState
 import com.kiero.data.kid.coin.repository.CoinRepository
@@ -20,7 +23,8 @@ import javax.inject.Inject
 @HiltViewModel
 class KidOnboardingViewModel @Inject constructor(
     private val onboardingManager: OnboardingManager,
-    private val coinRepository: CoinRepository
+    private val coinRepository: CoinRepository,
+    private val tracker: Tracker
 ) : ViewModel() {
     private val coin = coinRepository.myCoin
 
@@ -39,6 +43,7 @@ class KidOnboardingViewModel @Inject constructor(
             _state.value = UiState.Loading
             delay(2000L)
             onboardingManager.saveIsSawOnboarding(isSaw = true)
+            tracker.track(KieroEvent.OnboardingCompleted)
             _sideEffect.emit(KidOnboardingSideEffect.NavigateToKid)
         }
     }
