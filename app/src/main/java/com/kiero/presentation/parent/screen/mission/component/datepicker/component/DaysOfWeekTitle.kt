@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
@@ -13,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.screen.mission.component.datepicker.util.daysOfWeek
 import kotlinx.collections.immutable.ImmutableList
@@ -49,7 +51,9 @@ fun DaysOfWeekTitle(
                             Locale.getDefault()
                         ),
                         color = KieroTheme.colors.white,
-                        style = KieroTheme.typography.regular.body3
+                        style = KieroTheme.typography.regular.body3,
+                        maxLines = 1,
+                        autoSize = TextAutoSize.StepBased(minFontSize = 10.sp, maxFontSize = 14.sp)
                     )
                 }
             }
@@ -60,6 +64,15 @@ fun DaysOfWeekTitle(
 @Preview(showBackground = true)
 @Composable
 private fun DaysOfWeekTitlePreview() {
+    KieroTheme {
+        val daysOfWeek = daysOfWeek(firstDayOfWeek = DayOfWeek.SUNDAY).toImmutableList()
+        DaysOfWeekTitle(daysOfWeek = daysOfWeek)
+    }
+}
+
+@Preview(showBackground = true, fontScale = 2f)
+@Composable
+private fun DaysOfWeekTitleLargeFontPreview() {
     KieroTheme {
         val daysOfWeek = daysOfWeek(firstDayOfWeek = DayOfWeek.SUNDAY).toImmutableList()
         DaysOfWeekTitle(daysOfWeek = daysOfWeek)

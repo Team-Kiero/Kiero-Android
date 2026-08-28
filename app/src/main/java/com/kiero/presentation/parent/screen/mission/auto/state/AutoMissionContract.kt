@@ -2,6 +2,8 @@ package com.kiero.presentation.parent.screen.mission.auto.state
 
 import androidx.compose.runtime.Immutable
 import com.kiero.presentation.parent.screen.mission.auto.model.MissionUiModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -13,7 +15,7 @@ data class AutoMissionState(
     val isAnalyzing: Boolean = false,
     val isSaving: Boolean = false,
 
-    val missions: List<MissionUiModel> = emptyList(),
+    val missions: ImmutableList<MissionUiModel> = persistentListOf(),
     val currentIndex: Int = 0,
 
     val selectedDate: LocalDate? = null,

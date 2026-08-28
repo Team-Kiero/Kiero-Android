@@ -32,6 +32,11 @@ data class PushEnabled(val enabled: Boolean) : UserProperty {
     override val value: Any get() = enabled
 }
 
+data class FamilyConnectionId(val connectionId: Long) : UserProperty {
+    override val key: String get() = UserPropertyKey.FAMILY_CONNECTION_ID
+    override val value: Any get() = connectionId
+}
+
 // com/kiero/core/analytic/property/AppVersion.kt
 data class AppVersion(val versionName: String) : UserProperty {
     override val key: String get() = UserPropertyKey.APP_VERSION

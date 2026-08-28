@@ -3,8 +3,11 @@ default_platform(:android)
 platform :android do
 
   # 공통 배포 로직
+  # 내부 테스트 빌드는 dev 서버를 바라보도록 고정 (프로덕션 배포 전 검증용)
   private_lane :distribute_flavor do |options|
-    flavor = options[:flavor]
+    version = options[:version]
+    environment = "dev"
+    flavor = "#{version}#{environment.capitalize}"
     app_id = options[:app_id]
 
     gradle(
@@ -16,7 +19,7 @@ platform :android do
     firebase_app_distribution(
       app: app_id,
       android_artifact_type: "APK",
-      android_artifact_path: "app/build/outputs/apk/#{flavor}/release/app-#{flavor}-release.apk",
+      android_artifact_path: "app/build/outputs/apk/#{flavor}/release/app-#{version}-#{environment}-release.apk",
       groups: "internal-testers",
       release_notes: "내부 테스트 빌드입니다.",
       service_credentials_file: ENV["FIREBASE_SERVICE_CREDENTIALS_PATH"] || "fastlane/firebase-service-account.json"
@@ -25,12 +28,12 @@ platform :android do
 
   desc "Parent 앱 Firebase 배포"
   lane :distribute_parent do
-    distribute_flavor(flavor: "parent", app_id: ENV["FIREBASE_APP_ID_PARENT"])
+    distribute_flavor(version: "parent", app_id: ENV["FIREBASE_APP_ID_PARENT"])
   end
 
   desc "Child 앱 Firebase 배포"
   lane :distribute_child do
-    distribute_flavor(flavor: "child", app_id: ENV["FIREBASE_APP_ID_CHILD"])
+    distribute_flavor(version: "child", app_id: ENV["FIREBASE_APP_ID_CHILD"])
   end
 
   desc "두 앱 모두 배포"

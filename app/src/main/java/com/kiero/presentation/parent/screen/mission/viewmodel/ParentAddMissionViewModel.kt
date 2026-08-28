@@ -185,7 +185,7 @@ class ParentAddMissionViewModel @Inject constructor(
                         dueDateType = getDueDateType(dueAt),
                         rewardGold = reward,
                         missionCount = 1,
-                        missionId = result.toString()
+                        missionId = result.id.toString()
                     )
                 )
 

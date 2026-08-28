@@ -12,6 +12,7 @@ import com.kiero.data.kid.schedule.repository.ScheduleRepository
 import com.kiero.presentation.kid.journey.fire.model.toUiModel
 import com.kiero.presentation.kid.journey.fire.navigation.FireResult
 import com.kiero.presentation.kid.journey.fire.state.KidFireResultState
+import com.kiero.presentation.kid.journey.map.model.KidMapScheduleStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,19 +41,34 @@ class KidFireResultVIewModel @Inject constructor(
 
             repository.patchScheduleFireLit()
                 .onSuccess { fireModel ->
-                    tracker.track(
-                        //TODO: count 관련 값 확인 예정
-                        KieroEvent.Schedule.DailyJourneyCompleted(
-                            completedCount = 0,
-                            totalCount = 0
-                        )
-                    )
                     _state.value = UiState.Success(
                         KidFireResultState(
                             date = fireResult.date,
                             content = fireModel.toUiModel()
                         )
                     )
+
+                    repository.getScheduleProgress()
+                        .onSuccess { progress ->
+                            val completedCount = progress.schedules.count { schedule ->
+                                when (KidMapScheduleStatus.from(schedule.status)) {
+                                    KidMapScheduleStatus.COMPLETED,
+                                    KidMapScheduleStatus.VERIFIED -> true
+
+                                    else -> false
+                                }
+                            }
+
+                            tracker.track(
+                                KieroEvent.Schedule.DailyJourneyCompleted(
+                                    completedCount = completedCount,
+                                    totalCount = progress.scheduleCount
+                                )
+                            )
+                        }
+                        .onFailure {
+                            Timber.w(it, "일일 여정 완료 분석 값 조회 실패")
+                        }
                 }
                 .onFailure {
                     Timber.e("불 피우기 실패: $it")

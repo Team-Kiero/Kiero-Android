@@ -13,6 +13,7 @@ import com.kiero.presentation.parent.screen.mission.component.datepicker.model.C
 import com.kiero.presentation.parent.screen.mission.component.datepicker.model.CalendarDisplayMode
 import com.kiero.presentation.parent.screen.mission.component.datepicker.util.nextMonth
 import com.kiero.presentation.parent.screen.mission.component.datepicker.util.previousMonth
+import kotlinx.collections.immutable.persistentMapOf
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -58,7 +59,7 @@ private fun KieroCalendarPreview() {
             yearMonth = yearMonth,
             selectedDate = selectedDate,
             displayMode = CalendarDisplayMode.Normal(
-                procedureCountByDate = mapOf(
+                procedureCountByDate = persistentMapOf(
                     today.minusDays(2) to 3,
                     today to 1,
                     today.plusDays(10) to 2

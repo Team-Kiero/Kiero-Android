@@ -2,6 +2,7 @@ package com.kiero.presentation.main.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kiero.core.analytic.tracker.Tracker
 import com.kiero.core.app.AppRestarter
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.model.auth.UserRole
@@ -26,6 +27,7 @@ class MainViewModel @Inject constructor(
     private val sseManager: SseManager,
     private val userInfoManager: UserInfoManager,
     private val appRestarter: AppRestarter,
+    private val tracker: Tracker,
 ) : ViewModel() {
     private val _state = MutableStateFlow(MainState())
     val state: StateFlow<MainState> = _state.asStateFlow()
@@ -70,6 +72,7 @@ class MainViewModel @Inject constructor(
 
                 sseManager.stopSubscription()
                 userInfoManager.clearKidInfo()
+                tracker.reset()
                 appRestarter.restartApp()
             }
         }

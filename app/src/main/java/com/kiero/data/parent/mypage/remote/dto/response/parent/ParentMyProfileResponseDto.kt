@@ -5,6 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ParentMyProfileResponseDto(
+    @SerialName("id")
+    val id: Int,
     @SerialName("image")
     val image: String?,
     @SerialName("name")

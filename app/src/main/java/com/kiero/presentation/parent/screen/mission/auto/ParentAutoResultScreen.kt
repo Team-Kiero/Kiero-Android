@@ -31,6 +31,7 @@ import com.kiero.presentation.parent.screen.mission.auto.model.MissionUiModel
 import com.kiero.presentation.parent.screen.mission.auto.state.AutoMissionState
 import com.kiero.presentation.parent.screen.mission.auto.viewmodel.AutoMissionViewModel
 import com.kiero.presentation.parent.screen.mission.component.datepicker.component.CalendarBottomSheet
+import kotlinx.collections.immutable.persistentListOf
 import java.time.LocalDate
 
 @Composable
@@ -185,7 +186,7 @@ private fun ParentAutoResultScreenPreview() {
     KieroTheme {
         ParentAutoResultScreen(
             state = AutoMissionState(
-                missions = listOf(
+                missions = persistentListOf(
                     MissionUiModel(
                         name = "수학 숙제하기",
                         dueAt = LocalDate.now().plusDays(1),

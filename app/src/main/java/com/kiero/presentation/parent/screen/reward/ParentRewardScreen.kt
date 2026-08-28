@@ -34,9 +34,6 @@ import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.model.UiState
 import com.kiero.core.model.trigger.SnackbarState
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
-import com.kiero.core.trigger.LocalRefreshState
-import com.kiero.presentation.main.navigation.ParentMainTab
-import com.kiero.presentation.main.navigation.component.BottomBarTab
 import com.kiero.presentation.parent.component.ParentFloatingButton
 import com.kiero.presentation.parent.navigation.ParentReward
 import com.kiero.presentation.parent.screen.reward.component.ParentRewardBottomSheet
@@ -57,7 +54,6 @@ fun ParentRewardRoute(
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val globalTrigger = LocalGlobalUiEventTrigger.current
-    val refreshState = LocalRefreshState.current
     val gridState = rememberLazyGridState()
 
     var isSheetVisible by remember { mutableStateOf(false) }
@@ -65,13 +61,14 @@ fun ParentRewardRoute(
     var shouldScrollToTop by remember { mutableStateOf(false) }
 
     // GNB 재클릭 처리
-    LaunchedEffect(refreshState) {
-        refreshState.refreshEvent.collect { tab: BottomBarTab ->
-            if (tab is ParentMainTab && tab.route == ParentReward) {
+    LaunchedEffect(globalTrigger) {
+        globalTrigger.tabReselectedEvent.collect { event ->
+            if (event?.route == ParentReward) {
                 viewModel.fetchRewards()
                 gridState.animateScrollToItem(0)
                 isSheetVisible = false
                 isDialogVisible = false
+                globalTrigger.consumeTabReselected(event.id)
             }
         }
     }

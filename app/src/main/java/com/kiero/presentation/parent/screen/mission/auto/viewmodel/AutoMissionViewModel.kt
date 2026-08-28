@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kiero.core.analytic.tracker.Tracker
 import com.kiero.core.analytic.event.CreationMethod
-import com.kiero.core.analytic.event.DueDateType
 import com.kiero.core.analytic.event.KieroEvent
 import com.kiero.core.common.extension.track
 import com.kiero.core.localstorage.info.UserInfoManager
@@ -17,6 +16,8 @@ import com.kiero.presentation.parent.screen.mission.auto.model.MissionUiModel
 import com.kiero.presentation.parent.screen.mission.auto.state.AutoMissionSideEffect
 import com.kiero.presentation.parent.screen.mission.auto.state.AutoMissionState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -81,13 +82,14 @@ class AutoMissionViewModel @Inject constructor(
     }
     private fun updateMissionReward(value: Int) {
         _state.update { state ->
-            val updatedMissions = state.missions.toMutableList().apply {
-                val index = state.currentIndex
-                if (index in indices) {
-                    this[index] = this[index].copy(reward = value)
-                }
+            val currentList = state.missions.toMutableList()
+            val index = state.currentIndex
+
+            if (index in currentList.indices) {
+                currentList[index] = currentList[index].copy(reward = value)
             }
-            state.copy(missions = updatedMissions)
+
+            state.copy(missions = currentList.toImmutableList())
         }
     }
 
@@ -150,7 +152,7 @@ class AutoMissionViewModel @Inject constructor(
                         delay(2000L)
                         _state.update {
                             it.copy(
-                                missions = emptyList(),
+                                missions = persistentListOf(),
                                 currentIndex = 0,
                                 hasViewedLastPage = false,
                                 isAnalyzing = false
@@ -167,7 +169,7 @@ class AutoMissionViewModel @Inject constructor(
                         }
                         _state.update {
                             it.copy(
-                                missions = uiMissions,
+                                missions = uiMissions.toImmutableList(),
                                 currentIndex = 0,
                                 hasViewedLastPage = uiMissions.size == 1,
                                 isAnalyzing = false
@@ -190,29 +192,25 @@ class AutoMissionViewModel @Inject constructor(
     fun updateMissionName(name: String) {
         val trimmedName = if (name.length > 15) name.substring(0, 15) else name
 
-        _state.update { currentState ->
-            val updatedMissions = currentState.missions.toMutableList().apply {
-                val index = currentState.currentIndex
-                if (index in indices) {
-                    this[index] = this[index].copy(name = trimmedName)
-                }
+        _state.update { state ->
+            val currentList = state.missions.toMutableList()
+            val index = state.currentIndex
+            if (index in currentList.indices) {
+                currentList[index] = currentList[index].copy(name = trimmedName)
             }
-            currentState.copy(missions = updatedMissions)
+            state.copy(missions = currentList.toImmutableList())
         }
     }
 
     fun updateMissionDate(date: LocalDate) {
-        _state.update { currentState ->
-
-            val updatedMissions = currentState.missions.toMutableList().apply {
-                val index = currentState.currentIndex
-                if (index in indices) {
-                    this[index] = this[index].copy(dueAt = date)
-                }
+        _state.update { state ->
+            val currentList = state.missions.toMutableList()
+            val index = state.currentIndex
+            if (index in currentList.indices) {
+                currentList[index] = currentList[index].copy(dueAt = date)
             }
-
-            currentState.copy(
-                missions = updatedMissions,
+            state.copy(
+                missions = currentList.toImmutableList(),
                 selectedDate = date,
                 showBottomSheet = false
             )
@@ -276,14 +274,16 @@ class AutoMissionViewModel @Inject constructor(
             }
 
             autoMissionRepository.saveBatchMissions(childId, domainMissions)
-                .onSuccess { result ->
+                .onSuccess {
                     tracker.track(
                         KieroEvent.Mission.Created(
                             creationMethod = CreationMethod.AI,
-                            dueDateType = DueDateType.FUTURE,
+                            // TODO(analytics): 일괄 생성 이벤트를 건별로 나눌지,
+                            //  mission_ids/due_date_types 배열 속성을 추가할지 기획 확인이 필요하다.
+                            dueDateType = null,
                             rewardGold = domainMissions.sumOf { it.reward },
                             missionCount = domainMissions.size,
-                            missionId = result.toString()
+                            missionId = null
                         )
                     )
                     Timber.e("message saveBatchMissions")
@@ -311,7 +311,7 @@ class AutoMissionViewModel @Inject constructor(
     fun backToInputScreen() {
         _state.update {
             it.copy(
-                missions = emptyList(),
+                missions = persistentListOf(),
                 currentIndex = 0,
                 hasViewedLastPage = false
             )

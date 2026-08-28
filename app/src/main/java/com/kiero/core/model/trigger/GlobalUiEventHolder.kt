@@ -2,12 +2,14 @@ package com.kiero.core.model.trigger
 
 import androidx.compose.runtime.Stable
 import com.kiero.core.navigation.Route
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @Stable
 class GlobalUiEventHolder(
     val dialogTrigger: DialogTrigger,
     val showToast: (String) -> Unit,
     val showSnackbar: (SnackbarState) -> Unit,
-    val onTabReselected: (Route) -> Unit
+    val tabReselectedEvent: StateFlow<TabReselectedEvent?>,
+    val onTabReselected: (Route) -> Unit,
+    val consumeTabReselected: (Long) -> Unit,
 )

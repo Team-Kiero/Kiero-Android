@@ -1,9 +1,9 @@
 package com.kiero.core.common.util
 
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.coroutines.coroutineContext
 
 suspend inline fun <R> suspendRunCatching(block: suspend () -> R): Result<R> {
     return try {
@@ -12,8 +12,8 @@ suspend inline fun <R> suspendRunCatching(block: suspend () -> R): Result<R> {
         Result.failure(t)
     } catch (c: CancellationException) {
         throw c
-    } catch (e: Throwable) {
-        coroutineContext.ensureActive()
+    } catch (e: Exception) {
+        currentCoroutineContext().ensureActive()
         Result.failure(e)
     }
 }

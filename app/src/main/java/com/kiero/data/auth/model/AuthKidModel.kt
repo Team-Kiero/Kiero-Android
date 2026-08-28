@@ -10,6 +10,7 @@ data class AuthKidModel(
 )
 
 data class AuthKidResponseModel(
+    val id: Int,
     val lastName: String,
     val firstName: String,
     val role: String,
@@ -24,6 +25,7 @@ fun AuthKidModel.toDto() = AuthKidRequestDto(
 )
 
 fun AuthKidResponseDto.toModel() = AuthKidResponseModel(
+    id = id,
     lastName = lastName,
     firstName = firstName,
     role = role,

@@ -84,7 +84,7 @@ fun MainBottomBar(
                         .padding(horizontal = 26.dp, vertical = 34.dp)
                         .selectableGroup(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.Top
                 ) {
                     tabs.forEach { tab ->
                         MainNavigationBarItem(
@@ -133,9 +133,8 @@ private fun MainNavigationBarItem(
             style = KieroTheme.typography.regular.body5,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth(),
-            softWrap = false,
-            overflow = TextOverflow.Visible,
-            maxLines = 1
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 2
         )
     }
 }
@@ -165,6 +164,21 @@ private fun PreviewMainBottomBarKid() {
             containerShape = RoundedCornerShape(12.dp),
             tabs = persistentListOf(*KidMainTab.entries.toTypedArray()),
             currentTab = KidMainTab.MISSION,
+            onTabSelected = {}
+        )
+    }
+}
+
+@Preview(name = "Parent Mode - Large Font", fontScale = 2f)
+@Composable
+private fun PreviewMainBottomBarParentLargeFont() {
+    KieroTheme {
+        MainBottomBar(
+            isVisible = true,
+            isParentMode = true,
+            containerShape = RoundedCornerShape(12.dp),
+            tabs = persistentListOf(*ParentMainTab.entries.toTypedArray()),
+            currentTab = ParentMainTab.SCHEDULE,
             onTabSelected = {}
         )
     }

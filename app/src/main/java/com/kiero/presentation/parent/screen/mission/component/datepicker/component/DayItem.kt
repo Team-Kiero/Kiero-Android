@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -18,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kiero.core.common.extension.noRippleClickable
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.presentation.parent.screen.mission.component.datepicker.model.CalendarDay
@@ -128,7 +130,9 @@ private fun DateText(
     Text(
         text = dayOfMonth.toString(),
         color = style.textColor,
-        style = KieroTheme.typography.semiBold.title4
+        style = KieroTheme.typography.semiBold.title4,
+        maxLines = 1,
+        autoSize = TextAutoSize.StepBased(minFontSize = 10.sp, maxFontSize = 14.sp)
     )
 }
 
@@ -164,6 +168,32 @@ private fun DayItemPreview() {
             DayItem(
                 day = CalendarDay.Date.Normal(today.plusDays(2), procedureCount = 0),
                 isSelected = true,
+                onDateClick = {},
+                modifier = Modifier.size(48.dp)
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, fontScale = 2f)
+@Composable
+private fun DayItemLargeFontPreview() {
+    KieroTheme {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(16.dp)
+        ) {
+            val today = LocalDate.now()
+
+            DayItem(
+                day = CalendarDay.Date.Normal(today, procedureCount = 0),
+                isSelected = true,
+                onDateClick = {},
+                modifier = Modifier.size(48.dp)
+            )
+
+            DayItem(
+                day = CalendarDay.Date.Normal(today.plusDays(9), procedureCount = 0),
                 onDateClick = {},
                 modifier = Modifier.size(48.dp)
             )

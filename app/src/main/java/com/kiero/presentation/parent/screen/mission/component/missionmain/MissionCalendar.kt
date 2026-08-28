@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kiero.R
@@ -36,7 +37,9 @@ fun MissionCalendar(
         Text(
             text = "마감일",
             color = KieroTheme.colors.gray200,
-            style = KieroTheme.typography.regular.body3
+            style = KieroTheme.typography.regular.body3,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -49,7 +52,9 @@ fun MissionCalendar(
             Text(
                 text = dateText,
                 color = KieroTheme.colors.gray200,
-                style = KieroTheme.typography.semiBold.title3
+                style = KieroTheme.typography.semiBold.title3,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
 
             Icon(
@@ -66,6 +71,17 @@ fun MissionCalendar(
 @Preview
 @Composable
 private fun MissionCalendarPreview() {
+    KieroTheme {
+        MissionCalendar(
+            dateText = "2023.05.15",
+            onDateClick = {}
+        )
+    }
+}
+
+@Preview(fontScale = 2f)
+@Composable
+private fun MissionCalendarLargeFontPreview() {
     KieroTheme {
         MissionCalendar(
             dateText = "2023.05.15",

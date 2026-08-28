@@ -6,6 +6,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AuthKidResponseDto(
+    @SerialName("id")
+    val id: Int,
     @SerialName("lastName")
     val lastName: String,
     @SerialName("firstName")

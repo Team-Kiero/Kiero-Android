@@ -10,6 +10,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.tooling.preview.Preview
@@ -17,12 +20,15 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kiero.R
+import com.kiero.core.common.extension.toTrustedHttpsUrl
 import com.kiero.core.designsystem.component.KieroTopbar
+import com.kiero.core.designsystem.component.WebViewDialog
 import com.kiero.core.designsystem.theme.KieroTheme
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
 import com.kiero.presentation.kid.myspace.component.KidMySpaceSettingItem
 import com.kiero.presentation.kid.myspace.policy.model.KidMenuLinkType
 import com.kiero.presentation.kid.myspace.policy.viewmodel.KidMySpacePolicyViewModel
+import timber.log.Timber
 
 @Composable
 fun KidMySpacePolicyRoute(
@@ -34,6 +40,7 @@ fun KidMySpacePolicyRoute(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val uriHandler = LocalUriHandler.current
     val globalTrigger = LocalGlobalUiEventTrigger.current
+    var webViewUrl by remember { mutableStateOf<String?>(null) }
 
     KidMySpacePolicyScreen(
         paddingValues = paddingValues,
@@ -42,13 +49,29 @@ fun KidMySpacePolicyRoute(
         onClickTerms = { type ->
             val link = state.myPageMenus.find { it.linkType == type }?.link
             if (!link.isNullOrEmpty()) {
-                uriHandler.openUri(link)
+                val safeLink = link.toTrustedHttpsUrl(allowedHostSuffixes = NOTION_TERMS_HOST_SUFFIXES)
+                if (safeLink == null) {
+                    globalTrigger.showToast("허용되지 않은 링크입니다.")
+                    return@KidMySpacePolicyScreen
+                }
+                try {
+                    uriHandler.openUri(safeLink)
+                } catch (e: Exception) {
+                    Timber.e(e)
+                    webViewUrl = safeLink
+                }
             } else {
                 globalTrigger.showToast("링크를 찾을 수 없습니다.")
             }
         }
     )
+
+    webViewUrl?.let { url ->
+        WebViewDialog(url = url, onDismiss = { webViewUrl = null })
+    }
 }
+
+private val NOTION_TERMS_HOST_SUFFIXES = setOf("notion.site")
 
 @Composable
 private fun KidMySpacePolicyScreen(

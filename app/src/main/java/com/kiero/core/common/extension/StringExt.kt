@@ -9,8 +9,10 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
+import java.net.URI
 import java.util.Locale
 
+private val HTTP_SCHEME_REGEX = Regex("^https?://")
 private val DATE_FORMAT_DASH = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 private val DATE_FORMAT_DOT = DateTimeFormatter.ofPattern("MM.dd")
 private val DATE_FORMAT_SINGLE_DIGIT = DateTimeFormatter.ofPattern("u-M-d")
@@ -177,6 +179,36 @@ fun String.toKoreanTimeString(): String {
         this
     }
 }
+
+fun String.toSafeHttpsUrl(): String {
+    val trimmedUrl = trim()
+    val urlWithoutScheme = trimmedUrl
+        .replaceFirst(HTTP_SCHEME_REGEX, "")
+        .removePrefix("ttps://")
+
+    return "https://$urlWithoutScheme"
+}
+
+fun String.toTrustedHttpsUrl(
+    allowedHosts: Set<String> = emptySet(),
+    allowedHostSuffixes: Set<String> = emptySet()
+): String? = runCatching {
+    val safeUrl = toSafeHttpsUrl()
+    val uri = URI(safeUrl)
+    val host = uri.host?.lowercase(Locale.ROOT)
+
+    safeUrl.takeIf {
+        uri.scheme.equals("https", ignoreCase = true) &&
+            host != null && (
+                host in allowedHosts ||
+                    allowedHostSuffixes.any { suffix ->
+                        host == suffix || host.endsWith(".$suffix")
+                    }
+                ) &&
+            uri.userInfo == null &&
+            uri.port == -1
+    }
+}.getOrNull()
 
 fun String.toWishArchiveDateString(): String {
     if (this.isBlank()) return this

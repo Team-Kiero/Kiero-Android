@@ -20,20 +20,22 @@ class ImageUploadRepositoryImpl @Inject constructor(
         contentType: String
     ): Result<String> = suspendRunCatching {
         val optimizedFile = localDataSource.getOptimizedFile(uriString)
-        val requestBody = optimizedFile.asRequestBody(contentType.toMediaTypeOrNull())
 
-        val presignedResponse = remoteDataSource.postPresignedUrl(fileName, contentType).data
-            ?: error("Presigned URL 발급 실패")
+        try {
+            val requestBody = optimizedFile.asRequestBody(contentType.toMediaTypeOrNull())
+            val presignedResponse = remoteDataSource.postPresignedUrl(fileName, contentType).data
+                ?: error("Presigned URL 발급 실패")
 
-        val response = remoteDataSource.uploadImageToS3(presignedResponse.presignedUrl, requestBody)
-        if (!response.isSuccessful) {
-            error("S3 업로드 실패: ${response.code()} - ${response.errorBody()?.string()}")
+            val response = remoteDataSource.uploadImageToS3(presignedResponse.presignedUrl, requestBody)
+            if (!response.isSuccessful) {
+                error("S3 업로드 실패: ${response.code()} - ${response.errorBody()?.string()}")
+            }
+
+            localDataSource.deleteOriginalUri(uriString)
+            Timber.d("S3 업로드 성공: ${presignedResponse.fileName}")
+            presignedResponse.presignedUrl.substringBefore("?")
+        } finally {
+            optimizedFile.delete()
         }
-
-        localDataSource.deleteOriginalUri(uriString)
-        optimizedFile.delete()
-
-        Timber.d("S3 업로드 성공: ${presignedResponse.fileName}")
-        presignedResponse.presignedUrl.substringBefore("?")
     }
 }

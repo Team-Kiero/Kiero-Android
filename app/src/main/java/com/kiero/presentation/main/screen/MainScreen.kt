@@ -43,7 +43,7 @@ import com.kiero.core.model.trigger.DialogTrigger
 import com.kiero.core.model.trigger.GlobalUiEventHolder
 import com.kiero.core.model.trigger.RefreshState
 import com.kiero.core.model.trigger.SnackbarState
-import com.kiero.core.navigation.Route
+import com.kiero.core.model.trigger.TabReselectedEvent
 import com.kiero.core.trigger.LocalGlobalUiEventTrigger
 import com.kiero.core.trigger.LocalRefreshState
 import com.kiero.presentation.main.component.ParentTopbar
@@ -59,9 +59,11 @@ import com.kiero.presentation.main.viewmodel.MainViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.concurrent.atomic.AtomicLong
 
 @Composable
 fun MainRoute(
@@ -180,7 +182,8 @@ fun MainScreen(
         }
     }
 
-    val tabReselectedEvent = remember { MutableSharedFlow<Route>() }
+    val tabReselectedEvent = remember { MutableStateFlow<TabReselectedEvent?>(null) }
+    val tabReselectedEventId = remember { AtomicLong(0L) }
     val eventHolder = remember(dialogState, onShowToast, onShowSnackbar) {
         GlobalUiEventHolder(
             dialogTrigger = DialogTrigger(
@@ -193,9 +196,16 @@ fun MainScreen(
             ),
             showToast = onShowToast,
             showSnackbar = onShowSnackbar,
+            tabReselectedEvent = tabReselectedEvent.asStateFlow(),
             onTabReselected = { route ->
-                scope.launch {
-                    tabReselectedEvent.emit(route)
+                tabReselectedEvent.value = TabReselectedEvent(
+                    id = tabReselectedEventId.incrementAndGet(),
+                    route = route,
+                )
+            },
+            consumeTabReselected = { eventId ->
+                if (tabReselectedEvent.value?.id == eventId) {
+                    tabReselectedEvent.value = null
                 }
             }
         )

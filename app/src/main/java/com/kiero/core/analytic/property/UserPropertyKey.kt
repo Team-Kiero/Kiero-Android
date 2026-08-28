@@ -8,6 +8,7 @@ object UserPropertyKey {
     const val PUSH_ENABLED = "push_enabled"
     const val PLATFORM = "platform"
     const val APP_VERSION = "app_version"
+    const val FAMILY_CONNECTION_ID = "family_connection_id"
 }
 
 enum class UserRole(val value: String) { PARENT("parent"), CHILD("child") }
