@@ -10,6 +10,7 @@ import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.localstorage.onboarding.OnboardingManager
 import com.kiero.core.model.auth.UserRole
 import com.kiero.core.network.auth.TokenRefreshService
+import com.kiero.core.network.monitor.NetworkMonitor
 import com.kiero.data.config.model.AppVersion
 import com.kiero.data.config.model.UpdateState
 import com.kiero.data.config.repository.ConfigRepository
@@ -23,9 +24,11 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
@@ -41,6 +44,7 @@ class SplashViewModel @Inject constructor(
     private val checkParentAutoLoginUseCase: CheckParentAutoLoginUseCase,
     private val configRepository: ConfigRepository,
     private val appRestarter: AppRestarter,
+    private val networkMonitor: NetworkMonitor,
 ) : ViewModel() {
     private val _state = MutableStateFlow(SplashState())
     val state = _state.asStateFlow()
@@ -84,15 +88,30 @@ class SplashViewModel @Inject constructor(
         val currentVersion = AppVersion(BuildConfig.VERSION_NAME)
 
         viewModelScope.launch {
+            // 콜드스타트 직후엔 네트워크 인터페이스/DNS가 아직 준비되지 않았을 수 있어,
+            // 짧게 온라인 상태를 기다렸다가 요청 (끝내 안 잡히면 타임아웃 후 그냥 진행)
+            withTimeoutOrNull(NETWORK_READY_TIMEOUT) {
+                networkMonitor.isOnline.first { it }
+            }
+
             configRepository.getAppVersionInfo()
                 .onSuccess { info ->
                     val state = info.checkUpdateState(currentVersion)
+
+                    Timber.d("checkAppVersion: $state, $info")
+
                     _state.update { it.copy(updateState = state) }
 
                     if (state == UpdateState.NONE) checkLoginState()
                 }
                 .onFailure { checkLoginState() }
         }
+    }
+
+    fun dismissUpdateDialog() {
+        // 다이얼로그를 먼저 닫은 뒤에 로그인 상태 체크(화면 전환)로 넘어간다.
+        _state.update { it.copy(updateState = UpdateState.NONE) }
+        checkLoginState()
     }
 
     private suspend fun handleParentLogin() {
@@ -131,5 +150,9 @@ class SplashViewModel @Inject constructor(
         } else {
             _sideEffect.send(SplashSideEffect.NavigateToKidOnboarding)
         }
+    }
+
+    private companion object {
+        private val NETWORK_READY_TIMEOUT = 2.seconds
     }
 }
