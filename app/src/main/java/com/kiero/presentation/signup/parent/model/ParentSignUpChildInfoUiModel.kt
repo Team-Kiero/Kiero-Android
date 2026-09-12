@@ -1,11 +1,11 @@
 package com.kiero.presentation.signup.parent.model
 
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import com.kiero.core.common.util.InputValidator
 import com.kiero.data.parent.signup.model.ParentSignUpModel
 
-@Immutable
+@Stable
 data class ParentSignUpChildInfoUiModel(
     val code: String = "",
     val childLastName: TextFieldState = TextFieldState(),

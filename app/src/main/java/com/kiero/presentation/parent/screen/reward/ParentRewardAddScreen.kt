@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -33,7 +32,6 @@ import com.kiero.presentation.parent.navigation.ParentReward
 import com.kiero.presentation.parent.screen.reward.component.RewardNameTextField
 import com.kiero.presentation.parent.screen.reward.component.RewardPriceInfo
 import com.kiero.presentation.parent.screen.reward.component.RewardPriceSelect
-import com.kiero.presentation.parent.screen.reward.model.RewardPriceDefaults
 import com.kiero.presentation.parent.screen.reward.state.ParentRewardSideEffect
 import com.kiero.presentation.parent.screen.reward.viewmodel.ParentAddRewardViewModel
 
@@ -67,10 +65,11 @@ fun ParentRewardAddRoute(
     ParentRewardAddScreen(
         isLoading = uiState.isLoading,
         nameState = viewModel.nameState,
-        priceState = viewModel.priceState,
+        priceState = viewModel.priceField.textState,
         focusRequester = focusRequester,
         onSaveClick = viewModel::createReward,
         onCancelClick = navigateUp,
+        onPriceClick = viewModel::onPriceClick,
         onValidatePrice = viewModel::validateAndFixPrice
     )
 }
@@ -83,6 +82,7 @@ private fun ParentRewardAddScreen(
     focusRequester: FocusRequester,
     onSaveClick: () -> Unit,
     onCancelClick: () -> Unit,
+    onPriceClick: (Int) -> Unit,
     onValidatePrice: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -120,14 +120,7 @@ private fun ParentRewardAddScreen(
 
         RewardPriceSelect(
             textFieldState = priceState,
-            onPriceClick = { delta ->
-                val current = priceState.text.toString().toIntOrNull() ?: RewardPriceDefaults.DEFAULT_PRICE
-                val updated = (current + delta).coerceIn(
-                    RewardPriceDefaults.MIN_PRICE,
-                    RewardPriceDefaults.MAX_PRICE
-                )
-                priceState.setTextAndPlaceCursorAtEnd(updated.toString())
-            },
+            onPriceClick = onPriceClick,
             onValueAdjust = {
                 onValidatePrice()
             }
@@ -146,6 +139,7 @@ private fun ParentRewardAddScreenPreview() {
             focusRequester = remember { FocusRequester() },
             onSaveClick = {},
             onCancelClick = {},
+            onPriceClick = {},
             onValidatePrice = {}
         )
     }

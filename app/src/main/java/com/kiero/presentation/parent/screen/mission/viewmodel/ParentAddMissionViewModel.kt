@@ -1,7 +1,6 @@
 package com.kiero.presentation.parent.screen.mission.viewmodel
 
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -12,9 +11,11 @@ import com.kiero.core.analytic.event.CreationMethod
 import com.kiero.core.analytic.event.DueDateType
 import com.kiero.core.analytic.event.KieroEvent
 import com.kiero.core.common.extension.track
+import com.kiero.core.common.state.ClampedNumberFieldState
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.parent.mission.model.UpdateMissionModel
 import com.kiero.data.parent.mission.repository.ParentMissionAddRepository
+import com.kiero.presentation.parent.screen.mission.component.model.MissionAwardDefaults
 import com.kiero.presentation.parent.screen.mission.navigation.MissionEdit
 import com.kiero.presentation.parent.screen.mission.state.ParentAddMissionSideEffect
 import com.kiero.presentation.parent.screen.mission.state.ParentAddMissionState
@@ -53,20 +54,22 @@ class ParentAddMissionViewModel @Inject constructor(
     val missionNameState = TextFieldState(
         initialText = editArgs?.name.orEmpty()
     )
-    val awardTextFieldState = TextFieldState(
-        initialText = editArgs?.reward?.takeIf { it > 0 }?.toString() ?: "20"
+    val awardField = ClampedNumberFieldState(
+        min = MissionAwardDefaults.MIN_AWARD,
+        max = MissionAwardDefaults.MAX_AWARD,
+        initialValue = editArgs?.reward?.takeIf { it > 0 } ?: MissionAwardDefaults.DEFAULT_AWARD,
     )
 
     init {
         viewModelScope.launch {
-            snapshotFlow { awardTextFieldState.text.toString() }.collectLatest { text ->
+            snapshotFlow { awardField.text }.collectLatest { text ->
                 val num = text.toIntOrNull()
                 if (num != null) {
-                    if (num > 500) {
-                        awardTextFieldState.setTextAndPlaceCursorAtEnd("500")
-                        _sideEffect.emit(ParentAddMissionSideEffect.ShowSnackbar("최대 보상은 500개입니다"))
+                    if (num > MissionAwardDefaults.MAX_AWARD) {
+                        awardField.setValue(MissionAwardDefaults.MAX_AWARD)
+                        _sideEffect.emit(ParentAddMissionSideEffect.ShowSnackbar("최대 보상은 ${MissionAwardDefaults.MAX_AWARD}개입니다"))
                     } else if (num == 0) {
-                        awardTextFieldState.setTextAndPlaceCursorAtEnd("1")
+                        awardField.setValue(MissionAwardDefaults.MIN_AWARD)
                     }
                 }
             }
@@ -112,33 +115,16 @@ class ParentAddMissionViewModel @Inject constructor(
     }
 
     fun validateAndFixReward() {
-        val currentText = awardTextFieldState.text.toString()
-        val current = currentText.toIntOrNull()
-
-        if (current == null || current < 1) {
-            awardTextFieldState.setTextAndPlaceCursorAtEnd("1")
-        } else if (current > 500) {
-            awardTextFieldState.setTextAndPlaceCursorAtEnd("500")
-        }
+        awardField.clampToRange()
     }
 
     fun onAwardClick(reward: Int) {
-        val currentText = awardTextFieldState.text.toString()
-        val current = if (currentText.isBlank()) 0 else currentText.toIntOrNull() ?: 0
-        val newValue = current + reward
+        val exceedsMax = awardField.exceedsMaxAfter(reward)
+        awardField.applyChange(reward)
 
-        when {
-            newValue > 500 -> {
-                awardTextFieldState.setTextAndPlaceCursorAtEnd("500")
-                viewModelScope.launch {
-                    _sideEffect.emit(ParentAddMissionSideEffect.ShowSnackbar("최대 보상은 500개입니다"))
-                }
-            }
-            newValue < 1 -> {
-                awardTextFieldState.setTextAndPlaceCursorAtEnd("1")
-            }
-            else -> {
-                awardTextFieldState.setTextAndPlaceCursorAtEnd(newValue.toString())
+        if (exceedsMax) {
+            viewModelScope.launch {
+                _sideEffect.emit(ParentAddMissionSideEffect.ShowSnackbar("최대 보상은 ${MissionAwardDefaults.MAX_AWARD}개입니다"))
             }
         }
     }
@@ -161,7 +147,7 @@ class ParentAddMissionViewModel @Inject constructor(
     private fun addMission() {
         viewModelScope.launch {
             val name   = missionNameState.text.toString().trim()
-            val reward = awardTextFieldState.text.toString().toIntOrNull()
+            val reward = awardField.value
             val dueAt  = _selectedDate.value
 
             if (!validate(name, reward, dueAt)) return@launch
@@ -202,7 +188,7 @@ class ParentAddMissionViewModel @Inject constructor(
         viewModelScope.launch {
             val missionId = editArgs?.missionId ?: return@launch
             val name      = missionNameState.text.toString().trim()
-            val reward    = awardTextFieldState.text.toString().toIntOrNull()
+            val reward    = awardField.value
             val dueAt     = _selectedDate.value
 
             if (!validate(name, reward, dueAt)) return@launch
