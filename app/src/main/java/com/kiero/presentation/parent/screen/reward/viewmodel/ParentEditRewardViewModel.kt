@@ -6,6 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.kiero.core.common.state.ClampedNumberFieldState
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.parent.reward.repository.RewardRepository
 import com.kiero.presentation.parent.screen.reward.model.RewardPriceDefaults
@@ -30,7 +31,10 @@ class ParentEditRewardViewModel @Inject constructor(
     private val couponId = savedStateHandle.toRoute<RewardEdit>().couponId
 
     val nameState = TextFieldState()
-    val priceState = TextFieldState()
+    val priceField = ClampedNumberFieldState(
+        min = RewardPriceDefaults.MIN_PRICE,
+        max = RewardPriceDefaults.MAX_PRICE,
+    )
 
     private val _state = MutableStateFlow(ParentRewardFormState())
     val state = _state.asStateFlow()
@@ -49,7 +53,7 @@ class ParentEditRewardViewModel @Inject constructor(
             rewardRepository.getCoupons(childId).onSuccess { list ->
                 list.find { it.couponId == couponId }?.let { reward ->
                     nameState.setTextAndPlaceCursorAtEnd(reward.name)
-                    priceState.setTextAndPlaceCursorAtEnd(reward.price.toString())
+                    priceField.setValue(reward.price)
                 }
             }
             _state.update { it.copy(isLoading = false) }
@@ -58,7 +62,7 @@ class ParentEditRewardViewModel @Inject constructor(
 
     fun updateReward() {
         val name = nameState.text.toString().trim()
-        val price = priceState.text.toString().toIntOrNull() ?: 0
+        val price = priceField.value ?: 0
 
         viewModelScope.launch {
             if (name.isEmpty()) {
@@ -83,16 +87,17 @@ class ParentEditRewardViewModel @Inject constructor(
         }
     }
 
+    fun onPriceClick(change: Int) {
+        priceField.applyChange(change)
+    }
+
     fun validateAndFixPrice() {
-        val text = priceState.text.toString()
-        val currentPrice = text.toIntOrNull() ?: 0
-        if (currentPrice > RewardPriceDefaults.MAX_PRICE) {
-            priceState.setTextAndPlaceCursorAtEnd(RewardPriceDefaults.MAX_PRICE.toString())
+        val exceedsMax = (priceField.value ?: 0) > RewardPriceDefaults.MAX_PRICE
+        priceField.clampToRange()
+        if (exceedsMax) {
             viewModelScope.launch {
                 _sideEffect.emit(ParentRewardSideEffect.ShowSnackBar("최대 보상은 ${RewardPriceDefaults.MAX_PRICE}개입니다"))
             }
-        } else if (text.isEmpty() || currentPrice < RewardPriceDefaults.MIN_PRICE) {
-            priceState.setTextAndPlaceCursorAtEnd(RewardPriceDefaults.MIN_PRICE.toString())
         }
     }
 }

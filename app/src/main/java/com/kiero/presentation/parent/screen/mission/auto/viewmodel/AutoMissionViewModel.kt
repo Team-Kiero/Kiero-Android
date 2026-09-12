@@ -1,7 +1,5 @@
 package com.kiero.presentation.parent.screen.mission.auto.viewmodel
 
-import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,12 +7,14 @@ import com.kiero.core.analytic.tracker.Tracker
 import com.kiero.core.analytic.event.CreationMethod
 import com.kiero.core.analytic.event.KieroEvent
 import com.kiero.core.common.extension.track
+import com.kiero.core.common.state.ClampedNumberFieldState
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.data.parent.mission.model.SuggestedMissionModel
 import com.kiero.data.parent.mission.repository.AutoMissionRepository
 import com.kiero.presentation.parent.screen.mission.auto.model.MissionUiModel
 import com.kiero.presentation.parent.screen.mission.auto.state.AutoMissionSideEffect
 import com.kiero.presentation.parent.screen.mission.auto.state.AutoMissionState
+import com.kiero.presentation.parent.screen.mission.component.model.MissionAwardDefaults
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -46,7 +46,11 @@ class AutoMissionViewModel @Inject constructor(
     private val _sideEffect = MutableSharedFlow<AutoMissionSideEffect>()
     val sideEffect: SharedFlow<AutoMissionSideEffect> = _sideEffect.asSharedFlow()
 
-    val awardTextFieldState = TextFieldState(initialText = "20")
+    val awardField = ClampedNumberFieldState(
+        min = MissionAwardDefaults.MIN_AWARD,
+        max = MissionAwardDefaults.MAX_AWARD,
+        initialValue = MissionAwardDefaults.DEFAULT_AWARD,
+    )
 
     init {
         observeAwardTextFieldChanges()
@@ -54,18 +58,18 @@ class AutoMissionViewModel @Inject constructor(
 
     private fun observeAwardTextFieldChanges() {
         viewModelScope.launch {
-            snapshotFlow { awardTextFieldState.text.toString() }
+            snapshotFlow { awardField.text }
                 .collectLatest{ text ->
                     val num = text.toIntOrNull()
 
                     if (num != null) {
-                        if (num > 500) {
-                            awardTextFieldState.setTextAndPlaceCursorAtEnd("500")
-                            _sideEffect.emit(AutoMissionSideEffect.ShowToast("최대 보상은 500개입니다."))
-                            updateMissionReward(500)
+                        if (num > MissionAwardDefaults.MAX_AWARD) {
+                            awardField.setValue(MissionAwardDefaults.MAX_AWARD)
+                            _sideEffect.emit(AutoMissionSideEffect.ShowToast("최대 보상은 ${MissionAwardDefaults.MAX_AWARD}개입니다."))
+                            updateMissionReward(MissionAwardDefaults.MAX_AWARD)
                         } else if (num == 0) {
-                            awardTextFieldState.setTextAndPlaceCursorAtEnd("1")
-                            updateMissionReward(1)
+                            awardField.setValue(MissionAwardDefaults.MIN_AWARD)
+                            updateMissionReward(MissionAwardDefaults.MIN_AWARD)
                         } else {
                             updateMissionReward(num)
                         }
@@ -73,8 +77,8 @@ class AutoMissionViewModel @Inject constructor(
                         if (text.isEmpty()) {
                             updateMissionReward(0)
                         } else {
-                            awardTextFieldState.setTextAndPlaceCursorAtEnd("1")
-                            updateMissionReward(1)
+                            awardField.setValue(MissionAwardDefaults.MIN_AWARD)
+                            updateMissionReward(MissionAwardDefaults.MIN_AWARD)
                         }
                     }
                 }
@@ -94,40 +98,24 @@ class AutoMissionViewModel @Inject constructor(
     }
 
     fun validateAndFixReward() {
-        val currentText = awardTextFieldState.text.toString()
-        val current = currentText.toIntOrNull()
+        val current = awardField.value
+        val clamped = awardField.clampToRange()
 
-        if (current == null || current < 1) {
-            awardTextFieldState.setTextAndPlaceCursorAtEnd("1")
-            updateMissionReward(1)
-        } else if (current > 500) {
-            awardTextFieldState.setTextAndPlaceCursorAtEnd("500")
-            updateMissionReward(500)
+        if (current == null || current != clamped) {
+            updateMissionReward(clamped)
         }
     }
 
     fun onAwardClick(change: Int) {
-        val currentText = awardTextFieldState.text.toString()
-        val current = if (currentText.isBlank()) 0 else currentText.toIntOrNull() ?: 0
-        val newValue = current + change
+        val exceedsMax = awardField.exceedsMaxAfter(change)
+        val newValue = awardField.applyChange(change)
 
-        when {
-            newValue > 500 -> {
-                awardTextFieldState.setTextAndPlaceCursorAtEnd("500")
-                viewModelScope.launch {
-                    _sideEffect.emit(AutoMissionSideEffect.ShowToast("최대 보상은 500개입니다."))
-                }
-                updateMissionReward(500)
-            }
-            newValue < 1 -> {
-                awardTextFieldState.setTextAndPlaceCursorAtEnd("1")
-                updateMissionReward(1)
-            }
-            else -> {
-                awardTextFieldState.setTextAndPlaceCursorAtEnd(newValue.toString())
-                updateMissionReward(newValue)
+        if (exceedsMax) {
+            viewModelScope.launch {
+                _sideEffect.emit(AutoMissionSideEffect.ShowToast("최대 보상은 ${MissionAwardDefaults.MAX_AWARD}개입니다."))
             }
         }
+        updateMissionReward(newValue)
     }
 
     fun updateNoticeText(text: String) {
@@ -235,7 +223,7 @@ class AutoMissionViewModel @Inject constructor(
 
         _state.value.currentMission?.let { mission ->
             _state.update { it.copy(selectedDate = mission.dueAt) }
-            awardTextFieldState.setTextAndPlaceCursorAtEnd(mission.reward.toString())
+            awardField.setValue(mission.reward)
         }
     }
 

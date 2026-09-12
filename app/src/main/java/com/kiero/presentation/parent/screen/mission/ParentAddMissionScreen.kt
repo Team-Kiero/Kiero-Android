@@ -107,7 +107,10 @@ fun ParentAddMissionScreen(
             .fillMaxSize()
             .background(color = KieroTheme.colors.black)
             .padding(paddingValues)
-            .noRippleClickable { focusManager.clearFocus() },
+            .noRippleClickable {
+                viewModel.validateAndFixReward()
+                focusManager.clearFocus()
+            },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(15.dp),
     ) {
@@ -140,7 +143,7 @@ fun ParentAddMissionScreen(
         Spacer(modifier = Modifier.height(12.dp))
 
         MissionAwardSelect(
-            textFieldState = viewModel.awardTextFieldState,
+            textFieldState = viewModel.awardField.textState,
             onAwardClick = viewModel::onAwardClick,
         )
 

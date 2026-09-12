@@ -59,7 +59,7 @@ fun ParentAutoResultRoute(
         onCancelClick = viewModel::backToInputScreen,
         onShowDatePicker = viewModel::showDatePicker,
         onDismissDatePicker = viewModel::dismissDatePicker,
-        awardTextFieldState = viewModel.awardTextFieldState,
+        awardTextFieldState = viewModel.awardField.textState,
         paddingValues = paddingValues,
     )
 }
