@@ -1,5 +1,6 @@
 package com.kiero.presentation.splash
 
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,6 +48,7 @@ fun SplashRoute(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val activity = LocalActivity.current
 
     viewModel.sideEffect.collectSingleEvent {
         when (it) {
@@ -68,7 +70,8 @@ fun SplashRoute(
         AppUpdateDialog(
             updateState = state.updateState,
             onConfirm = { context.navigateToPlayStore() },
-            onDismiss = { viewModel.checkLoginState() },
+            onDismiss = { viewModel.dismissUpdateDialog() },
+            onForceExit = { activity?.finishAffinity() },
         )
     }
 }

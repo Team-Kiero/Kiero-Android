@@ -14,12 +14,14 @@ fun AppUpdateDialog(
     updateState: UpdateState,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
+    onForceExit: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val isForce = updateState == UpdateState.FORCE
 
     KieroDialog(
-        onDismiss = if (isForce) ({}) else onDismiss,
+        // 강제 업데이트일 땐 뒤로가기/바깥 터치로 닫으려는 시도 자체를 앱 종료로 처리한다.
+        onDismiss = if (isForce) onForceExit else onDismiss,
         modifier = modifier,
         title = "새로운 업데이트가 있어요",
         subDescription = if (isForce) {

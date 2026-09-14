@@ -10,6 +10,7 @@ import com.kiero.data.config.constant.RELEASE_MIN_FETCH_INTERVAL_SECONDS
 import com.kiero.data.config.model.AppVersion
 import com.kiero.data.config.model.AppVersionInfo
 import com.kiero.data.config.remote.datasource.ConfigRemoteDataSource
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.tasks.await
@@ -24,12 +25,7 @@ class RemoteConfigDataSourceImpl @Inject constructor(
 
     override suspend fun getAppVersionInfo(): AppVersionInfo {
         initialize()
-
-        runCatching {
-            remoteConfig.fetchAndActivate().await()
-        }.onFailure { throwable ->
-            Timber.w(throwable, "Remote Config fetch failed. Using the active or in-app defaults.")
-        }
+        fetchAndActivateWithRetry()
 
         val currentVersion = AppVersion(BuildConfig.VERSION_NAME)
         val minForceVersion = getConfiguredVersion(KEY_MIN_FORCE_VERSION, currentVersion)
@@ -43,6 +39,20 @@ class RemoteConfigDataSourceImpl @Inject constructor(
 
     private fun getConfiguredVersion(key: String, fallback: AppVersion): AppVersion =
         AppVersion(remoteConfig.getString(key)).takeIf(AppVersion::isValid) ?: fallback
+
+    private suspend fun fetchAndActivateWithRetry() {
+        repeat(FETCH_ATTEMPT_COUNT) { attempt ->
+            val result = runCatching { remoteConfig.fetchAndActivate().await() }
+            if (result.isSuccess) return
+
+            val throwable = result.exceptionOrNull()
+            if (attempt == FETCH_ATTEMPT_COUNT - 1) {
+                Timber.w(throwable, "Remote Config fetch failed. Using the active or in-app defaults.")
+            } else {
+                delay(FETCH_RETRY_DELAY_MILLIS)
+            }
+        }
+    }
 
     private suspend fun initialize() {
         initializationMutex.withLock {
@@ -71,5 +81,10 @@ class RemoteConfigDataSourceImpl @Inject constructor(
                 Timber.w(throwable, "Remote Config initialization failed.")
             }
         }
+    }
+
+    private companion object {
+        private const val FETCH_ATTEMPT_COUNT = 2
+        private const val FETCH_RETRY_DELAY_MILLIS = 300L
     }
 }

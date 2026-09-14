@@ -83,7 +83,9 @@ fun KieroDialog(
                         tint = Color.Unspecified,
                         modifier = Modifier
                             .alpha(if (isDisabled) 0f else 1f)
-                            .noRippleClickable(onClick = onDismiss)
+                            .then(
+                                if (isDisabled) Modifier else Modifier.noRippleClickable(onClick = onDismiss)
+                            )
                     )
                 }
 
