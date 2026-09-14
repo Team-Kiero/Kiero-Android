@@ -102,7 +102,8 @@ fun ParentMyPageRoute(
         }
     }
 
-    val actions = object : ParentMyPageActions {
+    val actions = remember(viewModel) {
+        object : ParentMyPageActions {
             override fun onClickChildCare() = navigateToParentChildCare()
 
             override fun onClickLogOut() {
@@ -137,7 +138,9 @@ fun ParentMyPageRoute(
             }
 
             override fun onClickTerms(type: ParentMenuLinkType) {
-                val link = state.myPageMenus.find { it.linkType == type }?.link
+                // remember(viewModel)로 재사용되는 객체이므로, 컴포저블 지역 변수 state(스냅샷)를 캡처하면
+                // 이 클로저가 만들어진 시점 이후의 갱신을 반영하지 못한다. 항상 최신 값을 읽도록 viewModel에서 직접 조회한다.
+                val link = viewModel.state.value.myPageMenus.find { it.linkType == type }?.link
 
                 if (!link.isNullOrEmpty()) {
                     val safeLink = link.toTrustedHttpsUrl(
@@ -158,6 +161,7 @@ fun ParentMyPageRoute(
                     globalTrigger.showToast("링크를 찾을 수 없습니다.")
                 }
             }
+        }
     }
 
     ParentMyPageScreen(
