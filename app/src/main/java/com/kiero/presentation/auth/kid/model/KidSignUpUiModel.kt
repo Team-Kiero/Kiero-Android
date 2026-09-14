@@ -1,11 +1,11 @@
 package com.kiero.presentation.auth.kid.model
 
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import com.kiero.core.common.util.InputValidator
 import com.kiero.data.auth.model.AuthKidModel
 
-@Immutable
+@Stable
 data class KidSignUpUiModel(
     val firstName: TextFieldState = TextFieldState(),
     val lastName: TextFieldState = TextFieldState(),

@@ -19,12 +19,4 @@ object MissionAwardDefaults {
         MissionAwardValue(5),
         MissionAwardValue(10)
     )
-
-    fun applyChange(currentValue: Int, change: Int): Int {
-        return (currentValue + change).coerceIn(MIN_AWARD, MAX_AWARD)
-    }
-
-    fun constrainValue(value: Int): Int {
-        return value.coerceIn(MIN_AWARD, MAX_AWARD)
-    }
 }

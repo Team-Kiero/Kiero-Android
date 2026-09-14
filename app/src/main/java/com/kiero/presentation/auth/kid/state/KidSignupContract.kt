@@ -1,9 +1,9 @@
 package com.kiero.presentation.auth.kid.state
 
-import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import com.kiero.presentation.auth.kid.model.KidSignUpUiModel
 
-@Immutable
+@Stable
 data class KidSignUpState(
     val kidSignUpUiModel: KidSignUpUiModel = KidSignUpUiModel(),
 )
