@@ -71,8 +71,8 @@ android {
             // Todo: local properties로 키 옮기기 (release keystore 적용 시 함께 처리)
             signingConfig = signingConfigs.getByName("debug")
 
-            // Todo: isMinifyEnabled = true로 바꿀 때 추가
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

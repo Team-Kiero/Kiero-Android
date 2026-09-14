@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.ManagedVirtualDevice
+
 plugins {
     alias(libs.plugins.android.test)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -24,6 +26,12 @@ android {
         targetSdk = 36
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // :app has an extra "environment" flavor dimension (dev/prod) that this module
+        // doesn't mirror. Without this, resolving :app's variant is ambiguous and
+        // generateBaselineProfile fails. Baseline profiles should reflect the real
+        // store build, so default to "prod".
+        missingDimensionStrategy("environment", "prod")
     }
 
     targetProjectPath = ":app"
@@ -34,12 +42,27 @@ android {
         create("child") { dimension = "version" }
     }
 
+    // This code creates the gradle managed device used to generate baseline profiles.
+    // To use GMD please invoke generation through the command line:
+    // ./gradlew :app:generateBaselineProfile
+    testOptions {
+        managedDevices {
+            allDevices {
+                create<ManagedVirtualDevice>("pixel6Api34") {
+                    device = "Pixel 6"
+                    apiLevel = 34
+                    systemImageSource = "google"
+                }
+            }
+        }
+    }
 }
 
 // This is the configuration block for the Baseline Profile plugin.
 // You can specify to run the generators on a managed devices or connected devices.
 baselineProfile {
-    useConnectedDevices = true
+    managedDevices += "pixel6Api34"
+    useConnectedDevices = false
 }
 
 dependencies {
