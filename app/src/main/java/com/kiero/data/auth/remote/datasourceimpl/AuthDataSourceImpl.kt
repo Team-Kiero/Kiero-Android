@@ -80,7 +80,7 @@ class AuthDataSourceImpl @Inject constructor(
         suspendRunCatching {
             Timber.d("📡 서버 로그인 API 호출")
             val response = authService.postAuthLogin(accessToken)
-            response.data ?: throw Exception("응답 데이터가 없습니다: ${response.message}")
+            response.data ?: throw IllegalStateException("응답 데이터가 없습니다: ${response.message}")
         }.onSuccess {
             Timber.i("✅ 서버 로그인 API 응답 성공")
         }.onFailure {
