@@ -5,10 +5,12 @@ import com.kiero.core.common.util.suspendRunCatching
 import com.kiero.core.localstorage.TokenManager
 import com.kiero.data.auth.model.AuthKidModel
 import com.kiero.data.auth.model.AuthKidResponseModel
+import com.kiero.data.auth.model.AuthLoginModel
 import com.kiero.data.auth.model.ChildrenModel
 import com.kiero.data.auth.model.toDto
 import com.kiero.data.auth.model.toModel
 import com.kiero.data.auth.remote.datasource.AuthDataSource
+import com.kiero.data.auth.remote.dto.request.reviewer.AuthReviewerRequestDto
 import com.kiero.data.auth.remote.dto.response.AuthLoginResponseDto
 import com.kiero.data.auth.repository.AuthRepository
 import timber.log.Timber
@@ -18,7 +20,7 @@ class AuthRepositoryImpl @Inject constructor(
     private val authRemoteDataSource: AuthDataSource,
     private val tokenManager: TokenManager,
 ) : AuthRepository {
-    override suspend fun loginWithKakao(context: Context): Result<AuthLoginResponseDto> = suspendRunCatching {
+    override suspend fun loginWithKakao(context: Context): Result<AuthLoginModel> = suspendRunCatching {
         Timber.d("🚀 카카오 로그인 프로세스 시작")
 
         val kakaoToken = authRemoteDataSource.getKakaoToken(context).getOrThrow()
@@ -32,7 +34,7 @@ class AuthRepositoryImpl @Inject constructor(
             refreshToken = loginResponse.refreshToken
         )
 
-        loginResponse
+        loginResponse.toModel()
     }
 
     override suspend fun saveAuthTokens(accessToken: String, refreshToken: String) = suspendRunCatching {
@@ -61,5 +63,18 @@ class AuthRepositoryImpl @Inject constructor(
         Timber.e("postAuthKidLogin $loginResponse")
 
         loginResponse
+    }
+
+    override suspend fun postReviewerLogin(reviewerPassword: String): Result<AuthLoginModel> = suspendRunCatching {
+        val loginResponse = authRemoteDataSource.postReviewerLogin(
+            reviewerRequestDto = AuthReviewerRequestDto(password = reviewerPassword)
+        ).data ?: throw IllegalStateException("응답 데이터가 없습니다")
+
+        tokenManager.saveTokens(
+            accessToken = loginResponse.accessToken,
+            refreshToken = loginResponse.refreshToken
+        )
+
+        loginResponse.toModel()
     }
 }

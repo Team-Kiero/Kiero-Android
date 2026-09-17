@@ -11,6 +11,7 @@ import com.kiero.data.auth.remote.api.AuthParentService
 import com.kiero.data.auth.remote.api.AuthService
 import com.kiero.data.auth.remote.datasource.AuthDataSource
 import com.kiero.data.auth.remote.dto.request.kid.AuthKidRequestDto
+import com.kiero.data.auth.remote.dto.request.reviewer.AuthReviewerRequestDto
 import com.kiero.data.auth.remote.dto.response.AuthKidResponseDto
 import com.kiero.data.auth.remote.dto.response.AuthLoginResponseDto
 import com.kiero.data.auth.remote.dto.response.ChildrenResponseDto
@@ -80,7 +81,7 @@ class AuthDataSourceImpl @Inject constructor(
         suspendRunCatching {
             Timber.d("📡 서버 로그인 API 호출")
             val response = authService.postAuthLogin(accessToken)
-            response.data ?: throw Exception("응답 데이터가 없습니다: ${response.message}")
+            response.data ?: throw IllegalStateException("응답 데이터가 없습니다: ${response.message}")
         }.onSuccess {
             Timber.i("✅ 서버 로그인 API 응답 성공")
         }.onFailure {
@@ -93,5 +94,8 @@ class AuthDataSourceImpl @Inject constructor(
 
     override suspend fun postAuthKidLogin(authKidRequestDto: AuthKidRequestDto): BaseResponse<AuthKidResponseDto> =
         authService.postAuthKidLogin(body = authKidRequestDto)
+
+    override suspend fun postReviewerLogin(reviewerRequestDto: AuthReviewerRequestDto): BaseResponse<AuthLoginResponseDto> =
+        authService.postReviewerLogin(body = reviewerRequestDto)
 
 }
