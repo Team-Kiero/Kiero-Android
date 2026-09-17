@@ -59,6 +59,13 @@ android {
 
         resValue("string", "app_name", "KIERO")
 
+        // 구글 비공개 테스트 심사자용 우회 로그인 비밀번호: buildType/flavor 상관없이 전부 동일하게 노출
+        buildConfigField(
+            "String",
+            "REVIEWER_BYPASS_PASSWORD",
+            properties.getProperty("reviewer.bypass.password", "\"\"").toString()
+        )
+
         // KAKAO_NATIVE_APP_KEY: 카카오는 네이티브 앱 키 1개당 Android 패키지명 1개만 등록 가능하므로
         // parent/child productFlavors에서 각자의 키로 설정한다 (아래 productFlavors 참고)
     }

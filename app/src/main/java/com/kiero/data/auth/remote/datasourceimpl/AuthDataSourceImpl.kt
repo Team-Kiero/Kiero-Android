@@ -11,6 +11,7 @@ import com.kiero.data.auth.remote.api.AuthParentService
 import com.kiero.data.auth.remote.api.AuthService
 import com.kiero.data.auth.remote.datasource.AuthDataSource
 import com.kiero.data.auth.remote.dto.request.kid.AuthKidRequestDto
+import com.kiero.data.auth.remote.dto.request.reviewer.AuthReviewerRequestDto
 import com.kiero.data.auth.remote.dto.response.AuthKidResponseDto
 import com.kiero.data.auth.remote.dto.response.AuthLoginResponseDto
 import com.kiero.data.auth.remote.dto.response.ChildrenResponseDto
@@ -93,5 +94,8 @@ class AuthDataSourceImpl @Inject constructor(
 
     override suspend fun postAuthKidLogin(authKidRequestDto: AuthKidRequestDto): BaseResponse<AuthKidResponseDto> =
         authService.postAuthKidLogin(body = authKidRequestDto)
+
+    override suspend fun postReviewerLogin(reviewerRequestDto: AuthReviewerRequestDto): BaseResponse<AuthLoginResponseDto> =
+        authService.postReviewerLogin(body = reviewerRequestDto)
 
 }
