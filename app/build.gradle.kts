@@ -41,7 +41,9 @@ android {
         // release 서명 정보는 local.properties에서 읽음 (local.properties는 git에 커밋되지 않음)
         // local.properties에 값이 없으면 ""로 채워짐
         create("release") {
-            storeFile = rootProject.file(properties.getProperty("release.store.file", ""))
+            properties.getProperty("release.store.file", "").takeIf { it.isNotBlank() }?.let {
+                storeFile = rootProject.file(it)
+            }
             storePassword = properties.getProperty("release.store.password", "")
             keyAlias = properties.getProperty("release.key.alias", "")
             keyPassword = properties.getProperty("release.key.password", "")
