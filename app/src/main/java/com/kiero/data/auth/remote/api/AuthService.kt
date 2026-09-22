@@ -25,7 +25,7 @@ interface AuthService {
     /**
      * 구글 리뷰어 로그인용
      * */
-    @POST("api/v1/login/reviewer")
+    @POST("api/v1/parents/login/reviewer")
     suspend fun postReviewerLogin(
         @Body body: AuthReviewerRequestDto
     ): BaseResponse<AuthLoginResponseDto>
