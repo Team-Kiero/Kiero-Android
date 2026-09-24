@@ -34,6 +34,11 @@ jobs:
           mkdir -p /home/runner/.android
           echo "${{ secrets.DEBUG_KEYSTORE }}" | base64 --decode > /home/runner/.android/debug.keystore
 
+      - name: Restore release keystore
+        run: |
+          mkdir -p keystore
+          echo "${{ secrets.RELEASE_KEYSTORE }}" | base64 --decode > keystore/kiero_release_key.jks
+
       # 빌드를 위해 gradle에 선언된 키들을 설정
       - name: Create local.properties from secret
         env:
