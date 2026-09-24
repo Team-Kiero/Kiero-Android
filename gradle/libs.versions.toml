@@ -5,7 +5,7 @@ minSdk = "28"
 targetSdk = "36"
 
 #App Version
-versionCode = "1"
+versionCode = "10000"
 versionName = "1.0.0"
 
 #Kotlin & AGP
