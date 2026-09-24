@@ -8,11 +8,13 @@ platform :android do
     version = options[:version]
     environment = "dev"
     flavor = "#{version}#{environment.capitalize}"
+    gradle_flavor = "#{version.capitalize}#{environment.capitalize}"
     app_id = options[:app_id]
 
+    gradle(task: "clean")
     gradle(
-      tasks: ["clean", "assemble"],
-      flavor: flavor,
+      task: "assemble",
+      flavor: gradle_flavor,
       build_type: "Release"
     )
 
