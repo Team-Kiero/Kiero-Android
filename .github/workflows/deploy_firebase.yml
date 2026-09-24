@@ -44,7 +44,7 @@ jobs:
         env:
           LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
         run: |
-          printf "%s" "$LOCAL_PROPERTIES" > local.properties
+          printf "%s\n" "$LOCAL_PROPERTIES" > local.properties
           echo "sdk.dir=$ANDROID_HOME" >> local.properties
 
       - name: Create google-services.json from secret
