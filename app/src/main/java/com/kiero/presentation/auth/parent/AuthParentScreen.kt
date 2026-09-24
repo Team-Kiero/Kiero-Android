@@ -3,6 +3,8 @@ package com.kiero.presentation.auth.parent
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,6 +13,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +32,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -58,6 +68,10 @@ fun AuthParentRoute(
     val urlHandler = LocalUriHandler.current
     val state by viewModel.state.collectAsStateWithLifecycle()
     var webViewUrl by remember { mutableStateOf<String?>(null) }
+
+    var isReviewerBypassDialogVisible by remember { mutableStateOf(false) }
+    val reviewerLoginPassword = rememberTextFieldState()
+
 
     viewModel.sideEffect.collectSingleEvent {
         when (it) {
@@ -112,6 +126,9 @@ fun AuthParentRoute(
                 if (state.uiState !is UiState.Loading) {
                     viewModel.loginWithKakao(context)
                 }
+            },
+            onReviewerBypassButtonLongClick = {
+                isReviewerBypassDialogVisible = true
             }
         )
 
@@ -129,6 +146,16 @@ fun AuthParentRoute(
                 onConfirm = viewModel::successTermsAgreement
             )
         }
+
+        if (isReviewerBypassDialogVisible) {
+            ReviewerBypassDialog(
+                passwordTextFieldState = reviewerLoginPassword,
+                onDismiss = {
+                    isReviewerBypassDialogVisible = false
+                },
+                onSubmit = viewModel::reviewerLogin
+            )
+        }
     }
 }
 
@@ -139,6 +166,7 @@ fun AuthParentScreen(
     paddingValues: PaddingValues,
     navigateUp: () -> Unit,
     onLoginClick: () -> Unit,
+    onReviewerBypassButtonLongClick: () -> Unit
 ) {
     val painter = painterResource(id = R.drawable.img_auth_parent_goblin)
 
@@ -185,6 +213,12 @@ fun AuthParentScreen(
                             horizontalBias = -0.4f,
                             verticalBias = -0.5f
                         ))
+                        .combinedClickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() },
+                            onClick = {},
+                            onLongClick = onReviewerBypassButtonLongClick
+                        )
                 )
 
                 KakaoLoginButton(
@@ -196,7 +230,34 @@ fun AuthParentScreen(
             }
         }
     }
+}
 
+@Composable
+private fun ReviewerBypassDialog(
+    passwordTextFieldState: TextFieldState,
+    onDismiss: () -> Unit,
+    onSubmit: (String) -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Reviewer Login") },
+        text = {
+            OutlinedTextField(
+                state = passwordTextFieldState,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = { onSubmit(passwordTextFieldState.text.toString()) }) {
+                Text("확인")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("취소")
+            }
+        }
+    )
 }
 
 @Preview(showBackground = true, name = "기본 화면")
@@ -206,7 +267,8 @@ private fun LoginScreenPreview() {
         AuthParentScreen(
             paddingValues = PaddingValues(),
             onLoginClick = {},
-            navigateUp = {}
+            navigateUp = {},
+            onReviewerBypassButtonLongClick = {}
         )
     }
 }

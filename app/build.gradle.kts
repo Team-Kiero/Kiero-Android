@@ -23,7 +23,6 @@ android {
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     signingConfigs {
-        // Todo: local properties로 키 옮기기
         getByName("debug") {
             val debugKeystorePath = System.getProperty("user.home") + "/.android/debug.keystore"
             storeFile = file(debugKeystorePath)
@@ -38,6 +37,17 @@ android {
             keyAlias = "androiddebugkey"
             keyPassword = "android"
         }
+
+        // release 서명 정보는 local.properties에서 읽음 (local.properties는 git에 커밋되지 않음)
+        // local.properties에 값이 없으면 ""로 채워짐
+        create("release") {
+            properties.getProperty("release.store.file", "").takeIf { it.isNotBlank() }?.let {
+                storeFile = rootProject.file(it)
+            }
+            storePassword = properties.getProperty("release.store.password", "")
+            keyAlias = properties.getProperty("release.key.alias", "")
+            keyPassword = properties.getProperty("release.key.password", "")
+        }
     }
 
     defaultConfig {
@@ -51,28 +61,22 @@ android {
 
         resValue("string", "app_name", "KIERO")
 
-        // KAKAO_NATIVE_APP_KEY
+        // 구글 비공개 테스트 심사자용 우회 로그인 비밀번호: buildType/flavor 상관없이 전부 동일하게 노출
         buildConfigField(
             "String",
-            "KAKAO_NATIVE_APP_KEY",
-            "\"${properties["kakao.native.app.key"]}\"" // 명시적으로 따옴표 추가
+            "REVIEWER_BYPASS_PASSWORD",
+            properties.getProperty("reviewer.bypass.password", "\"\"").toString()
         )
 
-        // manifestPlaceholders for AndroidManifest
-        manifestPlaceholders["NATIVE_APP_KEY"] = properties["kakao.native.app.key"].toString()
-
-        // Todo : (Issue) LocalProperties의 "" 유무 및 일관성
-        //buildConfigField("String", "KAKAO_NATIVE_KEY", properties["kakao.native.app.key"].toString())
-        // manifestPlaceholders["NATIVE_APP_KEY"] = properties["kakao.native.app.key"].toString().replace("\"", "")
-
+        // KAKAO_NATIVE_APP_KEY: 카카오는 네이티브 앱 키 1개당 Android 패키지명 1개만 등록 가능하므로
+        // parent/child productFlavors에서 각자의 키로 설정한다 (아래 productFlavors 참고)
     }
     buildTypes {
         getByName("release") {
-            // Todo: local properties로 키 옮기기 (release keystore 적용 시 함께 처리)
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
 
-            // Todo: isMinifyEnabled = true로 바꿀 때 추가
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -113,12 +117,26 @@ android {
             dimension = "version"
             applicationIdSuffix = ".parent"
             resValue("string", "launcher_name", "kiero-parent")
+
+            buildConfigField(
+                "String",
+                "KAKAO_NATIVE_APP_KEY",
+                "\"${properties["kakao.native.app.key.parent"]}\""
+            )
+            manifestPlaceholders["NATIVE_APP_KEY"] = properties["kakao.native.app.key.parent"].toString()
         }
 
         create("child") {
             dimension = "version"
             applicationIdSuffix = ".child"
             resValue("string", "launcher_name", "kiero-child")
+
+            buildConfigField(
+                "String",
+                "KAKAO_NATIVE_APP_KEY",
+                "\"${properties["kakao.native.app.key.child"]}\""
+            )
+            manifestPlaceholders["NATIVE_APP_KEY"] = properties["kakao.native.app.key.child"].toString()
         }
 
         create("dev") {

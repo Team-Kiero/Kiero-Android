@@ -5,13 +5,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
-import com.kiero.core.analytic.tracker.Tracker
 import com.kiero.core.analytic.event.FamilyConnectionId
 import com.kiero.core.analytic.event.LoginMethod
 import com.kiero.core.analytic.event.UserRole
+import com.kiero.core.analytic.tracker.Tracker
 import com.kiero.core.common.extension.toHandleErrorMessage
 import com.kiero.core.localstorage.info.UserInfoManager
 import com.kiero.core.model.UiState
+import com.kiero.data.auth.model.AuthLoginModel
 import com.kiero.data.auth.repository.AuthRepository
 import com.kiero.data.fcm.repository.FcmRepository
 import com.kiero.data.terms.repository.TermsRepository
@@ -55,30 +56,8 @@ class AuthParentViewModel @Inject constructor(
 
         authRepository.loginWithKakao(context)
             .onSuccess { result ->
-                handleKakaoLoginResultUseCase(
-                    name = result.name,
-                    image = result.image
-                ).onSuccess { domainResult: KakaoLoginResult ->
-                    tracker.setUserId("parent_${result.id}")
-                    tracker.setUserProperty(UserRole.PARENT)
-                    tracker.setUserProperty(LoginMethod.KAKAO)
-
-                    when (domainResult) {
-                        is KakaoLoginResult.NeedTermsAgreement -> showTermsAgreement()
-                        is KakaoLoginResult.HasChildren -> {
-                            tracker.setUserProperty(FamilyConnectionId(domainResult.connectionId))
-                            syncFcmToken()
-                            _sideEffect.emit(AuthSideEffect.NavigateToParentGraph)
-                        }
-                        is KakaoLoginResult.NoChildren -> {
-                            syncFcmToken()
-                            _sideEffect.emit(AuthSideEffect.NavigateToParentSignUp)
-                        }
-                    }
-                }.onFailure { throwable ->
-                    Timber.e(throwable)
-                    handleError(throwable)
-                }
+                tracker.setUserProperty(LoginMethod.KAKAO)
+                handleLoginResult(result)
             }
             .onFailure { throwable ->
                 Timber.e(throwable)
@@ -88,6 +67,46 @@ class AuthParentViewModel @Inject constructor(
                 }
                 handleError(throwable)
             }
+    }
+
+    fun reviewerLogin(password: String) = viewModelScope.launch {
+        _state.update { it.copy(uiState = UiState.Loading) }
+
+        authRepository.postReviewerLogin(password)
+            .onSuccess { result ->
+                handleLoginResult(result)
+            }
+            .onFailure { throwable ->
+                Timber.e(throwable)
+                handleError(message = "비밀번호가 올바르지 않아요")
+            }
+    }
+
+    // 카카오 로그인/심사자 우회 로그인 공통 후처리: 약관 동의 여부, 자녀 연결 여부에 따라 화면을 분기한다
+    private suspend fun handleLoginResult(result: AuthLoginModel) {
+        handleKakaoLoginResultUseCase(
+            name = result.name,
+            image = result.image
+        ).onSuccess { domainResult: KakaoLoginResult ->
+            tracker.setUserId("parent_${result.id}")
+            tracker.setUserProperty(UserRole.PARENT)
+
+            when (domainResult) {
+                is KakaoLoginResult.NeedTermsAgreement -> showTermsAgreement()
+                is KakaoLoginResult.HasChildren -> {
+                    tracker.setUserProperty(FamilyConnectionId(domainResult.connectionId))
+                    syncFcmToken()
+                    _sideEffect.emit(AuthSideEffect.NavigateToParentGraph)
+                }
+                is KakaoLoginResult.NoChildren -> {
+                    syncFcmToken()
+                    _sideEffect.emit(AuthSideEffect.NavigateToParentSignUp)
+                }
+            }
+        }.onFailure { throwable ->
+            Timber.e(throwable)
+            handleError(throwable)
+        }
     }
 
     fun navigateUp() {

@@ -328,7 +328,7 @@ private fun KidJourneyScreen(
             type = KieroAnimationType.Image(R.drawable.webp_kid_intro),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 250.dp, start = 8.dp, end = 8.dp, bottom = 150.dp)
+                .padding(top = 235.dp, start = 8.dp, end = 8.dp, bottom = 135.dp)
         )
     }
 

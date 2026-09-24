@@ -4,6 +4,7 @@ import android.content.Context
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kiero.core.network.model.BaseResponse
 import com.kiero.data.auth.remote.dto.request.kid.AuthKidRequestDto
+import com.kiero.data.auth.remote.dto.request.reviewer.AuthReviewerRequestDto
 import com.kiero.data.auth.remote.dto.response.AuthKidResponseDto
 import com.kiero.data.auth.remote.dto.response.AuthLoginResponseDto
 import com.kiero.data.auth.remote.dto.response.ChildrenResponseDto
@@ -20,4 +21,8 @@ interface AuthDataSource {
     suspend fun postAuthKidLogin(
         authKidRequestDto: AuthKidRequestDto
     ): BaseResponse<AuthKidResponseDto>
+
+    suspend fun postReviewerLogin(
+        reviewerRequestDto: AuthReviewerRequestDto
+    ): BaseResponse<AuthLoginResponseDto>
 }

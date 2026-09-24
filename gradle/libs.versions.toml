@@ -57,7 +57,7 @@ material = "1.13.0"
 timber = "5.0.1"
 
 #Kakao SDK
-kakao = "2.20.6"
+kakao = "2.25.0"
 
 #Lottie
 lottie = "6.7.1"

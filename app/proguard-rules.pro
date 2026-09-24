@@ -21,24 +21,15 @@
 #-renamesourcefileattribute SourceFile
 
 # 카카오 SDK의 모델 클래스는 JSON 변환에 사용되므로 난독화하지 않음
--keep class com.kakao.sdk.**.model.* { <fields>; }
+# (com.kakao.sdk 2.20.6은 model 패키지에 대한 consumer rule을 제공하지 않아 직접 유지 필요.
+#  앱에서 실제로 쓰는 auth/common 패키지로 범위를 좁힘)
+-keep class com.kakao.sdk.auth.model.* { <fields>; }
+-keep class com.kakao.sdk.common.model.* { <fields>; }
 
 # OkHttp 관련 선택적 보안 라이브러리 경고 무시
 -dontwarn org.bouncycastle.jsse.**
 -dontwarn org.conscrypt.*
 -dontwarn org.openjsse.**
 
-# Retrofit2 (with r8 full mode)
-# Retrofit API 인터페이스 보존 (어노테이션 기반이므로 필수)
--if interface * { @retrofit2.http.* <methods>; }
--keep,allowobfuscation interface <1>
-
-# 코루틴 Continuation 클래스 보존 (suspend 함수 지원용)
--keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
-
-# Retrofit 메서드의 반환 타입 보존
--if interface * { @retrofit2.http.* public *** *(...); }
--keep,allowoptimization,allowshrinking,allowobfuscation class <3>
-
-# Retrofit Response 클래스 보존
--keep,allowobfuscation,allowshrinking class retrofit2.Response
+# Retrofit2, 코루틴 Continuation 관련 rule은 Retrofit 3.0.0의
+# META-INF/proguard/retrofit2.pro에 동일하게 번들되어 있어 제거함

@@ -2,6 +2,7 @@ package com.kiero.data.auth.remote.api
 
 import com.kiero.core.network.model.BaseResponse
 import com.kiero.data.auth.remote.dto.request.kid.AuthKidRequestDto
+import com.kiero.data.auth.remote.dto.request.reviewer.AuthReviewerRequestDto
 import com.kiero.data.auth.remote.dto.response.AuthKidResponseDto
 import com.kiero.data.auth.remote.dto.response.AuthLoginResponseDto
 import retrofit2.http.Body
@@ -20,4 +21,12 @@ interface AuthService {
     suspend fun postAuthKidLogin(
         @Body body: AuthKidRequestDto
     ): BaseResponse<AuthKidResponseDto>
+
+    /**
+     * 구글 리뷰어 로그인용
+     * */
+    @POST("api/v1/parents/login/reviewer")
+    suspend fun postReviewerLogin(
+        @Body body: AuthReviewerRequestDto
+    ): BaseResponse<AuthLoginResponseDto>
 }
