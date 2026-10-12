@@ -116,7 +116,7 @@ android {
         create("parent") {
             dimension = "version"
             applicationIdSuffix = ".parent"
-            resValue("string", "launcher_name", "kiero-parent")
+            resValue("string", "launcher_name", "KIERO")
 
             buildConfigField(
                 "String",
