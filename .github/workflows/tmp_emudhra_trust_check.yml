@@ -1,0 +1,42 @@
+name: TMP eMudhra trust check
+
+# 임시 워크플로: 확인 후 삭제. 배포(deploy_firebase.yml)와 무관하며 시크릿을 사용하지 않는다.
+on:
+  push:
+    branches: [ 'chore/#208-firebase-renovate-issue' ]
+    paths:
+      - '.github/workflows/tmp_emudhra_trust_check.yml'
+      - '.github/scripts/emudhra_trust_check.rb'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+
+      - name: curl
+        continue-on-error: true
+        run: |
+          for u in https://dv-g3b-emudhra.we-have-a-problem.com/ https://dv-g3b-noct-emudhra.we-have-a-problem.com/; do
+            if curl -sS -I --max-time 15 "$u" >/dev/null 2>&1; then echo "[TRUSTS]   curl $u"; else echo "[rejected] curl $u"; fi
+          done
+          curl --version | head -1
+
+      - name: Ruby clients (net/http, excon, httpclient)
+        continue-on-error: true
+        run: bundle exec ruby .github/scripts/emudhra_trust_check.rb
+
+      - name: CA package version
+        continue-on-error: true
+        run: dpkg -l ca-certificates | tail -1
