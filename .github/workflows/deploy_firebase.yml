@@ -44,6 +44,12 @@ jobs:
         env:
           LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
         run: |
+          # 빌드 실패 시 로그에 값이 평문으로 찍히지 않도록 각 값을 개별 마스킹
+          while IFS= read -r line; do
+            case "$line" in ''|'#'*) continue ;; esac
+            value="${line#*=}"
+            if [ -n "$value" ]; then echo "::add-mask::$value"; fi
+          done <<< "$LOCAL_PROPERTIES"
           printf "%s\n" "$LOCAL_PROPERTIES" > local.properties
           echo "sdk.dir=$ANDROID_HOME" >> local.properties
 
