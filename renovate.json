@@ -68,13 +68,12 @@
       "groupName": "Android Gradle Plugin"
     },
     {
-      "description": "Ruby와 Fastlane은 CI 파이프라인에서 사용되며, 버전 변경 시 Gemfile.lock과의 충돌 또는 CI 스크립트 오류를 유발할 수 있음. postUpdateOptions의 bundler로 관리하므로 Renovate 자동 업데이트에서 제외.",
+      "description": "Ruby와 Fastlane은 CI 파이프라인에서 사용되며, 버전 변경 시 Gemfile.lock과의 충돌 또는 CI 스크립트 오류를 유발할 수 있음. Renovate 자동 업데이트에서 제외.",
       "enabled": false,
       "matchPackageNames": [
         "/^ruby/",
         "/^fastlane/"
       ]
     }
-  ],
-  "postUpdateOptions": ["bundler"]
+  ]
 }

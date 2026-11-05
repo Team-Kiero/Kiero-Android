@@ -31,13 +31,9 @@ jobs:
           mkdir -p /home/runner/.android
           echo "${{ secrets.DEBUG_KEYSTORE }}" | base64 --decode > /home/runner/.android/debug.keystore    
 
-      # 빌드를 위해 gradle에 선언된 키들을 설정
-      - name: Create local.properties from secret
-        env:
-          LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
-        run: |
-          printf "%s" "$LOCAL_PROPERTIES" > local.properties 
-          echo "sdk.dir=$ANDROID_HOME" >> local.properties      
+      # PR 체크는 컴파일 검증이 목적이므로 실제 값 없이 sdk.dir만 가진 local.properties를 사용
+      - name: Create local.properties
+        run: echo "sdk.dir=$ANDROID_HOME" > local.properties
 
       - name: Grant permission to gradlew
         run: chmod +x ./gradlew
